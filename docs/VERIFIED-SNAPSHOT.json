@@ -1,0 +1,71 @@
+{
+  "releaseId": "fb7e27f1a9d1ce111674",
+  "totalRecords": 316717,
+  "sources": [
+    {
+      "id": "aer-abandoned-wells",
+      "province": "AB",
+      "count": 238158,
+      "sourceCount": 238158,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T04:41:41Z",
+      "upstreamModifiedAt": "Thu, 30 Jan 2025 12:02:17 GMT",
+      "sourceDateText": null,
+      "publication": "noncommercial",
+      "licenceUrl": "https://www.aer.ca/copyright-and-disclaimer",
+      "indexSha256": "0bc55b2a157b14cacba305c44dba9a92ca95eb7b5a7320a9e784effff5cd5b25"
+    },
+    {
+      "id": "on-petroleum-wells",
+      "province": "ON",
+      "count": 27639,
+      "sourceCount": 27639,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T04:42:45Z",
+      "upstreamModifiedAt": null,
+      "sourceDateText": null,
+      "publication": "open",
+      "licenceUrl": "https://www.ontario.ca/page/open-government-licence-ontario",
+      "indexSha256": "a34ec4196523bbb498f49c58c2841ada4a51e014ab602650a63402ea9a9eb785"
+    },
+    {
+      "id": "bcer-surface-wells",
+      "province": "BC",
+      "count": 34425,
+      "sourceCount": 34425,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T04:43:49Z",
+      "upstreamModifiedAt": null,
+      "sourceDateText": null,
+      "publication": "open",
+      "licenceUrl": "https://www.bc-er.ca/files/gis/BCER-Open-Data-Licence.pdf",
+      "indexSha256": "536b4a22a18a5ee277711cdb76c982228437414da46a44d1852465ba0d42e8ff"
+    },
+    {
+      "id": "sk-orphan-wells",
+      "province": "SK",
+      "count": 4340,
+      "sourceCount": 4340,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T04:43:58Z",
+      "upstreamModifiedAt": null,
+      "sourceDateText": "10/02/2026 00:00",
+      "publication": "open",
+      "licenceUrl": "https://gisappl.saskatchewan.ca/Html5Ext/Resources/GOS_Standard_Unrestricted_Use_Data_Licence_v2.0.pdf",
+      "indexSha256": "65bfef81b4afe2837f6ddc8a38410b1667f2818e4c0687ffa27889f0cc3e3808"
+    },
+    {
+      "id": "mb-petroleum-wells",
+      "province": "MB",
+      "count": 12155,
+      "sourceCount": 12155,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T04:45:37Z",
+      "upstreamModifiedAt": "Thu, 27 Aug 2026 16:10:12 GMT",
+      "sourceDateText": null,
+      "publication": "open",
+      "licenceUrl": "https://www.gov.mb.ca/asset_library/en/legal/OpenMB-Information-Data-Use-Licence.pdf",
+      "indexSha256": "d1cf68d7c7192c205f784bf5d6be4a42c0c14df312d74361fcf90d46e7651909"
+    }
+  ]
+}

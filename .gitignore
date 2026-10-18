@@ -1,0 +1,15 @@
+.DS_Store
+node_modules/
+.venv/
+__pycache__/
+dist/
+.data-cache/
+data/releases/
+data/catalog.json
+data/refresh-report.json
+data/wells.json
+data/well-sources.json
+*.zip
+.env
+.env.*
+data/source-monitor.json

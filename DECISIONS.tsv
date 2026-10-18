@@ -1,0 +1,7 @@
+ts	phase	decision	why	evidence	result
+2026-10-18T04:45:06.615816+00:00	architecture	Use immutable static releases and lazy detailed records	Public browsing needs no visitor identity or server-side query storage	../../work/production/architecture.md	implemented
+2026-10-18T04:45:06.615962+00:00	rights	Gate public launch on source permissions and national coverage	Queryable records are not necessarily licensed for redistribution	config/research-source-registry.json	public launch blocked
+2026-10-18T04:45:06.615965+00:00	data	Replace sampled Alberta acquisition with full published file	Source enumeration must match all238158records	../../work/production/refresh.log	verified source count
+2026-10-18T04:45:06.615966+00:00	identity	Use Ontario OGF_ID rather than WELL_ID	Full extraction found duplicate zero WELL_ID values	pipeline/refresh.py	27639unique source records
+2026-10-18T04:45:06.615968+00:00	review	Centralize selected-record load and failure recovery	Saved views and race failures need the same loading path	app.js	repaired
+2026-10-18T04:45:06.615969+00:00	updates	Restore the previous successful artifact before both workflows	Count-drop and publication-hash comparisons need persisted baselines	.github/workflows/refresh.yml	configured

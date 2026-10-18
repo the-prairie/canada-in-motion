@@ -1,0 +1,13 @@
+{
+  "purpose": "noncommercial",
+  "owner": "the-prairie",
+  "repository": "canada-in-motion",
+  "publicLaunchEnabled": false,
+  "requireNationalCompleteness": true,
+  "requiredProvinces": ["AB", "BC", "SK", "MB", "ON", "QC", "NB", "NS", "PE", "NL"],
+  "requiredTopics": ["well-inventory", "orphan-status", "abandonment-status", "infrastructure", "carrier-rates", "government-charges"],
+  "refreshSchedule": "17 10 * * *",
+  "refreshScheduleDescription": "Daily at 10:17 UTC, 04:17 MDT or 03:17 MST in Edmonton.",
+  "maxCountDecreaseFraction": 0.05,
+  "staleAfterDays": 8
+}

@@ -1,0 +1,983 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-17",
+  "nationalComplete": false,
+  "provinces": [
+    {
+      "code": "AB",
+      "name": "Alberta",
+      "jurisdictionType": "province",
+      "topics": {
+        "well-inventory": {
+          "status": "partial",
+          "sourceIds": [
+            "aer-abandoned-wells"
+          ],
+          "evidenceUrl": "https://www.aer.ca/data/wells/ABNDWells_SHP.zip",
+          "note": "Complete abandoned-well layer available; all-well inventory and orphan authority need separate feeds."
+        },
+        "orphan-status": {
+          "status": "partial",
+          "sourceIds": [
+            "aer-abandoned-wells"
+          ],
+          "evidenceUrl": "https://www.aer.ca/data/wells/ABNDWells_SHP.zip",
+          "note": "Complete national coverage has not been established."
+        },
+        "abandonment-status": {
+          "status": "partial",
+          "sourceIds": [
+            "aer-abandoned-wells"
+          ],
+          "evidenceUrl": "https://www.aer.ca/data/wells/ABNDWells_SHP.zip",
+          "note": "Complete national coverage has not been established."
+        },
+        "infrastructure": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": null,
+          "note": "Complete national coverage has not been established."
+        },
+        "carrier-rates": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": null,
+          "note": "Complete national coverage has not been established."
+        },
+        "government-charges": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": null,
+          "note": "Complete national coverage has not been established."
+        }
+      }
+    },
+    {
+      "code": "BC",
+      "name": "British Columbia",
+      "jurisdictionType": "province",
+      "topics": {
+        "well-inventory": {
+          "status": "partial",
+          "sourceIds": [
+            "bcer-surface-wells"
+          ],
+          "evidenceUrl": "https://geoweb-ags.bc-er.ca/arcgis/rest/services/OPERATIONAL/DMS_DORMANT_WELLS/FeatureServer/3",
+          "note": "Published surface-location authorizations, including cancelled and undrilled records. Orphan membership is joined separately."
+        },
+        "orphan-status": {
+          "status": "partial",
+          "sourceIds": [
+            "bcer-surface-wells"
+          ],
+          "evidenceUrl": "https://geoweb-ags.bc-er.ca/arcgis/rest/services/OPERATIONAL/DMS_DORMANT_WELLS/FeatureServer/3",
+          "note": "Complete national coverage has not been established."
+        },
+        "abandonment-status": {
+          "status": "partial",
+          "sourceIds": [
+            "bcer-surface-wells"
+          ],
+          "evidenceUrl": "https://geoweb-ags.bc-er.ca/arcgis/rest/services/OPERATIONAL/DMS_DORMANT_WELLS/FeatureServer/3",
+          "note": "Complete national coverage has not been established."
+        },
+        "infrastructure": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": null,
+          "note": "Complete national coverage has not been established."
+        },
+        "carrier-rates": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": null,
+          "note": "Complete national coverage has not been established."
+        },
+        "government-charges": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": null,
+          "note": "Complete national coverage has not been established."
+        }
+      }
+    },
+    {
+      "code": "SK",
+      "name": "Saskatchewan",
+      "jurisdictionType": "province",
+      "topics": {
+        "well-inventory": {
+          "status": "partial",
+          "sourceIds": [
+            "sk-orphan-wells"
+          ],
+          "evidenceUrl": "https://gis.saskatchewan.ca/egis/rest/services/economy/Petroleum/MapServer/18",
+          "note": "Orphan-designation inventory only. Vertical and nonvertical general well layers remain to integrate."
+        },
+        "orphan-status": {
+          "status": "partial",
+          "sourceIds": [
+            "sk-orphan-wells"
+          ],
+          "evidenceUrl": "https://gis.saskatchewan.ca/egis/rest/services/economy/Petroleum/MapServer/18",
+          "note": "Complete national coverage has not been established."
+        },
+        "abandonment-status": {
+          "status": "partial",
+          "sourceIds": [
+            "sk-orphan-wells"
+          ],
+          "evidenceUrl": "https://gis.saskatchewan.ca/egis/rest/services/economy/Petroleum/MapServer/18",
+          "note": "Complete national coverage has not been established."
+        },
+        "infrastructure": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": null,
+          "note": "Complete national coverage has not been established."
+        },
+        "carrier-rates": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": null,
+          "note": "Complete national coverage has not been established."
+        },
+        "government-charges": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": null,
+          "note": "Complete national coverage has not been established."
+        }
+      }
+    },
+    {
+      "code": "MB",
+      "name": "Manitoba",
+      "jurisdictionType": "province",
+      "topics": {
+        "well-inventory": {
+          "status": "partial",
+          "sourceIds": [
+            "mb-petroleum-wells"
+          ],
+          "evidenceUrl": "https://www.gov.mb.ca/iem/petroleum/gis/wells.zip",
+          "note": "Published petroleum well file. Orphan designation absent."
+        },
+        "orphan-status": {
+          "status": "partial",
+          "sourceIds": [
+            "mb-petroleum-wells"
+          ],
+          "evidenceUrl": "https://www.gov.mb.ca/iem/petroleum/gis/wells.zip",
+          "note": "Complete national coverage has not been established."
+        },
+        "abandonment-status": {
+          "status": "partial",
+          "sourceIds": [
+            "mb-petroleum-wells"
+          ],
+          "evidenceUrl": "https://www.gov.mb.ca/iem/petroleum/gis/wells.zip",
+          "note": "Complete national coverage has not been established."
+        },
+        "infrastructure": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": null,
+          "note": "Complete national coverage has not been established."
+        },
+        "carrier-rates": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": null,
+          "note": "Complete national coverage has not been established."
+        },
+        "government-charges": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": null,
+          "note": "Complete national coverage has not been established."
+        }
+      }
+    },
+    {
+      "code": "ON",
+      "name": "Ontario",
+      "jurisdictionType": "province",
+      "topics": {
+        "well-inventory": {
+          "status": "partial",
+          "sourceIds": [
+            "on-petroleum-wells"
+          ],
+          "evidenceUrl": "https://ws.lioservices.lrc.gov.on.ca/arcgis2/rest/services/LIO_OPEN_DATA/LIO_Open08/MapServer/22",
+          "note": "Public petroleum records include potential, not-drilled and unlocated entries. Orphan designation not supplied."
+        },
+        "orphan-status": {
+          "status": "partial",
+          "sourceIds": [
+            "on-petroleum-wells"
+          ],
+          "evidenceUrl": "https://ws.lioservices.lrc.gov.on.ca/arcgis2/rest/services/LIO_OPEN_DATA/LIO_Open08/MapServer/22",
+          "note": "Complete national coverage has not been established."
+        },
+        "abandonment-status": {
+          "status": "partial",
+          "sourceIds": [
+            "on-petroleum-wells"
+          ],
+          "evidenceUrl": "https://ws.lioservices.lrc.gov.on.ca/arcgis2/rest/services/LIO_OPEN_DATA/LIO_Open08/MapServer/22",
+          "note": "Complete national coverage has not been established."
+        },
+        "infrastructure": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": null,
+          "note": "Complete national coverage has not been established."
+        },
+        "carrier-rates": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": null,
+          "note": "Complete national coverage has not been established."
+        },
+        "government-charges": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": null,
+          "note": "Complete national coverage has not been established."
+        }
+      }
+    },
+    {
+      "code": "QC",
+      "name": "Québec",
+      "jurisdictionType": "province",
+      "topics": {
+        "well-inventory": {
+          "status": "permission-required",
+          "sourceIds": [],
+          "evidenceUrl": "https://sigpeg.mrn.gouv.qc.ca/gpg/hydrocarbures/Licence_utilisation.pdf",
+          "note": "SIGPEG end-user licence requires written permission for third-party redistribution."
+        },
+        "orphan-status": {
+          "status": "permission-required",
+          "sourceIds": [],
+          "evidenceUrl": "https://sigpeg.mrn.gouv.qc.ca/gpg/hydrocarbures/Licence_utilisation.pdf",
+          "note": "Complete national coverage has not been established."
+        },
+        "abandonment-status": {
+          "status": "permission-required",
+          "sourceIds": [],
+          "evidenceUrl": "https://sigpeg.mrn.gouv.qc.ca/gpg/hydrocarbures/Licence_utilisation.pdf",
+          "note": "Complete national coverage has not been established."
+        },
+        "infrastructure": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://sigpeg.mrn.gouv.qc.ca/gpg/hydrocarbures/Licence_utilisation.pdf",
+          "note": "Complete national coverage has not been established."
+        },
+        "carrier-rates": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://sigpeg.mrn.gouv.qc.ca/gpg/hydrocarbures/Licence_utilisation.pdf",
+          "note": "Complete national coverage has not been established."
+        },
+        "government-charges": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://sigpeg.mrn.gouv.qc.ca/gpg/hydrocarbures/Licence_utilisation.pdf",
+          "note": "Complete national coverage has not been established."
+        }
+      }
+    },
+    {
+      "code": "NB",
+      "name": "New Brunswick",
+      "jurisdictionType": "province",
+      "topics": {
+        "well-inventory": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://www2.gnb.ca/content/gnb/en/departments/erd/energy/content/minerals/content/GeoNB.html",
+          "note": "Complete national coverage has not been established."
+        },
+        "orphan-status": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://www2.gnb.ca/content/gnb/en/departments/erd/energy/content/minerals/content/GeoNB.html",
+          "note": "Complete national coverage has not been established."
+        },
+        "abandonment-status": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://www2.gnb.ca/content/gnb/en/departments/erd/energy/content/minerals/content/GeoNB.html",
+          "note": "Complete national coverage has not been established."
+        },
+        "infrastructure": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://www2.gnb.ca/content/gnb/en/departments/erd/energy/content/minerals/content/GeoNB.html",
+          "note": "Complete national coverage has not been established."
+        },
+        "carrier-rates": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://www2.gnb.ca/content/gnb/en/departments/erd/energy/content/minerals/content/GeoNB.html",
+          "note": "Complete national coverage has not been established."
+        },
+        "government-charges": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://www2.gnb.ca/content/gnb/en/departments/erd/energy/content/minerals/content/GeoNB.html",
+          "note": "Complete national coverage has not been established."
+        }
+      }
+    },
+    {
+      "code": "NS",
+      "name": "Nova Scotia",
+      "jurisdictionType": "province",
+      "topics": {
+        "well-inventory": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://data.novascotia.ca/api/views/5q4c-27fh.json",
+          "note": "Complete national coverage has not been established."
+        },
+        "orphan-status": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://data.novascotia.ca/api/views/5q4c-27fh.json",
+          "note": "Complete national coverage has not been established."
+        },
+        "abandonment-status": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://data.novascotia.ca/api/views/5q4c-27fh.json",
+          "note": "Complete national coverage has not been established."
+        },
+        "infrastructure": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://data.novascotia.ca/api/views/5q4c-27fh.json",
+          "note": "Complete national coverage has not been established."
+        },
+        "carrier-rates": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://data.novascotia.ca/api/views/5q4c-27fh.json",
+          "note": "Complete national coverage has not been established."
+        },
+        "government-charges": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://data.novascotia.ca/api/views/5q4c-27fh.json",
+          "note": "Complete national coverage has not been established."
+        }
+      }
+    },
+    {
+      "code": "PE",
+      "name": "Prince Edward Island",
+      "jurisdictionType": "province",
+      "topics": {
+        "well-inventory": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.princeedwardisland.ca/en/topic/energy",
+          "note": "Complete national coverage has not been established."
+        },
+        "orphan-status": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.princeedwardisland.ca/en/topic/energy",
+          "note": "Complete national coverage has not been established."
+        },
+        "abandonment-status": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.princeedwardisland.ca/en/topic/energy",
+          "note": "Complete national coverage has not been established."
+        },
+        "infrastructure": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.princeedwardisland.ca/en/topic/energy",
+          "note": "Complete national coverage has not been established."
+        },
+        "carrier-rates": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.princeedwardisland.ca/en/topic/energy",
+          "note": "Complete national coverage has not been established."
+        },
+        "government-charges": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.princeedwardisland.ca/en/topic/energy",
+          "note": "Complete national coverage has not been established."
+        }
+      }
+    },
+    {
+      "code": "NL",
+      "name": "Newfoundland and Labrador",
+      "jurisdictionType": "province",
+      "topics": {
+        "well-inventory": {
+          "status": "permission-required",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.gov.nl.ca/iet/energy/petroleum/onshore/",
+          "note": "Onshore digital distribution is restricted. Offshore needs separate authority and coverage."
+        },
+        "orphan-status": {
+          "status": "permission-required",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.gov.nl.ca/iet/energy/petroleum/onshore/",
+          "note": "Complete national coverage has not been established."
+        },
+        "abandonment-status": {
+          "status": "permission-required",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.gov.nl.ca/iet/energy/petroleum/onshore/",
+          "note": "Complete national coverage has not been established."
+        },
+        "infrastructure": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.gov.nl.ca/iet/energy/petroleum/onshore/",
+          "note": "Complete national coverage has not been established."
+        },
+        "carrier-rates": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.gov.nl.ca/iet/energy/petroleum/onshore/",
+          "note": "Complete national coverage has not been established."
+        },
+        "government-charges": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.gov.nl.ca/iet/energy/petroleum/onshore/",
+          "note": "Complete national coverage has not been established."
+        }
+      }
+    },
+    {
+      "code": "YT",
+      "name": "Yukon",
+      "jurisdictionType": "territory",
+      "topics": {
+        "well-inventory": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://yukon.ca/en/oil-and-gas",
+          "note": "Complete national coverage has not been established."
+        },
+        "orphan-status": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://yukon.ca/en/oil-and-gas",
+          "note": "Complete national coverage has not been established."
+        },
+        "abandonment-status": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://yukon.ca/en/oil-and-gas",
+          "note": "Complete national coverage has not been established."
+        },
+        "infrastructure": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://yukon.ca/en/oil-and-gas",
+          "note": "Complete national coverage has not been established."
+        },
+        "carrier-rates": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://yukon.ca/en/oil-and-gas",
+          "note": "Complete national coverage has not been established."
+        },
+        "government-charges": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://yukon.ca/en/oil-and-gas",
+          "note": "Complete national coverage has not been established."
+        }
+      }
+    },
+    {
+      "code": "NT",
+      "name": "Northwest Territories",
+      "jurisdictionType": "territory",
+      "topics": {
+        "well-inventory": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.orogo.gov.nt.ca",
+          "note": "Complete national coverage has not been established."
+        },
+        "orphan-status": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.orogo.gov.nt.ca",
+          "note": "Complete national coverage has not been established."
+        },
+        "abandonment-status": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.orogo.gov.nt.ca",
+          "note": "Complete national coverage has not been established."
+        },
+        "infrastructure": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.orogo.gov.nt.ca",
+          "note": "Complete national coverage has not been established."
+        },
+        "carrier-rates": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.orogo.gov.nt.ca",
+          "note": "Complete national coverage has not been established."
+        },
+        "government-charges": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.orogo.gov.nt.ca",
+          "note": "Complete national coverage has not been established."
+        }
+      }
+    },
+    {
+      "code": "NU",
+      "name": "Nunavut",
+      "jurisdictionType": "territory",
+      "topics": {
+        "well-inventory": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.cer-rec.gc.ca/en/about/north-offshore/",
+          "note": "Complete national coverage has not been established."
+        },
+        "orphan-status": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.cer-rec.gc.ca/en/about/north-offshore/",
+          "note": "Complete national coverage has not been established."
+        },
+        "abandonment-status": {
+          "status": "unavailable",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.cer-rec.gc.ca/en/about/north-offshore/",
+          "note": "Complete national coverage has not been established."
+        },
+        "infrastructure": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.cer-rec.gc.ca/en/about/north-offshore/",
+          "note": "Complete national coverage has not been established."
+        },
+        "carrier-rates": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.cer-rec.gc.ca/en/about/north-offshore/",
+          "note": "Complete national coverage has not been established."
+        },
+        "government-charges": {
+          "status": "partial",
+          "sourceIds": [],
+          "evidenceUrl": "https://www.cer-rec.gc.ca/en/about/north-offshore/",
+          "note": "Complete national coverage has not been established."
+        }
+      }
+    }
+  ],
+  "scope": "Energy infrastructure, petroleum well source records and published carrier charges. Source records are not necessarily unique drilled wells.",
+  "refresh": "Daily acquisition workflow configured. Public launch remains gated.",
+  "transportSources": [
+    {
+      "id": "cer-pipeline-map",
+      "name": "CER Interactive Pipeline Map",
+      "url": "https://www.cer-rec.gc.ca/en/safety-environment/industry-performance/interactive-pipeline/index.html",
+      "domain": "pipeline-geometry",
+      "checkedAt": "2026-10-17",
+      "status": "blocked-redistribution",
+      "license": {
+        "status": "restricted",
+        "evidence": "Pipeline map data may not be reproduced, published, distributed or transferred, in whole or part. The page separately identifies some other map information as OGL."
+      },
+      "update": "Unspecified",
+      "coverage": "Federal pipelines only. Approximate locations. Source says about90% of operating federal pipelines as of March2017.",
+      "adapter": "Link out only. Do not extract this geometry for a public app."
+    },
+    {
+      "id": "nacei-refineries",
+      "name": "Refineries - North American Cooperation on Energy Information",
+      "url": "https://open.canada.ca/data/en/dataset/57e7bc4c-680b-4640-9fa1-ded7ce186fab",
+      "domain": "facilities",
+      "checkedAt": "2026-10-17",
+      "status": "historical-only",
+      "license": {
+        "status": "open",
+        "name": "Open Government Licence - Canada",
+        "url": "https://open.canada.ca/en/open-government-licence-canada"
+      },
+      "update": "As needed according to catalogue. Actual records are historical.",
+      "coverage": "Canada filter returned 21 records; observed record Period=2016. Not current facility inventory.",
+      "adapter": {
+        "type": "arcgis-query",
+        "url": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/NACEI/energy_infrastructure_of_north_america_en/MapServer/10/query",
+        "parameters": {
+          "where": "Country = 'Canada'",
+          "outFields": "*",
+          "outSR": 4326,
+          "f": "geojson"
+        },
+        "catalogueApi": "https://open.canada.ca/data/api/action/package_show?id=57e7bc4c-680b-4640-9fa1-ded7ce186fab"
+      },
+      "catalogueModified": "2021-05-19T14:16:15.184849",
+      "sourcePeriod": "2016",
+      "observedCanadianRecords": 21,
+      "publicationGate": "Historical layer only; never label current or complete. Validate source period before accepting updates."
+    },
+    {
+      "id": "nacei-lng",
+      "name": "Liquefied Natural Gas Terminals - North American Cooperation on Energy Information",
+      "url": "https://open.canada.ca/data/en/dataset/e08eec16-7c7a-4253-9bee-ea640d400a54",
+      "domain": "facilities",
+      "checkedAt": "2026-10-17",
+      "status": "historical-only",
+      "license": {
+        "status": "open",
+        "name": "Open Government Licence - Canada",
+        "url": "https://open.canada.ca/en/open-government-licence-canada"
+      },
+      "update": "As needed according to catalogue. Actual records are historical.",
+      "coverage": "Canada filter returned 1 records; observed record Period=201707. Not current facility inventory.",
+      "adapter": {
+        "type": "arcgis-query",
+        "url": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/NACEI/energy_infrastructure_of_north_america_en/MapServer/5/query",
+        "parameters": {
+          "where": "Country = 'Canada'",
+          "outFields": "*",
+          "outSR": 4326,
+          "f": "geojson"
+        },
+        "catalogueApi": "https://open.canada.ca/data/api/action/package_show?id=e08eec16-7c7a-4253-9bee-ea640d400a54"
+      },
+      "catalogueModified": "2021-05-19T14:16:01.836996",
+      "sourcePeriod": "201707",
+      "observedCanadianRecords": 1,
+      "publicationGate": "Historical layer only; never label current or complete. Validate source period before accepting updates."
+    },
+    {
+      "id": "bcer-pipeline-segments",
+      "name": "BCER Oil and Gas Pipeline Segment Permits",
+      "url": "https://catalogue.data.gov.bc.ca/dataset/oil-and-gas-commission-pipeline-segment-permits",
+      "domain": "pipeline-geometry",
+      "checkedAt": "2026-10-17",
+      "status": "candidate",
+      "license": {
+        "status": "open",
+        "name": "Open Government Licence - British Columbia",
+        "evidence": "https://open.canada.ca/data/en/dataset/ecf567ea-4901-4f51-a5b0-35959ca96c47"
+      },
+      "update": "Nightly according to catalogue",
+      "coverage": "BC approved pipeline centreline records collected on or after2016-07-11. Permit geography does not prove operating status.",
+      "adapter": "WFS/BC Geographic Warehouse; inspect feature schema, dates and licence before import.",
+      "machineEndpoint": "https://openmaps.gov.bc.ca/geo/pub/WHSE_MINERAL_TENURE.OG_PIPELINE_SEGMENT_PERMIT_SP/ows"
+    },
+    {
+      "id": "nb-pipelines",
+      "name": "New Brunswick Pipelines",
+      "url": "https://gnb.socrata.com/datasets/ab8j-dc35",
+      "domain": "pipeline-geometry",
+      "checkedAt": "2026-10-17",
+      "status": "candidate",
+      "license": {
+        "status": "open",
+        "name": "Open Government Licence - New Brunswick",
+        "evidence": "https://open.canada.ca/data/en/dataset/4188dacc-07c5-f72c-cfb1-cd505fcd4eb4"
+      },
+      "update": "Not verified",
+      "coverage": "Approximate major transmission centrelines in New Brunswick only.",
+      "adapter": {
+        "type": "geojson",
+        "url": "https://gnb.socrata.com/api/geospatial/ab8j-dc35?method=export&format=GeoJSON"
+      },
+      "publicationGate": "Fetch, schema-check, record source vintage and retain attribution before importing."
+    },
+    {
+      "id": "aer-pipelines",
+      "name": "AER Enhanced Pipeline Graphics File",
+      "url": "https://www.aer.ca/data-and-performance-reports/activity-and-data/spatial-data",
+      "domain": "pipeline-geometry",
+      "checkedAt": "2026-10-17",
+      "status": "candidate-noncommercial",
+      "license": {
+        "status": "scope-review",
+        "evidence": "https://www1.aer.ca/ProductCatalogue/PIPE.html",
+        "note": "Catalogue prohibits unauthorized commercial exploitation. Parent separately verified attributed noncommercial reproduction for free public resource. Do not extend to commercial use."
+      },
+      "update": "Dataset layout says daily. General spatial page defaults monthly unless specified. Validate actual file dates.",
+      "coverage": "AER-approved oil and gas pipelines; excludes low-pressure distribution. Unmapped records are separate CSV.",
+      "adapter": "ZIP shapefile/CSV; preserve unmapped records, native status and source license.",
+      "schemaUrl": "https://static.aer.ca/prd/data/pipeline/EnhancedPipeline_Layout.pdf"
+    },
+    {
+      "id": "tm-current-tariffs",
+      "name": "Trans Mountain current tolls and tariffs",
+      "url": "https://www.transmountain.com/tolls-tariffs",
+      "domain": "carrier-tariffs",
+      "checkedAt": "2026-10-17",
+      "status": "monitor-candidate",
+      "license": {
+        "status": "not-open-licensed",
+        "note": "Public tariff reference. Link to documents; no blanket permission to republish carrier PDF assets established."
+      },
+      "update": "Monitor daily for changes; source release cadence not promised.",
+      "coverage": "Current index lists Interim123 effective2026-05-01 and Rules122 effective2026-02-01. AB/BC system.",
+      "adapter": "Monitor HTML headings and linkedPDF hashes. Parse only under an independently verified schema.",
+      "currentSchedule": "https://docs.transmountain.com/Tolls-and-Tariffs/Interim-Tariff-No.-123.pdf",
+      "effectiveFrom": "2026-05-01",
+      "effectiveTo": null,
+      "publicationGate": "Resolve later filings and settlement effects; unknown end date is not perpetual validity.",
+      "regulatorUrl": "https://www.rec-cer.gc.ca/en/applications-hearings/view-applications-projects/trans-mountain-application-interim-tolls/"
+    },
+    {
+      "id": "enbridge-canadian-mainline",
+      "name": "Enbridge Canadian Mainline current tariffs",
+      "url": "https://www.enbridge.com/Projects-and-Infrastructure/For-Shippers/Tariffs/Enbridge-Mainline-GP-Inc-Enbridge-Canadian-Mainline-LP-Canadian-Mainline-Tariffs",
+      "domain": "carrier-tariffs",
+      "checkedAt": "2026-10-17",
+      "status": "monitor-candidate",
+      "license": {
+        "status": "not-open-licensed",
+        "note": "Publicly posted regulatory tariff. No general redistribution grant verified."
+      },
+      "update": "Monitor daily, follow replacement/cancellation links.",
+      "coverage": "CER10 Canadian local movement; CER11 joint Canada/US movement. Origin,destination,commodity,service and additionalcharges determine applicability.",
+      "adapter": "HTML change monitor plus PDF hash. Human-verified extraction; compare against filed tariff.",
+      "effectiveFrom": "2026-10-01",
+      "effectiveTo": null,
+      "documents": [
+        {
+          "id": "CER10",
+          "url": "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDN-Mainline-CER-CLT-Tariff-No-10-Posting.pdf",
+          "replaces": "CER4",
+          "kind": "Canadian local tolls"
+        },
+        {
+          "id": "CER11",
+          "url": "https://www.enbridge.com/~/media/Enb/Documents/Tariffs/2026/CDN-Mainline-CER-IJT-Tariff-No-11-Posting.pdf",
+          "replaces": "CER5",
+          "kind": "International joint rates"
+        }
+      ],
+      "publicationGate": "Do not mislabel Canadian local segment toll as a complete Edmonton-to-Sarnia rate. Receipt/delivery tankage and in-kind allowance may be additional."
+    },
+    {
+      "id": "tc-mainline-tariffs",
+      "name": "TC Energy Canadian Mainline tariffs",
+      "url": "https://www.tccustomerexpress.com/mainline.html",
+      "domain": "carrier-tariffs",
+      "checkedAt": "2026-10-17",
+      "status": "monitor-candidate",
+      "license": {
+        "status": "not-open-licensed",
+        "note": "Public carrier reference. CER-filed documents are authoritative if site differs."
+      },
+      "update": "Monitor daily; fuel ratios have seasonal versions.",
+      "coverage": "Fixed toll settlement through2026-12-31. Toll schedules, abandonment surcharges, rate riders and fuel ratios must be joined.",
+      "adapter": "Download linkedXLS with sheet/header contract and PDF cross-check. Hash tariff index changes. No automatic quote until applicability model verified.",
+      "tariffIndex": "https://www.tccustomerexpress.com/891.html",
+      "publicationGate": "Gas demand charges and fuel ratios cannot be treated as oil CAD/m3 volumetric rates."
+    },
+    {
+      "id": "canada-internal-trade",
+      "name": "Canada internal trade",
+      "url": "https://www.canada.ca/en/intergovernmental-affairs/services/internal-trade/federal-investments-internal-trade.html",
+      "domain": "government-charges",
+      "checkedAt": "2026-10-17",
+      "status": "reference",
+      "license": {
+        "status": "government-reference"
+      },
+      "update": "Monitor monthly",
+      "coverage": "Federal government explicitly states no tariffs on goods/services crossing internal borders. Permits, standards, prohibitions and administration can still add costs.",
+      "adapter": "Monitor pagehash; editorial review. Do not convert tariff-equivalent economic estimates into payable charges."
+    },
+    {
+      "id": "cra-freight-tax",
+      "name": "CRA GST/HST for freight carriers",
+      "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-specific-situations/freight-carriers.html",
+      "domain": "government-charges",
+      "checkedAt": "2026-10-17",
+      "status": "reference",
+      "license": {
+        "status": "government-reference"
+      },
+      "update": "Monitor daily with general rates table",
+      "coverage": "GST/HST for ordinary domestic freight generally depends on service destination. Continuous inbound/outbound and interlining exceptions may zero-rate.",
+      "adapter": "Dated tax rules table, with explicit service and exception predicates. Keep provincialtaxes/fees outside verifiedGST/HST scope.",
+      "ratesUrl": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate.html",
+      "publicationGate": "Tax is not an internal-border tariff. GST/HST is not a complete government-charge total."
+    },
+    {
+      "id": "cta-freight-pricing",
+      "name": "Canadian Transportation Agency freight rail pricing",
+      "url": "https://otc-cta.gc.ca/eng/publication/freight-rail-service-and-rates-a-guide?wbdisable=true",
+      "domain": "carrier-tariffs",
+      "checkedAt": "2026-10-17",
+      "status": "reference",
+      "license": {
+        "status": "government-reference"
+      },
+      "update": "Monitor monthly",
+      "coverage": "Public tariffs coexist with negotiated confidential contracts. Actual customer-specific transport prices cannot be reconstructed completely from public tariffs.",
+      "adapter": "Reference only. Show publictariff vs contractquote explicitly."
+    },
+    {
+      "id": "nrcan-lng-projects",
+      "name": "NRCan Canadian LNG projects",
+      "url": "https://natural-resources.canada.ca/energy-sources/fossil-fuels/canadian-liquified-natural-gas-projects?wbdisable=true",
+      "domain": "facilities",
+      "checkedAt": "2026-10-17",
+      "status": "needs-reconciliation",
+      "license": {
+        "status": "government-reference"
+      },
+      "update": "Monitor weekly, compare facility-leveloperator/regulator evidence",
+      "coverage": "National overview includes proposed projects and dated expectations. Current page still describes LNGCanada firstexports as future2025.",
+      "adapter": "Manual facility register with source-levelasOf, operating vs proposed and explicit commissioning evidence.",
+      "publicationGate": "Do not infer current operations from a recently crawled page with old content."
+    }
+  ],
+  "jurisdictionResearch": [
+    {
+      "code": "AB",
+      "name": "Alberta",
+      "sourceIds": [
+        "aer-abandoned-wells"
+      ],
+      "readiness": "parent-investigation",
+      "note": "Full-source ingestion and licence audit assigned to parent."
+    },
+    {
+      "code": "BC",
+      "name": "British Columbia",
+      "sourceIds": [
+        "bcer-surface-wells"
+      ],
+      "readiness": "published-surface-layer-available",
+      "note": "Orphan layer can be joined by normalized authority number; published authorization record inventory is not all physical sites."
+    },
+    {
+      "code": "SK",
+      "name": "Saskatchewan",
+      "sourceIds": [
+        "sk-orphan-wells",
+        "sk-vertical-wells",
+        "sk-nonvertical-wells"
+      ],
+      "readiness": "partial-ingestion-ready",
+      "note": "Orphan layer clear open licence; full layers need grain/union and dataset licence audit."
+    },
+    {
+      "code": "MB",
+      "name": "Manitoba",
+      "sourceIds": [
+        "mb-petroleum-wells"
+      ],
+      "readiness": "published-snapshot-available",
+      "note": "12155 download records; current official MapServer returned1 and isnot fullfeed."
+    },
+    {
+      "code": "ON",
+      "name": "Ontario",
+      "sourceIds": [
+        "on-petroleum-wells"
+      ],
+      "readiness": "published-record-layer-available",
+      "note": "27639 records includes unlocated/not-drilled/potential and non-oil/gas classes."
+    },
+    {
+      "code": "QC",
+      "name": "Québec",
+      "sourceIds": [
+        "qc-sigpeg-wells"
+      ],
+      "readiness": "public-redistribution-blocked",
+      "note": "907 queryable records but SIGPEG end-user terms require writtenpermission for publicinternet redistribution."
+    },
+    {
+      "code": "NB",
+      "name": "New Brunswick",
+      "sourceIds": [
+        "nb-ong-viewer",
+        "nb-borehole-database"
+      ],
+      "readiness": "coverage-and-licence-unresolved",
+      "note": "49 point viewer isnot completehistorical inventory; broaderborehole source notfullyextracted."
+    },
+    {
+      "code": "NS",
+      "name": "Nova Scotia",
+      "sourceIds": [
+        "ns-onshore-petroleum-wells",
+        "ns-historical-open-wells",
+        "ns-offshore-dmc"
+      ],
+      "readiness": "historical-open-current-terms-unresolved",
+      "note": "Current143onshore sourceavailable, explicitopenhistorical131source; offshoremissing."
+    },
+    {
+      "code": "PE",
+      "name": "Prince Edward Island",
+      "sourceIds": [
+        "pe-exploratory-2007"
+      ],
+      "readiness": "historical-pdf-current-feed-unresolved",
+      "note": "Historic2007PDF20entries includingre-entry/offshore; no currentcompletefeedverified."
+    },
+    {
+      "code": "NL",
+      "name": "Newfoundland and Labrador",
+      "sourceIds": [
+        "nl-onshore-data",
+        "nl-offshore-hub"
+      ],
+      "readiness": "onshore-redistribution-blocked-offshore-unresolved",
+      "note": "Onshoretermsprohibitthird-partycopies; offshorehubmustbeauditedseparately."
+    },
+    {
+      "code": "YT",
+      "name": "Yukon",
+      "sourceIds": [
+        "yt-oil-gas-wells"
+      ],
+      "readiness": "published-layer-available",
+      "note": "76publishedpoints underYukonOGL; approximate locations, noorphan/reclamationfields."
+    },
+    {
+      "code": "NT",
+      "name": "Northwest Territories",
+      "sourceIds": [
+        "nt-orogo-wells",
+        "cer-frontier-wells"
+      ],
+      "readiness": "multi-regulator-feed-unresolved",
+      "note": "685OROGOrecords excludeCERfederalareas; cannotclaimterritorycomplete."
+    },
+    {
+      "code": "NU",
+      "name": "Nunavut",
+      "sourceIds": [
+        "cer-frontier-wells"
+      ],
+      "readiness": "current-lifecycle-feed-unresolved",
+      "note": "CERofficialsourcesidentified; no verifiedcompletecurrentpointinventory ororphanregistry. Missingisnotzero."
+    }
+  ]
+}

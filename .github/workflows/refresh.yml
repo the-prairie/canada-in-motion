@@ -1,0 +1,86 @@
+name: Refresh verified data candidate
+on:
+  schedule:
+    - cron: '17 10 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: verified-data-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Install acquisition dependencies
+        run: python -m pip install --disable-pip-version-check -r pipeline/requirements.txt
+      - name: Run model and release safety tests
+        run: node --test tests/*.test.mjs
+      - name: Verify acquisition failure behavior
+        run: python -m unittest discover -s pipeline -p 'test_*.py'
+      - name: Find previous successful refresh baseline
+        id: baseline
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          previous=$(gh api "repos/${{ github.repository }}/actions/workflows/refresh.yml/runs?status=success&per_page=1" --jq '.workflow_runs[0].id // empty')
+          echo "run=$previous" >> "$GITHUB_OUTPUT"
+      - name: Restore previous source counts
+        if: steps.baseline.outputs.run != ''
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: source-baseline
+          path: data/
+          run-id: ${{ steps.baseline.outputs.run }}
+          github-token: ${{ github.token }}
+      - name: Acquire all enabled approved sources atomically
+        run: python pipeline/refresh.py
+      - name: Build private review candidate
+        run: node scripts/build-public.mjs
+      - name: Upload complete candidate
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: candidate-${{ github.run_id }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Preserve acquisition report on failure or success
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: refresh-report-${{ github.run_id }}
+          path: data/refresh-report.json
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Check transport publication changes without promoting prices
+        if: always()
+        run: python pipeline/monitor_sources.py
+        continue-on-error: true
+      - name: Preserve transport source health
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: source-health-${{ github.run_id }}
+          path: data/source-monitor.json
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Retain verified source counts for the next run
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: source-baseline
+          path: |
+            data/catalog.json
+            data/source-monitor.json
+          retention-days: 90
+          if-no-files-found: error

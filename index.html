@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#222923" />
+    <meta
+      name="description"
+      content="Explore Canadian energy corridors, published transport rates and provincial well records. Inspect sources and compare explicit scenarios."
+    />
+    <title>Canada in Motion — Energy atlas</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23222923'/%3E%3Cpath d='M9 28V12h8v16h7V12h7' fill='none' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="vendor/leaflet.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="vendor/leaflet.js" defer></script>
+    <script src="vendor/supercluster.js" defer></script>
+    <script type="module" src="app.js"></script>
+  </head>
+  <body data-surface="details">
+    <a class="skip-link" href="#panel">Skip to controls and records</a>
+    <div class="app-shell">
+      <header class="masthead">
+        <a class="brand" href="#" aria-label="Canada in Motion home">
+          <svg class="brand-symbol" viewBox="0 0 40 40" aria-hidden="true">
+            <path d="M8 28V12h8v16h8V12h8" />
+            <circle cx="8" cy="28" r="2" />
+            <circle cx="32" cy="12" r="2" />
+          </svg>
+          <span>Canada in Motion<small>ENERGY ATLAS</small></span>
+        </a>
+        <nav class="main-nav" aria-label="Explore the atlas">
+          <button data-view="journey" class="selected">Transport costs</button>
+          <button data-view="wells">Well records</button>
+          <button data-view="lab">Scenarios</button>
+        </nav>
+        <div class="header-actions">
+          <button class="quiet" data-action="evidence">Sources</button
+          ><button class="share-button" data-action="share">
+            Copy view link <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+      </header>
+      <div class="mobile-surface" role="group" aria-label="Workspace view">
+        <button data-surface="details" aria-pressed="true">Details</button
+        ><button data-surface="map" aria-pressed="false">Map</button>
+      </div>
+      <main class="workspace">
+        <aside
+          class="detail-panel"
+          id="panel"
+          tabindex="-1"
+          aria-label="Controls and results"
+        >
+          <div class="loading">
+            <h1>Loading the atlas</h1>
+            <p>Reading the verified data release…</p>
+          </div>
+        </aside>
+        <section class="map-space" aria-label="Interactive geographic atlas">
+          <div class="map-topbar">
+            <div>
+              <span class="eyebrow" id="map-eyebrow">CORRIDOR MAP</span>
+              <h2 id="map-title">Energy infrastructure</h2>
+            </div>
+            <span class="map-method" id="map-subtitle"
+              >Schematic connections</span
+            >
+          </div>
+          <div class="map-canvas">
+            <div
+              id="map"
+              aria-label="Interactive map. Use the route selector or well list for a keyboard alternative."
+            ></div>
+            <div class="map-toolbar">
+              <button data-action="extent" title="Show Canada and US">
+                Overview</button
+              ><button data-action="focus">Fit selection</button>
+              <details class="layers-control" id="layer-details">
+                <summary>Layers</summary>
+                <div id="layer-inputs"></div>
+              </details>
+            </div>
+            <div class="map-legend" id="map-legend"></div>
+            <div class="map-dock" id="map-dock"></div>
+          </div>
+          <div class="map-source">
+            <span id="map-source-label"
+              >Corridor lines are schematic, not pipeline alignments.</span
+            ><button data-action="evidence">Source notes</button>
+          </div>
+        </section>
+      </main>
+      <footer class="app-footer">
+        <button class="text-link" data-action="coverage" id="coverage-line">Loading coverage</button>
+        <div>
+          <span id="snapshot-label">Loading snapshots</span
+          ><button data-action="about">About</button>
+        </div>
+      </footer>
+    </div>
+    <dialog id="evidence-dialog" aria-labelledby="dialog-title">
+      <div class="dialog-header">
+        <h2 id="dialog-title">Sources and methods</h2>
+        <button
+          class="icon-button"
+          data-action="close-dialog"
+          aria-label="Close dialog"
+        >
+          ×
+        </button>
+      </div>
+      <div id="evidence-body"></div>
+    </dialog>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div
+      class="sr-only"
+      id="result-announcement"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+    <noscript
+      >This atlas needs JavaScript. Source snapshots are available in the data
+      folder.</noscript
+    >
+  </body>
+</html>

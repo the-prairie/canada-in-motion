@@ -1,0 +1,589 @@
+{
+  "schemaVersion": 1,
+  "researchedAt": "2026-10-18T04:39:36.396573+00:00",
+  "completeNationalInventory": false,
+  "countDefinition": "Counts are source records/features as observed, not necessarily unique drilled wells; never sum without grain and overlap audit.",
+  "sources": [
+    {
+      "id": "on-petroleum-wells",
+      "province": "ON",
+      "title": "Ontario petroleum well records",
+      "publisher": "Government of Ontario",
+      "url": "https://ws.lioservices.lrc.gov.on.ca/arcgis2/rest/services/LIO_OPEN_DATA/LIO_Open08/MapServer/22",
+      "objectIdField": "OBJECTID",
+      "countVerified": 27639,
+      "stableIdField": "OGF_ID",
+      "fields": {
+        "name": "WELL_NAME",
+        "license": "LICENCE_NUMBER",
+        "operator": "OPERATOR",
+        "wellType": "WELL_TYPE",
+        "status": "WELL_MODE",
+        "locationLabel": "TOWNSHIP"
+      },
+      "closureMapping": {
+        "Abandoned Well": "abandoned",
+        "Active Well": "active",
+        "Suspended Well": "suspended"
+      },
+      "unknownStatusValues": [
+        "Capped Well",
+        "No Well Found",
+        "Abandoned and Junked (Lost)",
+        "Potential",
+        "Not Drilled",
+        "Plugged back and whipstocked",
+        "Unknown"
+      ],
+      "dates": {
+        "abandoned": "PLUGGING_END_DATE"
+      },
+      "rawFields": [
+        "WELL_MODE",
+        "WELL_TYPE",
+        "LOCATION_ACCURACY",
+        "LOCATION_SOURCE",
+        "PLUGGING_END_DATE",
+        "EFFECTIVE_DATETIME",
+        "SYSTEM_DATETIME"
+      ],
+      "publication": "open-licence",
+      "licenceUrl": "https://www.ontario.ca/page/open-government-licence-ontario",
+      "licenceEvidence": "https://open.canada.ca/data/en/dataset/235fcd04-6632-4cce-a403-556089cc4276",
+      "limitations": "Full published layer is not all physically existing wells. Includes salt, storage, unlocated, potential and not-drilled records; preserve WELL_TYPE and WELL_MODE. Orphan designation and reclamation completion absent. Plugging date is a source event and must not override an explicitly re-entered or active current mode. Coordinates are approximate at source-specific accuracy.",
+      "implementationFinding": "WELL_ID has repeated zero values in full extraction. Use unique OGF_ID, validated on every release."
+    },
+    {
+      "id": "bcer-surface-wells",
+      "province": "BC",
+      "title": "British Columbia well surface locations",
+      "publisher": "BC Energy Regulator",
+      "url": "https://geoweb-ags.bc-er.ca/arcgis/rest/services/OPERATIONAL/DMS_DORMANT_WELLS/FeatureServer/3",
+      "objectIdField": "OBJECTID",
+      "countVerified": 34425,
+      "stableIdField": "WELL_AUTHORITY_NUMBER",
+      "fields": {
+        "name": "WELL_NAME",
+        "license": "WELL_AUTHORITY_NUMBER",
+        "operator": "OPERATOR_ABBREVIATION",
+        "wellType": "BORE_FLUID_TYPE",
+        "status": "WELL_ACTIVITY",
+        "locationLabel": "WELL_SURFACE_LOCATION"
+      },
+      "closureMapping": {
+        "ABAN": "abandoned",
+        "SUSP": "suspended",
+        "ACT": "active"
+      },
+      "unknownStatusValues": [
+        "ABNZ",
+        "CANC",
+        "WAG",
+        "COMP",
+        "CASE",
+        "DRIL",
+        "DSUS"
+      ],
+      "dates": {},
+      "conditionalDates": [
+        {
+          "when": {
+            "WELL_ACTIVITY": "ABAN"
+          },
+          "target": "abandoned",
+          "field": "STATUS_EFFECTIVE_DATE"
+        }
+      ],
+      "rawFields": [
+        "WELL_ACTIVITY",
+        "OPERATION_TYPE",
+        "STATUS_EFFECTIVE_DATE",
+        "CERT_OF_RESTORATION_FLAG",
+        "OPERATOR_ABBREVIATION",
+        "OPERATOR_ABBREVIATION2"
+      ],
+      "reclamationMapping": {
+        "field": "CERT_OF_RESTORATION_FLAG",
+        "values": {
+          "Y": "Certificate of restoration recorded",
+          "N": "Certificate not indicated"
+        }
+      },
+      "orphanJoin": {
+        "url": "https://geoweb-ags.bc-er.ca/arcgis/rest/services/OPERATIONAL/ORPHAN_WELL_PT/FeatureServer/0",
+        "localField": "WELL_AUTHORITY_NUMBER",
+        "foreignField": "WA_NUM",
+        "comparison": "decimal integer equivalence; 00001 equals 1; absent membership remains unknown"
+      },
+      "publication": "open-licence",
+      "licenceUrl": "https://www.bc-er.ca/files/gis/BCER-Open-Data-Licence.pdf",
+      "limitations": "Published surface-location view includes cancelled authorizations and un-drilled authorizations. ABNZ is zone abandonment, not completed whole-well abandonment. Operator field is abbreviation, not proof of present ownership or liability. Restoration flag is separate from closure and orphan designation. Do not treat absent orphan join as not orphan."
+    },
+    {
+      "id": "ns-onshore-petroleum-wells",
+      "province": "NS",
+      "title": "Nova Scotia onshore petroleum wells",
+      "publisher": "Government of Nova Scotia, Department of Energy",
+      "url": "https://services5.arcgis.com/IaJYcw699CHE9DGQ/arcgis/rest/services/NS_Onshore_Petroleum_Wells/FeatureServer/2",
+      "objectIdField": "OBJECTID",
+      "countVerified": 143,
+      "stableIdField": "Well_ID",
+      "fields": {
+        "name": "Well_Name",
+        "license": "Well_ID",
+        "operator": "Company",
+        "status": "Status",
+        "locationLabel": "Geog_Loc"
+      },
+      "closureMapping": {
+        "Plugged and Abandoned": "abandoned",
+        "Active": "active",
+        "Suspended": "suspended"
+      },
+      "dates": {},
+      "rawFields": [
+        "Status",
+        "Spud_Year",
+        "Spud_Month",
+        "Spud_Day",
+        "Basin",
+        "Data_Pkg"
+      ],
+      "asOf": "2026-10-13",
+      "publication": "noncommercial-unmodified-only",
+      "licenceUrl": "https://www.novascotia.ca/copyright",
+      "licenceEvidence": "https://www.arcgis.com/sharing/rest/content/items/6bf88109bdb74b80afa45579b779c7a8?f=pjson",
+      "limitations": "Onshore only, offshore needs separate regulator feed. Source item is public and as-is, but does not grant explicit modification/redistribution rights. General government notice permits accurate unmodified non-commercial reproduction with Crown attribution. A transformed normalized public bundle needs additional open-data licence evidence or permission; safe option is unmodified records presented with source labels, retaining original attributes. Spud fields are mixed precision, including Summer, so no fabricated ISO dates. No orphan or reclamation field."
+    },
+    {
+      "id": "qc-sigpeg-wells",
+      "province": "QC",
+      "title": "Qu\u00e9bec SIGPEG all wells",
+      "publisher": "Gouvernement du Qu\u00e9bec",
+      "url": "https://servicescarto.mern.gouv.qc.ca/pes/rest/services/Energie/HYDROCARBURES_WMS/MapServer/0",
+      "objectIdField": "ESRI_OID",
+      "countVerified": 907,
+      "stableIdField": "NO_PUITS",
+      "fields": {
+        "name": "NOM_PUITS",
+        "license": "NO_PUITS",
+        "wellType": "TYPE_PUITS",
+        "locationLabel": "REGION_GEOLOGIQUE"
+      },
+      "closureMapping": {},
+      "dates": {},
+      "rawFields": [
+        "NO_SEQ",
+        "NO_ENTRE_PUITS",
+        "ANNEE",
+        "TYPE_PUITS",
+        "SYMBOLOGIE",
+        "LIEN"
+      ],
+      "publication": "written-permission-required",
+      "licenceUrl": "https://sigpeg.mrn.gouv.qc.ca/gpg/hydrocarbures/Licence_utilisation.pdf",
+      "licenceEvidence": "https://sigpeg.mrn.gouv.qc.ca/gpg/hydrocarbures/faq.htm",
+      "limitations": "The linked end-user licence permits internal/intranet/extranet use and prohibits third-party distribution; public Internet use requires written MEIE authorization. Do not put these records into a public bundle, including for non-commercial use. TYPE_PUITS and SYMBOLOGIE are not validated closure/orphan definitions. All normalized statuses unknown until documented semantics are established."
+    },
+    {
+      "id": "mb-petroleum-wells",
+      "province": "MB",
+      "title": "Manitoba petroleum well locations",
+      "publisher": "Government of Manitoba, Petroleum Branch",
+      "url": "https://www.gov.mb.ca/iem/petroleum/gis/wells.zip",
+      "format": "shapefile-zip",
+      "shapeSuffix": "mb_wells.shp",
+      "crs": "from-prj",
+      "expectedCrs": "EPSG:26914",
+      "objectIdField": "LICENCE",
+      "stableIdField": "LICENCE",
+      "countVerified": 12155,
+      "asOf": "2026-08-26",
+      "fields": {
+        "name": "NAME",
+        "license": "LICENCE",
+        "operator": "COMPANY",
+        "status": "STATUS",
+        "locationLabel": "LOCATION"
+      },
+      "closureMapping": {
+        "ABD P": "abandoned",
+        "ABD D": "abandoned",
+        "ABD WIW": "abandoned",
+        "ABD SWD": "abandoned",
+        "ABD PTH": "abandoned",
+        "ABD STH": "abandoned",
+        "ABD J": "abandoned",
+        "ABD WSW": "abandoned",
+        "ABD DUAL": "abandoned",
+        "SUSP COOP": "suspended",
+        "SUSP WIW": "suspended",
+        "SUSP ST": "suspended",
+        "SUSP SWD": "suspended"
+      },
+      "dates": {},
+      "conditionalDates": [
+        {
+          "whenStatus": "abandoned",
+          "target": "abandoned",
+          "field": "STATUS_DAT",
+          "format": "YYYYMMDD"
+        }
+      ],
+      "rawFields": [
+        "STATUS",
+        "STATUS_DAT",
+        "MAP_STATUS",
+        "DEVIATION_",
+        "MULTI_COMP",
+        "TECHDOC_UR"
+      ],
+      "publication": "open-licence",
+      "licenceUrl": "https://www.gov.mb.ca/asset_library/en/legal/OpenMB-Information-Data-Use-Licence.pdf",
+      "licenceEvidence": "https://www.gov.mb.ca/legal/copyright.html",
+      "limitations": "Full downloadable snapshot, not real-time. Includes water, salt and potash test wells plus cancelled authorizations; raw status retained. MAP_STATUS may describe directional surface location instead of closure; use explicit STATUS. No orphan designation or reclamation fields. Public ArcGIS layer17 returned only1 record during probe and is unsuitable as full feed."
+    },
+    {
+      "id": "yt-oil-gas-wells",
+      "province": "YT",
+      "title": "Yukon oil and gas wells",
+      "publisher": "Government of Yukon",
+      "url": "https://mapservices.gov.yk.ca/arcgis/rest/services/GeoYukon/GY_OilGas/MapServer/0",
+      "objectIdField": "OBJECTID",
+      "stableIdField": "WELL_LICENCE_NUMBER",
+      "countVerified": 76,
+      "fields": {
+        "name": "WELL_NAME",
+        "license": "WELL_LICENCE_NUMBER",
+        "operator": "OPERATOR",
+        "wellType": "WELL_CLASSIFICATION",
+        "status": "WELL_STATUS",
+        "locationLabel": "GRID_LOCATION"
+      },
+      "closureMapping": {
+        "Abandoned": "abandoned",
+        "Suspended": "suspended"
+      },
+      "dates": {
+        "abandoned": "ABANDONED_DATE"
+      },
+      "rawFields": [
+        "WELL_STATUS",
+        "WELL_UWI",
+        "WELL_LICENSEE",
+        "WELL_TYPE",
+        "LICENSED_DATE",
+        "ABANDONED_DATE"
+      ],
+      "publication": "open-licence",
+      "licenceUrl": "https://open.yukon.ca/data/open-government-licence-yukon",
+      "licenceEvidence": "https://www.arcgis.com/sharing/rest/content/items/11aabfb914c2469090d8488961b88e5d?f=pjson",
+      "limitations": "Published historic and active oil and gas well locations are approximate; full source layer count is76. No orphan designation or reclamation completion in source. OPERATOR may be null; recorded WELL_LICENSEE is separate and preserved in raw. Source has no verified data-as-of stamp, so retrieval must not be represented as status effective date."
+    },
+    {
+      "id": "sk-orphan-wells",
+      "province": "SK",
+      "title": "Saskatchewan designated orphan wells",
+      "url": "https://gis.saskatchewan.ca/egis/rest/services/economy/Petroleum/MapServer/18",
+      "format": "ArcGIS JSON",
+      "countVerified": 4340,
+      "publication": "open-licence",
+      "licenceUrl": "https://gisappl.saskatchewan.ca/Html5Ext/Resources/GOS_Standard_Unrestricted_Use_Data_Licence_v2.0.pdf",
+      "licenceEvidence": "https://gis.saskatchewan.ca/egis/rest/services/economy/Petroleum/MapServer/18/iteminfo",
+      "limitations": "Includes completed abandonment, reclamation and transferred records. It is a designation-history inventory, not all Saskatchewan wells or only remaining obligations. Preserve orphan designation separately from closure and reclamation. Count from existing app full-layer extraction, not new recount in this research."
+    },
+    {
+      "id": "sk-vertical-wells",
+      "province": "SK",
+      "title": "Saskatchewan vertical well records",
+      "url": "https://gis.saskatchewan.ca/egis/rest/services/economy/Petroleum/MapServer/0",
+      "format": "ArcGIS JSON points",
+      "countVerified": 119569,
+      "publication": "noncommercial-general-notice",
+      "licenceUrl": "https://www.saskatchewan.ca/Copyright",
+      "licenceEvidence": "https://gis.saskatchewan.ca/egis/rest/services/economy/Petroleum/MapServer/0/iteminfo",
+      "limitations": "No dataset-specific licence in iteminfo. General government notice permits accurate non-commercial reproduction. Contains wellbore/completion attributes, possible repeated WELL_CWI; counts are features, not unique wells. Needs union with nonvertical layer and identity audit. WELLSTATUS, WELLABANDONEDDATE, WELLLICENCENUMBER, WELL_CWI, SURFACELATITUDE/LONGITUDE available."
+    },
+    {
+      "id": "sk-nonvertical-wells",
+      "province": "SK",
+      "title": "Saskatchewan nonvertical well records",
+      "url": "https://gis.saskatchewan.ca/egis/rest/services/economy/Petroleum/MapServer/1",
+      "format": "ArcGIS JSON polylines with surface-coordinate attributes",
+      "countVerified": 67923,
+      "publication": "noncommercial-general-notice",
+      "licenceUrl": "https://www.saskatchewan.ca/Copyright",
+      "limitations": "Do not render line centroid as well surface. Use explicit surface coordinates and correct source datum. Source sample includes Vertical trajectory despite layer name; layer name is not a safe classification. Needs well/wellbore/completion grain audit before national totals. Dataset-specific unrestricted licence not established."
+    },
+    {
+      "id": "ns-historical-open-wells",
+      "province": "NS",
+      "title": "Nova Scotia historical onshore petroleum wells",
+      "url": "https://data.novascotia.ca/api/geospatial/5q4c-27fh?method=export&format=GeoJSON",
+      "format": "GeoJSON",
+      "countVerified": 131,
+      "publication": "open-licence",
+      "licenceUrl": "https://novascotia.ca/opendata/licence.asp",
+      "licenceEvidence": "https://data.novascotia.ca/api/views/5q4c-27fh.json",
+      "asOf": "2016-02-01",
+      "limitations": "Explicit OGL_NOVA_SCOTIA metadata, 131 points. Historical through February2016; endpoint fresh retrieval does not make well statuses current. rowsUpdatedAt is2020. No orphan/reclamation fields; source status_des distinguishes Plugged and Abandoned, Active and Suspended. Mixed spud_date precision."
+    },
+    {
+      "id": "nb-ong-viewer",
+      "province": "NB",
+      "title": "New Brunswick oil and natural gas viewer wells",
+      "url": "https://gis-erd-der.gnb.ca/arcgis/rest/services/ONG/Natural_Gas_Rights/MapServer/0",
+      "format": "ArcGIS JSON points",
+      "countVerified": 49,
+      "publication": "licence-unresolved",
+      "licenceEvidence": "https://www.gnb.ca/en/campaign/geonb/applications/oil-gas.html",
+      "limitations": "Current viewer layer only49 features; cannot represent full historic provincial inventory. Fields UNIQUE_ID, WELL_NAME_NUMBER, COMPANY, SPUD_DATE, ONG_VIEWER_STATUS. No explicit orphan/reclamation fields. No dataset redistribution licence found; general disclaimer is not a licence."
+    },
+    {
+      "id": "nb-borehole-database",
+      "province": "NB",
+      "title": "New Brunswick historical borehole database",
+      "url": "https://www1.gnb.ca/0078/GeoscienceDatabase/Borehole/Search.asp",
+      "format": "HTML search/results",
+      "countVerified": null,
+      "publication": "licence-unresolved",
+      "documentation": [
+        "https://www2.gnb.ca/content/gnb/en/departments/erd/energy/content/minerals/content/Oil_Gas/WellReports.html"
+      ],
+      "limitations": "Contains nonpetroleum prospects such as coal and uranium; petroleum filtering required. Indexed result tables include coordinates, company, prospect and spud date but not verified current status. Direct broad query returned403 in this probe; no bypass attempted. No complete extract validated."
+    },
+    {
+      "id": "pe-exploratory-2007",
+      "province": "PE",
+      "title": "PEI oil and gas exploratory wells on and around PEI,2007",
+      "url": "https://www.princeedwardisland.ca/sites/default/files/publications/07gasoilwells.pdf",
+      "format": "PDF table",
+      "countVerified": 20,
+      "publication": "licence-unresolved",
+      "asOf": "2007",
+      "documentation": [
+        "https://www.princeedwardisland.ca/en/publication/2007-oil-and-gas-exploratory-wells-on-and-around-pei"
+      ],
+      "limitations": "20 table entries, including re-entry and offshore wells, are not20 unique onshore wells. Coordinates in DMS with inconsistent precision; several statuses blank. Historical PDF is not a current regulator inventory. Public reuse licence and current complete feed not established."
+    },
+    {
+      "id": "nl-onshore-data",
+      "province": "NL",
+      "title": "Newfoundland and Labrador onshore maps and data",
+      "url": "https://www.gov.nl.ca/em/energy/petroleum/onshore/onshore-maps/",
+      "format": "Reports/maps/digital drilling data; inventory endpoint not validated",
+      "countVerified": null,
+      "publication": "third-party-redistribution-prohibited",
+      "licenceEvidence": "https://www.gov.nl.ca/em/energy/petroleum/onshore/onshore-maps/",
+      "limitations": "Official page expressly disallows supplying digital reproduction/copy to third parties. Permission or alternate licensed source needed for public bundle. Direct page retrieval returned500, but web indexed current official page supplied terms. Offshore is separate jurisdiction."
+    },
+    {
+      "id": "nl-offshore-hub",
+      "province": "NL",
+      "title": "Canada\u2013Newfoundland and Labrador offshore regulator data hub",
+      "url": "https://home-cnlopb.hub.arcgis.com/",
+      "format": "Shapefiles and well inventory; exact current endpoint not validated",
+      "countVerified": null,
+      "publication": "licence-unresolved",
+      "documentation": [
+        "https://www.cnlopb.ca/news/nr10052021/",
+        "https://www.cnloer.ca/disclaimer/"
+      ],
+      "limitations": "Official regulator confirms well shapefiles and inventory available. No current count, identity grain, endpoint or redistribution permission validated in this research. Must not substitute onshore licence or presume offshore points belong to terrestrial province bounds."
+    },
+    {
+      "id": "ns-offshore-dmc",
+      "province": "NS",
+      "title": "Canada\u2013Nova Scotia offshore regulator data management centre",
+      "url": "https://callforbids.cnsopb.ns.ca/2018/03/data-environment/digital-data.html",
+      "format": "Data management centre; registration for digital records",
+      "countVerified": null,
+      "publication": "access-and-licence-unresolved",
+      "limitations": "Onshore inventory does not cover offshore. Source describes registered access to data. Current complete point inventory, public feed and redistribution rights still require verification."
+    },
+    {
+      "id": "nt-orogo-wells",
+      "province": "NT",
+      "title": "OROGO well data",
+      "url": "https://www.orogo.gov.nt.ca/en/well-data",
+      "format": "Paginated HTML registry and per-well reports",
+      "countVerified": 685,
+      "publication": "licence-unresolved",
+      "limitations": "Official live registry displays685 entries,683Abandoned and2Suspended at probe. Jurisdiction excludes federal areas and Inuvialuit Settlement Region; cannot claim allNT fromOROGO alone. Completeness of coordinate feed and public redistribution licence not established."
+    },
+    {
+      "id": "cer-frontier-wells",
+      "province": null,
+      "jurisdictions": [
+        "NT",
+        "NU",
+        "BC",
+        "PE"
+      ],
+      "title": "CER frontier well records and formation tops",
+      "url": "https://cer-rec.gc.ca/en/about/north-offshore/statistics/index.html",
+      "format": "Excel formation tops; well records by library request",
+      "countVerified": null,
+      "publication": "dataset-specific-licence-review-required",
+      "documentation": [
+        "https://www.cer-rec.gc.ca/en/about/north-offshore/access-information.html",
+        "https://cer-rec.gc.ca/en/about/contact/library/north-offshore-data.html"
+      ],
+      "limitations": "Covers federal lands administered underCOGOA, includingNunavut and parts ofNT/offshore. Formation tops are geological observations, not a current lifecycle/orphan register; multiple formation rows per well. Current complete lifecycle feed not established."
+    },
+    {
+      "id": "aer-abandoned-wells",
+      "province": "AB",
+      "title": "Alberta abandoned well surface locations",
+      "url": "https://gis.aer.ca/arcgis/rest/services/WMS-Public/ICD_AbandonedWell_Ext_Proxy/MapServer/1",
+      "format": "ArcGIS JSON points",
+      "countVerified": 238158,
+      "publication": "parent-investigation",
+      "limitations": "Parent handles fullAlberta source audit and ingestion. Existing count from previous extraction; not independently refreshed bythisagent. Abandoned-layer scope isnot allactive/inactive wells or orphan designation."
+    }
+  ],
+  "jurisdictions": [
+    {
+      "code": "AB",
+      "name": "Alberta",
+      "sourceIds": [
+        "aer-abandoned-wells"
+      ],
+      "readiness": "parent-investigation",
+      "note": "Full-source ingestion and licence audit assigned to parent."
+    },
+    {
+      "code": "BC",
+      "name": "British Columbia",
+      "sourceIds": [
+        "bcer-surface-wells"
+      ],
+      "readiness": "published-surface-layer-available",
+      "note": "Orphan layer can be joined by normalized authority number; published authorization record inventory is not all physical sites."
+    },
+    {
+      "code": "SK",
+      "name": "Saskatchewan",
+      "sourceIds": [
+        "sk-orphan-wells",
+        "sk-vertical-wells",
+        "sk-nonvertical-wells"
+      ],
+      "readiness": "partial-ingestion-ready",
+      "note": "Orphan layer clear open licence; full layers need grain/union and dataset licence audit."
+    },
+    {
+      "code": "MB",
+      "name": "Manitoba",
+      "sourceIds": [
+        "mb-petroleum-wells"
+      ],
+      "readiness": "published-snapshot-available",
+      "note": "12155 download records; current official MapServer returned1 and isnot fullfeed."
+    },
+    {
+      "code": "ON",
+      "name": "Ontario",
+      "sourceIds": [
+        "on-petroleum-wells"
+      ],
+      "readiness": "published-record-layer-available",
+      "note": "27639 records includes unlocated/not-drilled/potential and non-oil/gas classes."
+    },
+    {
+      "code": "QC",
+      "name": "Qu\u00e9bec",
+      "sourceIds": [
+        "qc-sigpeg-wells"
+      ],
+      "readiness": "public-redistribution-blocked",
+      "note": "907 queryable records but SIGPEG end-user terms require writtenpermission for publicinternet redistribution."
+    },
+    {
+      "code": "NB",
+      "name": "New Brunswick",
+      "sourceIds": [
+        "nb-ong-viewer",
+        "nb-borehole-database"
+      ],
+      "readiness": "coverage-and-licence-unresolved",
+      "note": "49 point viewer isnot completehistorical inventory; broaderborehole source notfullyextracted."
+    },
+    {
+      "code": "NS",
+      "name": "Nova Scotia",
+      "sourceIds": [
+        "ns-onshore-petroleum-wells",
+        "ns-historical-open-wells",
+        "ns-offshore-dmc"
+      ],
+      "readiness": "historical-open-current-terms-unresolved",
+      "note": "Current143onshore sourceavailable, explicitopenhistorical131source; offshoremissing."
+    },
+    {
+      "code": "PE",
+      "name": "Prince Edward Island",
+      "sourceIds": [
+        "pe-exploratory-2007"
+      ],
+      "readiness": "historical-pdf-current-feed-unresolved",
+      "note": "Historic2007PDF20entries includingre-entry/offshore; no currentcompletefeedverified."
+    },
+    {
+      "code": "NL",
+      "name": "Newfoundland and Labrador",
+      "sourceIds": [
+        "nl-onshore-data",
+        "nl-offshore-hub"
+      ],
+      "readiness": "onshore-redistribution-blocked-offshore-unresolved",
+      "note": "Onshoretermsprohibitthird-partycopies; offshorehubmustbeauditedseparately."
+    },
+    {
+      "code": "YT",
+      "name": "Yukon",
+      "sourceIds": [
+        "yt-oil-gas-wells"
+      ],
+      "readiness": "published-layer-available",
+      "note": "76publishedpoints underYukonOGL; approximate locations, noorphan/reclamationfields."
+    },
+    {
+      "code": "NT",
+      "name": "Northwest Territories",
+      "sourceIds": [
+        "nt-orogo-wells",
+        "cer-frontier-wells"
+      ],
+      "readiness": "multi-regulator-feed-unresolved",
+      "note": "685OROGOrecords excludeCERfederalareas; cannotclaimterritorycomplete."
+    },
+    {
+      "code": "NU",
+      "name": "Nunavut",
+      "sourceIds": [
+        "cer-frontier-wells"
+      ],
+      "readiness": "current-lifecycle-feed-unresolved",
+      "note": "CERofficialsourcesidentified; no verifiedcompletecurrentpointinventory ororphanregistry. Missingisnotzero."
+    }
+  ],
+  "refreshPolicy": {
+    "recommendedPolling": "Weekly source availability/schema/count probes; publish only after source-specific validation and licensing gates.",
+    "observedSourceCadence": "Generally as-needed or unspecified; no uniform national publication SLA. Qu\u00e9bec inactive-well report everythree years. MBdownload has datedsnapshot. NSopenfallback ishistorical.",
+    "requiredMetadata": [
+      "retrievedAt",
+      "sourceAsOf",
+      "sourceCount",
+      "includedCount",
+      "rejectedCount",
+      "licenceStatus",
+      "scope",
+      "lastSuccessfulRefresh",
+      "lastAttempt",
+      "error",
+      "checksum"
+    ],
+    "failureBehavior": "Keep previous validated snapshot, show stale age and error; do not replace with emptydata or treat retrieval timestamp as sourcecurrency."
+  }
+}

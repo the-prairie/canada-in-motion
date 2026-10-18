@@ -1,0 +1,62 @@
+[
+  {
+    "id": "tm-tariff-123",
+    "title": "Trans Mountain Interim Tariff No. 123",
+    "url": "https://docs.transmountain.com/Tolls-and-Tariffs/Interim-Tariff-No.-123.pdf",
+    "publisher": "Trans Mountain Pipeline ULC",
+    "retrievedAt": "2026-10-17",
+    "asOf": "2026-05-01",
+    "method": "Downloaded official PDF. Read pages 1, 2 and 8-11. Visually checked page 2 rate table and page 8 variable-component table.",
+    "limitations": "Dated schedule, not a booking quote. Base toll excludes contingent and Westridge marine fees. Shipment-specific availability is unknown."
+  },
+  {
+    "id": "cer-order-to-005-2026",
+    "title": "CER Order TO-005-2026, Trans Mountain negotiated settlement",
+    "url": "https://apps.cer-rec.gc.ca/REGDOCS/File/Download/4734954",
+    "publisher": "Canada Energy Regulator",
+    "retrievedAt": "2026-10-17",
+    "asOf": "2026-09-28",
+    "method": "Downloaded and read the two-page order from REGDOCS Filing C41001.",
+    "limitations": "Settlement effective January 1, 2027. This calculator retains the May 2026 schedule and does not model the new toll framework."
+  },
+  {
+    "id": "cer-tm-settlement-decision",
+    "title": "CER letter decision, Trans Mountain negotiated settlement",
+    "url": "https://apps.cer-rec.gc.ca/REGDOCS/File/Download/4734952",
+    "publisher": "Canada Energy Regulator",
+    "retrievedAt": "2026-10-17",
+    "asOf": "2026-09-28",
+    "method": "Downloaded letter decision from REGDOCS. Reviewed effective-date and settlement sections.",
+    "limitations": "The implementation schedule and subsequent rate amendments are not imported."
+  },
+  {
+    "id": "canada-internal-trade",
+    "title": "Advancing internal trade",
+    "url": "https://www.canada.ca/en/intergovernmental-affairs/services/internal-trade/federal-investments-internal-trade.html",
+    "publisher": "Government of Canada, Intergovernmental Affairs",
+    "retrievedAt": "2026-10-17",
+    "asOf": null,
+    "method": "Read official explanation of internal trade barriers.",
+    "limitations": "General border-tariff statement. Does not enumerate every tax, permit or government fee."
+  },
+  {
+    "id": "cer-tm-profile",
+    "title": "Trans Mountain System pipeline profile",
+    "url": "https://apps.cer-rec.gc.ca/PPS/en/pipeline-profiles/trans-mountain-expanded-system",
+    "publisher": "Canada Energy Regulator",
+    "retrievedAt": "2026-10-17",
+    "asOf": "2026-08",
+    "method": "Read infrastructure description and throughput methodology.",
+    "limitations": "Description section dates to October 2024. Nominal capacity is not available capacity. Embedded pipeline geometries have separate licensing restrictions and are not copied."
+  },
+  {
+    "id": "eia-conversion",
+    "title": "Energy conversion calculators",
+    "url": "https://www.eia.gov/energyexplained/units-and-calculators/energy-conversion-calculators.php",
+    "publisher": "U.S. Energy Information Administration",
+    "retrievedAt": "2026-10-17",
+    "asOf": null,
+    "method": "Oil barrel definition is 42 U.S. gallons; volume conversion uses 0.003785411784 cubic metres per U.S. gallon.",
+    "limitations": "Physical volume conversion only. No energy-content, quality or density equivalence is implied."
+  }
+]
