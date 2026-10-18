@@ -1,6 +1,6 @@
-# Operating the public release candidate
+# Operating the approved public beta
 
-This repository prepares a free, noncommercial public resource. A working candidate is not proof of complete national coverage or permission to redistribute every source. `config/publication.json` keeps public launch disabled and requires all ten provinces and six topics to be complete. The deployment gate is expected to fail while those requirements are unmet. Do not toggle the requirement merely to make a deployment green.
+The owner approved public repository visibility and an explicitly incomplete, free noncommercial beta on October 18, 2026. `config/publication.json` records this scope. The beta gate checks rights, integrity, acquisition freshness and explicit jurisdiction/topic limitations. The separate national-completeness gate remains enabled and fails until its evidence requirements hold.
 
 ## Local verification
 
@@ -11,6 +11,8 @@ python -m pip install -r pipeline/requirements.txt
 node --test tests/*.test.mjs
 python pipeline/refresh.py
 python pipeline/refresh_context.py
+python pipeline/refresh_bcer.py
+node scripts/beta-release-gate.mjs
 node scripts/build-public.mjs
 node scripts/serve-public.mjs
 ```
@@ -27,7 +29,7 @@ A successful public gate additionally requires an explicitly enabled launch, lic
 
 The build copies named app files, named bundled vendor assets and their licence notices, named static data, the coverage registry, verified open context files, and only the catalog's verified index and detail shards. It rejects unapproved source rights, purpose mismatches, incomplete enumerations, unreviewed dropped records, mismatched counts, duplicate record IDs, broken detail references, SHA-256 mismatches, path traversal and symbolic links. Raw downloads, `.data-cache`, configurations, acquisition reports, old `wells.json`, source tooling, tests and internal documentation are excluded.
 
-`dist/health.json` identifies the candidate release, record count, retrieval time and build time. Its `candidate` status does not certify national coverage, live upstream availability or legal review. `build-manifest.json` records hashes of public files; the Node server uses it internally and does not serve it. The artifact remains inspectable on disk.
+`dist/health.json` identifies the candidate release, record count, retrieval time and build time. Its `public-beta` status does not certify national coverage, live upstream availability or legal review. `build-manifest.json` records hashes of public files; the Node server uses it internally and does not serve it. The artifact remains inspectable on disk.
 
 The source registry is a reviewed trust boundary. Automated gates cannot decide whether a regulator's licence applies, whether a list includes every well, or whether a government charge is legally payable. Review changes to permissions, coverage and source definitions through pull requests with source evidence. Protect the default branch and require a reviewer for public launch configuration changes.
 
@@ -35,24 +37,19 @@ The source registry is a reviewed trust boundary. Automated gates cannot decide 
 
 `.github/workflows/refresh.yml` runs at **10:17 UTC daily**, which is **04:17 MDT or 03:17 MST in Edmonton**, and can be dispatched manually. GitHub scheduled workflows may be delayed; this is not a precise delivery SLA. Scheduling only becomes active after this workflow is pushed to the default branch and Actions is enabled.
 
-Each run installs pinned Python packages, runs Node tests, retrieves all enabled permitted sources, validates the full enumeration, builds an allowlisted candidate, and uploads a uniquely named private review artifact. A failed acquisition does not advance the catalog or overwrite the last deployed public site. Failure reports are retained for 90 days; successful candidate artifacts for 30 days. Enable GitHub Actions failure notifications for the repository in your GitHub notification settings. No email, webhook or credentials for another messaging service are configured.
+Each run installs pinned Python packages, runs Node tests, retrieves all enabled permitted sources, validates the full enumeration, builds an allowlisted candidate, and uploads a uniquely named review artifact. A failed acquisition does not advance the catalog or overwrite the last deployed public site. Failure reports are retained for 90 days; successful candidate artifacts for 30 days. Enable GitHub Actions failure notifications for the repository in your GitHub notification settings. No email, webhook or credentials for another messaging service are configured.
 
-Scheduled runs are artifact preparation, **not automatic public publication**. Refresh and deployment runs restore the latest successful refresh artifact containing the catalog, transport publication hashes and the verified open context group. Count-drop validation compares against that previous successful snapshot. The first run has no historical baseline. If the baseline artifact is unavailable, the workflow fails rather than silently dropping this check. Preserve releases outside transient Actions artifact retention if long-term auditability is required.
+Successful refresh runs trigger the approved beta publication workflow via `workflow_run`; failed refreshes do not publish. Refresh and deployment runs restore the latest successful refresh artifact containing the catalog, transport publication hashes and the verified open context and BC permit groups. Count-drop validation compares against that previous successful snapshot. The first run has no historical baseline. If the baseline artifact is unavailable, the workflow fails rather than silently dropping this check. Preserve releases outside transient Actions artifact retention if long-term auditability is required.
 
 An upstream schema change, a count decrease beyond the configured threshold, or a licence uncertainty should block a new source release. Inspect `refresh-report-<run-id>`, compare source definitions with the authority, repair the adapter or rights record, rerun tests, then dispatch a new refresh. Never change retrieval timestamps to conceal a failed refresh. Carrier publications require human-reviewed rate imports; this workflow does not silently turn newly observed PDFs into authoritative toll schedules.
 
 ## Public launch
 
-The separate `deploy.yml` workflow has no schedule. It runs fresh acquisition, all Node tests and the public release gate before building or uploading a Pages artifact. The deployment job alone receives `pages: write` and `id-token: write`. There are no personal access tokens in these workflows. Official actions are pinned to commit SHAs verified against the GitHub API for their official repositories on 2026-10-17; updates require reviewing the new upstream commit.
+The `deploy.yml` workflow runs on manual dispatch or successful default-branch refresh completion. It runs tests, fresh well acquisition, weekly context/BC verification and `beta-release-gate.mjs` before building and uploading. Only the deployment job has `pages: write` and `id-token: write`. Workflows use GitHub's scoped job token; official actions are pinned to reviewed commit SHAs.
 
-Before the first deployment:
+Pages is configured for GitHub Actions on the public `the-prairie/canada-in-motion` repository. The `github-pages` deployment environment is restricted to `main`. Changes to licence/coverage policy must retain source evidence. A required-reviewer rule is not installed: approved scheduled deployments do not wait for manual approval. No custom domain is required or purchased.
 
-1. Resolve coverage and redistribution gaps and document the source evidence. Confirm the noncommercial purpose remains accurate.
-2. Configure GitHub Pages to use GitHub Actions, and verify the account/repository plan supports Pages for the chosen repository visibility. Creating a private repository does not itself make a public site available.
-3. Protect the `github-pages` environment with required reviewers and an allowed default branch. Set branch protection on the default branch. These are account settings; YAML does not establish them automatically.
-4. Enable public launch only in a reviewed configuration change once the gate's evidence requirements actually hold.
-5. Dispatch the public workflow from the reviewed default branch; inspect the returned site URL, health release ID, map, direct links, mobile layout and source dates.
-6. Configure the intended custom domain and HTTPS at the host, then test again at that exact base URL. No domain is assumed or purchased by this package.
+After a deployment, verify the HTTPS site, health record, shared views, mobile layout and source dates. Current verified run links are in `LAUNCH-STATUS.md`.
 
 ## Security and host differences
 
@@ -72,4 +69,8 @@ A failed refresh or gate never deploys. For a regression discovered after public
 
 The first benchmark acquisition downloads about 430 MB; the public snapshots are much smaller. Local research recovery can use `CIM_CONTEXT_RESUME=1` only for files younger than four hours. CI never enables research-cache reuse. Well acquisition remains daily. A new retrieval does not make historical source observations current.
 
-`npm run readiness:beta` reports the technical status of the incomplete candidate and always leaves launch unauthorized. It verifies source rights/integrity, freshness and explicit coverage for every jurisdiction/topic. It does not alter publication configuration or weaken `npm run gate:public`. A public beta requires the scope/visibility decisions in LAUNCH-STATUS.md and an explicitly reviewed beta deployment policy.
+`npm run readiness:beta` reports the technical status of the incomplete candidate and always leaves launch unauthorized. It verifies source rights/integrity, freshness and explicit coverage for every jurisdiction/topic. It does not alter publication configuration or weaken `npm run gate:public`. The owner-approved scope and beta deployment policy are recorded in publication configuration.
+
+## BC permit refresh
+
+`pipeline/refresh_bcer.py` verifies the official dataset item licence, complete ID enumeration, duplicate identities, full/display counts, checksums and oldest acquisition date. It stages all four files atomically. A decline above 5% blocks replacement. Reuse within seven days preserves original source timestamps. The map retains every feature while simplifying pipeline geometry with a 10 metre tolerance in EPSG:3005. Permit statuses never become inferred operating status; the separate orphan table has no invented geometry join.

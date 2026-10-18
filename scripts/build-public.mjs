@@ -1,3 +1,4 @@
+import { BC_FILES, validateBC } from './bc-validation.mjs';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,7 +8,7 @@ export const CONTEXT_FILES = ['historical-infrastructure.geojson','benchmark-tol
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const CSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
 export const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
-export const PUBLIC_FILES = ['index.html','app.js','map.js','model.mjs','data-store.mjs','style.css', 'vendor/leaflet.js','vendor/leaflet.css','vendor/supercluster.js', 'vendor/fonts/ibm-plex-sans-400.ttf','vendor/fonts/ibm-plex-sans-500.ttf','vendor/fonts/ibm-plex-sans-600.ttf','vendor/fonts/ibm-plex-mono-400.ttf','vendor/fonts/ibm-plex-mono-500.ttf', 'data/network.json','data/tariffs.json','data/tariff-sources.json','data/countries.geojson','data/provinces.geojson','data/national-coverage.json', 'data/context/manifest.json', ...CONTEXT_FILES.map(name => 'data/context/'+name)];
+export const PUBLIC_FILES = ['index.html','app.js','map.js','model.mjs','data-store.mjs','insights.mjs','style.css','design.css', 'vendor/leaflet.js','vendor/leaflet.css','vendor/supercluster.js', 'vendor/fonts/ibm-plex-sans-400.ttf','vendor/fonts/ibm-plex-sans-500.ttf','vendor/fonts/ibm-plex-sans-600.ttf','vendor/fonts/ibm-plex-mono-400.ttf','vendor/fonts/ibm-plex-mono-500.ttf', 'data/network.json','data/tariffs.json','data/tariff-sources.json','data/countries.geojson','data/provinces.geojson','data/national-coverage.json', 'data/context/manifest.json', ...CONTEXT_FILES.map(name => 'data/context/'+name)];
 export function safeRelative(value) {
   if (typeof value !== 'string' || !value || value.includes('\\') || value.includes('%') || value.includes('\0') || path.posix.isAbsolute(value) || value.split('/').some(x => !x || x === '.' || x === '..' || x.startsWith('.')) || !/^[A-Za-z0-9_./-]+$/.test(value)) throw new Error(`Unsafe release path: ${value}`);
   return value;
@@ -89,7 +90,9 @@ export async function validateRelease(root = ROOT) {
   assert(total === catalog.totalRecords, 'Catalog total mismatch');
   assert(registry.filter(source => source.enabled && ['open','noncommercial'].includes(source.publication)).every(source => ids.has(source.id)), 'Catalog omits an enabled permitted source');
   const context = await validateContext(root);
-  return { config, catalog, registry, context, files: [...files].sort() };
+  const bc = config.bcInfrastructureEnabled ? await validateBC(root, {readJSON,safeRead,sha256}) : null;
+  if (bc) for (const name of [...BC_FILES, "manifest.json"]) files.add("data/bc-infrastructure/"+name);
+  return { config, catalog, registry, context, bc, files: [...files].sort() };
 }
 const licence = value => value?.name === 'Open Government Licence - Canada' && value.url === 'https://open.canada.ca/en/open-government-licence-canada' && value.attribution?.trim();
 export async function validateContext(root) {
@@ -139,7 +142,7 @@ export async function validateContext(root) {
 }
 
 export async function buildPublic(root = ROOT) {
-  const { catalog, files } = await validateRelease(root);
+  const { catalog, files, config } = await validateRelease(root);
   const stage = await fs.mkdtemp(path.join(root, '.public-build-'));
   try {
     const vendorExtras = [];
@@ -159,7 +162,7 @@ export async function buildPublic(root = ROOT) {
       }
       output.set(file, bytes);
     }
-    output.set('health.json', Buffer.from(JSON.stringify({status:'candidate',releaseId:catalog.releaseId,records:catalog.totalRecords,retrievedAt:catalog.retrievedAt,builtAt:new Date().toISOString(),nationalComplete:catalog.nationalComplete === true})));
+    output.set('health.json', Buffer.from(JSON.stringify({status:config.publicLaunchEnabled && config.releaseScope === 'public-beta' ? 'public-beta' : 'candidate',releaseId:catalog.releaseId,records:catalog.totalRecords,retrievedAt:catalog.retrievedAt,builtAt:new Date().toISOString(),nationalComplete:catalog.nationalComplete === true})));
     output.set('robots.txt', Buffer.from('User-agent: *\nAllow: /\n'));
     output.set('_headers', Buffer.from(`/*\n  Content-Security-Policy: ${CSP}\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  X-Frame-Options: DENY\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n  Cache-Control: no-cache\n/data/releases/*\n  Cache-Control: public, max-age=31536000, immutable\n`));
     const manifest = {schemaVersion:1,releaseId:catalog.releaseId,files:[]};

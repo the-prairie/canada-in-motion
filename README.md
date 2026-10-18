@@ -1,23 +1,40 @@
 # Canada in Motion
 
-A noncommercial Canadian energy atlas. Explore published well records, dated pipeline tolls and explicit scenarios. This repository is a launch candidate. It is not a complete national inventory and public deployment is disabled until the release gate passes.
+A free, noncommercial Canadian energy atlas, approved for publication as an explicitly incomplete public beta. Explore regulator well records, dated pipeline tolls, permit geography and transparent scenarios. National completeness remains false.
+
+Public address: https://the-prairie.github.io/canada-in-motion/
 
 ## Run
 
-Use Node 22 and Python 3.12. Create a virtual environment, install `pipeline/requirements.txt`, and run `python pipeline/refresh.py` and `python pipeline/refresh_context.py`. This acquires every record in each enabled, permitted source layer. Initial acquisition takes several minutes and requires network access; the full CER benchmark histories download about 430 MB before being reduced to small dated snapshots.
+Use Node 22 and Python 3.12. Create a virtual environment and install `pipeline/requirements.txt`, then run:
 
-Run `npm test`, `python -m unittest discover -s pipeline -p 'test_*.py'`, then `npm run build`. Run `npm run preview` to serve the allowlisted build on localhost. Detailed well records load on demand. Tariff amounts remain restricted to their independently verified shipment dates.
+```sh
+python pipeline/refresh.py
+python pipeline/refresh_context.py
+python pipeline/refresh_bcer.py
+npm test
+python -m unittest discover -s pipeline -p 'test_*.py'
+node scripts/beta-release-gate.mjs
+npm run build
+npm run preview
+```
 
-## Coverage
+Initial acquisition requires network access and takes several minutes. Full CER histories download about 430 MB before reduction to dated reference snapshots. Historical geometry, benchmarks and BC permit geometry load only when requested. Well indexes load on entering the explorer; detailed records load on demand.
 
-The current verified snapshot has 317,129 source records in six provinces and Yukon. Nova Scotia records are historical. Optional CanVec infrastructure and CER benchmarks retain their own observation dates and cannot establish current operation or quotes.
+## Coverage and meaning
 
-Read `data/national-coverage.json` and `docs/WELL-SOURCES.md` before interpreting a count. A full source layer can still be a partial provincial inventory. Orphan designation, wellbore abandonment and site reclamation are independent facts. Missing data never means zero wells or zero charges.
+The verified launch snapshot contains 317,129 well source records from six provinces and Yukon; Nova Scotia records are historical. BC adds 6,144 pipeline permit segments, 11,717 facility permit points and 27 separate orphan-pipeline rows. Permits collected since July 2016 are not a complete operating inventory. These counts are kept separate from well counts.
 
-The public resource is noncommercial. AER material is attributed and is not an official AER version or endorsement. Other datasets retain their own licences. Source code licensing does not grant additional rights to source data. Restricted Québec and Newfoundland datasets are excluded from publication.
+Read the in-app Coverage register and `data/national-coverage.json` before interpreting a count. Orphan designation, wellbore abandonment and site reclamation are independent facts. Missing data never means zero wells or zero charges. CanVec geometry and CER benchmarks retain observation dates and do not establish current operations or quotes. Dated transport schedules are available only for their verified date; government charges remain separately identified as unknown where unsupported.
 
-## Updates and launch
+AER material is attributed and is not an official AER version or endorsement. Every other dataset retains its own licence. Source-code licensing grants no additional data rights. Restricted datasets remain excluded.
 
-Daily well acquisition and weekly open infrastructure/benchmark acquisition are configured in GitHub Actions. An atomic catalog points to a verified immutable release. Failed acquisition cannot replace a previous successful catalog. Workflow artifacts retain candidate snapshots; a separate manual deployment workflow runs the public release gate. A configured workflow is not proof that the schedule has successfully run. See `docs/OPERATIONS.md` and `docs/LAUNCH-STATUS.md` for verified status and remaining gates.
+## Updates and publication
 
-No visitor account is required. Scenarios and preferences stay in browser storage. There is no application analytics, advertising, tracking pixel or server-side collection of search text. A hosting provider may keep access logs under its own policy.
+Daily well refresh and weekly context/BC acquisition run in GitHub Actions. A successful refresh triggers the approved beta deployment workflow, which reacquires/verifies data and checks rights, integrity, freshness and disclosed coverage before publication. Failures retain the last deployed site. GitHub schedules may be delayed; see `docs/OPERATIONS.md` and `docs/LAUNCH-STATUS.md` for evidence and limitations.
+
+`node scripts/beta-release-gate.mjs` governs the approved incomplete beta. `npm run gate:public` remains the stricter national-completeness check and is expected to fail until national coverage is established. Do not disable it to manufacture completeness.
+
+No visitor account is required. Scenarios stay in browser storage. There is no app analytics, advertising or server-side search collection. The host may retain access logs.
+
+Design work applies progressive disclosure, comparable scales and accessible interaction from [interactive-visualization-creator](https://github.com/oysteinkrog/dotfiles/tree/master/.claude/skills/interactive-visualization-creator), adapted to native JavaScript and Leaflet.

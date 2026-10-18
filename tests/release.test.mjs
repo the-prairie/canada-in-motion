@@ -1,3 +1,4 @@
+import { betaReleaseGate } from '../scripts/beta-release-gate.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { promises as fs } from 'node:fs';
@@ -101,4 +102,24 @@ test('only bounded reviewed source exclusions may reconcile a larger raw source 
   await validateRelease(f.root);
   f.source.excludedRecords[0].sourceRecordId = '127'; await f.write('data/catalog.json', f.catalog);
   await assert.rejects(validateRelease(f.root), /Unreviewed exclusions/);
+});
+
+test('approved beta gate retains honest scope, freshness and the national gate',async t=>{
+  const f=await fixture(t);
+  f.config.owner='the-prairie';f.config.requireNationalCompleteness=true;
+  f.coverage.nationalComplete=false;
+  f.catalog.nationalComplete=false;
+  f.coverage.provinces=['AB','BC','SK','MB','ON','QC','NB','NS','PE','NL','YT','NT','NU'].map(code=>({code,topics:Object.fromEntries(['well-inventory','orphan-status','abandonment-status','infrastructure','carrier-rates','government-charges'].map(topic=>[topic,{status:code==='AB'?'partial':'unavailable',note:'Coverage is incomplete',sourceIds:code==='AB'?['example']:[]}]))}));
+  f.source.province='AB';f.source.publisher='Authority';f.source.license='Open licence';f.source.limitations='Partial inventory';
+  await f.write('data/catalog.json',f.catalog);await f.write('data/national-coverage.json',f.coverage);
+  await f.write('config/sources.json',[{id:'example',enabled:true,publication:'open',licenseUrl:'https://example.org/licence'}]);
+  await f.write('config/publication.json',f.config);
+  assert.equal((await betaReleaseGate(f.root,{now:new Date(DATE)})).passed,false);
+  f.config.publicLaunchEnabled=true;f.config.releaseScope='public-beta';f.config.betaApproval={owner:'the-prairie',approvedAt:DATE,scope:'incomplete-national-coverage',repositoryVisibility:'public'};
+  await f.write('config/publication.json',f.config);
+  assert.equal((await betaReleaseGate(f.root,{now:new Date(DATE)})).passed,true);
+  assert.equal((await releaseGate(f.root,{now:new Date(DATE)})).passed,false);
+  assert.equal((await betaReleaseGate(f.root,{now:new Date('2027-01-01')})).passed,false);
+  f.coverage.nationalComplete=true;await f.write('data/national-coverage.json',f.coverage);
+  assert.equal((await betaReleaseGate(f.root,{now:new Date(DATE)})).passed,false);
 });

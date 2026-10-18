@@ -39,30 +39,38 @@ export class AtlasMap {
     );
     this.land = L.geoJSON(geography.countries, {
       style: {
-        color: "#aebdad",
+        color: "#31474f",
         weight: 0.8,
-        fillColor: "#f0f2e8",
+        fillColor: "#19313b",
         fillOpacity: 1,
       },
       interactive: false,
     }).addTo(this.map);
     this.provinces = L.geoJSON(geography.provinces, {
       style: (f) => ({
-        color: "#b6c2af",
+        color: "#354d56",
         weight: 0.75,
-        fillColor: f.properties.admin === "Canada" ? "#f0f2e8" : "#e6ebdf",
+        fillColor: f.properties.admin === "Canada" ? "#19313b" : "#142a34",
         fillOpacity: 1,
       }),
       onEachFeature: (f, layer) => {
         layer.on("click", () => this.callbacks.onProvince(f.properties));
       },
     }).addTo(this.map);
-    this.historicalLayer = L.geoJSON(geography.historicalInfrastructure, {
-      style: {color: "#726a85", weight: 1.5, opacity: 0.8},
-      pointToLayer: (feature, latlng) => L.circleMarker(latlng, {radius: 4, color: "#726a85", fillColor: "#f7f4e9", fillOpacity: 1, weight: 2}),
+    this.historicalLayer = L.geoJSON(null, {
+      style: {color: "#b3a4d4", weight: 1.5, opacity: 0.8},
+      pointToLayer: (feature, latlng) => L.circleMarker(latlng, {radius: 4, color: "#b3a4d4", fillColor: "#142a34", fillOpacity: 1, weight: 2}),
       onEachFeature: (feature, layer) => {
         const p = feature.properties;
         layer.bindTooltip(`${esc(p.name)} · historical ${esc(p.kind)}<br>Source dates ${esc(p.sourceDateMin)} to ${esc(p.sourceDateMax)}<br>Current operation not established`, {sticky: true});
+      },
+    });
+    this.bcLayer = L.geoJSON(null, {
+      style: {color: "#d7be83", weight: 1.5, opacity: 0.8},
+      pointToLayer: (feature, latlng) => L.circleMarker(latlng, {radius: 3, color: "#d7be83", fillColor: "#d7be83", fillOpacity: 0.65, weight: 1}),
+      onEachFeature: (feature, layer) => {
+        layer.bindTooltip(`${esc(feature.id)}<br>Permit status: ${esc(feature.properties.sourceStatus)}<br>Operating status unknown`, {sticky:true});
+        layer.on("click", () => this.callbacks.onBCFeature(feature));
       },
     });
     this.cityLayer = L.layerGroup().addTo(this.map);
@@ -84,6 +92,14 @@ export class AtlasMap {
       document.getElementById("map"),
     );
   }
+  setBCPermits(layer) {
+    this.bcLayer.clearLayers();
+    this.bcLayer.addData(layer);
+  }
+  setHistorical(layer) {
+    this.historicalLayer.clearLayers();
+    this.historicalLayer.addData(layer);
+  }
   setRecords(wells) {
     this.wells = wells;
     this.wellById = new Map(wells.map((w) => [w.id, w]));
@@ -91,6 +107,13 @@ export class AtlasMap {
   update(state, filtered) {
     this.state = state;
     this.filtered = filtered;
+    if (state.layers.bcPermits && !this.map.hasLayer(this.bcLayer)) {
+      this.bcLayer.addTo(this.map);
+      this.map.attributionControl.addAttribution("BC Energy Regulator · Open Data Licence");
+    } else if (!state.layers.bcPermits && this.map.hasLayer(this.bcLayer)) {
+      this.map.removeLayer(this.bcLayer);
+      this.map.attributionControl.removeAttribution("BC Energy Regulator · Open Data Licence");
+    }
     if (state.layers.historical && !this.map.hasLayer(this.historicalLayer)) {
       this.historicalLayer.addTo(this.map);
       this.map.attributionControl.addAttribution('NRCan CanVec · OGL Canada · historical');
@@ -129,10 +152,10 @@ export class AtlasMap {
           color: closed
             ? "#a33d3d"
             : active
-              ? "#ac3e24"
+              ? "#55d8c7"
               : r.commodity === "oil"
-                ? "#526f60"
-                : "#346685",
+                ? "#93b5a5"
+                : "#81b5dc",
           weight: active ? 3.5 : 1.5,
           opacity: active ? 1 : 0.55,
           dashArray: closed ? "3 8" : active ? "10 5" : "5 5",
@@ -347,8 +370,8 @@ export class AtlasMap {
           renderer: this.renderer,
           radius: 7,
           weight: p.orphan ? 2 : 1,
-          color: p.orphan ? "#945622" : "#56665c",
-          fillColor: p.orphan ? "#945622" : "#fffefa",
+          color: p.orphan ? "#e4ad68" : "#a8bcc3",
+          fillColor: p.orphan ? "#e4ad68" : "#213f48",
           fillOpacity: 1,
         })
           .on("click", () => this.callbacks.onWell(p.id))

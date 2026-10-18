@@ -32,6 +32,7 @@ export const DEFAULT_STATE = Object.freeze({
     wells: false,
     context: false,
     historical: false,
+    bcPermits: false,
   },
   camera: null,
 });

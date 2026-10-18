@@ -1,6 +1,10 @@
-name: Manually gated public launch
+name: Publish approved public beta
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: [Refresh verified data candidate]
+    types: [completed]
+    branches: [main]
 permissions:
   contents: read
   actions: read
@@ -9,6 +13,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   prepare:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -40,10 +45,12 @@ jobs:
           run-id: ${{ steps.baseline.outputs.run }}
           github-token: ${{ github.token }}
       - run: python pipeline/refresh.py
+      - name: Refresh licensed BC permit inventory when seven days old
+        run: python pipeline/refresh_bcer.py
       - name: Refresh openly licensed context when seven days old
         run: python pipeline/refresh_context.py
-      - name: Require enabled launch, rights, freshness and national completeness
-        run: node scripts/release-gate.mjs
+      - name: Require approved beta scope, rights, integrity and freshness
+        run: node scripts/beta-release-gate.mjs
       - run: node scripts/build-public.mjs
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:

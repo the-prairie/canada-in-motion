@@ -10,6 +10,7 @@ import {
   eventTimeline,
   isCleanupRecord,
 } from "./model.mjs";
+import { wellStatusSummary, comparisonWidths, revealPanel } from "./insights.mjs";
 import { AtlasMap } from "./map.js";
 import { fetchJSON, loadWells, loadDetail, snapshotFreshness } from "./data-store.mjs";
 const $ = (id) => document.getElementById(id);
@@ -76,6 +77,7 @@ try {
     decodeState(location.hash) ||
     normalizeState(JSON.parse(localStorage.getItem("cim-state-v1") || "{}"));
 } catch {}
+let bcPromise = null, historicalPromise = null, dialogRevision = 0;
 let wellsReady = false, wellsLoading = false, wellLoadError = null, detailLoadingId = null, detailError = null;
 async function boot() {
   const [
@@ -86,8 +88,6 @@ async function boot() {
     tariffSources,
     countries,
     provinces,
-    historicalInfrastructure,
-    benchmarkTolls,
   ] = await Promise.all(
     [
       "data/network.json",
@@ -97,24 +97,23 @@ async function boot() {
       "data/tariff-sources.json",
       "data/countries.geojson",
       "data/provinces.geojson",
-      "data/context/historical-infrastructure.geojson",
-      "data/context/benchmark-tolls.json",
     ].map(fetchJSON),
   );
   const wells = { wells: [], retrievedAt: catalog.retrievedAt, coverage: catalog.sources.map(source => ({province:source.province, sourceId:source.id, included:source.count, totalAvailable:source.sourceCount, scope:source.scope, note:source.limitations})) };
-  data = { network, wells, tariffs, catalog, coverage, historicalInfrastructure, benchmarkTolls };
+  data = { network, wells, tariffs, catalog, coverage, historicalInfrastructure: null, benchmarkTolls: null, bcInfrastructure: null };
   sources = [...network.sources, ...catalog.sources, ...tariffSources];
   if (!network.routes.some((r) => r.id === state.route))
     state.route = DEFAULT_STATE.route;
 
   atlas = new AtlasMap(
     network,
-    { countries, provinces, historicalInfrastructure },
+    { countries, provinces },
     {
       onRoute: (id) => chooseRoute(id),
       onStep: (n) => chooseStep(n),
       onWell: (id) => chooseWell(id),
       onFacility: showFacility,
+      onBCFeature: showBCFeature,
       onProvince: (p) => {
         const names = Object.fromEntries(data.coverage.provinces.map(p => [p.name,p.code]));
         if (state.view === "wells" && names[p.name]) {
@@ -150,6 +149,16 @@ async function boot() {
   });
   persist();
   document.body.dataset.ready = "true";
+}
+async function ensureHistoricalData() {
+  if (data.historicalInfrastructure) return data.historicalInfrastructure;
+  if (!historicalPromise) historicalPromise = fetchJSON('data/context/historical-infrastructure.geojson').then(layer => {
+    data.historicalInfrastructure = layer;
+    atlas.setHistorical(layer);
+    render();
+    return layer;
+  }).catch(error => { historicalPromise = null; state.layers.historical = false; render(); announce('Historical layer unavailable. Toggle the layer to retry.'); throw error; });
+  return historicalPromise;
 }
 function restoreState(raw) {
   const restored = normalizeState(raw);
@@ -237,6 +246,8 @@ async function ensureSelectedDetail(record) {
   }
 }
 function render() {
+  if (state.layers.bcPermits && !data.bcInfrastructure) void ensureBCData().catch(() => {});
+  if (state.layers.historical && !data.historicalInfrastructure) void ensureHistoricalData().catch(() => {});
   const selectedRecord = wellsReady && state.view === "wells" && state.well ? data.wells.wells.find(w => w.id === state.well) : null;
   if (selectedRecord && !selectedRecord._detailLoaded) {
     const error = detailError?.id === selectedRecord.id ? detailError.message : null;
@@ -257,7 +268,7 @@ function render() {
   const active = document.activeElement,
     activeId = active?.id,
     activeControl = active?.matches("button")
-      ? ["view", "lab", "action", "nextWell"]
+      ? ["view", "lab", "action", "nextWell", "statusFilter", "route"]
           .map((key) =>
             active.dataset[key] ? [key, active.dataset[key]] : null,
           )
@@ -303,6 +314,7 @@ function render() {
         ["facilities", "Facilities", "layer-line"],
         ["wells", "Well records", "layer-dot"],
       ];
+  layerItems.push(["bcPermits", "BC pipeline & facility permits", "layer-line bc-permit"]);
   layerItems.push(["historical", "Historical pipelines & refineries", "layer-line"]);
   $("layer-inputs").innerHTML =
     layerItems
@@ -311,10 +323,11 @@ function render() {
           `<label class="check-row"><input type="checkbox" data-layer="${key}" ${state.layers[key] ? "checked" : ""}><span class="${cl}"></span>${label}</label>`,
       )
       .join("") +
-    '<button class="text-link" data-action="facilities">Browse six featured facility localities</button><button class="text-link" data-action="historical-infrastructure">Historical layer dates & sources</button>';
+    '<button class="text-link" data-action="facilities">Browse six featured facility localities</button><button class="text-link" data-action="historical-infrastructure">Historical layer dates & sources</button><button class="text-link" data-action="bc-infrastructure">BC permit records & sources</button>';
   $("map-legend").innerHTML = wellMode
     ? '<span><i class="wells"></i>Orphan recorded</span><span><i class="context"></i>Designation unknown</span><span><i class="mixed-key"></i>Mixed cluster</span>'
     : `${state.layers[getRoute().commodity] ? '<span><i class="selected-route"></i>Selected corridor</span>' : ""}${state.layers.oil ? "<span><i></i>Oil</span>" : ""}${state.layers.gas ? '<span><i class="gas"></i>Gas</span>' : ""}${state.layers.facilities ? "<span>◇ Facility locality</span>" : ""}${state.layers.wells ? '<span><i class="wells"></i>Well records</span>' : ""}`;
+  if (state.layers.bcPermits) $("map-legend").innerHTML += '<span><i class="bc-permit"></i>BC permit records · operation unknown</span>';
   if (state.layers.historical) $("map-legend").innerHTML += '<span><i class="historical-line"></i>Historical pipeline</span><span><i class="historical-point"></i>Historical refinery</span>';
   $("layer-inputs").insertAdjacentHTML(
     "beforeend",
@@ -326,7 +339,7 @@ function render() {
       : state.view === "wells"
         ? "Clusters count source records, not unique sites."
         : "Indicative corridors. Facility markers represent localities.";
-  if (state.layers.historical) $("map-source-label").textContent += ` Historical CanVec overlay: pipelines through ${data.historicalInfrastructure.metadata.observationRanges.pipeline.latest.slice(0,4)}, refineries through ${data.historicalInfrastructure.metadata.observationRanges.refinery.latest.slice(0,4)}; current operation unknown.`;
+  if (state.layers.historical && data.historicalInfrastructure) $("map-source-label").textContent += ` Historical CanVec overlay: pipelines through ${data.historicalInfrastructure.metadata.observationRanges.pipeline.latest.slice(0,4)}, refineries through ${data.historicalInfrastructure.metadata.observationRanges.refinery.latest.slice(0,4)}; current operation unknown.`;
   $("coverage-line").textContent =
     `${fmt(data.catalog.totalRecords)} records · ${new Set(data.catalog.sources.map(s => s.province)).size} jurisdictions · coverage gaps`;
   $("panel").innerHTML =
@@ -355,9 +368,8 @@ function render() {
   atlas.update(state, filtered);
   if (activeControl && !activeId) {
     const [key, value] = activeControl;
-    [...document.querySelectorAll("button")]
-      .find((button) => button.dataset[key] === value)
-      ?.focus({ preventScroll: true });
+    const replacement = [...document.querySelectorAll("button")].find((button) => button.dataset[key] === value) || (key === "statusFilter" ? document.querySelector("[data-status-filter=designated]") : null);
+    replacement?.focus({ preventScroll: true });
   }
   if (activeId) {
     const el = $(activeId);
@@ -410,8 +422,13 @@ function receipt() {
     )}<p class="micro">Rate applicability is verified for ${rate.effectiveFrom} only. The pipeline reclamation surcharge is included in the variable toll. It is not an orphan-well cleanup payment.</p>${rate.destination.includes("Westridge") ? '<p class="micro">Marine and port charges are not included.</p>' : ""}<button class="secondary-button" data-action="export-receipt">Download receipt</button></details></section>`;
 }
 
+function destinationComparison() {
+  const widths = comparisonWidths(data.tariffs.rates.map(rate => rate.rate));
+  return data.tariffs.rates.map((rate, i) => `<button class="route-option ${rate.routeId === state.route ? "selected" : ""}" data-route="${rate.routeId}" aria-pressed="${rate.routeId === state.route}"><span><strong>${esc(rate.destination.split(",")[0])}</strong><span class="rate-strip"><i style="width:${widths[i]}%"></i></span></span><span class="route-cost">${precise(rate.rate)} <small>CAD / m³</small></span></button>`).join("");
+}
 function journeyPanel() {
-  return `<div class="panel-head"><h1>Transport costs</h1><p>Published pipeline rates, separated from government charges.</p></div><div class="panel-section">${routeSelect()}${shipmentFields()}</div>${receipt()}<div class="panel-section"><button class="secondary-button wide" data-action="benchmark-tolls">Browse CER benchmark tolls</button><p class="micro">Dated observations across pipeline systems. These do not change the shipment estimate.</p></div><div class="panel-section"><h3>Compare destinations</h3><p class="micro">Edmonton origin · light crude · same service and schedule. Delivery outcomes differ.</p>${data.tariffs.rates.map((rate) => `<button class="route-option ${rate.routeId === state.route ? "selected" : ""}" data-route="${rate.routeId}" aria-pressed="${rate.routeId === state.route}"><span><strong>${esc(rate.destination.split(",")[0])}</strong><span class="rate-strip"><i style="width:${(rate.rate / 90) * 100}%"></i></span></span><span class="route-cost">${precise(rate.rate)} <small>CAD / m³</small></span></button>`).join("")}<button class="primary-button wide" data-view="lab">Compare a cost scenario</button></div>`;
+  const route = getRoute();
+  return `<div class="panel-head"><span class="eyebrow">01 / MOVE ENERGY</span><h1>Transport costs</h1><p>Follow a corridor. See what is priced—and what remains unknown.</p></div><div class="panel-section shipment-form"><div class="route-identity"><span>${esc(route.origin.split(",")[0])}</span><span aria-hidden="true">↗</span><strong>${esc(route.destination.split(",")[0])}</strong></div>${routeSelect()}<details class="disclosure" id="shipment-inputs"><summary>Shipment assumptions <span class="assumption-preview">${fmt(state.volume)} ${state.unit === "m3" ? "m³" : "bbl"} · ${esc(state.date)}</span></summary>${shipmentFields()}</details></div>${receipt()}<section class="panel-section destination-section"><span class="eyebrow">SAME SERVICE · SAME SCHEDULE</span><h3>Compare destinations</h3><p class="micro">Published schedule: May 1, 2026 · Edmonton origin · light crude · CAD per m³. Select a destination to follow its corridor.</p>${destinationComparison()}<button class="primary-button wide" data-view="lab">Test a cost scenario <span aria-hidden="true">↗</span></button></section><div class="panel-section benchmark-entry"><span class="eyebrow">EXPLORE THE REFERENCE DATA</span><h3>Beyond this corridor</h3><p class="micro">Dated CER benchmarks across 25 pipeline systems. Each keeps its own units and service conditions.</p><button class="secondary-button wide" data-action="benchmark-tolls">Browse benchmark tolls <span aria-hidden="true">↗</span></button></div>`;
 }
 
 function wellFilters() {
@@ -483,6 +500,12 @@ function eventChart() {
       .join("")}</select>`,
   )}${years.length ? `<div class="event-bars" aria-label="Documented source events by year">${years.map((y) => `<div class="event-bar ${state.eventYear === y ? "active" : ""}" role="img" aria-label="${counts.get(y)} recorded ${counts.get(y) === 1 ? "event" : "events"} in ${y}"><span style="height:${Math.max(3, (counts.get(y) / max) * 62)}px"></span><small>${Number(y) % 10 === 0 ? y : ""}</small></div>`).join("")}</div>` : '<p class="small muted">This source does not include dated events.</p>'}${field("Show wells with an event in", "event-year", `<select id="event-year" data-state="eventYear">${option("all", "Any recorded year", state.eventYear)}${years.map((y) => option(y, `${y} · ${fmt(counts.get(y))} ${counts.get(y) === 1 ? "event" : "events"}`, state.eventYear)).join("")}</select>`)}</details>`;
 }
+function wellInsights(unavailable) {
+  if (unavailable) return '';
+  const records = filterWells(data.wells.wells, {...state, closure:'all', orphan:'all'});
+  const counts = wellStatusSummary(records);
+  return `<section class="well-insights" aria-label="Designation and closure in the selected source records"><div class="split-note"><h3>Two different questions</h3><button class="text-link" data-action="status-guide" aria-label="Explain orphan designation and abandonment">Explain ↗</button></div><p class="micro">Counts within the current jurisdiction, search and event filters. Categories overlap.</p><div class="status-pair"><button data-status-filter="designated" aria-pressed="${state.orphan==='designated' && state.closure==='all'}"><span class="status-symbol orphan-symbol" aria-hidden="true">◇</span><strong>${fmt(counts.designated)}</strong><span>Orphan designation<br>recorded</span></button><button data-status-filter="abandoned" aria-pressed="${state.closure==='abandoned' && state.orphan==='all'}"><span class="status-symbol closure-symbol" aria-hidden="true">○</span><strong>${fmt(counts.abandoned)}</strong><span>Wellbore recorded<br>as abandoned</span></button></div><button class="overlap-filter" data-status-filter="both" aria-pressed="${state.closure==='abandoned' && state.orphan==='designated'}"><span>${fmt(counts.both)} records have both statuses</span><span aria-hidden="true">↗</span></button>${state.closure!=='all'||state.orphan!=='all'?'<button class="text-link" data-status-filter="all">Clear status selection</button>':''}</section>`;
+}
 function wellsPanel() {
   const provinceCoverage = data.coverage.provinces.find(p => p.code === state.province);
   const inventoryGap = state.province !== "all" && !data.catalog.sources.some(source => source.province === state.province);
@@ -497,7 +520,7 @@ function wellsPanel() {
     state.eventType !== "all";
   const scope = state.province === "all" ? "Published source layers from the provinces listed in Coverage" : (data.catalog.sources.filter(s => s.province === state.province).map(s => s.title).join("; ") || "No licensed inventory loaded for this province");
   const controls = wellFilters();
-  return `<div class="panel-head"><h1>Well records</h1><p>Search source records for status and documented events.</p></div><div class="panel-section">${state.cohort === "cleanup" ? '<div class="callout">Closure-budget cohort active. Clear filters to browse all records.</div>' : ""}${controls}<div class="result-count" role="status"><span>${inventoryGap ? "Inventory not loaded" : `<strong>${fmt(filtered.length)}</strong> loaded ${filtered.length === 1 ? "record" : "records"}`}</span><button class="text-link" data-action="clear-well-filters">Clear filters</button></div><p class="coverage-note">${inventoryGap ? esc(provinceCoverage?.topics["well-inventory"].note || scope) : esc(scope) + ". Counts are not province-wide totals."} <button class="text-link" data-action="coverage">Coverage</button></p><details id="well-filter-options" class="disclosure" ${advanced ? "open" : ""}><summary>Status & event filters${advanced ? " · active" : ""}</summary>${wellAdvancedFilters()}${eventChart()}</details><button class="text-link" data-action="well-csv" ${inventoryGap ? "disabled" : ""}>Download filtered records</button></div><div class="well-results" aria-label="Matching well records">${
+  return `<div class="panel-head"><span class="eyebrow">02 / TRACE THE RECORD</span><h1>Well records</h1><p>Search source records for status and documented events.</p></div><div class="panel-section">${state.cohort === "cleanup" ? '<div class="callout">Closure-budget cohort active. Clear filters to browse all records.</div>' : ""}${controls}${wellInsights(inventoryGap)}<div class="result-count" role="status"><span>${inventoryGap ? "Inventory not loaded" : `<strong>${fmt(filtered.length)}</strong> loaded ${filtered.length === 1 ? "record" : "records"}`}</span><button class="text-link" data-action="clear-well-filters">Clear filters</button></div><p class="coverage-note">${inventoryGap ? esc(provinceCoverage?.topics["well-inventory"].note || scope) : esc(scope) + ". Counts are not province-wide totals."} <button class="text-link" data-action="coverage">Coverage</button></p><details id="well-filter-options" class="disclosure" ${advanced ? "open" : ""}><summary>Status & event filters${advanced ? " · active" : ""}</summary>${wellAdvancedFilters()}${eventChart()}</details><button class="text-link" data-action="well-csv" ${inventoryGap ? "disabled" : ""}>Download filtered records</button></div><div class="well-results" aria-label="Matching well records">${
     filtered.length
       ? filtered
           .slice(0, resultLimit)
@@ -524,15 +547,19 @@ function wellDetail(w) {
     .join("")}</details></div>`;
 }
 function labPanel() {
-  return `<div class="panel-head"><h1>Scenarios</h1><div class="tab-switch" role="group" aria-label="Scenario type"><button data-lab="transport" class="${state.labTab === "transport" ? "active" : ""}" aria-pressed="${state.labTab === "transport"}">Transport costs</button><button data-lab="cleanup" class="${state.labTab === "cleanup" ? "active" : ""}" aria-pressed="${state.labTab === "cleanup"}">Closure budget</button></div></div>${state.labTab === "transport" ? transportLab() : cleanupLab()}<div class="panel-section"><h3>Save or export</h3><p class="micro">Named scenarios stay in this browser. Downloads include inputs, results and source references.</p><div class="action-row"><button class="primary-button" data-action="save-scenario">Save scenario</button><button class="secondary-button" data-action="saved-scenarios">Saved scenarios</button><button class="secondary-button" data-action="export-scenario">Download scenario</button><button class="text-link" data-action="reset-scenario">Reset assumptions</button></div></div>`;
+  return `<div class="panel-head"><span class="eyebrow">03 / TEST AN ASSUMPTION</span><h1>Scenarios</h1><div class="tab-switch" role="group" aria-label="Scenario type"><button data-lab="transport" class="${state.labTab === "transport" ? "active" : ""}" aria-pressed="${state.labTab === "transport"}">Transport costs</button><button data-lab="cleanup" class="${state.labTab === "cleanup" ? "active" : ""}" aria-pressed="${state.labTab === "cleanup"}">Closure budget</button></div></div>${state.labTab === "transport" ? transportLab() : cleanupLab()}<div class="panel-section"><h3>Save or export</h3><p class="micro">Named scenarios stay in this browser. Downloads include inputs, results and source references.</p><div class="action-row"><button class="primary-button" data-action="save-scenario">Save scenario</button><button class="secondary-button" data-action="saved-scenarios">Saved scenarios</button><button class="secondary-button" data-action="export-scenario">Download scenario</button><button class="text-link" data-action="reset-scenario">Reset assumptions</button></div></div>`;
 }
 
+function scenarioChart(base, alternative) {
+  const widths = comparisonWidths([base, alternative]);
+  return `<div class="scenario-bars" role="img" aria-label="Carrier baseline ${esc(money(base))}; scenario known subtotal ${esc(money(alternative))}. Actual government charges remain unknown.">${[['Carrier baseline',base],['Your scenario',alternative]].map(([label,value],i)=>`<div><span>${label}</span><strong>${money(value)}</strong><div class="scenario-track"><i class="${i?'assumed':'baseline'}" style="width:${widths[i]}%"></i></div></div>`).join('')}</div>`;
+}
 function transportLab() {
   const base = getQuote(),
     alt = getQuote(true);
   const valid = base.status === "partial" && alt.status === "partial";
   const delta = valid ? alt.knownSubtotal - base.carrier : 0;
-  return `<section class="panel-section sticky-result" id="scenario-results"><span class="eyebrow">SCENARIO SUBTOTAL · CAD</span>${state.scenario.closed ? '<h2 style="margin-top:10px">Corridor unavailable</h2><p class="micro">No verified alternative route is modeled. No shipment price is calculated.</p>' : valid ? `<div class="scenario-comparison"><div class="scenario-number" data-testid="scenario-subtotal">${money(alt.knownSubtotal)}</div><span class="delta">${delta >= 0 ? "+" : ""}${money(delta)}<small>vs. carrier baseline</small></span></div><p class="receipt-label">${money(base.carrier)} carrier baseline · actual government charges unknown</p>` : `<div class="callout amber" role="status">${esc(base.status === "partial" ? alt.reason : base.reason)}${getRate() && ["unverified-date", "out-of-period"].includes(base.status) ? '<button class="text-link" data-action="rate-date">Use the verified schedule date</button>' : ""}</div>`}</section><div class="panel-section"><div class="split-note"><h3>Change an assumption</h3>${pill("User assumptions", "amber")}</div><div class="field" style="margin-top:16px"><div class="range-top"><label for="toll-change">Carrier toll adjustment</label><output>${state.scenario.tollChange > 0 ? "+" : ""}${state.scenario.tollChange}%</output></div><input id="toll-change" data-scenario="tollChange" type="range" min="-100" max="200" step="5" value="${state.scenario.tollChange}"></div>${field("Additional government fee · assumed CAD / m³", "government-assumption", `<input id="government-assumption" data-scenario="extraGovernment" type="number" min="0" max="10000" step="0.1" value="${Number.isFinite(state.scenario.extraGovernment) ? state.scenario.extraGovernment : ""}">`)}<label class="toggle-line"><span>Make corridor unavailable</span><input id="corridor-closed" data-scenario="closed" type="checkbox" ${state.scenario.closed ? "checked" : ""}></label><p class="micro">A $0 fee assumption does not establish zero actual charges.</p><details id="baseline-settings" class="disclosure"><summary>Edit baseline shipment</summary>${routeSelect()}${shipmentFields()}</details><button class="text-link" data-action="receipt-evidence">Baseline calculation & source</button></div>`;
+  return `<section class="panel-section sticky-result" id="scenario-results"><span class="eyebrow">SCENARIO SUBTOTAL · CAD</span>${state.scenario.closed ? '<h2 style="margin-top:10px">Corridor unavailable</h2><p class="micro">No verified alternative route is modeled. No shipment price is calculated.</p>' : valid ? `<div class="scenario-comparison"><div class="scenario-number" data-testid="scenario-subtotal">${money(alt.knownSubtotal)}</div><span class="delta">${delta >= 0 ? "+" : ""}${money(delta)}<small>vs. carrier baseline</small></span></div>${scenarioChart(base.carrier, alt.knownSubtotal)}<p class="receipt-label">Scenario includes your assumptions. Actual government charges remain unknown.</p>` : `<div class="callout amber" role="status">${esc(base.status === "partial" ? alt.reason : base.reason)}${getRate() && ["unverified-date", "out-of-period"].includes(base.status) ? '<button class="text-link" data-action="rate-date">Use the verified schedule date</button>' : ""}</div>`}</section><div class="panel-section"><div class="split-note"><h3>Change an assumption</h3>${pill("User assumptions", "amber")}</div><div class="field" style="margin-top:16px"><div class="range-top"><label for="toll-change">Carrier toll adjustment</label><output>${state.scenario.tollChange > 0 ? "+" : ""}${state.scenario.tollChange}%</output></div><input id="toll-change" data-scenario="tollChange" type="range" min="-100" max="200" step="5" value="${state.scenario.tollChange}"></div>${field("Additional government fee · assumed CAD / m³", "government-assumption", `<input id="government-assumption" data-scenario="extraGovernment" type="number" min="0" max="10000" step="0.1" value="${Number.isFinite(state.scenario.extraGovernment) ? state.scenario.extraGovernment : ""}">`)}<label class="toggle-line"><span>Make corridor unavailable</span><input id="corridor-closed" data-scenario="closed" type="checkbox" ${state.scenario.closed ? "checked" : ""}></label><p class="micro">A $0 fee assumption does not establish zero actual charges.</p><details id="baseline-settings" class="disclosure"><summary>Edit baseline shipment</summary>${routeSelect()}${shipmentFields()}</details><button class="text-link" data-action="receipt-evidence">Baseline calculation & source</button></div>`;
 }
 
 function cleanupLab() {
@@ -580,8 +607,10 @@ function chooseView(view) {
   atlas.focus();
   persist();
   $("panel").scrollTop = 0;
+  revealPanel($("panel").firstElementChild);
 }
 function openDialog(html, title) {
+  dialogRevision++;
   $("evidence-body").innerHTML = html;
   const firstHeading = $("evidence-body").querySelector("h3");
   $("dialog-title").textContent =
@@ -616,8 +645,9 @@ function showEvidence(id) {
         .join(""),
   );
 }
-function showHistoricalInfrastructure() {
-  const layer = data.historicalInfrastructure;
+async function showHistoricalInfrastructure() {
+  let layer;
+  try { layer = await ensureHistoricalData(); } catch { return; }
   const metadata = layer.metadata;
   const refineries = layer.features.filter(feature => feature.properties.kind === "refinery");
   openDialog(`<h3>Historical pipelines and refineries</h3><p>${esc(metadata.scope)}</p><p>${fmt(metadata.counts.pipeline)} pipeline segments and ${fmt(metadata.counts.refinery)} refinery points at 1:250,000 scale. Pipeline feature dates extend through ${esc(metadata.observationRanges.pipeline.latest.slice(0,4))}; refinery dates extend through ${esc(metadata.observationRanges.refinery.latest.slice(0,4))}. Archive modification date: ${esc(metadata.source.upstreamModifiedAt || "not supplied on this retrieval")}.</p><p>${esc(metadata.licence.attribution)} <a href="${esc(metadata.licence.url)}" target="_blank" rel="noopener">Licence</a>.</p><p><a href="data/context/historical-infrastructure.geojson" download>Download mapped features and source dates</a> · <a href="${esc(metadata.source.url)}" target="_blank" rel="noopener">Original NRCan archive</a></p><h3>Refinery records</h3><p>Historical locations. Current operating status is not established.</p>${refineries.map(feature => `<p><strong>${esc(feature.properties.name)}</strong><br>${esc(feature.properties.sourceDateMin)} to ${esc(feature.properties.sourceDateMax)} · ${feature.geometry.coordinates[1].toFixed(4)}, ${feature.geometry.coordinates[0].toFixed(4)}</p>`).join("")}`);
@@ -625,16 +655,31 @@ function showHistoricalInfrastructure() {
 function benchmarkRows(index) {
   const system = data.benchmarkTolls.systems[index];
   if (!system) return '<p>No benchmark observations for this system.</p>';
-  return `<p><strong>Observation date ${esc(system.latestObservationDate)}</strong><br>${fmt(system.snapshotRowCount)} observations on this date. Historical benchmarks are not current offers or all-in prices.</p><p><a href="${esc(system.source.url)}" target="_blank" rel="noopener">Download full CER history</a></p>${system.rows.map(row => `<article class="source-entry"><h3>${esc(row.Path || row['Pipeline Name'])}</h3><div class="receipt-row"><span>Published benchmark</span><strong>${esc(row.Toll)} ${esc(row.Unit)}</strong></div><p>${esc(row.Service)} · ${esc(row.Product)}<br>${esc(row['Corporate Entity'])}<br>Tariff ${esc(row['Tariff Number'] || 'not supplied')}</p></article>`).join("")}`;
+  return `<div class="benchmark-summary"><span class="eyebrow">OBSERVATION DATE</span><strong>${esc(system.latestObservationDate)}</strong><span>${fmt(system.snapshotRowCount)} observations · current applicability unverified</span></div><div class="benchmark-table" role="table" aria-label="Dated benchmark observations"><div class="benchmark-row benchmark-heading" role="row"><span role="columnheader">Route & service</span><span role="columnheader">Observed toll</span></div>${system.rows.map(row => `<div class="benchmark-row" role="row"><div role="cell"><strong>${esc(row.Path || row['Pipeline Name'])}</strong><span>${esc(row.Service)} · ${esc(row.Product)}</span><small>${esc(row['Corporate Entity'])} · Tariff ${esc(row['Tariff Number'] || 'not supplied')}</small></div><div role="cell" class="benchmark-value"><strong>${esc(row.Toll)}</strong><span>${esc(row.Unit)}</span></div></div>`).join('')}</div><p><a href="${esc(system.source.url)}" target="_blank" rel="noopener">Download full CER history</a></p>`;
 }
-function showBenchmarkTolls() {
+async function showBenchmarkTolls() {
+  if (!data.benchmarkTolls) {
+    openDialog('<div class="source-entry"><h3>CER benchmark tolls</h3><p role="status">Loading the dated reference records…</p></div>');
+    const requestRevision = dialogRevision;
+    try { data.benchmarkTolls = await fetchJSON('data/context/benchmark-tolls.json'); }
+    catch { if (requestRevision === dialogRevision && $("evidence-dialog").open) openDialog('<div class="source-entry"><h3>Reference data unavailable</h3><p>The file could not be loaded.</p><button data-action="benchmark-tolls">Retry benchmark data</button></div>'); return; }
+    if (requestRevision !== dialogRevision || !$("evidence-dialog").open) return;
+  }
   const tolls = data.benchmarkTolls;
-  openDialog(`<h3>CER benchmark tolls</h3><p>${esc(tolls.scope)}</p><p>${esc(tolls.licence.attribution)} <a href="${esc(tolls.licence.url)}" target="_blank" rel="noopener">Licence</a>.</p>${field("Pipeline system", "benchmark-system", `<select id="benchmark-system" data-benchmark-system>${tolls.systems.map((system,index) => `<option value="${index}">${esc(system.name)}</option>`).join("")}</select>`)}<div id="benchmark-records">${benchmarkRows(0)}</div><p><a href="data/context/benchmark-tolls.json" download>Download all benchmark snapshots with provenance</a></p>`);
+  openDialog(`<h3>CER benchmark tolls</h3><p class="benchmark-intro">${fmt(tolls.systemCount)} systems. Each observation keeps its date, service and original unit. These are references, not current shipment quotes.</p>${field("Pipeline system", "benchmark-system", `<select id="benchmark-system" data-benchmark-system>${tolls.systems.map((system,index) => `<option value="${index}">${esc(system.name)}</option>`).join("")}</select>`)}<div id="benchmark-records">${benchmarkRows(0)}</div><details class="source-entry"><summary>Method, licence & downloads</summary><p>${esc(tolls.scope)}</p><p>${esc(tolls.licence.attribution)} <a href="${esc(tolls.licence.url)}" target="_blank" rel="noopener">Licence</a>.</p><p><a href="data/context/benchmark-tolls.json" download>Download benchmark snapshots with provenance</a></p><p><a href="data/context/pipeline-attributes.json" download>Download CER pipeline attributes</a></p></details>`);
+}
+function coverageOverview() {
+  return `<div class="coverage-intro"><span class="eyebrow">PUBLIC BETA / COVERAGE REGISTER</span><h3>A map of the records we can verify.</h3><p>${fmt(data.catalog.totalRecords)} source records across ${new Set(data.catalog.sources.map(s=>s.province)).size} jurisdictions. A complete source download is not a complete provincial inventory.</p></div><div class="jurisdiction-grid">${data.coverage.provinces.map(p => {
+    const loaded = data.catalog.sources.filter(s=>s.province===p.code);
+    const count = loaded.reduce((total,s)=>total+s.count,0);
+    const historical = loaded.some(s=>s.observationsThrough);
+    return `<button data-coverage-province="${esc(p.code)}" class="jurisdiction ${count?'loaded':'unavailable'}"><span class="jurisdiction-code">${esc(p.code)}</span><span><strong>${esc(p.name)}</strong><small>${count?`${fmt(count)} records · ${historical?'historical / partial':'partial coverage'}`:'Inventory not loaded'}</small></span><span aria-hidden="true">↗</span></button>`;
+  }).join('')}</div>`;
 }
 
 function coverageTable() {
   const statusLabel = {partial:"Partial coverage",unavailable:"Not available", "permission-required":"Permission required",complete:"Verified complete"};
-  return `<p>National coverage is incomplete. Retrieval dates show when files were checked, not when the underlying records were last updated.</p><div class="table-scroll" role="region" aria-label="National well inventory coverage" tabindex="0"><table class="coverage-table"><thead><tr><th>Jurisdiction</th><th>Published records</th><th>Coverage</th></tr></thead><tbody>${data.coverage.provinces.map(p => {const loaded=data.catalog.sources.filter(s => s.province===p.code);return `<tr><td>${esc(p.name)}</td><td>${loaded.length ? fmt(loaded.reduce((n,s)=>n+s.count,0)) : "Not loaded"}</td><td>${esc(statusLabel[p.topics["well-inventory"].status] || p.topics["well-inventory"].status)}</td></tr>`;}).join("")}</tbody></table></div><h3>Source freshness</h3>${data.catalog.sources.map(s=>`<p><strong>${esc(s.title)}</strong><br>Retrieved ${esc(localDate(s.retrievedAt))} · ${snapshotFreshness(s.retrievedAt)==="stale"?"refresh overdue":"recent retrieval"}<br>${s.observationsThrough ? `Historical observations through ${esc(s.observationsThrough)}<br>` : ""}Source date: ${esc(s.sourceDateText || (typeof s.upstreamModifiedAt === "number" ? new Date(s.upstreamModifiedAt).toISOString() : s.upstreamModifiedAt) || "not supplied")}<br>${esc(s.limitations)}</p>`).join("")}<p><a href="data/national-coverage.json" target="_blank" rel="noopener">Download coverage and source register</a></p>`;
+  return `${coverageOverview()}<details class="coverage-detail"><summary>Coverage table, dates & limitations</summary><p>National coverage is incomplete. Retrieval dates show when files were checked, not when the underlying records were last updated.</p><div class="table-scroll" role="region" aria-label="National well inventory coverage" tabindex="0"><table class="coverage-table"><thead><tr><th>Jurisdiction</th><th>Published records</th><th>Coverage</th></tr></thead><tbody>${data.coverage.provinces.map(p => {const loaded=data.catalog.sources.filter(s => s.province===p.code);return `<tr><td>${esc(p.name)}</td><td>${loaded.length ? fmt(loaded.reduce((n,s)=>n+s.count,0)) : "Not loaded"}</td><td>${esc(statusLabel[p.topics["well-inventory"].status] || p.topics["well-inventory"].status)}</td></tr>`;}).join("")}</tbody></table></div><h3>Source freshness</h3>${data.catalog.sources.map(s=>`<p><strong>${esc(s.title)}</strong><br>Retrieved ${esc(localDate(s.retrievedAt))} · ${snapshotFreshness(s.retrievedAt)==="stale"?"refresh overdue":"recent retrieval"}<br>${s.observationsThrough ? `Historical observations through ${esc(s.observationsThrough)}<br>` : ""}Source date: ${esc(s.sourceDateText || (typeof s.upstreamModifiedAt === "number" ? new Date(s.upstreamModifiedAt).toISOString() : s.upstreamModifiedAt) || "not supplied")}<br>${esc(s.limitations)}</p>`).join("")}<p><a href="data/national-coverage.json" target="_blank" rel="noopener">Download coverage and source register</a></p></details>`;
 }
 function showReceiptEvidence() {
   const rate = getRate(),
@@ -910,6 +955,17 @@ document.addEventListener("click", async (e) => {
     chooseView("journey");
     return;
   }
+  if (b.dataset.statusFilter) {
+    state.orphan = ['designated','both'].includes(b.dataset.statusFilter) ? 'designated' : 'all';
+    state.closure = ['abandoned','both'].includes(b.dataset.statusFilter) ? 'abandoned' : 'all';
+    state.well = null; resultLimit = 30; render(); persist();
+    $("result-announcement").textContent = `${fmt(filtered.length)} matching source records`;
+    return;
+  }
+  if (b.dataset.coverageProvince) {
+    state.province = b.dataset.coverageProvince; state.query = ''; state.orphan = 'all'; state.closure = 'all'; state.eventYear = 'all'; state.eventType = 'all'; state.cohort = 'all';
+    $("evidence-dialog").close(); chooseView('wells'); return;
+  }
   if (b.dataset.surface) {
     setSurface(b.dataset.surface);
     return;
@@ -991,6 +1047,7 @@ document.addEventListener("click", async (e) => {
     openDialog(
       `<div class="source-entry"><h3>Facilities</h3><p class="micro">Selected CAPP capacity records. Map markers represent localities.</p>${data.network.facilities.map((f, i) => `<button class="route-option" data-facility="${i}"><span><strong>${esc(f.name)}</strong><small>${esc(f.type)}</small></span><span>${fmt(f.capacity)}<small>${esc(f.unit)}</small></span></button>`).join("")}</div>`,
     );
+  if (a === "status-guide") openDialog('<div class="source-entry"><h3>Orphan and abandoned mean different things</h3><p><strong>Orphan designation</strong> is an authority’s recorded designation concerning responsibility. It does not describe whether a wellbore is open or sealed.</p><p><strong>Abandonment</strong> describes documented wellbore closure. An abandoned well can still have an orphan designation.</p><p><strong>Site reclamation</strong> is a third, separate question. Neither designation nor wellbore closure establishes that a site is reclaimed.</p><p>The two counts can overlap. Select “both statuses” to inspect the actual overlap in the loaded records. Unknown designation never means confirmed not orphaned.</p></div>');
   if (a === "evidence") showEvidence();
   if (a === "close-dialog") $("evidence-dialog").close();
   if (a === "focus") {
@@ -1035,6 +1092,7 @@ document.addEventListener("click", async (e) => {
   }
   if (a === "retry-detail") { detailError = null; render(); return; }
   if (a === "retry-wells") { wellLoadError = null; render(); return; }
+  if (a === "bc-infrastructure") void showBCSources();
   if (a === "historical-infrastructure") showHistoricalInfrastructure();
   if (a === "benchmark-tolls") showBenchmarkTolls();
   if (a === "coverage")
@@ -1139,3 +1197,29 @@ boot().catch((error) => {
   $("snapshot-label").textContent = "Source loading failed";
   console.error(error);
 });
+
+async function ensureBCData() {
+  if (data.bcInfrastructure) return data.bcInfrastructure;
+  if (!bcPromise) {
+    announce('Loading BC permit geometry…');
+    bcPromise = fetchJSON('data/bc-infrastructure/map.geojson').then(layer => {
+      data.bcInfrastructure = layer; atlas.setBCPermits(layer); render();
+      announce(`${fmt(layer.features.length)} BC permit records loaded. Operating status is not established.`);
+      return layer;
+    }).catch(error => {bcPromise=null; state.layers.bcPermits=false; render(); announce('BC permit layer unavailable. Toggle the layer to retry.'); throw error;});
+  }
+  return bcPromise;
+}
+function showBCFeature(feature) {
+  const p=feature.properties;
+  openDialog(`<h3>${esc(feature.id)}</h3><p>BC ${esc(p.kind.replace('-',' '))} record</p><dl class="record-fields"><dt>Source permit status</dt><dd>${esc(p.sourceStatus||'Not supplied')}</dd><dt>Approval date</dt><dd>${esc(p.approvalDate||'Not supplied')}</dd><dt>Operating status</dt><dd>Not established by this source</dd></dl><p>Locations collected on or after July 11, 2016. Pipeline display geometry is simplified within 10 metres of the source geometry.</p><button class="primary-button" data-action="bc-infrastructure">Inventory scope, sources & downloads</button>`);
+}
+async function showBCSources() {
+  openDialog('<h3>BC pipeline & facility permits</h3><p role="status">Loading source details…</p>');
+  const revision=dialogRevision;
+  try {
+    const m=await fetchJSON('data/bc-infrastructure/manifest.json');
+    if(revision!==dialogRevision||!$('evidence-dialog').open)return;
+    openDialog(`<h3>BC pipeline & facility permits</h3><p>${fmt(m.counts['pipeline-permit'])} pipeline segments · ${fmt(m.counts['facility-permit'])} facility points · ${fmt(m.counts['orphan-pipeline-row'])} separate orphan pipeline rows.</p><p>${esc(m.scope)}</p><p>Retrieved ${esc(localDate(m.retrievedAt))}. Publisher updates nightly; this app checks weekly. Permit statuses are preserved verbatim and do not establish current operations.</p><p>Contains information licensed under the <a href="https://www.bc-er.ca/files/gis/BCER-Open-Data-Licence.pdf" target="_blank" rel="noopener">BC Energy Regulator Open Data Licence</a>.</p>${Object.entries(m.sources).map(([name,s])=>`<p><a href="${esc(s.sourceUrl)}" target="_blank" rel="noopener">BCER ${esc(name)} source</a> · ${fmt(s.recordCount)} records</p>`).join('')}<p><a href="data/bc-infrastructure/full.geojson" download>Download full geometry and attributes</a><br><a href="data/bc-infrastructure/orphan-pipelines.json" download>Download separate orphan table</a></p><p>Map geometry uses a 10 metre simplification. Full geometry retains source vertices, with coordinates rounded to six decimals. No spatial join has been inferred for the orphan table.</p>`);
+  } catch {if(revision===dialogRevision)openDialog('<h3>Source details unavailable</h3><p>Please retry.</p>');}
+}

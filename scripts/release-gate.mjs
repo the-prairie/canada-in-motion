@@ -18,6 +18,7 @@ export async function releaseGate(root = ROOT, { now = new Date() } = {}) {
   if(!Number.isFinite(config.staleAfterDays) || config.staleAfterDays <= 0) errors.push('Invalid freshness threshold.');
   fresh(catalog.retrievedAt,'Catalog');
   fresh(release.context.retrievedAt,'Infrastructure and benchmark context');
+  if (release.bc) fresh(release.bc.retrievedAt,'BC permit inventory');
   for(const source of catalog.sources) {
     fresh(source.retrievedAt,source.id);
     const definition = registry.find(item=>item.id===source.id);

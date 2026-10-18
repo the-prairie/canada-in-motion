@@ -15,6 +15,7 @@
     />
     <link rel="stylesheet" href="vendor/leaflet.css" />
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="design.css" />
     <script src="vendor/leaflet.js" defer></script>
     <script src="vendor/supercluster.js" defer></script>
     <script type="module" src="app.js"></script>
@@ -29,7 +30,7 @@
             <circle cx="8" cy="28" r="2" />
             <circle cx="32" cy="12" r="2" />
           </svg>
-          <span>Canada in Motion<small>ENERGY ATLAS</small></span>
+          <span>Canada in Motion<small>ENERGY ATLAS <em class="beta-tag">PUBLIC BETA</em></small></span>
         </a>
         <nav class="main-nav" aria-label="Explore the atlas">
           <button data-view="journey" class="selected">Transport costs</button>
@@ -37,7 +38,7 @@
           <button data-view="lab">Scenarios</button>
         </nav>
         <div class="header-actions">
-          <button class="quiet" data-action="evidence">Sources</button
+          <button class="quiet" data-action="coverage">Coverage</button><button class="quiet" data-action="evidence">Sources</button
           ><button class="share-button" data-action="share">
             Copy view link <span aria-hidden="true">↗</span>
           </button>

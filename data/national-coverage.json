@@ -91,7 +91,7 @@
             "nrcan-canvec-historical"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
-          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
+          "note": "Partial coverage: BCER pipeline and facility permit locations collected on or after July 11, 2016, refreshed weekly. Includes non-operating statuses; permits do not establish operating inventory. Historical CanVec geometry and schematic featured corridors are separate layers."
         },
         "carrier-rates": {
           "status": "partial",
@@ -270,7 +270,7 @@
     },
     {
       "code": "QC",
-      "name": "Québec",
+      "name": "Qu\u00e9bec",
       "jurisdictionType": "province",
       "topics": {
         "well-inventory": {
@@ -971,7 +971,7 @@
     },
     {
       "code": "QC",
-      "name": "Québec",
+      "name": "Qu\u00e9bec",
       "sourceIds": [
         "qc-sigpeg-wells"
       ],

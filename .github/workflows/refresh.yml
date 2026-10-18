@@ -46,9 +46,11 @@ jobs:
           github-token: ${{ github.token }}
       - name: Acquire all enabled approved sources atomically
         run: python pipeline/refresh.py
+      - name: Refresh licensed BC permit inventory when seven days old
+        run: python pipeline/refresh_bcer.py
       - name: Refresh openly licensed context when seven days old
         run: python pipeline/refresh_context.py
-      - name: Build private review candidate
+      - name: Build verified beta candidate
         run: node scripts/build-public.mjs
       - name: Report beta technical readiness without authorizing launch
         run: node scripts/launch-readiness.mjs > data/beta-readiness.json
@@ -94,5 +96,6 @@ jobs:
             data/catalog.json
             data/source-monitor.json
             data/context/
+            data/bc-infrastructure/
           retention-days: 90
           if-no-files-found: error
