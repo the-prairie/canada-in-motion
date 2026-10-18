@@ -278,6 +278,7 @@ function render() {
   const wellMode =
     state.view === "wells" ||
     (state.view === "lab" && state.labTab === "cleanup");
+  const inventoryGap = state.province !== "all" && !data.catalog.sources.some(source => source.province === state.province);
   document.body.dataset.view = state.view;
   $("map-eyebrow").textContent = wellMode
     ? "REGULATOR RECORDS"
@@ -285,7 +286,7 @@ function render() {
   $("map-title").textContent = wellMode
     ? state.well
       ? data.wells.wells.find((w) => w.id === state.well)?.name
-      : `${fmt(filtered.length)} loaded well ${filtered.length === 1 ? "record" : "records"}`
+      : inventoryGap ? "Inventory not loaded" : `${fmt(filtered.length)} loaded well ${filtered.length === 1 ? "record" : "records"}`
     : `${getRoute().origin} → ${getRoute().destination}`;
   $("map-subtitle").textContent = wellMode
     ? "Source coordinates · incomplete national coverage"
@@ -331,7 +332,7 @@ function render() {
     state.view === "journey"
       ? journeyDock()
       : wellMode
-        ? `<div class="dock-summary"><div><strong>${fmt(filtered.length)}</strong><small>${state.labTab === "cleanup" && state.view === "lab" ? "eligible SK records · assumed closure budget" : "loaded records matching filters"}</small></div><button data-action="show-records">${state.view === "lab" ? "Inspect cohort" : "View records"}</button></div>`
+        ? `<div class="dock-summary"><div><strong>${inventoryGap ? "Not loaded" : fmt(filtered.length)}</strong><small>${state.labTab === "cleanup" && state.view === "lab" ? "eligible SK records · assumed closure budget" : "loaded records matching filters"}</small></div><button data-action="show-records">${state.view === "lab" ? "Inspect cohort" : "View records"}</button></div>`
         : `<div class="dock-summary"><div><strong>${state.scenario.closed ? "Corridor unavailable" : getQuote(true).status === "partial" ? money(getQuote(true).knownSubtotal) : "Estimate unavailable"}</strong><small>Scenario subtotal · includes your assumptions</small></div><button data-action="show-details">Edit scenario</button></div>`;
   openSections.forEach((id) => {
     if ($(id)) $(id).open = true;
@@ -476,6 +477,8 @@ function eventChart() {
   )}${years.length ? `<div class="event-bars" aria-label="Documented source events by year">${years.map((y) => `<div class="event-bar ${state.eventYear === y ? "active" : ""}" role="img" aria-label="${counts.get(y)} recorded ${counts.get(y) === 1 ? "event" : "events"} in ${y}"><span style="height:${Math.max(3, (counts.get(y) / max) * 62)}px"></span><small>${Number(y) % 10 === 0 ? y : ""}</small></div>`).join("")}</div>` : '<p class="small muted">This source does not include dated events.</p>'}${field("Show wells with an event in", "event-year", `<select id="event-year" data-state="eventYear">${option("all", "Any recorded year", state.eventYear)}${years.map((y) => option(y, `${y} · ${fmt(counts.get(y))} ${counts.get(y) === 1 ? "event" : "events"}`, state.eventYear)).join("")}</select>`)}</details>`;
 }
 function wellsPanel() {
+  const provinceCoverage = data.coverage.provinces.find(p => p.code === state.province);
+  const inventoryGap = state.province !== "all" && !data.catalog.sources.some(source => source.province === state.province);
   if (state.well) {
     const w = data.wells.wells.find((w) => w.id === state.well);
     if (w) return wellDetail(w);
@@ -487,7 +490,7 @@ function wellsPanel() {
     state.eventType !== "all";
   const scope = state.province === "all" ? "Published source layers from the provinces listed in Coverage" : (data.catalog.sources.filter(s => s.province === state.province).map(s => s.title).join("; ") || "No licensed inventory loaded for this province");
   const controls = wellFilters();
-  return `<div class="panel-head"><h1>Well records</h1><p>Search source records for status and documented events.</p></div><div class="panel-section">${state.cohort === "cleanup" ? '<div class="callout">Closure-budget cohort active. Clear filters to browse all records.</div>' : ""}${controls}<div class="result-count" role="status"><span><strong>${fmt(filtered.length)}</strong> loaded ${filtered.length === 1 ? "record" : "records"}</span><button class="text-link" data-action="clear-well-filters">Clear filters</button></div><p class="coverage-note">${scope}. Counts are not province-wide totals. <button class="text-link" data-action="coverage">Coverage</button></p><details id="well-filter-options" class="disclosure" ${advanced ? "open" : ""}><summary>Status & event filters${advanced ? " · active" : ""}</summary>${wellAdvancedFilters()}${eventChart()}</details><button class="text-link" data-action="well-csv">Download filtered records</button></div><div class="well-results" aria-label="Matching well records">${
+  return `<div class="panel-head"><h1>Well records</h1><p>Search source records for status and documented events.</p></div><div class="panel-section">${state.cohort === "cleanup" ? '<div class="callout">Closure-budget cohort active. Clear filters to browse all records.</div>' : ""}${controls}<div class="result-count" role="status"><span>${inventoryGap ? "Inventory not loaded" : `<strong>${fmt(filtered.length)}</strong> loaded ${filtered.length === 1 ? "record" : "records"}`}</span><button class="text-link" data-action="clear-well-filters">Clear filters</button></div><p class="coverage-note">${inventoryGap ? esc(provinceCoverage?.topics["well-inventory"].note || scope) : esc(scope) + ". Counts are not province-wide totals."} <button class="text-link" data-action="coverage">Coverage</button></p><details id="well-filter-options" class="disclosure" ${advanced ? "open" : ""}><summary>Status & event filters${advanced ? " · active" : ""}</summary>${wellAdvancedFilters()}${eventChart()}</details><button class="text-link" data-action="well-csv" ${inventoryGap ? "disabled" : ""}>Download filtered records</button></div><div class="well-results" aria-label="Matching well records">${
     filtered.length
       ? filtered
           .slice(0, resultLimit)
@@ -496,7 +499,7 @@ function wellsPanel() {
               `<button class="well-card" data-well="${esc(w.id)}"><strong>${esc(w.name)}</strong>${pill(w.province, "gray")} ${pill(statusNames[w.closureStatus] || w.closureStatus, "gray")} ${w.orphanStatus === "designated" ? pill("Orphan designation recorded", "amber") : ""}<small>${esc(w.locationLabel || w.license)}<br>${esc(w.operator || "Licensee not supplied")}</small></button>`,
           )
           .join("")
-      : '<div class="empty"><h3>No matching records</h3><p>Try a different licence or clear the filters. Missing coverage does not mean no wells exist.</p><button class="secondary-button" data-action="clear-well-filters">Clear all filters</button></div>'
+      : inventoryGap ? '<div class="empty"><h3>Coverage is unavailable</h3><p>This is a source-access or coverage gap, not a zero-well count.</p><button class="secondary-button" data-action="coverage">Inspect source requirements</button></div>' : '<div class="empty"><h3>No matching records</h3><p>Try a different licence or clear the filters. Missing coverage does not mean no wells exist.</p><button class="secondary-button" data-action="clear-well-filters">Clear all filters</button></div>'
   }${filtered.length > resultLimit ? '<button class="secondary-button wide" data-action="more-wells">Show 30 more records</button>' : ""}</div>`;
 }
 
@@ -1009,7 +1012,7 @@ document.addEventListener("click", async (e) => {
   if (a === "retry-wells") { wellLoadError = null; render(); return; }
   if (a === "coverage")
     openDialog(
-      `<div class="source-entry"><h3>Well-data coverage</h3>${coverageTable()}${data.wells.coverage.map((c) => `<h3>${esc(c.province)}</h3><p>${esc(c.note)}</p>`).join("")}</div>`,
+      `<div class="source-entry"><h3>Well-data coverage</h3>${coverageTable()}</div>`,
     );
   if (a === "well-csv")
     exportFile(

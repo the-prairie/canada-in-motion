@@ -2,6 +2,10 @@
 
 Research completed October 17, 2026, America/Edmonton. Raw probe files use UTC timestamps where present. This audit identifies usable feeds and concrete gaps; it does not certify a complete national inventory.
 
+## Implementation verification supersedes research suggestions
+
+The implemented acquisition has now fetched all five enabled provincial source layers locally and in GitHub Actions. Ontario uses `OGF_ID`: full enumeration found duplicate zero values in `WELL_ID`. Alberta contains 238,158 records and its upstream file reports January 30, 2025; Manitoba contains 12,155 records and its HTTP modification date is August 27, 2026. See VERIFIED-SNAPSHOT.json and VERIFICATION.md for the actual release evidence. Research handoff filenames below describe local investigation artifacts; production paths are pipeline/ and config/.
+
 ## Immediate implementation handoff
 
 - `adapter-config.json`: exact endpoints, source and stable IDs, mappings, publication status, licence references and limitations for ON, BC, MB, QC, NS and YT.

@@ -1,0 +1,115 @@
+{
+  "workflowRun": "https://github.com/the-prairie/canada-in-motion/actions/runs/39098379760",
+  "commit": "d71cfe7",
+  "conclusion": "success",
+  "trigger": "workflow_dispatch",
+  "releaseId": "b095870af6cb838561a3",
+  "retrievedAt": "2026-10-18T04:50:56Z",
+  "sources": [
+    {
+      "id": "aer-abandoned-wells",
+      "province": "AB",
+      "sourceCount": 238158,
+      "count": 238158,
+      "enumerationVerified": true
+    },
+    {
+      "id": "on-petroleum-wells",
+      "province": "ON",
+      "sourceCount": 27639,
+      "count": 27639,
+      "enumerationVerified": true
+    },
+    {
+      "id": "bcer-surface-wells",
+      "province": "BC",
+      "sourceCount": 34425,
+      "count": 34425,
+      "enumerationVerified": true
+    },
+    {
+      "id": "sk-orphan-wells",
+      "province": "SK",
+      "sourceCount": 4340,
+      "count": 4340,
+      "enumerationVerified": true
+    },
+    {
+      "id": "mb-petroleum-wells",
+      "province": "MB",
+      "sourceCount": 12155,
+      "count": 12155,
+      "enumerationVerified": true
+    }
+  ],
+  "transportMonitor": {
+    "checkedAt": "2026-10-18T04:51:09.846953+00:00",
+    "results": [
+      {
+        "id": "cer-pipeline-map",
+        "status": "baseline-needs-review",
+        "error": null
+      },
+      {
+        "id": "nacei-refineries",
+        "status": "baseline-needs-review",
+        "error": null
+      },
+      {
+        "id": "nacei-lng",
+        "status": "baseline-needs-review",
+        "error": null
+      },
+      {
+        "id": "bcer-pipeline-segments",
+        "status": "baseline-needs-review",
+        "error": null
+      },
+      {
+        "id": "nb-pipelines",
+        "status": "baseline-needs-review",
+        "error": null
+      },
+      {
+        "id": "aer-pipelines",
+        "status": "baseline-needs-review",
+        "error": null
+      },
+      {
+        "id": "tm-current-tariffs",
+        "status": "failed",
+        "error": "HTTP Error 403: Forbidden"
+      },
+      {
+        "id": "enbridge-canadian-mainline",
+        "status": "baseline-needs-review",
+        "error": null
+      },
+      {
+        "id": "tc-mainline-tariffs",
+        "status": "baseline-needs-review",
+        "error": null
+      },
+      {
+        "id": "canada-internal-trade",
+        "status": "baseline-needs-review",
+        "error": null
+      },
+      {
+        "id": "cra-freight-tax",
+        "status": "baseline-needs-review",
+        "error": null
+      },
+      {
+        "id": "cta-freight-pricing",
+        "status": "baseline-needs-review",
+        "error": null
+      },
+      {
+        "id": "nrcan-lng-projects",
+        "status": "baseline-needs-review",
+        "error": null
+      }
+    ]
+  }
+}

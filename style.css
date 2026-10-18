@@ -1918,6 +1918,21 @@ a[target="_blank"]::after {
 .coverage-table td:nth-child(3) {
   white-space: nowrap;
 }
+@media (max-width: 760px) {
+  .coverage-table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+  .coverage-table th,
+  .coverage-table td:nth-child(2),
+  .coverage-table td:nth-child(3) {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .coverage-table th:first-child { width: 39%; }
+  .coverage-table th:nth-child(2) { width: 27%; }
+  .coverage-table th:nth-child(3) { width: 34%; }
+}
 .layer-key {
   border-top: 1px solid var(--line);
   padding-top: 12px;

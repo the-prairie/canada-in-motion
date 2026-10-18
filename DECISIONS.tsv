@@ -5,3 +5,6 @@ ts	phase	decision	why	evidence	result
 2026-10-18T04:45:06.615966+00:00	identity	Use Ontario OGF_ID rather than WELL_ID	Full extraction found duplicate zero WELL_ID values	pipeline/refresh.py	27639unique source records
 2026-10-18T04:45:06.615968+00:00	review	Centralize selected-record load and failure recovery	Saved views and race failures need the same loading path	app.js	repaired
 2026-10-18T04:45:06.615969+00:00	updates	Restore the previous successful artifact before both workflows	Count-drop and publication-hash comparisons need persisted baselines	.github/workflows/refresh.yml	configured
+2026-10-18T04:53:51.696782+00:00	verification	Verify private hosted acquisition	Configured schedules alone do not prove execution	docs/HOSTED-VERIFICATION.json	316717 records reproduced
+2026-10-18T04:53:51.697086+00:00	ux	Distinguish unavailable inventory from zero	Missing source coverage must not imply zero wells	app.js	Verified desktop and mobile
+2026-10-18T04:53:51.697088+00:00	evidence	Supersede local investigation paths with committed evidence	Repository reviewers need durable references	docs/VERIFICATION.md	Local and hosted proof recorded

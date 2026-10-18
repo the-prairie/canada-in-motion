@@ -367,6 +367,10 @@ export class AtlasMap {
         );
         return;
       }
+      const province = this.provinces.getLayers().find(layer => layer.feature.properties.admin === "Canada" && layer.feature.properties.postal === this.state.province);
+      if (province) this.map.fitBounds(province.getBounds(), {padding: [50,80],maxZoom:7});
+      else this.continent();
+      return;
     }
     const r = this.network.routes.find((r) => r.id === this.state.route);
     if (r)

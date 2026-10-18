@@ -4,7 +4,7 @@ The repository is private. Public launch is disabled. This candidate has a publi
 
 The ten provinces and three territories have source research records. Alberta, British Columbia, Saskatchewan, Ontario and Manitoba have enabled acquisition adapters. Full source-layer enumeration does not imply complete provincial coverage. Québec and Newfoundland sources require redistribution permission. Other gaps are documented in WELL-SOURCES.md and data/national-coverage.json.
 
-Daily GitHub Actions acquisition is configured for 10:17 UTC. A candidate artifact is separate from the live release. No public site has been deployed. Deployment remains a manual, gated operation. Transport publications have a change monitor, but rate changes require review and cannot silently become authoritative quotes.
+Daily GitHub Actions acquisition is configured for 10:17 UTC. The first manual hosted run succeeded and reproduced all 316,717 records; see VERIFICATION.md and HOSTED-VERIFICATION.json. Twelve transport monitors established baselines; Trans Mountain returned HTTP 403 and remains an explicit failed source check. A candidate artifact is separate from the live release. No public site has been deployed. Deployment remains a manual, gated operation. Transport publications have a change monitor, but rate changes require review and cannot silently become authoritative quotes.
 
 ## External requirements
 
