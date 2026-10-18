@@ -111,5 +111,13 @@
         "error": null
       }
     ]
+  },
+  "repeatRun": {
+    "workflowRun": "https://github.com/the-prairie/canada-in-motion/actions/runs/39098701065",
+    "commit": "baaad12",
+    "conclusion": "success",
+    "previousBaselineRestore": "success",
+    "releaseId": "bb8af118744d8b435f97",
+    "totalRecords": 316717
   }
 }
