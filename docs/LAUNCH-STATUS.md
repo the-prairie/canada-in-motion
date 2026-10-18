@@ -14,7 +14,7 @@ Live public beta: https://the-prairie.github.io/canada-in-motion/
 
 ## Remaining coverage work
 
-Québec, NL, NB, PEI and current NS petroleum well inventories still need the authority-specific licence/inventory requests in `DATA-ACCESS-REQUESTS.md`. No requests were sent. The delegated second investigation and openly licensed NPRI refinery candidate are documented in `ADDITIONAL-COVERAGE-RESEARCH.md`; the NPRI candidate is not published until its refresh adapter is implemented. Current national infrastructure, carrier rates and government-charge coverage remain incomplete.
+Québec, NL, NB, PEI and current NS petroleum well coverage remains incomplete. These gaps combine acquisition, completeness and source-specific reuse questions; separate permission letters are not a blanket requirement. See the revised approach in `DATA-ACCESS-REQUESTS.md`. No requests were sent. The delegated second investigation and openly licensed NPRI refinery candidate are documented in `ADDITIONAL-COVERAGE-RESEARCH.md`; the NPRI candidate is not published until its refresh adapter is implemented. Current national infrastructure, carrier rates and government-charge coverage remain incomplete.
 
 ## Validation
 
@@ -26,4 +26,4 @@ Québec, NL, NB, PEI and current NS petroleum well inventories still need the au
 
 [Fresh data run](https://github.com/the-prairie/canada-in-motion/actions/runs/39106671252) succeeded and triggered [automatic public deployment](https://github.com/the-prairie/canada-in-motion/actions/runs/39106844305) via `workflow_run`, also successful. Latest verified public release: `948554d5cee0d0a641b1`. BC weekly reuse preserved its prior acquisition timestamp. Daily schedule remains 10:17 UTC; the timer itself has not yet fired since this launch, while its refresh-to-publication path has been exercised end to end.
 
-No further hosting setup is required from the owner. Full national expansion still requires the authority-specific data/redistribution grants or authorization to send the prepared requests; no external requests have been sent.
+No further hosting setup is required from the owner. Full national expansion requires additional verified source acquisition and integration. Existing licences and applicable noncommercial reuse terms should be used directly; only explicit unresolved source/use restrictions warrant separate escalation. No external requests have been sent.

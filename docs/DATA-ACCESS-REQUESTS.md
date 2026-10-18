@@ -1,6 +1,27 @@
-# Prepared data-access requests
+# Data acquisition and optional authority requests
 
-Drafts only; no messages have been sent. The proposed service is a free, noncommercial public Canadian energy atlas, with attribution, retrieval dates and original source links.
+Updated October 18, 2026 after reassessing the initial approach. Separate permission letters are **not a blanket prerequisite** for expanding this free, noncommercial atlas. The earlier drafts below were too broad in treating unresolved reuse scope as a confirmed permission requirement.
+
+## Working approach
+
+- Use applicable open licences and published noncommercial reuse terms directly; do not ask authorities to reconfirm rights they have already granted.
+- Missing dataset-level licence metadata means the applicable terms need checking; it does not by itself establish that permission is required. Check the publisher's general terms and any source-specific exceptions.
+- Distinguish technical acquisition and inventory-completeness gaps from actual reuse restrictions. Requests for a better export, definitions or update endpoint are data-quality requests, not automatically permission requests.
+- Evaluate the intended use separately: an attributed display, unchanged reproduction, normalized bulk export and a mirror of an entire dataset need not have identical conditions. Do not require every source to support every export feature before it can contribute useful information.
+- Where an explicit source restriction applies to the intended use, record that exact restriction and pursue another source or a compatible use. Link to the authoritative viewer where appropriate. Do not label an entire province's public information as restricted because one dataset has restrictive terms.
+- No external requests have been sent. The drafts below are optional fallbacks for particular unresolved uses, not a list of tasks the owner must complete before work can continue.
+
+## Recheck: Nova Scotia
+
+The province's [copyright policy](https://www.novascotia.ca/copyright) expressly permits noncommercial reproduction without further permission unless a specific page/item says otherwise. Conditions include government attribution and Crown copyright acknowledgement, accurate and unmodified material, and no implication of an official version, affiliation or endorsement. This supports an unchanged-reproduction approach where those terms apply; it does not automatically authorize changing source data or prove that a particular external service falls within that policy. Assess the current atlas feed against these terms before proposing any separate request. Historical OGL inventories already published remain available under their existing broader licence.
+
+## Recheck: source-specific limits remain distinct
+
+The [Newfoundland and Labrador onshore page](https://www.gov.nl.ca/em/energy/petroleum/onshore/onshore-maps/) explicitly restricts third-party digital reproduction/copying, while separately discussing attribution for derivative products. That is a specific source/use issue, not evidence that all provincial facts or all derivative displays need permission. Assess alternatives and the precise intended use before escalating.
+
+## Optional authority drafts
+
+The proposed service is a free, noncommercial public Canadian energy atlas, with attribution, retrieval dates and original source links. Use these drafts only where a specific unresolved use or missing inventory warrants contact.
 
 ## Québec — SIGPEG / MEIE
 
@@ -20,7 +41,7 @@ Evidence: https://www.gov.nl.ca/em/energy/petroleum/onshore/onshore-maps/
 
 ## Remaining provincial inventory gaps
 
-Nova Scotia: the 125-record 2016 onshore export and 211-record historical offshore directory are now integrated under open licences. Request the current 143-record onshore inventory with distribution permission and current offshore status updates. New Brunswick: request the complete historical petroleum-well export, status definitions, current update feed and dataset licence. Prince Edward Island: request a current machine-readable inventory, identification of re-entries versus unique physical sites, onshore/offshore scope and public distribution rights. For each, request documented orphan designation and reclamation status separately from wellbore abandonment.
+Nova Scotia: the 125-record 2016 onshore export and 211-record historical offshore directory are integrated under open licences. First assess the current 143-record feed against the published noncommercial reproduction terms above; an inventory/update enquiry may still be useful, but a permission letter is not automatically required. New Brunswick: request the complete historical petroleum-well export, status definitions, current update feed and dataset licence. Prince Edward Island: request a current machine-readable inventory, identification of re-entries versus unique physical sites, onshore/offshore scope and public distribution rights. For each inventory enquiry, request documented orphan designation and reclamation status separately from wellbore abandonment.
 
 Prince Edward Island copyright contact: `creativeservices@gov.pe.ca`, from the [official permission service](https://www.princeedwardisland.ca/en/service/request-use-of-wordmark-or-copyrighted-material). For New Brunswick, use the petroleum data service linked from the [official oil and natural gas page](https://www2.gnb.ca/content/gnb/en/departments/erd/energy/content/minerals/content/Oil_Gas.html) and request explicit application of the provincial open licence to the specific export.
 
@@ -28,9 +49,9 @@ Prince Edward Island copyright contact: `creativeservices@gov.pe.ca`, from the [
 
 Request a current, redistributable national pipeline/refinery/LNG dataset with stable IDs, geometry, capacity definitions and updates. Historical NRCan CanVec geometry and dated CER benchmarks are now integrated under OGL Canada; neither establishes current infrastructure or current all-in prices. The CER interactive-map geometry is excluded because its published terms prohibit redistribution. Obtain carrier-specific public schedules, commodities, routes, units, effective/end dates, surcharges and tax treatment. Contract freight prices require the carrier or shipper's permission; published tariffs cannot establish every customer's price. Never characterize a transport fee as a provincial government tariff.
 
-## Evidence needed before enabling publication
+## Evidence for a new source
 
-Save the actual written authorization or open licence URL, permitted uses and attribution in the source registry. Validate complete acquisition, source dates and the adapter against authoritative counts. Run the same automated release checks and independent review before changing coverage from partial or unavailable to complete.
+Record the applicable existing licence, published reuse terms, another substantiated basis for the intended use, or a source-specific authorization when one is actually needed. Record permitted uses and attribution in the source registry. An open licence URL or a separate permission letter is not the only possible basis for use. Validate complete acquisition, source dates and the adapter against authoritative counts. Run the same automated release checks and independent review before changing coverage from partial or unavailable to complete.
 
 ## Ready-to-send request text
 

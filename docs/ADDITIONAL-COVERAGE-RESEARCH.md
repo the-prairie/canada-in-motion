@@ -1,5 +1,7 @@
 # Remaining coverage investigation — October 18, 2026
 
+Subsequent correction (October 18, 2026): the permission-request recommendations below were too broad. See [the revised acquisition approach](DATA-ACCESS-REQUESTS.md), especially Nova Scotia’s existing noncommercial reproduction terms. Unresolved licence scope is not a confirmed requirement for a separate permission letter. Source counts and acquisition findings remain unchanged.
+
 ## Reusable improvement: British Columbia permitted infrastructure
 
 Actual complete acquisitions produced **6,144 pipeline segment permit records and 11,717 facility permit records** from the BC Energy Regulator. The latter include **13 records whose source type is LNG Facility**. This is useful provincial infrastructure coverage, not a complete inventory of operating assets. Both official catalogue descriptions limit scope to approved locations collected on or after July 11, 2016 and state that the datasets update nightly.
