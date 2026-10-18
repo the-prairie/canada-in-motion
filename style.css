@@ -1995,6 +1995,20 @@ a[target="_blank"]::after {
 .layer-key i.selected-route {
   background: var(--green);
 }
+.map-legend i.historical-line {
+  border-top: 2px solid #726a85;
+}
+.layer-key i.historical-line {
+  background: #726a85;
+}
+.map-legend i.historical-point,
+.layer-key i.historical-point {
+  width: 9px;
+  height: 9px;
+  border: 2px solid #726a85;
+  border-radius: 50%;
+  background: #f7f4e9;
+}
 @media (max-width: 760px) and (max-height: 650px) {
   .map-topbar {
     min-height: 46px;

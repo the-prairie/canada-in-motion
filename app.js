@@ -315,6 +315,7 @@ function render() {
   $("map-legend").innerHTML = wellMode
     ? '<span><i class="wells"></i>Orphan recorded</span><span><i class="context"></i>Designation unknown</span><span><i class="mixed-key"></i>Mixed cluster</span>'
     : `${state.layers[getRoute().commodity] ? '<span><i class="selected-route"></i>Selected corridor</span>' : ""}${state.layers.oil ? "<span><i></i>Oil</span>" : ""}${state.layers.gas ? '<span><i class="gas"></i>Gas</span>' : ""}${state.layers.facilities ? "<span>◇ Facility locality</span>" : ""}${state.layers.wells ? '<span><i class="wells"></i>Well records</span>' : ""}`;
+  if (state.layers.historical) $("map-legend").innerHTML += '<span><i class="historical-line"></i>Historical pipeline</span><span><i class="historical-point"></i>Historical refinery</span>';
   $("layer-inputs").insertAdjacentHTML(
     "beforeend",
     `<div class="layer-key"><strong>Map key</strong>${$("map-legend").innerHTML}</div>`,

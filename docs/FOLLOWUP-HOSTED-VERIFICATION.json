@@ -1,0 +1,295 @@
+{
+  "workflowRun": "https://github.com/the-prairie/canada-in-motion/actions/runs/39102260809",
+  "commit": "1dbe83d",
+  "conclusion": "success",
+  "trigger": "workflow_dispatch",
+  "releaseId": "df5fde375ccd81c731f6",
+  "records": 317129,
+  "sources": [
+    {
+      "id": "aer-abandoned-wells",
+      "province": "AB",
+      "count": 238158,
+      "sourceCount": 238158,
+      "droppedRecords": 0,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T05:56:31Z"
+    },
+    {
+      "id": "on-petroleum-wells",
+      "province": "ON",
+      "count": 27639,
+      "sourceCount": 27639,
+      "droppedRecords": 0,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T05:56:54Z"
+    },
+    {
+      "id": "bcer-surface-wells",
+      "province": "BC",
+      "count": 34425,
+      "sourceCount": 34425,
+      "droppedRecords": 0,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T05:57:34Z"
+    },
+    {
+      "id": "sk-orphan-wells",
+      "province": "SK",
+      "count": 4340,
+      "sourceCount": 4340,
+      "droppedRecords": 0,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T05:57:42Z"
+    },
+    {
+      "id": "mb-petroleum-wells",
+      "province": "MB",
+      "count": 12155,
+      "sourceCount": 12155,
+      "droppedRecords": 0,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T05:57:43Z"
+    },
+    {
+      "id": "yt-oil-gas-wells",
+      "province": "YT",
+      "count": 76,
+      "sourceCount": 76,
+      "droppedRecords": 0,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T05:57:44Z"
+    },
+    {
+      "id": "ns-onshore-open-historical",
+      "province": "NS",
+      "count": 125,
+      "sourceCount": 131,
+      "droppedRecords": 6,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T05:57:45Z"
+    },
+    {
+      "id": "ns-offshore-open-directory",
+      "province": "NS",
+      "count": 211,
+      "sourceCount": 211,
+      "droppedRecords": 0,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T05:57:46Z"
+    }
+  ],
+  "contextManifest": {
+    "schemaVersion": 1,
+    "retrievedAt": "2026-10-18T05:57:46.997469+00:00",
+    "builtAt": "2026-10-18T05:58:31.133071+00:00",
+    "counts": {
+      "geometry": {
+        "pipeline": 1253,
+        "refinery": 21
+      },
+      "benchmarkSystems": 25,
+      "benchmarkRows": 216,
+      "pipelineAttributes": 26
+    },
+    "files": [
+      {
+        "file": "benchmark-tolls.json",
+        "sha256": "0d63889bcd3fac8d42dcae298499d9efd1fda7cf8543dae81fd8c181edd021d8"
+      },
+      {
+        "file": "historical-infrastructure.geojson",
+        "sha256": "c65ee15300425f25a4a883bd68aee7dd2d86eff51ddc3476d760f28474613f11"
+      },
+      {
+        "file": "pipeline-attributes.json",
+        "sha256": "2ba61355196d92bad5f52e2fdc6dc5a4a0d06e2e480c9e03b9bd8bae1c0efb8a"
+      }
+    ]
+  },
+  "contextHashesVerified": true,
+  "beta": {
+    "technicalReady": true,
+    "launchAuthorized": false,
+    "releaseId": "df5fde375ccd81c731f6",
+    "records": 317129,
+    "checkedAt": "2026-10-18T05:58:33.250Z",
+    "scope": "Public beta with explicit national coverage gaps",
+    "requiredDecisions": [
+      "Approve a public beta with disclosed incomplete coverage.",
+      "Approve making the source repository public for the free GitHub Pages hosting path, or choose an eligible private-repository host."
+    ],
+    "errors": []
+  },
+  "monitors": {
+    "checkedAt": "2026-10-18T05:58:41.319834+00:00",
+    "sources": [
+      {
+        "id": "cer-pipeline-map",
+        "url": "https://www.cer-rec.gc.ca/en/safety-environment/industry-performance/interactive-pipeline/index.html",
+        "checkedAt": "2026-10-18T05:58:39.203405+00:00",
+        "promotesRates": false,
+        "status": "unchanged",
+        "sha256": "927a58314ef3bff8587c8b886894ba08fe8fa431788f20305d46e750baa9d7b7",
+        "lastSuccessfulCheckAt": "2026-10-18T05:58:39.203405+00:00",
+        "bytes": 21917,
+        "upstreamModifiedAt": null
+      },
+      {
+        "id": "nacei-refineries",
+        "url": "https://open.canada.ca/data/en/dataset/57e7bc4c-680b-4640-9fa1-ded7ce186fab",
+        "checkedAt": "2026-10-18T05:58:39.203858+00:00",
+        "promotesRates": false,
+        "status": "changed-review-required",
+        "sha256": "f2a6e9287588a2abce30d8fa6b0753fc027460f853271444f7d46f53c9ea9cf1",
+        "lastSuccessfulCheckAt": "2026-10-18T05:58:39.203858+00:00",
+        "bytes": 77929,
+        "upstreamModifiedAt": null
+      },
+      {
+        "id": "nacei-lng",
+        "url": "https://open.canada.ca/data/en/dataset/e08eec16-7c7a-4253-9bee-ea640d400a54",
+        "checkedAt": "2026-10-18T05:58:39.204322+00:00",
+        "promotesRates": false,
+        "status": "changed-review-required",
+        "sha256": "771747f370131cf5d1776cd2237a8e44cc2b8029c27346a02e97705afe58f6dc",
+        "lastSuccessfulCheckAt": "2026-10-18T05:58:39.204322+00:00",
+        "bytes": 76990,
+        "upstreamModifiedAt": null
+      },
+      {
+        "id": "bcer-pipeline-segments",
+        "url": "https://catalogue.data.gov.bc.ca/dataset/oil-and-gas-commission-pipeline-segment-permits",
+        "checkedAt": "2026-10-18T05:58:39.466702+00:00",
+        "promotesRates": false,
+        "status": "unchanged",
+        "sha256": "3f55fcc6d0fe131bfafd50f021896f3f4655779462cffbdc44753c48f58df331",
+        "lastSuccessfulCheckAt": "2026-10-18T05:58:39.466702+00:00",
+        "bytes": 37599,
+        "upstreamModifiedAt": null
+      },
+      {
+        "id": "nb-pipelines",
+        "url": "https://gnb.socrata.com/datasets/ab8j-dc35",
+        "checkedAt": "2026-10-18T05:58:39.663430+00:00",
+        "promotesRates": false,
+        "status": "changed-review-required",
+        "sha256": "e2e0bdf9ff469f34b0900cfcea52527aa8396059adc8abdc568625ff4fac5f8d",
+        "lastSuccessfulCheckAt": "2026-10-18T05:58:39.663430+00:00",
+        "bytes": 702305,
+        "upstreamModifiedAt": null
+      },
+      {
+        "id": "aer-pipelines",
+        "url": "https://www.aer.ca/data-and-performance-reports/activity-and-data/spatial-data",
+        "checkedAt": "2026-10-18T05:58:39.702517+00:00",
+        "promotesRates": false,
+        "status": "unchanged",
+        "sha256": "165038253067dcab3fbeda0e6b9e7bfca65a8ec0c39821a61fc1ca47be197fc4",
+        "lastSuccessfulCheckAt": "2026-10-18T05:58:39.702517+00:00",
+        "bytes": 168094,
+        "upstreamModifiedAt": "Fri, 16 Oct 2026 21:54:27 GMT"
+      },
+      {
+        "id": "tm-current-tariffs",
+        "url": "https://docs.transmountain.com/Tolls-and-Tariffs/Interim-Tariff-No.-123.pdf",
+        "checkedAt": "2026-10-18T05:58:39.858067+00:00",
+        "promotesRates": false,
+        "status": "baseline-needs-review",
+        "sha256": "0891d4aea8974cd479b07e4c2a0e6434c28dc23a7f99cd625246ea92cf0ff7eb",
+        "lastSuccessfulCheckAt": "2026-10-18T05:58:39.858067+00:00",
+        "bytes": 399372,
+        "upstreamModifiedAt": "Tue, 07 Apr 2026 15:36:13 GMT"
+      },
+      {
+        "id": "enbridge-canadian-mainline",
+        "url": "https://www.enbridge.com/Projects-and-Infrastructure/For-Shippers/Tariffs/Enbridge-Mainline-GP-Inc-Enbridge-Canadian-Mainline-LP-Canadian-Mainline-Tariffs",
+        "checkedAt": "2026-10-18T05:58:40.044515+00:00",
+        "promotesRates": false,
+        "status": "changed-review-required",
+        "sha256": "853ff88f3666b8c6cb331aedf4208980d42a9ac292a65367e28b1435d0455025",
+        "lastSuccessfulCheckAt": "2026-10-18T05:58:40.044515+00:00",
+        "bytes": 163105,
+        "upstreamModifiedAt": null
+      },
+      {
+        "id": "tc-mainline-tariffs",
+        "url": "https://www.tccustomerexpress.com/mainline.html",
+        "checkedAt": "2026-10-18T05:58:40.061297+00:00",
+        "promotesRates": false,
+        "status": "unchanged",
+        "sha256": "b5166a6a9c5f199385b42e2e2a73349da4e4479a9d487ad0b50d5b51e99b9040",
+        "lastSuccessfulCheckAt": "2026-10-18T05:58:40.061297+00:00",
+        "bytes": 27047,
+        "upstreamModifiedAt": "Tue, 13 Oct 2026 16:41:10 GMT"
+      },
+      {
+        "id": "canada-internal-trade",
+        "url": "https://www.canada.ca/en/intergovernmental-affairs/services/internal-trade/federal-investments-internal-trade.html",
+        "checkedAt": "2026-10-18T05:58:40.558170+00:00",
+        "promotesRates": false,
+        "status": "changed-review-required",
+        "sha256": "12203956665b22b217aa6a6f4762b5472d270c44fad59423722340bf402b87e8",
+        "lastSuccessfulCheckAt": "2026-10-18T05:58:40.558170+00:00",
+        "bytes": 29591,
+        "upstreamModifiedAt": "Sat, 17 Oct 2026 23:55:45 GMT"
+      },
+      {
+        "id": "cra-freight-tax",
+        "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-specific-situations/freight-carriers.html",
+        "checkedAt": "2026-10-18T05:58:40.759735+00:00",
+        "promotesRates": false,
+        "status": "changed-review-required",
+        "sha256": "44ced4b6f3832b3c791a29f005b360378d6e01659ba0f516339574103549c88c",
+        "lastSuccessfulCheckAt": "2026-10-18T05:58:40.759735+00:00",
+        "bytes": 77825,
+        "upstreamModifiedAt": "Sat, 17 Oct 2026 22:10:40 GMT"
+      },
+      {
+        "id": "cta-freight-pricing",
+        "url": "https://otc-cta.gc.ca/eng/publication/freight-rail-service-and-rates-a-guide?wbdisable=true",
+        "checkedAt": "2026-10-18T05:58:40.824355+00:00",
+        "promotesRates": false,
+        "status": "changed-review-required",
+        "sha256": "373b9ef372b43f6e1d25282f8633c956a83ff2e9eb3d11a20a2d3a0150964093",
+        "lastSuccessfulCheckAt": "2026-10-18T05:58:40.824355+00:00",
+        "bytes": 69474,
+        "upstreamModifiedAt": "Sun, 18 Oct 2026 05:58:40 GMT"
+      },
+      {
+        "id": "nrcan-lng-projects",
+        "url": "https://natural-resources.canada.ca/energy-sources/fossil-fuels/canadian-liquified-natural-gas-projects?wbdisable=true",
+        "checkedAt": "2026-10-18T05:58:40.894950+00:00",
+        "promotesRates": false,
+        "status": "unchanged",
+        "sha256": "1da93535a4140e56066bb7885298b0976f40d0f110216eebacc5f83daf27f9a2",
+        "lastSuccessfulCheckAt": "2026-10-18T05:58:40.894950+00:00",
+        "bytes": 31998,
+        "upstreamModifiedAt": "Sun, 18 Oct 2026 04:56:02 GMT"
+      },
+      {
+        "id": "tm-tolls-proceeding",
+        "url": "https://www.rec-cer.gc.ca/en/applications-hearings/view-applications-projects/trans-mountain-application-interim-tolls/",
+        "checkedAt": "2026-10-18T05:58:40.963514+00:00",
+        "promotesRates": false,
+        "status": "baseline-needs-review",
+        "sha256": "043f3e4a4fcd4eb7b391ffec10b2155056c5d47497ab32abcd9300043b663c62",
+        "lastSuccessfulCheckAt": "2026-10-18T05:58:40.963514+00:00",
+        "bytes": 27263,
+        "upstreamModifiedAt": null
+      },
+      {
+        "id": "cer-pipeline-toll-catalogue",
+        "url": "https://open.canada.ca/data/api/action/package_show?id=e00172b8-35c2-4651-a8c5-13ab30bd7236",
+        "checkedAt": "2026-10-18T05:58:41.040014+00:00",
+        "promotesRates": false,
+        "status": "baseline-needs-review",
+        "sha256": "9d5ccf695bce8ecd0fa27abb78556071da8aa91247fc64ce137c3f46e5b84252",
+        "lastSuccessfulCheckAt": "2026-10-18T05:58:41.040014+00:00",
+        "bytes": 47393,
+        "upstreamModifiedAt": null
+      }
+    ],
+    "note": "Page checks are not rate validation. A successful fetch never changes verified shipment dates or prices."
+  }
+}

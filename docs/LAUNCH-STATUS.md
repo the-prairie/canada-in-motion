@@ -30,4 +30,4 @@ See [prepared authority requests](DATA-ACCESS-REQUESTS.md) and the [eastern sour
 
 ## Verification
 
-See VERIFICATION.md for local tests, browser checks and hosted execution evidence. GitHub scheduled recurrence and public deployment are distinct from successful manual candidate runs. Review reports are scoped evidence, not a claim of national completeness or a security certification.
+The expanded hosted run 39102260809 succeeded with 317,129 records, all context counts, a passing report-only beta check and 15 successful transport publication checks. See VERIFICATION.md for local tests, browser checks and hosted execution evidence. GitHub scheduled recurrence and public deployment are distinct from successful manual candidate runs. Review reports are scoped evidence, not a claim of national completeness or a security certification.
