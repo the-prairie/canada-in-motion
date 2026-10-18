@@ -7,7 +7,7 @@ const eventKinds = {
 const chunks = new Map();
 export async function fetchJSON(path) {
   const response = await fetch(path);
-  if (!response.ok) throw new Error(`Data request failed (${response.status}). Please retry.`);
+  if (!response.ok) throw new Error(`The data could not be loaded. Error ${response.status}. Please try again.`);
   return response.json();
 }
 export function snapshotFreshness(retrievedAt, now = Date.now(), maxDays = 8) {
@@ -17,10 +17,11 @@ export function snapshotFreshness(retrievedAt, now = Date.now(), maxDays = 8) {
 export async function loadWells(catalog) {
   const lists = await Promise.all(catalog.sources.map(async source => {
     const index = await fetchJSON(catalog.basePath + source.indexFile);
-    if (!Array.isArray(index.fields) || !Array.isArray(index.rows) || index.rows.length !== source.count) throw new Error('Inventory count does not match the release manifest.');
+    if (!Array.isArray(index.fields) || !Array.isArray(index.rows) || index.rows.length !== source.count) throw new Error('The downloaded inventory has an unexpected number of records.');
     return index.rows.map(row => {
       const well = Object.fromEntries(index.fields.map((field,i) => [field,row[i]]));
       well.observationsThrough = source.observationsThrough || '';
+      well.identifierLabel = source.identifierLabel || 'Licence';
       well.sourceRetrievedAt = source.retrievedAt;
       well.sourceDateDetail = source.sourceDateDetail || source.sourceDateText || (typeof source.upstreamModifiedAt === 'number' ? new Date(source.upstreamModifiedAt).toISOString() : source.upstreamModifiedAt) || 'Not supplied';
       well.sourceLimitations = source.limitations;
@@ -35,6 +36,6 @@ export async function loadDetail(catalog, well) {
   const path = catalog.basePath + well.detailFile;
   if (!chunks.has(path)) chunks.set(path, fetchJSON(path).catch(error => { chunks.delete(path); throw error; }));
   const record = (await chunks.get(path)).find(record => record.id === well.id);
-  if (!record) throw new Error('This record is missing from its release.');
+  if (!record) throw new Error('This record is missing from the downloaded data.');
   return record;
 }

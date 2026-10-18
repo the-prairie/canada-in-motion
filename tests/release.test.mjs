@@ -123,3 +123,38 @@ test('approved beta gate retains honest scope, freshness and the national gate',
   f.coverage.nationalComplete=true;await f.write('data/national-coverage.json',f.coverage);
   assert.equal((await betaReleaseGate(f.root,{now:new Date(DATE)})).passed,false);
 });
+
+test('faithful source downloads preserve publisher bytes and reject altered application copies', async t => {
+  const f = await fixture(t);
+  const definition = {id:'example',enabled:true,publication:'noncommercial',faithfulReproduction:true,objectIdField:'OBJECTID',stableIdField:'Well_ID',itemOwner:'publisher',serviceUrl:'https://example.org/FeatureServer',itemId:'item',itemLicenceSha256:sha256('As-is public data'),coordinateBounds:[-67,43,-59,48]};
+  Object.assign(f.source, definition, {sourceObservationDate:'2026-10-13'});
+  const attributes = {OBJECTID:1,Well_ID:'A1',Spud_Month:'Febuary',Status:'Plugged and Abandoned'};
+  const native = {geometryType:'esriGeometryPoint',spatialReference:{wkid:26920},features:[{attributes,geometry:{x:400000,y:5000000}}]};
+  const display = {...native,spatialReference:{wkid:4326},features:[{attributes,geometry:{x:-63.123456789,y:45.3456789}}]};
+  const payloads = {'publisher-native.json':native,'publisher-wgs84.json':display,'publisher-layer.json':{},'publisher-item.json':{owner:'publisher',url:definition.serviceUrl,licenseInfo:'As-is public data'},'publisher-service.json':{serviceItemId:'item'},'publisher-ids.json':{objectIds:[1]},'publisher-count.json':{count:1},'publisher-final-ids.json':{objectIds:[1]}};
+  const bytes = new Map();
+  f.source.reproductions=[];
+  for(const [name,value] of Object.entries(payloads)) {
+    const raw=JSON.stringify(value,null,3)+'\n';bytes.set(name,raw);
+    const file='example/'+name;
+    f.source.reproductions.push({file,url:'https://example.org/'+name,sha256:sha256(raw),bytes:Buffer.byteLength(raw)});
+    await f.write(f.catalog.basePath+file,raw);
+  }
+  const details=[{id:'example-1',sourceId:'example',sourceRecordId:'1',province:'NS',lon:-63.123457,lat:45.345679,raw:attributes}];
+  f.source.detailFiles[0].sha256=sha256(JSON.stringify(details));
+  await f.write(f.catalog.basePath+f.source.detailFiles[0].file,details);
+  await f.write('config/sources.json',[definition]);await f.write('data/catalog.json',f.catalog);
+  await buildPublic(f.root);
+  for(const [name,raw] of bytes) assert.equal(await fs.readFile(path.join(f.root,'dist',f.catalog.basePath,'example',name),'utf8'),raw);
+  details[0].raw={...attributes,Spud_Month:'February'};
+  f.source.detailFiles[0].sha256=sha256(JSON.stringify(details));
+  await f.write(f.catalog.basePath+f.source.detailFiles[0].file,details);await f.write('data/catalog.json',f.catalog);
+  await assert.rejects(validateRelease(f.root),/Application attributes differ/);
+  details[0].raw=attributes;details[0].lon=0;f.source.detailFiles[0].sha256=sha256(JSON.stringify(details));
+  await f.write(f.catalog.basePath+f.source.detailFiles[0].file,details);await f.write('data/catalog.json',f.catalog);
+  await assert.rejects(validateRelease(f.root),/source envelope/);
+  details[0].lon=-63.123457;f.source.detailFiles[0].sha256=sha256(JSON.stringify(details));
+  await f.write(f.catalog.basePath+f.source.detailFiles[0].file,details);
+  f.source.reproductions=f.source.reproductions.filter(entry=>!entry.file.endsWith('publisher-native.json'));await f.write('data/catalog.json',f.catalog);
+  await assert.rejects(validateRelease(f.root),/Missing original publisher/);
+});

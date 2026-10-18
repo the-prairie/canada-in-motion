@@ -152,7 +152,7 @@ export function quoteShipment(
   if (!["CAD/m3", "CAD/bbl", "m3", "bbl"].includes(rate.unit))
     return {
       status: "unknown",
-      reason: "This rate requires a service-specific calculation.",
+      reason: "This rate uses a calculation the app does not support.",
     };
   if (
     (rate.effectiveFrom && date < rate.effectiveFrom) ||
@@ -160,7 +160,7 @@ export function quoteShipment(
   )
     return {
       status: "out-of-period",
-      reason: "The shipment date is outside this schedule’s documented period.",
+      reason: "The shipment date falls outside the dates covered by this schedule.",
     };
   if (
     rate.currentness?.verifiedShipmentDate &&
@@ -169,7 +169,7 @@ export function quoteShipment(
     return {
       status: "unverified-date",
       reason:
-        "Rate applicability is only verified for the schedule date in this build. Choose that date or verify subsequent filings.",
+        "This app has verified the rate only for the schedule date. Use that date, or check the source for a later schedule.",
     };
   const m3 = volumeM3(volume, unit),
     billable = /bbl/.test(rate.unit) ? m3 * BARRELS_PER_CUBIC_METRE : m3;
@@ -185,7 +185,7 @@ export function quoteShipment(
     unit: rate.unit,
     rate: rate.rate,
     reason:
-      "Carrier estimate only. Applicable taxes, fees and other services are not fully established.",
+      "The estimate covers the carrier charge. Additional taxes, fees and services have not been calculated.",
   };
 }
 export function filterWells(wells, state) {

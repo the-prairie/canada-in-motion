@@ -20,7 +20,7 @@ test("A sourced rate remains a partial estimate, never an all-in total", () => {
   const q = quoteShipment(rate, 100, "m3", "2026-06-01");
   assert.equal(q.carrier, 5000);
   assert.equal(q.status, "partial");
-  assert.match(q.reason, /not fully established/);
+  assert.match(q.reason, /Additional taxes, fees and services have not been calculated/);
 });
 test("Barrels and cubic metres price the same physical shipment", () =>
   assert.ok(

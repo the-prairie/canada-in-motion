@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "researchedAt": "2026-10-18T04:39:36.396573+00:00",
+  "researchedAt": "2026-10-18",
   "completeNationalInventory": false,
   "countDefinition": "Counts are source records/features as observed, not necessarily unique drilled wells; never sum without grain and overlap audit.",
   "sources": [
@@ -150,16 +150,17 @@
         "Data_Pkg"
       ],
       "asOf": "2026-10-13",
-      "publication": "noncommercial-unmodified-only",
+      "publication": "noncommercial-faithful-reproduction",
       "licenceUrl": "https://www.novascotia.ca/copyright",
       "licenceEvidence": "https://www.arcgis.com/sharing/rest/content/items/6bf88109bdb74b80afa45579b779c7a8?f=pjson",
-      "limitations": "Onshore only, offshore needs separate regulator feed. Source item is public and as-is, but does not grant explicit modification/redistribution rights. General government notice permits accurate unmodified non-commercial reproduction with Crown attribution. A transformed normalized public bundle needs additional open-data licence evidence or permission; safe option is unmodified records presented with source labels, retaining original attributes. Spud fields are mixed precision, including Summer, so no fabricated ISO dates. No orphan or reclamation field."
+      "limitations": "The public app includes all 143 onshore records from the October 13, 2026 inventory. Original publisher responses are available unchanged with Crown attribution. The app preserves all source attributes and groups statuses separately for filtering. Spud dates have mixed precision, including seasons, so the app does not invent ISO dates. Orphan designation and reclamation are not supplied.",
+      "implementationSourceId": "ns-onshore-current"
     },
     {
       "id": "qc-sigpeg-wells",
       "province": "QC",
-      "title": "Qu\u00e9bec SIGPEG all wells",
-      "publisher": "Gouvernement du Qu\u00e9bec",
+      "title": "Québec SIGPEG all wells",
+      "publisher": "Gouvernement du Québec",
       "url": "https://servicescarto.mern.gouv.qc.ca/pes/rest/services/Energie/HYDROCARBURES_WMS/MapServer/0",
       "objectIdField": "ESRI_OID",
       "countVerified": 907,
@@ -337,7 +338,7 @@
       "countVerified": 49,
       "publication": "licence-unresolved",
       "licenceEvidence": "https://www.gnb.ca/en/campaign/geonb/applications/oil-gas.html",
-      "limitations": "Current viewer layer only49 features; cannot represent full historic provincial inventory. Fields UNIQUE_ID, WELL_NAME_NUMBER, COMPANY, SPUD_DATE, ONG_VIEWER_STATUS. No explicit orphan/reclamation fields. No dataset redistribution licence found; general disclaimer is not a licence."
+      "limitations": "The viewer contains 49 producer records: 32 producing gas and 17 producing oil. It does not cover all historical wells or provide orphan or reclamation status. Exact-layer open-licence applicability remains unresolved. The public app uses 56 historical federal BASIN records instead."
     },
     {
       "id": "nb-borehole-database",
@@ -380,7 +381,7 @@
     {
       "id": "nl-offshore-hub",
       "province": "NL",
-      "title": "Canada\u2013Newfoundland and Labrador offshore regulator data hub",
+      "title": "Canada–Newfoundland and Labrador offshore regulator data hub",
       "url": "https://home-cnlopb.hub.arcgis.com/",
       "format": "Shapefiles and well inventory; exact current endpoint not validated",
       "countVerified": null,
@@ -394,7 +395,7 @@
     {
       "id": "ns-offshore-dmc",
       "province": "NS",
-      "title": "Canada\u2013Nova Scotia offshore regulator data management centre",
+      "title": "Canada–Nova Scotia offshore regulator data management centre",
       "url": "https://callforbids.cnsopb.ns.ca/2018/03/data-environment/digital-data.html",
       "format": "Data management centre; registration for digital records",
       "countVerified": null,
@@ -439,7 +440,85 @@
       "format": "ArcGIS JSON points",
       "countVerified": 238158,
       "publication": "parent-investigation",
-      "limitations": "Parent handles fullAlberta source audit and ingestion. Existing count from previous extraction; not independently refreshed bythisagent. Abandoned-layer scope isnot allactive/inactive wells or orphan designation."
+      "limitations": "Parent handles full Alberta source audit and ingestion. Existing count from previous extraction; not independently refreshed in this review. Abandoned-layer scope does not cover all active and inactive wells or orphan designation."
+    },
+    {
+      "id": "nrcan-basin-nl",
+      "province": "NL",
+      "title": "BASIN well records for Newfoundland and Labrador",
+      "publisher": "Natural Resources Canada, Geological Survey of Canada",
+      "url": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+      "countVerified": 527,
+      "publication": "noncommercial",
+      "licenceUrl": "https://www.canada.ca/en/transparency/terms.html",
+      "limitations": "Historical records from the BASIN compilation, grouped by the source AREA field. Coverage is partial. LOC_NO identifies a Geological Survey of Canada record; provincial licence numbers are unavailable. Status dates, orphan designation and reclamation status are also unavailable. Recorded statuses may have changed. Original attributes are retained. Locations use the service WGS84 coordinates, with varying source accuracy.",
+      "where": "AREA IN ('Northeast Newfoundland Shelf','Grand Banks','Labrador Shelf','Newfoundland (West)','Labrador Sea')",
+      "identifierLabel": "GSC record ID"
+    },
+    {
+      "id": "nrcan-basin-pe",
+      "province": "PE",
+      "title": "BASIN well records for Prince Edward Island",
+      "publisher": "Natural Resources Canada, Geological Survey of Canada",
+      "url": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+      "countVerified": 14,
+      "publication": "noncommercial",
+      "licenceUrl": "https://www.canada.ca/en/transparency/terms.html",
+      "limitations": "Historical records from the BASIN compilation, grouped by the source AREA field. Coverage is partial. LOC_NO identifies a Geological Survey of Canada record; provincial licence numbers are unavailable. Status dates, orphan designation and reclamation status are also unavailable. Recorded statuses may have changed. Original attributes are retained. Locations use the service WGS84 coordinates, with varying source accuracy.",
+      "where": "AREA IN ('Prince Edward Island')",
+      "identifierLabel": "GSC record ID"
+    },
+    {
+      "id": "nrcan-basin-qc",
+      "province": "QC",
+      "title": "BASIN well records for Québec",
+      "publisher": "Natural Resources Canada, Geological Survey of Canada",
+      "url": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+      "countVerified": 1,
+      "publication": "noncommercial",
+      "licenceUrl": "https://www.canada.ca/en/transparency/terms.html",
+      "limitations": "Historical records from the BASIN compilation, grouped by the source AREA field. Coverage is partial. LOC_NO identifies a Geological Survey of Canada record; provincial licence numbers are unavailable. Status dates, orphan designation and reclamation status are also unavailable. Recorded statuses may have changed. Original attributes are retained. Locations use the service WGS84 coordinates, with varying source accuracy.",
+      "where": "AREA IN ('Quebec')",
+      "identifierLabel": "GSC record ID"
+    },
+    {
+      "id": "nrcan-basin-nt",
+      "province": "NT",
+      "title": "BASIN well records for Northwest Territories",
+      "publisher": "Natural Resources Canada, Geological Survey of Canada",
+      "url": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+      "countVerified": 47,
+      "publication": "noncommercial",
+      "licenceUrl": "https://www.canada.ca/en/transparency/terms.html",
+      "limitations": "Historical records from the BASIN compilation, grouped by the source AREA field. Coverage is partial. LOC_NO identifies a Geological Survey of Canada record; provincial licence numbers are unavailable. Status dates, orphan designation and reclamation status are also unavailable. Recorded statuses may have changed. Original attributes are retained. Locations use the service WGS84 coordinates, with varying source accuracy.",
+      "where": "AREA IN ('Arctic Islands - NWT (onshore)','Arctic Islands - NWT (offshore)')",
+      "identifierLabel": "GSC record ID"
+    },
+    {
+      "id": "nrcan-basin-nu",
+      "province": "NU",
+      "title": "BASIN well records for Nunavut",
+      "publisher": "Natural Resources Canada, Geological Survey of Canada",
+      "url": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+      "countVerified": 144,
+      "publication": "noncommercial",
+      "licenceUrl": "https://www.canada.ca/en/transparency/terms.html",
+      "limitations": "Historical records from the BASIN compilation, grouped by the source AREA field. Coverage is partial. LOC_NO identifies a Geological Survey of Canada record; provincial licence numbers are unavailable. Status dates, orphan designation and reclamation status are also unavailable. Recorded statuses may have changed. Original attributes are retained. Locations use the service WGS84 coordinates, with varying source accuracy.",
+      "where": "AREA IN ('Arctic Islands - Nunavut (onshore)','Arctic Islands - Nunavut (offshore)')",
+      "identifierLabel": "GSC record ID"
+    },
+    {
+      "id": "nrcan-basin-nb",
+      "province": "NB",
+      "title": "BASIN well records for New Brunswick",
+      "publisher": "Natural Resources Canada, Geological Survey of Canada",
+      "url": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+      "countVerified": 56,
+      "publication": "noncommercial",
+      "licenceUrl": "https://www.canada.ca/en/transparency/terms.html",
+      "limitations": "Historical records from the BASIN compilation, grouped by the source AREA field. Coverage is partial. LOC_NO identifies a Geological Survey of Canada record; provincial licence numbers are unavailable. Status dates, orphan designation and reclamation status are also unavailable. Recorded statuses may have changed. Original attributes are retained. Locations use the service WGS84 coordinates, with varying source accuracy.",
+      "where": "AREA IN ('New Brunswick (onshore)')",
+      "identifierLabel": "GSC record ID"
     }
   ],
   "jurisdictions": [
@@ -450,7 +529,7 @@
         "aer-abandoned-wells"
       ],
       "readiness": "parent-investigation",
-      "note": "Full-source ingestion and licence audit assigned to parent."
+      "note": "The app imports the Alberta abandoned-well layer."
     },
     {
       "code": "BC",
@@ -479,7 +558,7 @@
         "mb-petroleum-wells"
       ],
       "readiness": "published-snapshot-available",
-      "note": "12155 download records; current official MapServer returned1 and isnot fullfeed."
+      "note": "The download contains 12,155 records. The MapServer returned only one record during review, so the app uses the download."
     },
     {
       "code": "ON",
@@ -488,11 +567,11 @@
         "on-petroleum-wells"
       ],
       "readiness": "published-record-layer-available",
-      "note": "27639 records includes unlocated/not-drilled/potential and non-oil/gas classes."
+      "note": "The source has 27,639 records, including unlocated, undrilled and potential wells and other well types."
     },
     {
       "code": "QC",
-      "name": "Qu\u00e9bec",
+      "name": "Québec",
       "sourceIds": [
         "qc-sigpeg-wells"
       ],
@@ -507,7 +586,7 @@
         "nb-borehole-database"
       ],
       "readiness": "coverage-and-licence-unresolved",
-      "note": "49 point viewer isnot completehistorical inventory; broaderborehole source notfullyextracted."
+      "note": "The viewer has 49 points and covers part of the historical inventory. The broader borehole database still needs extraction."
     },
     {
       "code": "NS",
@@ -518,7 +597,7 @@
         "ns-offshore-dmc"
       ],
       "readiness": "historical-open-current-terms-unresolved",
-      "note": "Current143onshore sourceavailable, explicitopenhistorical131source; offshoremissing."
+      "note": "The current onshore viewer has 143 records. The historical open download has 131 features, including six empty placeholders. See the loaded-source list for the separate offshore inventory."
     },
     {
       "code": "PE",
@@ -527,7 +606,7 @@
         "pe-exploratory-2007"
       ],
       "readiness": "historical-pdf-current-feed-unresolved",
-      "note": "Historic2007PDF20entries includingre-entry/offshore; no currentcompletefeedverified."
+      "note": "The 2007 PDF lists 20 entries, including re-entries and offshore wells. A complete current feed has not been verified."
     },
     {
       "code": "NL",
@@ -546,7 +625,7 @@
         "yt-oil-gas-wells"
       ],
       "readiness": "published-layer-available",
-      "note": "76publishedpoints underYukonOGL; approximate locations, noorphan/reclamationfields."
+      "note": "The source has 76 approximate locations under the Yukon Open Government Licence. Orphan and reclamation fields are unavailable."
     },
     {
       "code": "NT",
@@ -556,7 +635,7 @@
         "cer-frontier-wells"
       ],
       "readiness": "multi-regulator-feed-unresolved",
-      "note": "685OROGOrecords excludeCERfederalareas; cannotclaimterritorycomplete."
+      "note": "The OROGO registry has 685 records and excludes areas under federal regulation. It covers only part of the territory."
     },
     {
       "code": "NU",
@@ -565,12 +644,12 @@
         "cer-frontier-wells"
       ],
       "readiness": "current-lifecycle-feed-unresolved",
-      "note": "CERofficialsourcesidentified; no verifiedcompletecurrentpointinventory ororphanregistry. Missingisnotzero."
+      "note": "CER sources are available, but a complete current point inventory and orphan registry have not been verified."
     }
   ],
   "refreshPolicy": {
     "recommendedPolling": "Weekly source availability/schema/count probes; publish only after source-specific validation and licensing gates.",
-    "observedSourceCadence": "Generally as-needed or unspecified; no uniform national publication SLA. Qu\u00e9bec inactive-well report everythree years. MBdownload has datedsnapshot. NSopenfallback ishistorical.",
+    "observedSourceCadence": "Generally as-needed or unspecified; no uniform national publication SLA. Québec inactive-well report everythree years. MBdownload has datedsnapshot. NSopenfallback ishistorical.",
     "requiredMetadata": [
       "retrievedAt",
       "sourceAsOf",

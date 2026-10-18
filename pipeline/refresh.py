@@ -1,5 +1,6 @@
 """Acquire complete permitted source layers and atomically publish verified snapshots."""
 import argparse
+import base64
 import hashlib
 import importlib.util
 import io
@@ -18,6 +19,10 @@ from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor
 
 ROOT = Path(__file__).resolve().parents[1]
+_faithful_spec = importlib.util.spec_from_file_location('faithful_source', Path(__file__).with_name('faithful_source.py'))
+_faithful = importlib.util.module_from_spec(_faithful_spec)
+_faithful_spec.loader.exec_module(_faithful)
+acquire_faithful = _faithful.acquire
 INDEX_FIELDS = ['id','province','lon','lat','license','name','operator','closureStatus','orphanStatus','reclamationStatus','sourceId','sourceRecordId','dates','detailFile']
 
 
@@ -45,25 +50,38 @@ def query(url,params):
 
 def arcgis(source):
     url=source['url']
-    meta=json.loads(request(url+'?f=json')[0])
+    originals={}
+    def get(name,params=None):
+        endpoint=url+'?f=json' if params is None else url+'/query?'+urllib.parse.urlencode({'f':'json',**params})
+        content,_=request(endpoint);result=json.loads(content)
+        if result.get('error'):raise ValueError(str(result['error']))
+        if source.get('preservePublisherResponses'): originals[name]={'url':endpoint,'base64':base64.b64encode(content).decode(),'sha256':hashlib.sha256(content).hexdigest()}
+        return result
+    meta=get('publisher-layer.json')
     names={field['name'] for field in meta.get('fields',[])}
     if not set(source['requiredFields']) <= names: raise ValueError('Source schema changed: '+source['id'])
     oid=source['objectIdField']
-    ids=sorted(query(url,{'where':'1=1','returnIdsOnly':'true'})['objectIds'])
+    where=source.get('where','1=1')
+    ids=sorted(get('publisher-ids.json',{'where':where,'returnIdsOnly':'true'})['objectIds'])
     if not ids or len(ids)!=len(set(ids)): raise ValueError('Empty or duplicate source ID enumeration')
+    if source.get('where') and get('publisher-count.json',{'where':where,'returnCountOnly':'true'})['count']!=len(ids): raise ValueError('Filtered source count disagrees with IDs')
     batchsize=min(100,meta.get('maxRecordCount',100))
     def batch(offset):
         selected=ids[offset:offset+batchsize]
-        result=query(url,{'objectIds':','.join(map(str,selected)),'outFields':'*','returnGeometry':'true','outSR':'4326'})
+        result=get(f'publisher-batch-{offset//batchsize:04}.json',{'objectIds':','.join(map(str,selected)),'outFields':'*','returnGeometry':'true','outSR':'4326'})
+        if result.get('exceededTransferLimit'):raise ValueError('Truncated publisher batch')
         if result.get('spatialReference',{}).get('wkid')!=4326: raise ValueError('Expected WGS84 geometry')
         rows=result.get('features',[])
         if sorted(row['attributes'][oid] for row in rows)!=selected: raise ValueError('Truncated or inconsistent response')
         return rows
     with ThreadPoolExecutor(max_workers=3) as pool:
         features=[row for batchrows in pool.map(batch,range(0,len(ids),batchsize)) for row in batchrows]
-    final_ids=sorted(query(url,{'where':'1=1','returnIdsOnly':'true'})['objectIds'])
+    final_ids=sorted(get('publisher-final-ids.json',{'where':where,'returnIdsOnly':'true'})['objectIds'])
     if ids!=final_ids: raise ValueError('Source changed during enumeration; retry whole source')
-    return features,{'sourceCount':len(ids),'upstreamModifiedAt':meta.get('editingInfo',{}).get('lastEditDate'),'enumerationVerified':True}
+    if source.get('attributeFilter'):
+        rule=source['attributeFilter']
+        if any(f['attributes'].get(rule['field']) not in rule['values'] for f in features): raise ValueError('Source returned records outside the declared filter')
+    return features,{'sourceCount':len(ids),'upstreamModifiedAt':meta.get('editingInfo',{}).get('lastEditDate'),'enumerationVerified':True,**({'originalPayloads':originals} if originals else {})}
 
 
 def shapefile_source(source,cache):
@@ -120,7 +138,8 @@ def validate(wells,source,previous_count=None,max_drop=.05):
         ids.add(w['id'])
         if w['sourceId']!=source['id'] or w['province']!=source['province']: raise ValueError('Source identity mismatch')
         if not all(isinstance(w[k],(int,float)) and math.isfinite(w[k]) for k in ['lon','lat']): raise ValueError('Invalid coordinates')
-        if not -142<=w['lon']<=-50 or not 40<=w['lat']<=84: raise ValueError('Coordinates outside Canada envelope')
+        west,south,east,north=source.get('coordinateBounds',[-142,40,-50,84])
+        if not west<=w['lon']<=east or not south<=w['lat']<=north: raise ValueError('Coordinates outside declared source envelope')
         if w['closureStatus'] not in ['abandoned','active','suspended','unknown']: raise ValueError('Invalid closure status')
         if w['orphanStatus'] not in ['designated','not-designated','unknown']: raise ValueError('Invalid orphan status')
         for e in w.get('events',[]): datetime.strptime(e['date'],'%Y-%m-%d')
@@ -134,11 +153,43 @@ def write_json(path,payload):
     return hashlib.sha256(content).hexdigest()
 
 
+def verify_originals(source,features,payloads):
+    """Reconcile unmodified source responses with the separate application input."""
+    parsed={}
+    for name,payload in payloads.items():
+        if not name.startswith('publisher-') or '/' in name or not name.endswith('.json'):
+            raise ValueError('Unexpected publisher response filename')
+        content=base64.b64decode(payload['base64'],validate=True)
+        if hashlib.sha256(content).hexdigest()!=payload.get('sha256'):
+            raise ValueError('Original publisher response checksum mismatch')
+        parsed[name]=json.loads(content)
+    if source.get('faithfulReproduction'):
+        required={'publisher-native.json','publisher-wgs84.json','publisher-layer.json','publisher-item.json','publisher-service.json','publisher-ids.json','publisher-count.json','publisher-final-ids.json'}
+        if not required<=parsed.keys():raise ValueError('Original publisher responses missing')
+        ids=parsed['publisher-ids.json']['objectIds']
+        rows=_faithful.validate_responses(source,parsed['publisher-native.json'],parsed['publisher-wgs84.json'],ids)
+        source['url']=payloads['publisher-layer.json']['url'].split('?')[0]
+    elif source.get('preservePublisherResponses'):
+        required={'publisher-layer.json','publisher-ids.json','publisher-count.json','publisher-final-ids.json'}
+        if not required<=parsed.keys():raise ValueError('Original publisher responses missing')
+        ids=parsed['publisher-ids.json']['objectIds']
+        batches=[parsed[name] for name in sorted(parsed) if name.startswith('publisher-batch-')]
+        if not batches or any(p.get('exceededTransferLimit') or p.get('spatialReference',{}).get('wkid')!=4326 for p in batches):raise ValueError('Invalid original publisher batches')
+        rows=[f for p in batches for f in p['features']]
+    else:return
+    oid=source['objectIdField']
+    if len(ids)!=len(set(ids)) or len(rows)!=len(ids) or sorted(f['attributes'][oid] for f in rows)!=sorted(ids) or sorted(parsed['publisher-final-ids.json']['objectIds'])!=sorted(ids) or parsed['publisher-count.json']['count']!=len(ids):
+        raise ValueError('Original publisher enumeration mismatch')
+    if sorted(rows,key=lambda f:f['attributes'][oid])!=sorted(features,key=lambda f:f['attributes'][oid]):
+        raise ValueError('Application input differs from original publisher records')
+
+
 def _refresh(root=ROOT,source_ids=None):
     config=json.loads((root/'config/publication.json').read_text())
     registry=json.loads((root/'config/sources.json').read_text())
     permitted=[s for s in registry if s.get('enabled') and s['publication'] in ['open','noncommercial'] and (not source_ids or s['id'] in source_ids)]
     if not permitted: raise ValueError('No permitted enabled sources')
+    if config.get('purpose')!='noncommercial' and any(s['publication']=='noncommercial' for s in permitted):raise ValueError('Noncommercial source in commercial publication')
     target=root/'data'
     target.mkdir(exist_ok=True)
     previous=json.loads((target/'catalog.json').read_text()) if (target/'catalog.json').exists() else None
@@ -149,18 +200,32 @@ def _refresh(root=ROOT,source_ids=None):
     staging=Path(tempfile.mkdtemp(prefix='.release-',dir=target))
     try:
         snapshots=[]
-        for source in permitted:
+        for definition in permitted:
+            source=dict(definition)
             print('Fetching '+source['id'],flush=True)
             try:
                 cachefile=root/'.data-cache'/(source['id']+'-acquisition.json')
+                definition_hash=hashlib.sha256(json.dumps(definition,sort_keys=True).encode()).hexdigest()
                 if os.environ.get('CIM_RESUME')=='1' and cachefile.exists():
                     acquisition=json.loads(cachefile.read_text())
                     if time.time()-cachefile.stat().st_mtime > 4*3600: raise ValueError('Resume cache is older than four hours')
+                    if acquisition.get('definitionSha256')!=definition_hash:raise ValueError('Resume cache source definition changed')
                     features,evidence=acquisition['features'],acquisition['evidence']
+                    retrieved=datetime.fromisoformat(evidence['retrievedAt'].replace('Z','+00:00')).timestamp()
+                    if not 0<=time.time()-retrieved<=4*3600:raise ValueError('Resume acquisition timestamp is stale or in the future')
+                    original_payloads=acquisition.get('originalPayloads',{})
+                    if source.get('faithfulReproduction') and not original_payloads:raise ValueError('Original publisher bytes missing from cache')
                 else:
-                    features,evidence=arcgis(source) if source['format']=='arcgis' else shapefile_source(source,root/'.data-cache')
+                    original_payloads={}
+                    if source.get('faithfulReproduction'):
+                        features,evidence,originals=acquire_faithful(source,request)
+                        original_payloads={name:{'url':url,'base64':base64.b64encode(b).decode(),'sha256':hashlib.sha256(b).hexdigest()} for name,(url,b) in originals.items()}
+                    else:
+                        features,evidence=arcgis(source) if source['format']=='arcgis' else shapefile_source(source,root/'.data-cache')
+                        original_payloads=evidence.pop('originalPayloads',{})
                     evidence['retrievedAt']=now()
-                    write_json(cachefile,{'features':features,'evidence':evidence})
+                    write_json(cachefile,{'features':features,'evidence':evidence,'originalPayloads':original_payloads,'definitionSha256':definition_hash})
+                verify_originals(source,features,original_payloads)
                 valid_features,excluded=exclude_reviewed_placeholders(features,source)
                 wells=[adapters.normalize(source,feature) for feature in valid_features]
                 if source.get('orphanJoin'):
@@ -176,7 +241,12 @@ def _refresh(root=ROOT,source_ids=None):
                 assert len(wells)+len(excluded)==evidence['sourceCount']
                 wells.sort(key=lambda w:w['id'])
                 source_dates=sorted({str(w.get('raw',{}).get('EXTRACT_DATE')) for w in wells if w.get('raw',{}).get('EXTRACT_DATE')})
-                snapshot={**source,**evidence,'sourceDateText':'; '.join(source_dates) if source_dates else None,'count':len(wells),'retrievedAt':evidence['retrievedAt'],'scope':'full published source layer','droppedRecords':len(excluded),'excludedRecords':excluded}
+                snapshot={**source,**evidence,'sourceDateText':'; '.join(source_dates) if source_dates else evidence.get('sourceDateText'),'count':len(wells),'retrievedAt':evidence['retrievedAt'],'scope':source.get('scope','full published source layer'),'droppedRecords':len(excluded),'excludedRecords':excluded}
+                snapshot['reproductions']=[]
+                for name,payload in original_payloads.items():
+                    b=base64.b64decode(payload['base64'],validate=True);filename=source['id']+'/'+name
+                    (staging/source['id']).mkdir(parents=True,exist_ok=True);(staging/filename).write_bytes(b)
+                    snapshot['reproductions'].append({'file':filename,'url':payload['url'],'sha256':hashlib.sha256(b).hexdigest(),'bytes':len(b)})
                 index=[]
                 snapshot['detailFiles']=[]
                 for offset in range(0,len(wells),1000):

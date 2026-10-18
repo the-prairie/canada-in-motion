@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "checkedAt": "2026-10-17",
+  "checkedAt": "2026-10-18",
   "nationalComplete": false,
   "provinces": [
     {
@@ -22,7 +22,7 @@
             "aer-abandoned-wells"
           ],
           "evidenceUrl": "https://www.aer.ca/data/wells/ABNDWells_SHP.zip",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         },
         "abandonment-status": {
           "status": "partial",
@@ -30,7 +30,7 @@
             "aer-abandoned-wells"
           ],
           "evidenceUrl": "https://www.aer.ca/data/wells/ABNDWells_SHP.zip",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         },
         "infrastructure": {
           "status": "partial",
@@ -38,7 +38,7 @@
             "nrcan-canvec-historical"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
-          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
+          "note": "The historical map layer includes dated infrastructure records. Coverage varies by jurisdiction, and current operations are unknown."
         },
         "carrier-rates": {
           "status": "partial",
@@ -46,13 +46,13 @@
             "cer-benchmark-tolls"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
-          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
+          "note": "Benchmark tolls cover 25 federally regulated pipeline systems. Compare the dates, paths, services and commodities. Current rates and additional shipment charges may differ."
         },
         "government-charges": {
           "status": "partial",
           "sourceIds": [],
           "evidenceUrl": null,
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         }
       }
     },
@@ -75,7 +75,7 @@
             "bcer-surface-wells"
           ],
           "evidenceUrl": "https://geoweb-ags.bc-er.ca/arcgis/rest/services/OPERATIONAL/DMS_DORMANT_WELLS/FeatureServer/3",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         },
         "abandonment-status": {
           "status": "partial",
@@ -83,7 +83,7 @@
             "bcer-surface-wells"
           ],
           "evidenceUrl": "https://geoweb-ags.bc-er.ca/arcgis/rest/services/OPERATIONAL/DMS_DORMANT_WELLS/FeatureServer/3",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         },
         "infrastructure": {
           "status": "partial",
@@ -99,13 +99,13 @@
             "cer-benchmark-tolls"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
-          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
+          "note": "Benchmark tolls cover 25 federally regulated pipeline systems. Compare the dates, paths, services and commodities. Current rates and additional shipment charges may differ."
         },
         "government-charges": {
           "status": "partial",
           "sourceIds": [],
           "evidenceUrl": null,
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         }
       }
     },
@@ -128,7 +128,7 @@
             "sk-orphan-wells"
           ],
           "evidenceUrl": "https://gis.saskatchewan.ca/egis/rest/services/economy/Petroleum/MapServer/18",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         },
         "abandonment-status": {
           "status": "partial",
@@ -136,7 +136,7 @@
             "sk-orphan-wells"
           ],
           "evidenceUrl": "https://gis.saskatchewan.ca/egis/rest/services/economy/Petroleum/MapServer/18",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         },
         "infrastructure": {
           "status": "partial",
@@ -144,7 +144,7 @@
             "nrcan-canvec-historical"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
-          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
+          "note": "The historical map layer includes dated infrastructure records. Coverage varies by jurisdiction, and current operations are unknown."
         },
         "carrier-rates": {
           "status": "partial",
@@ -152,13 +152,13 @@
             "cer-benchmark-tolls"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
-          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
+          "note": "Benchmark tolls cover 25 federally regulated pipeline systems. Compare the dates, paths, services and commodities. Current rates and additional shipment charges may differ."
         },
         "government-charges": {
           "status": "partial",
           "sourceIds": [],
           "evidenceUrl": null,
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         }
       }
     },
@@ -181,7 +181,7 @@
             "mb-petroleum-wells"
           ],
           "evidenceUrl": "https://www.gov.mb.ca/iem/petroleum/gis/wells.zip",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         },
         "abandonment-status": {
           "status": "partial",
@@ -189,7 +189,7 @@
             "mb-petroleum-wells"
           ],
           "evidenceUrl": "https://www.gov.mb.ca/iem/petroleum/gis/wells.zip",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         },
         "infrastructure": {
           "status": "partial",
@@ -197,7 +197,7 @@
             "nrcan-canvec-historical"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
-          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
+          "note": "The historical map layer includes dated infrastructure records. Coverage varies by jurisdiction, and current operations are unknown."
         },
         "carrier-rates": {
           "status": "partial",
@@ -205,13 +205,13 @@
             "cer-benchmark-tolls"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
-          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
+          "note": "Benchmark tolls cover 25 federally regulated pipeline systems. Compare the dates, paths, services and commodities. Current rates and additional shipment charges may differ."
         },
         "government-charges": {
           "status": "partial",
           "sourceIds": [],
           "evidenceUrl": null,
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         }
       }
     },
@@ -234,7 +234,7 @@
             "on-petroleum-wells"
           ],
           "evidenceUrl": "https://ws.lioservices.lrc.gov.on.ca/arcgis2/rest/services/LIO_OPEN_DATA/LIO_Open08/MapServer/22",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         },
         "abandonment-status": {
           "status": "partial",
@@ -242,7 +242,7 @@
             "on-petroleum-wells"
           ],
           "evidenceUrl": "https://ws.lioservices.lrc.gov.on.ca/arcgis2/rest/services/LIO_OPEN_DATA/LIO_Open08/MapServer/22",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         },
         "infrastructure": {
           "status": "partial",
@@ -250,7 +250,7 @@
             "nrcan-canvec-historical"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
-          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
+          "note": "The historical map layer includes dated infrastructure records. Coverage varies by jurisdiction, and current operations are unknown."
         },
         "carrier-rates": {
           "status": "partial",
@@ -258,38 +258,44 @@
             "cer-benchmark-tolls"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
-          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
+          "note": "Benchmark tolls cover 25 federally regulated pipeline systems. Compare the dates, paths, services and commodities. Current rates and additional shipment charges may differ."
         },
         "government-charges": {
           "status": "partial",
           "sourceIds": [],
           "evidenceUrl": null,
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         }
       }
     },
     {
       "code": "QC",
-      "name": "Qu\u00e9bec",
+      "name": "Québec",
       "jurisdictionType": "province",
       "topics": {
         "well-inventory": {
-          "status": "permission-required",
-          "sourceIds": [],
-          "evidenceUrl": "https://sigpeg.mrn.gouv.qc.ca/gpg/hydrocarbures/Licence_utilisation.pdf",
-          "note": "SIGPEG end-user licence requires written permission for third-party redistribution."
+          "status": "partial",
+          "sourceIds": [
+            "nrcan-basin-qc"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN supplies 1 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial. This single BASIN record does not cover the wider SIGPEG inventory."
         },
         "orphan-status": {
-          "status": "permission-required",
-          "sourceIds": [],
-          "evidenceUrl": "https://sigpeg.mrn.gouv.qc.ca/gpg/hydrocarbures/Licence_utilisation.pdf",
-          "note": "Complete national coverage has not been established."
+          "status": "unavailable",
+          "sourceIds": [
+            "nrcan-basin-qc"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN does not supply orphan designations. Unknown does not mean not orphaned."
         },
         "abandonment-status": {
-          "status": "permission-required",
-          "sourceIds": [],
-          "evidenceUrl": "https://sigpeg.mrn.gouv.qc.ca/gpg/hydrocarbures/Licence_utilisation.pdf",
-          "note": "Complete national coverage has not been established."
+          "status": "partial",
+          "sourceIds": [
+            "nrcan-basin-qc"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN supplies 1 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial. This single BASIN record does not cover the wider SIGPEG inventory."
         },
         "infrastructure": {
           "status": "partial",
@@ -297,7 +303,7 @@
             "nrcan-canvec-historical"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
-          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
+          "note": "The historical map layer includes dated infrastructure records. Coverage varies by jurisdiction, and current operations are unknown."
         },
         "carrier-rates": {
           "status": "partial",
@@ -305,13 +311,13 @@
             "cer-benchmark-tolls"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
-          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
+          "note": "Benchmark tolls cover 25 federally regulated pipeline systems. Compare the dates, paths, services and commodities. Current rates and additional shipment charges may differ."
         },
         "government-charges": {
           "status": "partial",
           "sourceIds": [],
           "evidenceUrl": "https://sigpeg.mrn.gouv.qc.ca/gpg/hydrocarbures/Licence_utilisation.pdf",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         }
       }
     },
@@ -321,22 +327,28 @@
       "jurisdictionType": "province",
       "topics": {
         "well-inventory": {
-          "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://www2.gnb.ca/content/gnb/en/departments/erd/energy/content/minerals/content/GeoNB.html",
-          "note": "Complete national coverage has not been established."
+          "status": "partial",
+          "sourceIds": [
+            "nrcan-basin-nb"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN supplies 56 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial."
         },
         "orphan-status": {
           "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://www2.gnb.ca/content/gnb/en/departments/erd/energy/content/minerals/content/GeoNB.html",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-basin-nb"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN does not supply orphan designations. Unknown does not mean not orphaned."
         },
         "abandonment-status": {
-          "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://www2.gnb.ca/content/gnb/en/departments/erd/energy/content/minerals/content/GeoNB.html",
-          "note": "Complete national coverage has not been established."
+          "status": "partial",
+          "sourceIds": [
+            "nrcan-basin-nb"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN supplies 56 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial."
         },
         "infrastructure": {
           "status": "partial",
@@ -344,7 +356,7 @@
             "nrcan-canvec-historical"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
-          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
+          "note": "The historical map layer includes dated infrastructure records. Coverage varies by jurisdiction, and current operations are unknown."
         },
         "carrier-rates": {
           "status": "partial",
@@ -352,13 +364,13 @@
             "cer-benchmark-tolls"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
-          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
+          "note": "Benchmark tolls cover 25 federally regulated pipeline systems. Compare the dates, paths, services and commodities. Current rates and additional shipment charges may differ."
         },
         "government-charges": {
           "status": "partial",
           "sourceIds": [],
           "evidenceUrl": "https://www2.gnb.ca/content/gnb/en/departments/erd/energy/content/minerals/content/GeoNB.html",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         }
       }
     },
@@ -370,29 +382,29 @@
         "well-inventory": {
           "status": "partial",
           "sourceIds": [
-            "ns-onshore-open-historical",
+            "ns-onshore-current",
             "ns-offshore-open-directory"
           ],
-          "evidenceUrl": "https://open.canada.ca/data/en/dataset/6278d435-fdd6-4889-a3fb-7f31134cf8eb",
-          "note": "Historical openly licensed onshore and offshore source records. Onshore observations through 2016; offshore directory2020/layer2022. Re-entries are separate records. Current complete inventory remains unverified."
+          "evidenceUrl": "https://services5.arcgis.com/IaJYcw699CHE9DGQ/arcgis/rest/services/NS_Onshore_Petroleum_Wells/FeatureServer/2",
+          "note": "Current onshore source: 143 records, updated October 13, 2026. Separate offshore directory: 211 historical records. The older 125-record onshore snapshot is excluded from current counts. Abandonment and suspension use recorded statuses; neither establishes orphan designation or reclamation."
         },
         "orphan-status": {
           "status": "unavailable",
           "sourceIds": [
-            "ns-onshore-open-historical",
+            "ns-onshore-current",
             "ns-offshore-open-directory"
           ],
-          "evidenceUrl": "https://open.canada.ca/data/en/dataset/6278d435-fdd6-4889-a3fb-7f31134cf8eb",
-          "note": "Neither open inventory supplies orphan designation. Abandonment does not establish orphan status."
+          "evidenceUrl": "https://services5.arcgis.com/IaJYcw699CHE9DGQ/arcgis/rest/services/NS_Onshore_Petroleum_Wells/FeatureServer/2",
+          "note": "Neither source supplies orphan designations. Unknown does not mean not orphaned."
         },
         "abandonment-status": {
           "status": "partial",
           "sourceIds": [
-            "ns-onshore-open-historical",
+            "ns-onshore-current",
             "ns-offshore-open-directory"
           ],
-          "evidenceUrl": "https://open.canada.ca/data/en/dataset/6278d435-fdd6-4889-a3fb-7f31134cf8eb",
-          "note": "Historical openly licensed onshore and offshore source records. Onshore observations through 2016; offshore directory2020/layer2022. Re-entries are separate records. Current complete inventory remains unverified."
+          "evidenceUrl": "https://services5.arcgis.com/IaJYcw699CHE9DGQ/arcgis/rest/services/NS_Onshore_Petroleum_Wells/FeatureServer/2",
+          "note": "Current onshore source: 143 records, updated October 13, 2026. Separate offshore directory: 211 historical records. The older 125-record onshore snapshot is excluded from current counts. Abandonment and suspension use recorded statuses; neither establishes orphan designation or reclamation."
         },
         "infrastructure": {
           "status": "partial",
@@ -400,7 +412,7 @@
             "nrcan-canvec-historical"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
-          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
+          "note": "The historical map layer includes dated infrastructure records. Coverage varies by jurisdiction, and current operations are unknown."
         },
         "carrier-rates": {
           "status": "partial",
@@ -408,13 +420,13 @@
             "cer-benchmark-tolls"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
-          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
+          "note": "Benchmark tolls cover 25 federally regulated pipeline systems. Compare the dates, paths, services and commodities. Current rates and additional shipment charges may differ."
         },
         "government-charges": {
           "status": "partial",
           "sourceIds": [],
           "evidenceUrl": "https://data.novascotia.ca/api/views/5q4c-27fh.json",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         }
       }
     },
@@ -424,22 +436,28 @@
       "jurisdictionType": "province",
       "topics": {
         "well-inventory": {
-          "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.princeedwardisland.ca/en/topic/energy",
-          "note": "Complete national coverage has not been established."
+          "status": "partial",
+          "sourceIds": [
+            "nrcan-basin-pe"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN supplies 14 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial."
         },
         "orphan-status": {
           "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.princeedwardisland.ca/en/topic/energy",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-basin-pe"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN does not supply orphan designations. Unknown does not mean not orphaned."
         },
         "abandonment-status": {
-          "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.princeedwardisland.ca/en/topic/energy",
-          "note": "Complete national coverage has not been established."
+          "status": "partial",
+          "sourceIds": [
+            "nrcan-basin-pe"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN supplies 14 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial."
         },
         "infrastructure": {
           "status": "partial",
@@ -447,7 +465,7 @@
             "nrcan-canvec-historical"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
-          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
+          "note": "The historical map layer includes dated infrastructure records. Coverage varies by jurisdiction, and current operations are unknown."
         },
         "carrier-rates": {
           "status": "partial",
@@ -455,13 +473,13 @@
             "cer-benchmark-tolls"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
-          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
+          "note": "Benchmark tolls cover 25 federally regulated pipeline systems. Compare the dates, paths, services and commodities. Current rates and additional shipment charges may differ."
         },
         "government-charges": {
           "status": "partial",
           "sourceIds": [],
           "evidenceUrl": "https://www.princeedwardisland.ca/en/topic/energy",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         }
       }
     },
@@ -471,22 +489,28 @@
       "jurisdictionType": "province",
       "topics": {
         "well-inventory": {
-          "status": "permission-required",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.gov.nl.ca/iet/energy/petroleum/onshore/",
-          "note": "Onshore digital distribution is restricted. Offshore needs separate authority and coverage."
+          "status": "partial",
+          "sourceIds": [
+            "nrcan-basin-nl"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN supplies 527 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial."
         },
         "orphan-status": {
-          "status": "permission-required",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.gov.nl.ca/iet/energy/petroleum/onshore/",
-          "note": "Complete national coverage has not been established."
+          "status": "unavailable",
+          "sourceIds": [
+            "nrcan-basin-nl"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN does not supply orphan designations. Unknown does not mean not orphaned."
         },
         "abandonment-status": {
-          "status": "permission-required",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.gov.nl.ca/iet/energy/petroleum/onshore/",
-          "note": "Complete national coverage has not been established."
+          "status": "partial",
+          "sourceIds": [
+            "nrcan-basin-nl"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN supplies 527 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial."
         },
         "infrastructure": {
           "status": "partial",
@@ -494,7 +518,7 @@
             "nrcan-canvec-historical"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
-          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
+          "note": "The historical map layer includes dated infrastructure records. Coverage varies by jurisdiction, and current operations are unknown."
         },
         "carrier-rates": {
           "status": "partial",
@@ -502,13 +526,13 @@
             "cer-benchmark-tolls"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
-          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
+          "note": "Benchmark tolls cover 25 federally regulated pipeline systems. Compare the dates, paths, services and commodities. Current rates and additional shipment charges may differ."
         },
         "government-charges": {
           "status": "partial",
           "sourceIds": [],
           "evidenceUrl": "https://www.gov.nl.ca/iet/energy/petroleum/onshore/",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         }
       }
     },
@@ -531,7 +555,7 @@
             "yt-oil-gas-wells"
           ],
           "evidenceUrl": "https://mapservices.gov.yk.ca/arcgis/rest/services/GeoYukon/GY_OilGas/MapServer/0",
-          "note": "Source does not provide an orphan designation. Unknown does not mean not orphan."
+          "note": "The source leaves orphan status unknown."
         },
         "abandonment-status": {
           "status": "partial",
@@ -547,7 +571,7 @@
             "nrcan-canvec-historical"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
-          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
+          "note": "The historical map layer includes dated infrastructure records. Coverage varies by jurisdiction, and current operations are unknown."
         },
         "carrier-rates": {
           "status": "partial",
@@ -555,13 +579,13 @@
             "cer-benchmark-tolls"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
-          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
+          "note": "Benchmark tolls cover 25 federally regulated pipeline systems. Compare the dates, paths, services and commodities. Current rates and additional shipment charges may differ."
         },
         "government-charges": {
           "status": "partial",
           "sourceIds": [],
           "evidenceUrl": "https://yukon.ca/en/oil-and-gas",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         }
       }
     },
@@ -571,22 +595,28 @@
       "jurisdictionType": "territory",
       "topics": {
         "well-inventory": {
-          "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.orogo.gov.nt.ca",
-          "note": "Complete national coverage has not been established."
+          "status": "partial",
+          "sourceIds": [
+            "nrcan-basin-nt"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN supplies 47 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial. Selected Arctic Islands records do not cover the entire territory."
         },
         "orphan-status": {
           "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.orogo.gov.nt.ca",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-basin-nt"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN does not supply orphan designations. Unknown does not mean not orphaned."
         },
         "abandonment-status": {
-          "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.orogo.gov.nt.ca",
-          "note": "Complete national coverage has not been established."
+          "status": "partial",
+          "sourceIds": [
+            "nrcan-basin-nt"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN supplies 47 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial. Selected Arctic Islands records do not cover the entire territory."
         },
         "infrastructure": {
           "status": "partial",
@@ -594,7 +624,7 @@
             "nrcan-canvec-historical"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
-          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
+          "note": "The historical map layer includes dated infrastructure records. Coverage varies by jurisdiction, and current operations are unknown."
         },
         "carrier-rates": {
           "status": "partial",
@@ -602,13 +632,13 @@
             "cer-benchmark-tolls"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
-          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
+          "note": "Benchmark tolls cover 25 federally regulated pipeline systems. Compare the dates, paths, services and commodities. Current rates and additional shipment charges may differ."
         },
         "government-charges": {
           "status": "partial",
           "sourceIds": [],
           "evidenceUrl": "https://www.orogo.gov.nt.ca",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         }
       }
     },
@@ -618,22 +648,28 @@
       "jurisdictionType": "territory",
       "topics": {
         "well-inventory": {
-          "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.cer-rec.gc.ca/en/about/north-offshore/",
-          "note": "Complete national coverage has not been established."
+          "status": "partial",
+          "sourceIds": [
+            "nrcan-basin-nu"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN supplies 144 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial. Selected Arctic Islands records do not cover the entire territory."
         },
         "orphan-status": {
           "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.cer-rec.gc.ca/en/about/north-offshore/",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-basin-nu"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN does not supply orphan designations. Unknown does not mean not orphaned."
         },
         "abandonment-status": {
-          "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.cer-rec.gc.ca/en/about/north-offshore/",
-          "note": "Complete national coverage has not been established."
+          "status": "partial",
+          "sourceIds": [
+            "nrcan-basin-nu"
+          ],
+          "evidenceUrl": "https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCA/basin_e/MapServer/0",
+          "note": "BASIN supplies 144 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial. Selected Arctic Islands records do not cover the entire territory."
         },
         "infrastructure": {
           "status": "partial",
@@ -641,7 +677,7 @@
             "nrcan-canvec-historical"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
-          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
+          "note": "The historical map layer includes dated infrastructure records. Coverage varies by jurisdiction, and current operations are unknown."
         },
         "carrier-rates": {
           "status": "partial",
@@ -649,13 +685,13 @@
             "cer-benchmark-tolls"
           ],
           "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
-          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
+          "note": "Benchmark tolls cover 25 federally regulated pipeline systems. Compare the dates, paths, services and commodities. Current rates and additional shipment charges may differ."
         },
         "government-charges": {
           "status": "partial",
           "sourceIds": [],
           "evidenceUrl": "https://www.cer-rec.gc.ca/en/about/north-offshore/",
-          "note": "Complete national coverage has not been established."
+          "note": "Coverage for this topic is incomplete."
         }
       }
     }
@@ -751,7 +787,7 @@
         "evidence": "https://open.canada.ca/data/en/dataset/ecf567ea-4901-4f51-a5b0-35959ca96c47"
       },
       "update": "Nightly according to catalogue",
-      "coverage": "BC approved pipeline centreline records collected on or after2016-07-11. Permit geography does not prove operating status.",
+      "coverage": "BC approved pipeline centreline records collected on or after 2016-07-11. Permit geography does not prove operating status.",
       "adapter": "WFS/BC Geographic Warehouse; inspect feature schema, dates and licence before import.",
       "machineEndpoint": "https://openmaps.gov.bc.ca/geo/pub/WHSE_MINERAL_TENURE.OG_PIPELINE_SEGMENT_PERMIT_SP/ows"
     },
@@ -785,7 +821,7 @@
       "license": {
         "status": "scope-review",
         "evidence": "https://www1.aer.ca/ProductCatalogue/PIPE.html",
-        "note": "Catalogue prohibits unauthorized commercial exploitation. Parent separately verified attributed noncommercial reproduction for free public resource. Do not extend to commercial use."
+        "note": "Catalogue prohibits unauthorized commercial exploitation. Attributed noncommercial reproduction was reviewed for this free public resource. Do not extend to commercial use."
       },
       "update": "Dataset layout says daily. General spatial page defaults monthly unless specified. Validate actual file dates.",
       "coverage": "AER-approved oil and gas pipelines; excludes low-pressure distribution. Unmapped records are separate CSV.",
@@ -805,7 +841,7 @@
       },
       "update": "Monitor daily for changes; source release cadence not promised.",
       "coverage": "Current index lists Interim123 effective2026-05-01 and Rules122 effective2026-02-01. AB/BC system.",
-      "adapter": "Monitor HTML headings and linkedPDF hashes. Parse only under an independently verified schema.",
+      "adapter": "Monitor HTML headings and linked PDF hashes. Parse only under an independently verified schema.",
       "currentSchedule": "https://docs.transmountain.com/Tolls-and-Tariffs/Interim-Tariff-No.-123.pdf",
       "effectiveFrom": "2026-05-01",
       "effectiveTo": null,
@@ -915,7 +951,7 @@
       "license": {
         "status": "government-reference"
       },
-      "update": "Monitor weekly, compare facility-leveloperator/regulator evidence",
+      "update": "Monitor weekly, compare facility-level operator and regulator records",
       "coverage": "National overview includes proposed projects and dated expectations. Current page still describes LNGCanada firstexports as future2025.",
       "adapter": "Manual facility register with source-levelasOf, operating vs proposed and explicit commissioning evidence.",
       "publicationGate": "Do not infer current operations from a recently crawled page with old content."
@@ -929,7 +965,7 @@
         "aer-abandoned-wells"
       ],
       "readiness": "parent-investigation",
-      "note": "Full-source ingestion and licence audit assigned to parent."
+      "note": "The app imports the Alberta abandoned-well layer."
     },
     {
       "code": "BC",
@@ -958,7 +994,7 @@
         "mb-petroleum-wells"
       ],
       "readiness": "published-snapshot-available",
-      "note": "12155 download records; current official MapServer returned1 and isnot fullfeed."
+      "note": "The download contains 12,155 records. The MapServer returned only one record during review, so the app uses the download."
     },
     {
       "code": "ON",
@@ -967,56 +1003,53 @@
         "on-petroleum-wells"
       ],
       "readiness": "published-record-layer-available",
-      "note": "27639 records includes unlocated/not-drilled/potential and non-oil/gas classes."
+      "note": "The source has 27,639 records, including unlocated, undrilled and potential wells and other well types."
     },
     {
       "code": "QC",
-      "name": "Qu\u00e9bec",
+      "name": "Québec",
       "sourceIds": [
-        "qc-sigpeg-wells"
+        "nrcan-basin-qc"
       ],
-      "readiness": "public-redistribution-blocked",
-      "note": "907 queryable records but SIGPEG end-user terms require writtenpermission for publicinternet redistribution."
+      "readiness": "partial-source-published",
+      "note": "BASIN supplies 1 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial. This single BASIN record does not cover the wider SIGPEG inventory."
     },
     {
       "code": "NB",
       "name": "New Brunswick",
       "sourceIds": [
-        "nb-ong-viewer",
-        "nb-borehole-database"
+        "nrcan-basin-nb"
       ],
-      "readiness": "coverage-and-licence-unresolved",
-      "note": "49 point viewer isnot completehistorical inventory; broaderborehole source notfullyextracted."
+      "readiness": "partial-source-published",
+      "note": "BASIN supplies 56 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial."
     },
     {
       "code": "NS",
       "name": "Nova Scotia",
       "sourceIds": [
-        "ns-onshore-petroleum-wells",
-        "ns-historical-open-wells",
-        "ns-offshore-dmc"
+        "ns-onshore-current",
+        "ns-offshore-open-directory"
       ],
-      "readiness": "historical-open-current-terms-unresolved",
-      "note": "Current143onshore sourceavailable, explicitopenhistorical131source; offshoremissing."
+      "readiness": "current-onshore-and-historical-offshore-published",
+      "note": "Current onshore data is reproduced unchanged for noncommercial use under the provincial policy. Historical offshore records remain separate. Orphan and reclamation status are unavailable."
     },
     {
       "code": "PE",
       "name": "Prince Edward Island",
       "sourceIds": [
-        "pe-exploratory-2007"
+        "nrcan-basin-pe"
       ],
-      "readiness": "historical-pdf-current-feed-unresolved",
-      "note": "Historic2007PDF20entries includingre-entry/offshore; no currentcompletefeedverified."
+      "readiness": "partial-source-published",
+      "note": "BASIN supplies 14 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial."
     },
     {
       "code": "NL",
       "name": "Newfoundland and Labrador",
       "sourceIds": [
-        "nl-onshore-data",
-        "nl-offshore-hub"
+        "nrcan-basin-nl"
       ],
-      "readiness": "onshore-redistribution-blocked-offshore-unresolved",
-      "note": "Onshoretermsprohibitthird-partycopies; offshorehubmustbeauditedseparately."
+      "readiness": "partial-source-published",
+      "note": "BASIN supplies 527 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial."
     },
     {
       "code": "YT",
@@ -1025,26 +1058,25 @@
         "yt-oil-gas-wells"
       ],
       "readiness": "published-layer-available",
-      "note": "76publishedpoints underYukonOGL; approximate locations, noorphan/reclamationfields."
+      "note": "The source has 76 approximate locations under the Yukon Open Government Licence. Orphan and reclamation fields are unavailable."
     },
     {
       "code": "NT",
       "name": "Northwest Territories",
       "sourceIds": [
-        "nt-orogo-wells",
-        "cer-frontier-wells"
+        "nrcan-basin-nt"
       ],
-      "readiness": "multi-regulator-feed-unresolved",
-      "note": "685OROGOrecords excludeCERfederalareas; cannotclaimterritorycomplete."
+      "readiness": "partial-source-published",
+      "note": "BASIN supplies 47 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial. Selected Arctic Islands records do not cover the entire territory."
     },
     {
       "code": "NU",
       "name": "Nunavut",
       "sourceIds": [
-        "cer-frontier-wells"
+        "nrcan-basin-nu"
       ],
-      "readiness": "current-lifecycle-feed-unresolved",
-      "note": "CERofficialsourcesidentified; no verifiedcompletecurrentpointinventory ororphanregistry. Missingisnotzero."
+      "readiness": "partial-source-published",
+      "note": "BASIN supplies 144 historical records for the explicitly selected source regions. Status observation dates, orphan designation and reclamation status are unavailable. Coverage remains partial. Selected Arctic Islands records do not cover the entire territory."
     }
   ]
 }

@@ -91,7 +91,7 @@
         "evidence": "https://open.canada.ca/data/en/dataset/ecf567ea-4901-4f51-a5b0-35959ca96c47"
       },
       "update": "Nightly according to catalogue",
-      "coverage": "BC approved pipeline centreline records collected on or after2016-07-11. Permit geography does not prove operating status.",
+      "coverage": "BC approved pipeline centreline records collected on or after 2016-07-11. Permit geography does not prove operating status.",
       "adapter": "WFS/BC Geographic Warehouse; inspect feature schema, dates and licence before import.",
       "machineEndpoint": "https://openmaps.gov.bc.ca/geo/pub/WHSE_MINERAL_TENURE.OG_PIPELINE_SEGMENT_PERMIT_SP/ows"
     },
@@ -125,7 +125,7 @@
       "license": {
         "status": "scope-review",
         "evidence": "https://www1.aer.ca/ProductCatalogue/PIPE.html",
-        "note": "Catalogue prohibits unauthorized commercial exploitation. Parent separately verified attributed noncommercial reproduction for free public resource. Do not extend to commercial use."
+        "note": "Catalogue prohibits unauthorized commercial exploitation. Attributed noncommercial reproduction was reviewed for this free public resource. Do not extend to commercial use."
       },
       "update": "Dataset layout says daily. General spatial page defaults monthly unless specified. Validate actual file dates.",
       "coverage": "AER-approved oil and gas pipelines; excludes low-pressure distribution. Unmapped records are separate CSV.",
@@ -145,7 +145,7 @@
       },
       "update": "Monitor daily for changes; source release cadence not promised.",
       "coverage": "Current index lists Interim123 effective2026-05-01 and Rules122 effective2026-02-01. AB/BC system.",
-      "adapter": "Monitor HTML headings and linkedPDF hashes. Parse only under an independently verified schema.",
+      "adapter": "Monitor HTML headings and linked PDF hashes. Parse only under an independently verified schema.",
       "currentSchedule": "https://docs.transmountain.com/Tolls-and-Tariffs/Interim-Tariff-No.-123.pdf",
       "effectiveFrom": "2026-05-01",
       "effectiveTo": null,
@@ -257,7 +257,7 @@
       "license": {
         "status": "government-reference"
       },
-      "update": "Monitor weekly, compare facility-leveloperator/regulator evidence",
+      "update": "Monitor weekly, compare facility-level operator and regulator records",
       "coverage": "National overview includes proposed projects and dated expectations. Current page still describes LNGCanada firstexports as future2025.",
       "adapter": "Manual facility register with source-levelasOf, operating vs proposed and explicit commissioning evidence.",
       "publicationGate": "Do not infer current operations from a recently crawled page with old content."

@@ -3,6 +3,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
 export const CONTEXT_FILES = ['historical-infrastructure.geojson','benchmark-tolls.json','pipeline-attributes.json'];
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -27,6 +28,53 @@ export async function safeRead(root, relative) {
 }
 export async function readJSON(root, file) { return JSON.parse(await safeRead(root, file)); }
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
+export async function validateReproductions(source, definition, readVerified, records) {
+  const enabled = definition.faithfulReproduction || definition.preservePublisherResponses;
+  const entries = source.reproductions || [];
+  assert(Array.isArray(entries), `Invalid publisher reproductions: ${source.id}`);
+  if (!enabled) { assert(entries.length === 0, `Unapproved publisher reproductions: ${source.id}`); return; }
+  const payloads = new Map();
+  for (const entry of entries) {
+    const name = entry.file?.slice(source.id.length + 1);
+    assert(/^publisher-(?:native|wgs84|layer|item|service|ids|count|final-ids|batch-\d{4})\.json$/.test(name) && !payloads.has(name), `Unexpected or duplicate publisher response: ${entry.file}`);
+    assert(/^https:\/\//.test(entry.url || '') && Number.isSafeInteger(entry.bytes) && entry.bytes > 0, `Missing publisher response provenance: ${entry.file}`);
+    payloads.set(name, await readVerified(entry.file, entry.sha256, entry.bytes));
+  }
+  const required = ['publisher-layer.json','publisher-ids.json','publisher-count.json','publisher-final-ids.json'];
+  if (definition.faithfulReproduction) required.push('publisher-native.json','publisher-wgs84.json','publisher-item.json','publisher-service.json');
+  assert(required.every(name => payloads.has(name)), `Missing original publisher responses: ${source.id}`);
+  const ids = payloads.get('publisher-ids.json').objectIds;
+  const finalIds = payloads.get('publisher-final-ids.json').objectIds;
+  assert(Array.isArray(ids) && new Set(ids).size === source.count && ids.length === source.count && payloads.get('publisher-count.json').count === source.count && Array.isArray(finalIds) && isDeepStrictEqual([...ids].sort(), [...finalIds].sort()), `Publisher enumeration mismatch: ${source.id}`);
+  let batches;
+  if (definition.faithfulReproduction) {
+    const item = payloads.get('publisher-item.json');
+    assert(item.owner === definition.itemOwner && item.url === definition.serviceUrl && sha256(item.licenseInfo || '') === definition.itemLicenceSha256, `Publisher identity or terms changed: ${source.id}`);
+    assert(payloads.get('publisher-service.json').serviceItemId === definition.itemId, `Publisher service identity mismatch: ${source.id}`);
+    assert(/^\d{4}-\d{2}-\d{2}$/.test(source.sourceObservationDate || '') && Number.isFinite(Date.parse(source.sourceObservationDate)), `Publisher observation date missing: ${source.id}`);
+    const native = payloads.get('publisher-native.json');
+    const display = payloads.get('publisher-wgs84.json');
+    assert(native.geometryType === 'esriGeometryPoint' && !native.exceededTransferLimit && native.features?.length === source.count, `Invalid native publisher response: ${source.id}`);
+    const attributes = features => new Map(features.map(f => [f.attributes[definition.objectIdField], f.attributes]));
+    assert(isDeepStrictEqual(attributes(native.features), attributes(display.features || [])), `Publisher projections disagree: ${source.id}`);
+    batches = [display];
+  } else {
+    batches = [...payloads].filter(([name]) => name.startsWith('publisher-batch-')).map(([,value]) => value);
+  }
+  assert(batches.length > 0 && batches.every(p => p.geometryType === 'esriGeometryPoint' && p.spatialReference?.wkid === 4326 && !p.exceededTransferLimit && Array.isArray(p.features)), `Invalid publisher map geometry: ${source.id}`);
+  const features = batches.flatMap(p => p.features);
+  const sourceIDs = features.map(f => f.attributes?.[definition.objectIdField]);
+  assert(features.length === source.count && isDeepStrictEqual([...sourceIDs].sort(), [...ids].sort()), `Publisher feature IDs mismatch: ${source.id}`);
+  const raw = new Map(features.map(f => [String(f.attributes[definition.objectIdField]), f]));
+  const stableIDs = features.map(f => f.attributes?.[definition.stableIdField]);
+  assert(stableIDs.every(id => id !== null && id !== undefined && String(id).trim()) && new Set(stableIDs).size === source.count, `Publisher stable IDs invalid: ${source.id}`);
+  for (const row of records) {
+    const original = raw.get(row.sourceRecordId);
+    assert(original && isDeepStrictEqual(original.attributes, row.raw), `Application attributes differ from publisher: ${source.id}`);
+    assert(Math.abs(original.geometry.x - row.lon) <= 0.00000051 && Math.abs(original.geometry.y - row.lat) <= 0.00000051, `Application location differs from publisher: ${source.id}`);
+    if (definition.attributeFilter) assert(definition.attributeFilter.values.includes(original.attributes[definition.attributeFilter.field]), `Publisher record outside declared filter: ${source.id}`);
+  }
+}
 export async function validateRelease(root = ROOT) {
   const config = await readJSON(root, 'config/publication.json');
   const registry = await readJSON(root, 'config/sources.json');
@@ -52,13 +100,14 @@ export async function validateRelease(root = ROOT) {
     assert(source.enumerationVerified === true && Number.isSafeInteger(source.count) && source.count > 0 && source.sourceCount === source.count + exclusions.length, `Incomplete source enumeration: ${source.id}`);
     assert(Number.isFinite(Date.parse(source.retrievedAt)), `Missing retrieval date: ${source.id}`);
     assert(Array.isArray(source.detailFiles) && source.detailFiles.length > 0, `Missing detail checksums: ${source.id}`);
-    const readVerified = async (file, digest) => {
+    const readVerified = async (file, digest, expectedBytes) => {
       safeRelative(file);
       assert(file.startsWith(source.id + '/') && file.endsWith('.json'), `Source path mismatch: ${file}`);
       assert(/^[a-f0-9]{64}$/.test(digest), `Missing SHA256: ${file}`);
       const full = catalog.basePath + file;
       const bytes = await safeRead(root, full);
       assert(sha256(bytes) === digest, `Checksum mismatch: ${file}`);
+      if (expectedBytes !== undefined) assert(bytes.length === expectedBytes, `Publisher byte count mismatch: ${file}`);
       files.add(full);
       return JSON.parse(bytes);
     };
@@ -68,6 +117,7 @@ export async function validateRelease(root = ROOT) {
     for (const field of ['id','sourceId','detailFile']) assert(Number.isInteger(columns[field]), `Missing index field: ${field}`);
     const details = new Map();
     const records = new Map();
+    const recordValues = [];
     for (const shard of source.detailFiles) {
       assert(!details.has(shard.file), `Duplicate detail file: ${shard.file}`);
       const rows = await readVerified(shard.file, shard.sha256);
@@ -75,10 +125,16 @@ export async function validateRelease(root = ROOT) {
       details.set(shard.file, rows.length);
       for (const row of rows) {
         assert(typeof row.id === 'string' && row.sourceId === source.id && !records.has(row.id), `Invalid or duplicate detail ID: ${shard.file}`);
+        if (definition.coordinateBounds) {
+          const [west,south,east,north] = definition.coordinateBounds;
+          assert(Number.isFinite(row.lon) && Number.isFinite(row.lat) && row.lon >= west && row.lon <= east && row.lat >= south && row.lat <= north, `Detail coordinates outside declared source envelope: ${source.id}`);
+        }
         records.set(row.id, shard.file);
+        if (definition.faithfulReproduction || definition.preservePublisherResponses) recordValues.push(row);
       }
     }
     assert(records.size === source.count, `Detail total mismatch: ${source.id}`);
+    await validateReproductions(source, definition, readVerified, recordValues);
     const rowIDs = new Set();
     for (const row of index.rows) {
       const id = row[columns.id], file = row[columns.detailFile];

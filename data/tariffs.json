@@ -20,20 +20,20 @@
       "sourceUrl": "https://docs.transmountain.com/Tolls-and-Tariffs/Interim-Tariff-No.-123.pdf",
       "page": 2,
       "conditions": [
-        "Light crude petroleum only in this calculator.",
+        "This calculator covers light crude petroleum.",
         "Uncommitted service, tank-metered receipt at Edmonton. No direct-inject credit.",
         "Published transport subtotal. Additional applicable charges are excluded.",
-        "All volumes are assumed accepted and delivered. Capacity, nominations and apportionment are not modeled.",
-        "Schedule effective May 1, 2026. No end date appears in this schedule. Do not assume this rate applies to another shipment date without checking subsequent filings.",
-        "The September 2026 settlement takes effect January 1, 2027. Order TO-005-2026 addresses finalization of interim-period tolls; this calculator does not import the new settlement rate framework."
+        "The calculation assumes the carrier accepts and delivers the full shipment. It does not account for capacity, nominations or apportionment.",
+        "The schedule took effect May 1, 2026 and gives no end date. Check later filings before using it for another shipment date.",
+        "The September 2026 settlement takes effect January 1, 2027. Order TO-005-2026 addresses final interim-period tolls. This calculator does not include the new settlement rates."
       ],
       "currentness": {
         "status": "dated-published-schedule",
         "verifiedShipmentDate": "2026-05-01",
-        "effectiveToMeaning": "Unknown; null does not mean indefinitely valid.",
+        "effectiveToMeaning": "The schedule gives no end date. Later schedules may replace this rate.",
         "settlementEffectiveFrom": "2027-01-01",
         "settlementSourceId": "cer-order-to-005-2026",
-        "explanation": "Tariff 123 is a verified published schedule. Subsequent amendments and shipment-specific applicability require confirmation. The later settlement has a January 1, 2027 effective date."
+        "explanation": "These rates come from Tariff 123. Check later amendments and the conditions for your shipment. The subsequent settlement takes effect January 1, 2027."
       },
       "subtotalLabel": "Published base transport subtotal",
       "exclusions": [
@@ -65,7 +65,7 @@
               "additive": false,
               "includedIn": "variable",
               "sourcePage": 8,
-              "explanation": "Already included in variable toll. This pipeline surcharge is not an orphan-well cleanup contribution."
+              "explanation": "Included in the variable toll. The schedule does not identify an orphan-well cleanup contribution."
             }
           ]
         }
@@ -90,20 +90,20 @@
       "sourceUrl": "https://docs.transmountain.com/Tolls-and-Tariffs/Interim-Tariff-No.-123.pdf",
       "page": 2,
       "conditions": [
-        "Light crude petroleum only in this calculator.",
+        "This calculator covers light crude petroleum.",
         "Uncommitted service, tank-metered receipt at Edmonton. No direct-inject credit.",
         "Published transport subtotal. Additional applicable charges are excluded.",
-        "All volumes are assumed accepted and delivered. Capacity, nominations and apportionment are not modeled.",
-        "Schedule effective May 1, 2026. No end date appears in this schedule. Do not assume this rate applies to another shipment date without checking subsequent filings.",
-        "The September 2026 settlement takes effect January 1, 2027. Order TO-005-2026 addresses finalization of interim-period tolls; this calculator does not import the new settlement rate framework."
+        "The calculation assumes the carrier accepts and delivers the full shipment. It does not account for capacity, nominations or apportionment.",
+        "The schedule took effect May 1, 2026 and gives no end date. Check later filings before using it for another shipment date.",
+        "The September 2026 settlement takes effect January 1, 2027. Order TO-005-2026 addresses final interim-period tolls. This calculator does not include the new settlement rates."
       ],
       "currentness": {
         "status": "dated-published-schedule",
         "verifiedShipmentDate": "2026-05-01",
-        "effectiveToMeaning": "Unknown; null does not mean indefinitely valid.",
+        "effectiveToMeaning": "The schedule gives no end date. Later schedules may replace this rate.",
         "settlementEffectiveFrom": "2027-01-01",
         "settlementSourceId": "cer-order-to-005-2026",
-        "explanation": "Tariff 123 is a verified published schedule. Subsequent amendments and shipment-specific applicability require confirmation. The later settlement has a January 1, 2027 effective date."
+        "explanation": "These rates come from Tariff 123. Check later amendments and the conditions for your shipment. The subsequent settlement takes effect January 1, 2027."
       },
       "subtotalLabel": "Published base transport subtotal",
       "exclusions": [
@@ -135,7 +135,7 @@
               "additive": false,
               "includedIn": "variable",
               "sourcePage": 8,
-              "explanation": "Already included in variable toll. This pipeline surcharge is not an orphan-well cleanup contribution."
+              "explanation": "Included in the variable toll. The schedule does not identify an orphan-well cleanup contribution."
             }
           ]
         }
@@ -160,20 +160,20 @@
       "sourceUrl": "https://docs.transmountain.com/Tolls-and-Tariffs/Interim-Tariff-No.-123.pdf",
       "page": 2,
       "conditions": [
-        "Light crude petroleum only in this calculator.",
+        "This calculator covers light crude petroleum.",
         "Uncommitted service, tank-metered receipt at Edmonton. No direct-inject credit.",
         "Published transport subtotal. Additional applicable charges are excluded.",
-        "All volumes are assumed accepted and delivered. Capacity, nominations and apportionment are not modeled.",
-        "Schedule effective May 1, 2026. No end date appears in this schedule. Do not assume this rate applies to another shipment date without checking subsequent filings.",
-        "The September 2026 settlement takes effect January 1, 2027. Order TO-005-2026 addresses finalization of interim-period tolls; this calculator does not import the new settlement rate framework."
+        "The calculation assumes the carrier accepts and delivers the full shipment. It does not account for capacity, nominations or apportionment.",
+        "The schedule took effect May 1, 2026 and gives no end date. Check later filings before using it for another shipment date.",
+        "The September 2026 settlement takes effect January 1, 2027. Order TO-005-2026 addresses final interim-period tolls. This calculator does not include the new settlement rates."
       ],
       "currentness": {
         "status": "dated-published-schedule",
         "verifiedShipmentDate": "2026-05-01",
-        "effectiveToMeaning": "Unknown; null does not mean indefinitely valid.",
+        "effectiveToMeaning": "The schedule gives no end date. Later schedules may replace this rate.",
         "settlementEffectiveFrom": "2027-01-01",
         "settlementSourceId": "cer-order-to-005-2026",
-        "explanation": "Tariff 123 is a verified published schedule. Subsequent amendments and shipment-specific applicability require confirmation. The later settlement has a January 1, 2027 effective date."
+        "explanation": "These rates come from Tariff 123. Check later amendments and the conditions for your shipment. The subsequent settlement takes effect January 1, 2027."
       },
       "subtotalLabel": "Published base transport subtotal",
       "exclusions": [
@@ -205,7 +205,7 @@
               "additive": false,
               "includedIn": "variable",
               "sourcePage": 8,
-              "explanation": "Already included in variable toll. This pipeline surcharge is not an orphan-well cleanup contribution."
+              "explanation": "Included in the variable toll. The schedule does not identify an orphan-well cleanup contribution."
             }
           ]
         }
@@ -230,21 +230,21 @@
       "sourceUrl": "https://docs.transmountain.com/Tolls-and-Tariffs/Interim-Tariff-No.-123.pdf",
       "page": 2,
       "conditions": [
-        "Light crude petroleum only in this calculator.",
+        "This calculator covers light crude petroleum.",
         "Uncommitted service, tank-metered receipt at Edmonton. No direct-inject credit.",
         "Published transport subtotal. Additional applicable charges are excluded.",
-        "All volumes are assumed accepted and delivered. Capacity, nominations and apportionment are not modeled.",
-        "Schedule effective May 1, 2026. No end date appears in this schedule. Do not assume this rate applies to another shipment date without checking subsequent filings.",
-        "The September 2026 settlement takes effect January 1, 2027. Order TO-005-2026 addresses finalization of interim-period tolls; this calculator does not import the new settlement rate framework.",
+        "The calculation assumes the carrier accepts and delivers the full shipment. It does not account for capacity, nominations or apportionment.",
+        "The schedule took effect May 1, 2026 and gives no end date. Check later filings before using it for another shipment date.",
+        "The September 2026 settlement takes effect January 1, 2027. Order TO-005-2026 addresses final interim-period tolls. This calculator does not include the new settlement rates.",
         "Westridge excludes dock bid premiums, WCMRC Bulk Oil Cargo and Capital Asset & Loan fees, and the Vancouver Fraser Port Authority Gateway Infrastructure Fee 2. These are not assumed to be zero."
       ],
       "currentness": {
         "status": "dated-published-schedule",
         "verifiedShipmentDate": "2026-05-01",
-        "effectiveToMeaning": "Unknown; null does not mean indefinitely valid.",
+        "effectiveToMeaning": "The schedule gives no end date. Later schedules may replace this rate.",
         "settlementEffectiveFrom": "2027-01-01",
         "settlementSourceId": "cer-order-to-005-2026",
-        "explanation": "Tariff 123 is a verified published schedule. Subsequent amendments and shipment-specific applicability require confirmation. The later settlement has a January 1, 2027 effective date."
+        "explanation": "These rates come from Tariff 123. Check later amendments and the conditions for your shipment. The subsequent settlement takes effect January 1, 2027."
       },
       "subtotalLabel": "Published base transport subtotal",
       "exclusions": [
@@ -280,7 +280,7 @@
               "additive": false,
               "includedIn": "variable",
               "sourcePage": 8,
-              "explanation": "Already included in variable toll. This pipeline surcharge is not an orphan-well cleanup contribution."
+              "explanation": "Included in the variable toll. The schedule does not identify an orphan-well cleanup contribution."
             }
           ]
         }
@@ -295,7 +295,7 @@
     },
     "otherCharges": {
       "status": "unknown",
-      "explanation": "Taxes, permits and fees depend on the actual transaction, commodity, service and jurisdictions. No complete government-charge schedule has been sourced for these shipments. Unknown is not zero."
+      "explanation": "Taxes, permits and fees depend on the shipment, service and jurisdictions. This app has not calculated the applicable government charges."
     }
   },
   "calculation": {

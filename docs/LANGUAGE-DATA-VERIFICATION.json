@@ -1,0 +1,63 @@
+{
+  "checkedAt": "2026-10-18T23:33:22.641344+00:00",
+  "localRelease": "e77b2ab3ebae30a03931",
+  "records": 317936,
+  "sourceCounts": {
+    "aer-abandoned-wells": 238158,
+    "on-petroleum-wells": 27639,
+    "bcer-surface-wells": 34425,
+    "sk-orphan-wells": 4340,
+    "mb-petroleum-wells": 12155,
+    "yt-oil-gas-wells": 76,
+    "ns-offshore-open-directory": 211,
+    "nrcan-basin-nl": 527,
+    "nrcan-basin-pe": 14,
+    "nrcan-basin-qc": 1,
+    "nrcan-basin-nt": 47,
+    "nrcan-basin-nu": 144,
+    "nrcan-basin-nb": 56,
+    "ns-onshore-current": 143
+  },
+  "nationalComplete": false,
+  "automated": {
+    "nodeTests": 29,
+    "pythonTests": 29,
+    "betaGatePassed": true
+  },
+  "browser": {
+    "viewports": [
+      [
+        1440,
+        1000
+      ],
+      [
+        390,
+        844
+      ]
+    ],
+    "verified": [
+      "benchmark introduction and system switching",
+      "historical labels in well search",
+      "GSC record ID in details and CSV",
+      "Nova Scotia inventory date 2026-10-13",
+      "publisher download matches source SHA256",
+      "coverage dialog shows 13 jurisdictions",
+      "unavailable transport scenario",
+      "closure-budget invalid inputs",
+      "empty saved scenarios",
+      "save and restore a scenario",
+      "copy view link",
+      "scenario download",
+      "About and source dialogs",
+      "HTTP 503 failure recovered by Try again under production CSP"
+    ]
+  },
+  "independentReview": {
+    "initialReplacements": 174,
+    "acceptanceFindingsFixed": [
+      "historical search labels",
+      "CSV identifier types"
+    ]
+  },
+  "publication": "pending"
+}

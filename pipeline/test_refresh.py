@@ -1,5 +1,7 @@
 import importlib.util
 import json
+import hashlib
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -45,5 +47,20 @@ class RefreshTests(unittest.TestCase):
             (root/'config/publication.json').write_text('{}')
             (root/'config/sources.json').write_text(json.dumps([{'id':'source','enabled':True,'publication':'open'}]))
             with self.assertRaisesRegex(ValueError,'Partial refresh'):refresh.refresh(root,['source'])
+    def test_resume_rejects_changed_definition_and_stale_retrieval_even_with_new_file_time(self):
+        source={'id':'source','publication':'open','enabled':True,'format':'arcgis'}
+        for digest,timestamp,expected in [('wrong',refresh.now(),'definition changed'),(hashlib.sha256(json.dumps(source,sort_keys=True).encode()).hexdigest(),'2020-01-01T00:00:00Z','timestamp is stale')]:
+            with self.subTest(expected=expected),tempfile.TemporaryDirectory() as folder:
+                root=Path(folder)
+                for sub in ['data','config','pipeline','.data-cache']:(root/sub).mkdir()
+                catalog=b'{"releaseId":"previous","sources":[]}'
+                (root/'data/catalog.json').write_bytes(catalog)
+                (root/'config/publication.json').write_text(json.dumps({'purpose':'noncommercial','maxCountDecreaseFraction':.05}))
+                (root/'config/sources.json').write_text(json.dumps([source]))
+                (root/'pipeline/adapters.py').write_text('def normalize(source, feature): return feature\n')
+                (root/'.data-cache/source-acquisition.json').write_text(json.dumps({'definitionSha256':digest,'features':[self.row()],'evidence':{'retrievedAt':timestamp}}))
+                with patch.dict(os.environ,{'CIM_RESUME':'1'}):
+                    with self.assertRaisesRegex(ValueError,expected):refresh.refresh(root)
+                self.assertEqual((root/'data/catalog.json').read_bytes(),catalog)
 
 if __name__=='__main__':unittest.main()

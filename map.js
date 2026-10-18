@@ -62,7 +62,7 @@ export class AtlasMap {
       pointToLayer: (feature, latlng) => L.circleMarker(latlng, {radius: 4, color: "#b3a4d4", fillColor: "#142a34", fillOpacity: 1, weight: 2}),
       onEachFeature: (feature, layer) => {
         const p = feature.properties;
-        layer.bindTooltip(`${esc(p.name)} · historical ${esc(p.kind)}<br>Source dates ${esc(p.sourceDateMin)} to ${esc(p.sourceDateMax)}<br>Current operation not established`, {sticky: true});
+        layer.bindTooltip(`${esc(p.name)} · historical ${esc(p.kind)}<br>Source dates ${esc(p.sourceDateMin)} to ${esc(p.sourceDateMax)}<br>Current operating status unknown`, {sticky: true});
       },
     });
     this.bcLayer = L.geoJSON(null, {
@@ -161,7 +161,7 @@ export class AtlasMap {
           dashArray: closed ? "3 8" : active ? "10 5" : "5 5",
           lineCap: "round",
         })
-          .bindTooltip(esc(r.name) + " · indicative corridor", {
+          .bindTooltip(esc(r.name) + " · schematic route", {
             className: "route-tooltip",
             sticky: true,
           })
@@ -375,7 +375,7 @@ export class AtlasMap {
           fillOpacity: 1,
         })
           .on("click", () => this.callbacks.onWell(p.id))
-          .bindTooltip(esc(w.name) + " · " + esc(w.province), {
+          .bindTooltip(esc(w.name) + " · " + esc(w.province) + (w.observationsThrough ? " · Historical record" : ""), {
             className: "route-tooltip",
           })
           .addTo(this.wellLayer);

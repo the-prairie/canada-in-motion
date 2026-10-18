@@ -7,7 +7,7 @@
     "retrievedAt": "2026-10-17",
     "asOf": "2026-05-01",
     "method": "Downloaded official PDF. Read pages 1, 2 and 8-11. Visually checked page 2 rate table and page 8 variable-component table.",
-    "limitations": "Dated schedule, not a booking quote. Base toll excludes contingent and Westridge marine fees. Shipment-specific availability is unknown."
+    "limitations": "The schedule gives base tolls. Contingent charges and Westridge marine fees are excluded. Confirm current rates and availability with the carrier."
   },
   {
     "id": "cer-order-to-005-2026",
@@ -37,7 +37,7 @@
     "retrievedAt": "2026-10-17",
     "asOf": null,
     "method": "Read official explanation of internal trade barriers.",
-    "limitations": "General border-tariff statement. Does not enumerate every tax, permit or government fee."
+    "limitations": "Explains the absence of provincial border tariffs. Other taxes, permits and government fees need a shipment-specific check."
   },
   {
     "id": "cer-tm-profile",
@@ -57,6 +57,6 @@
     "retrievedAt": "2026-10-17",
     "asOf": null,
     "method": "Oil barrel definition is 42 U.S. gallons; volume conversion uses 0.003785411784 cubic metres per U.S. gallon.",
-    "limitations": "Physical volume conversion only. No energy-content, quality or density equivalence is implied."
+    "limitations": "Converts volume only. Energy content, quality and density are outside this calculation."
   }
 ]
