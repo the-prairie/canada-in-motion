@@ -8,6 +8,7 @@ import { gunzipSync } from 'node:zlib';
 import { buildPublic, validateRelease, PUBLIC_FILES, sha256 } from '../scripts/build-public.mjs';
 import { createPublicServer } from '../scripts/serve-public.mjs';
 import { releaseGate } from '../scripts/release-gate.mjs';
+import { betaReadiness } from '../scripts/launch-readiness.mjs';
 const DATE='2026-10-17T12:00:00Z';
 async function fixture(t) {
   const root=await fs.mkdtemp(path.join(os.tmpdir(),'atlas-release-'));
@@ -24,6 +25,15 @@ async function fixture(t) {
   await write('vendor/LICENSE.txt','Third party notice');await write('vendor/fonts/OFL.txt','Font notice');
   await write('config/publication.json',config);await write('config/sources.json',[definition]);await write('data/catalog.json',catalog);await write('data/national-coverage.json',coverage);
   await write(catalog.basePath+source.indexFile,index);await write(catalog.basePath+source.detailFiles[0].file,details);
+  const openLicence={name:'Open Government Licence - Canada',url:'https://open.canada.ca/en/open-government-licence-canada',attribution:'Contains information licensed under the Open Government Licence - Canada.'};
+  const contextEvidence={url:'https://example.org/open-data',sha256:'a'.repeat(64),retrievedAt:DATE};
+  const contextFiles={
+    'historical-infrastructure.geojson':{type:'FeatureCollection',metadata:{licence:openLicence,source:contextEvidence,catalogue:contextEvidence,counts:{pipeline:1,refinery:0}},features:[{id:'line1',type:'Feature',properties:{kind:'pipeline',historical:true},geometry:{type:'MultiLineString',coordinates:[[[-100,50],[-101,51]]]}}]},
+    'benchmark-tolls.json':{licence:openLicence,catalogue:contextEvidence,snapshotAsOf:'2026-10-17',currentValidity:'not-verified',eligibleForQuote:false,systemCount:1,rowCount:1,systems:[{name:'Example',eligibleForQuote:false,currentValidity:'not-verified',latestObservationDate:'2026-05-01',snapshotRowCount:1,source:{url:'https://example.org/tolls',sha256:'a'.repeat(64),retrievedAt:DATE},rows:[{Date:'2026-05-01',Unit:'CAD/m3',Toll:'2.5','Pipeline Name':'Example'}]}]},
+    'pipeline-attributes.json':{licence:openLicence,source:contextEvidence,catalogue:contextEvidence,rowCount:1,rows:[{'Pipeline name':'Example'}]}
+  };
+  for(const [name,value] of Object.entries(contextFiles)) await write('data/context/'+name,value);
+  await write('data/context/manifest.json',{schemaVersion:1,retrievedAt:DATE,counts:{geometry:{pipeline:1,refinery:0},benchmarkSystems:1,benchmarkRows:1,pipelineAttributes:1},files:Object.entries(contextFiles).map(([file,value])=>({file,sha256:sha256(JSON.stringify(value))}))});
   return {root,write,config,catalog,coverage,source};
 }
 test('public package is an allowlist; source-only and extra release files cannot leak',async t=>{
@@ -64,4 +74,31 @@ test('server isolates public files, blocks traversal/methods/symlinks, supports 
   assert.equal((await request(port,'/app.js',{headers:{'Accept-Encoding':'gzip;q=0'}})).headers['content-encoding'],undefined);
   const index=await request(port,'/'+f.catalog.basePath+f.source.indexFile);assert.match(index.headers['cache-control'],/immutable/);
   await fs.rm(path.join(f.root,'dist/app.js'));await fs.symlink(path.join(f.root,'app.js'),path.join(f.root,'dist/app.js'));assert.equal((await request(port,'/app.js')).status,500);
+});
+
+test('beta readiness requires honest coverage and never authorizes deployment', async t => {
+  const f = await fixture(t);
+  f.source.province = 'AB'; f.source.publisher = 'Example regulator'; f.source.license = 'Open licence'; f.source.limitations = 'Partial inventory.';
+  f.coverage.nationalComplete = false;
+  for (const code of ['YT','NT','NU']) f.coverage.provinces.push({code, topics: structuredClone(f.coverage.provinces[0].topics)});
+  for (const row of f.coverage.provinces) for (const item of Object.values(row.topics)) item.note = 'Partial or missing source coverage.';
+  await f.write('data/catalog.json', f.catalog); await f.write('data/national-coverage.json', f.coverage);
+  let report = await betaReadiness(f.root, {now:new Date(DATE)});
+  assert.equal(report.technicalReady, true); assert.equal(report.launchAuthorized, false);
+  assert.equal((await releaseGate(f.root, {now:new Date(DATE)})).passed, false);
+  f.coverage.provinces.find(row => row.code === 'AB').topics['well-inventory'].sourceIds = [];
+  await f.write('data/national-coverage.json', f.coverage);
+  report = await betaReadiness(f.root, {now:new Date(DATE)}); assert.equal(report.technicalReady, false); assert.ok(report.errors.some(x=>x.includes('absent')));
+});
+
+test('only bounded reviewed source exclusions may reconcile a larger raw source count', async t => {
+  const f = await fixture(t);
+  f.source.sourceCount = 2; f.source.droppedRecords = 1;
+  f.source.excludedRecords = [{sourceRecordId:'126',reason:'Empty placeholder'}];
+  await f.write('data/catalog.json', f.catalog);
+  await assert.rejects(validateRelease(f.root), /Unreviewed exclusions/);
+  await f.write('config/sources.json',[{id:'example',enabled:true,publication:'open',reviewedExclusion:{maximumCount:1,sourceRecordIds:['126'],reason:'Empty placeholder'}}]);
+  await validateRelease(f.root);
+  f.source.excludedRecords[0].sourceRecordId = '127'; await f.write('data/catalog.json', f.catalog);
+  await assert.rejects(validateRelease(f.root), /Unreviewed exclusions/);
 });

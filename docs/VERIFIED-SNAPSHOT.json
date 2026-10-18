@@ -1,6 +1,6 @@
 {
-  "releaseId": "fb7e27f1a9d1ce111674",
-  "totalRecords": 316717,
+  "releaseId": "6bcfaedd2d7bcd8889ce",
+  "totalRecords": 317129,
   "sources": [
     {
       "id": "aer-abandoned-wells",
@@ -13,7 +13,9 @@
       "sourceDateText": null,
       "publication": "noncommercial",
       "licenceUrl": "https://www.aer.ca/copyright-and-disclaimer",
-      "indexSha256": "0bc55b2a157b14cacba305c44dba9a92ca95eb7b5a7320a9e784effff5cd5b25"
+      "indexSha256": "0bc55b2a157b14cacba305c44dba9a92ca95eb7b5a7320a9e784effff5cd5b25",
+      "droppedRecords": 0,
+      "excludedRecords": []
     },
     {
       "id": "on-petroleum-wells",
@@ -26,7 +28,9 @@
       "sourceDateText": null,
       "publication": "open",
       "licenceUrl": "https://www.ontario.ca/page/open-government-licence-ontario",
-      "indexSha256": "a34ec4196523bbb498f49c58c2841ada4a51e014ab602650a63402ea9a9eb785"
+      "indexSha256": "a34ec4196523bbb498f49c58c2841ada4a51e014ab602650a63402ea9a9eb785",
+      "droppedRecords": 0,
+      "excludedRecords": []
     },
     {
       "id": "bcer-surface-wells",
@@ -39,7 +43,9 @@
       "sourceDateText": null,
       "publication": "open",
       "licenceUrl": "https://www.bc-er.ca/files/gis/BCER-Open-Data-Licence.pdf",
-      "indexSha256": "536b4a22a18a5ee277711cdb76c982228437414da46a44d1852465ba0d42e8ff"
+      "indexSha256": "536b4a22a18a5ee277711cdb76c982228437414da46a44d1852465ba0d42e8ff",
+      "droppedRecords": 0,
+      "excludedRecords": []
     },
     {
       "id": "sk-orphan-wells",
@@ -52,7 +58,9 @@
       "sourceDateText": "10/02/2026 00:00",
       "publication": "open",
       "licenceUrl": "https://gisappl.saskatchewan.ca/Html5Ext/Resources/GOS_Standard_Unrestricted_Use_Data_Licence_v2.0.pdf",
-      "indexSha256": "65bfef81b4afe2837f6ddc8a38410b1667f2818e4c0687ffa27889f0cc3e3808"
+      "indexSha256": "65bfef81b4afe2837f6ddc8a38410b1667f2818e4c0687ffa27889f0cc3e3808",
+      "droppedRecords": 0,
+      "excludedRecords": []
     },
     {
       "id": "mb-petroleum-wells",
@@ -65,7 +73,81 @@
       "sourceDateText": null,
       "publication": "open",
       "licenceUrl": "https://www.gov.mb.ca/asset_library/en/legal/OpenMB-Information-Data-Use-Licence.pdf",
-      "indexSha256": "d1cf68d7c7192c205f784bf5d6be4a42c0c14df312d74361fcf90d46e7651909"
+      "indexSha256": "d1cf68d7c7192c205f784bf5d6be4a42c0c14df312d74361fcf90d46e7651909",
+      "droppedRecords": 0,
+      "excludedRecords": []
+    },
+    {
+      "id": "yt-oil-gas-wells",
+      "province": "YT",
+      "count": 76,
+      "sourceCount": 76,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T05:43:39Z",
+      "upstreamModifiedAt": null,
+      "sourceDateText": null,
+      "publication": "open",
+      "licenceUrl": "https://yukon.ca/en/your-government/open-government/open-government-licence-yukon",
+      "indexSha256": "75d1476c5d4cd7173bc6fe2606b9299eb10c2eb3e76ee6cc7a6934b85a0b45b8",
+      "droppedRecords": 0,
+      "excludedRecords": []
+    },
+    {
+      "id": "ns-onshore-open-historical",
+      "province": "NS",
+      "count": 125,
+      "sourceCount": 131,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T05:43:40Z",
+      "upstreamModifiedAt": null,
+      "sourceDateText": null,
+      "observationsThrough": "2016-02-01",
+      "publication": "open",
+      "licenceUrl": "https://novascotia.ca/opendata/licence.asp",
+      "indexSha256": "b8b3e25fb4cd5efb717d794805cc410b50bab5e0ec5d9aa7b7555f286f20492d",
+      "droppedRecords": 6,
+      "excludedRecords": [
+        {
+          "sourceRecordId": "126",
+          "reason": "Empty source placeholders projected from zero easting/northing to latitude zero. These are not identifiable well records."
+        },
+        {
+          "sourceRecordId": "127",
+          "reason": "Empty source placeholders projected from zero easting/northing to latitude zero. These are not identifiable well records."
+        },
+        {
+          "sourceRecordId": "128",
+          "reason": "Empty source placeholders projected from zero easting/northing to latitude zero. These are not identifiable well records."
+        },
+        {
+          "sourceRecordId": "129",
+          "reason": "Empty source placeholders projected from zero easting/northing to latitude zero. These are not identifiable well records."
+        },
+        {
+          "sourceRecordId": "130",
+          "reason": "Empty source placeholders projected from zero easting/northing to latitude zero. These are not identifiable well records."
+        },
+        {
+          "sourceRecordId": "131",
+          "reason": "Empty source placeholders projected from zero easting/northing to latitude zero. These are not identifiable well records."
+        }
+      ]
+    },
+    {
+      "id": "ns-offshore-open-directory",
+      "province": "NS",
+      "count": 211,
+      "sourceCount": 211,
+      "enumerationVerified": true,
+      "retrievedAt": "2026-10-18T05:44:14Z",
+      "upstreamModifiedAt": null,
+      "sourceDateText": null,
+      "observationsThrough": "2020 directory / 2022 layer title",
+      "publication": "open",
+      "licenceUrl": "https://open.canada.ca/en/open-government-licence-canada",
+      "indexSha256": "ce8b4b9ec53aa87af0a659059240768db656f37093f58ed41e6395273343237d",
+      "droppedRecords": 0,
+      "excludedRecords": []
     }
   ]
 }

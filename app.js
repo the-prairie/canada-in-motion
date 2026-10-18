@@ -86,6 +86,8 @@ async function boot() {
     tariffSources,
     countries,
     provinces,
+    historicalInfrastructure,
+    benchmarkTolls,
   ] = await Promise.all(
     [
       "data/network.json",
@@ -95,17 +97,19 @@ async function boot() {
       "data/tariff-sources.json",
       "data/countries.geojson",
       "data/provinces.geojson",
+      "data/context/historical-infrastructure.geojson",
+      "data/context/benchmark-tolls.json",
     ].map(fetchJSON),
   );
   const wells = { wells: [], retrievedAt: catalog.retrievedAt, coverage: catalog.sources.map(source => ({province:source.province, sourceId:source.id, included:source.count, totalAvailable:source.sourceCount, scope:source.scope, note:source.limitations})) };
-  data = { network, wells, tariffs, catalog, coverage };
+  data = { network, wells, tariffs, catalog, coverage, historicalInfrastructure, benchmarkTolls };
   sources = [...network.sources, ...catalog.sources, ...tariffSources];
   if (!network.routes.some((r) => r.id === state.route))
     state.route = DEFAULT_STATE.route;
 
   atlas = new AtlasMap(
     network,
-    { countries, provinces },
+    { countries, provinces, historicalInfrastructure },
     {
       onRoute: (id) => chooseRoute(id),
       onStep: (n) => chooseStep(n),
@@ -299,6 +303,7 @@ function render() {
         ["facilities", "Facilities", "layer-line"],
         ["wells", "Well records", "layer-dot"],
       ];
+  layerItems.push(["historical", "Historical pipelines & refineries", "layer-line"]);
   $("layer-inputs").innerHTML =
     layerItems
       .map(
@@ -306,7 +311,7 @@ function render() {
           `<label class="check-row"><input type="checkbox" data-layer="${key}" ${state.layers[key] ? "checked" : ""}><span class="${cl}"></span>${label}</label>`,
       )
       .join("") +
-    '<button class="text-link" data-action="facilities">Browse all six facilities</button>';
+    '<button class="text-link" data-action="facilities">Browse six featured facility localities</button><button class="text-link" data-action="historical-infrastructure">Historical layer dates & sources</button>';
   $("map-legend").innerHTML = wellMode
     ? '<span><i class="wells"></i>Orphan recorded</span><span><i class="context"></i>Designation unknown</span><span><i class="mixed-key"></i>Mixed cluster</span>'
     : `${state.layers[getRoute().commodity] ? '<span><i class="selected-route"></i>Selected corridor</span>' : ""}${state.layers.oil ? "<span><i></i>Oil</span>" : ""}${state.layers.gas ? '<span><i class="gas"></i>Gas</span>' : ""}${state.layers.facilities ? "<span>◇ Facility locality</span>" : ""}${state.layers.wells ? '<span><i class="wells"></i>Well records</span>' : ""}`;
@@ -320,8 +325,9 @@ function render() {
       : state.view === "wells"
         ? "Clusters count source records, not unique sites."
         : "Indicative corridors. Facility markers represent localities.";
+  if (state.layers.historical) $("map-source-label").textContent += ` Historical CanVec overlay: pipelines through ${data.historicalInfrastructure.metadata.observationRanges.pipeline.latest.slice(0,4)}, refineries through ${data.historicalInfrastructure.metadata.observationRanges.refinery.latest.slice(0,4)}; current operation unknown.`;
   $("coverage-line").textContent =
-    `${fmt(data.catalog.totalRecords)} records · ${new Set(data.catalog.sources.map(s => s.province)).size} provinces · coverage gaps`;
+    `${fmt(data.catalog.totalRecords)} records · ${new Set(data.catalog.sources.map(s => s.province)).size} jurisdictions · coverage gaps`;
   $("panel").innerHTML =
     state.view === "journey"
       ? journeyPanel()
@@ -404,15 +410,15 @@ function receipt() {
 }
 
 function journeyPanel() {
-  return `<div class="panel-head"><h1>Transport costs</h1><p>Published pipeline rates, separated from government charges.</p></div><div class="panel-section">${routeSelect()}${shipmentFields()}</div>${receipt()}<div class="panel-section"><h3>Compare destinations</h3><p class="micro">Edmonton origin · light crude · same service and schedule. Delivery outcomes differ.</p>${data.tariffs.rates.map((rate) => `<button class="route-option ${rate.routeId === state.route ? "selected" : ""}" data-route="${rate.routeId}" aria-pressed="${rate.routeId === state.route}"><span><strong>${esc(rate.destination.split(",")[0])}</strong><span class="rate-strip"><i style="width:${(rate.rate / 90) * 100}%"></i></span></span><span class="route-cost">${precise(rate.rate)} <small>CAD / m³</small></span></button>`).join("")}<button class="primary-button wide" data-view="lab">Compare a cost scenario</button></div>`;
+  return `<div class="panel-head"><h1>Transport costs</h1><p>Published pipeline rates, separated from government charges.</p></div><div class="panel-section">${routeSelect()}${shipmentFields()}</div>${receipt()}<div class="panel-section"><button class="secondary-button wide" data-action="benchmark-tolls">Browse CER benchmark tolls</button><p class="micro">Dated observations across pipeline systems. These do not change the shipment estimate.</p></div><div class="panel-section"><h3>Compare destinations</h3><p class="micro">Edmonton origin · light crude · same service and schedule. Delivery outcomes differ.</p>${data.tariffs.rates.map((rate) => `<button class="route-option ${rate.routeId === state.route ? "selected" : ""}" data-route="${rate.routeId}" aria-pressed="${rate.routeId === state.route}"><span><strong>${esc(rate.destination.split(",")[0])}</strong><span class="rate-strip"><i style="width:${(rate.rate / 90) * 100}%"></i></span></span><span class="route-cost">${precise(rate.rate)} <small>CAD / m³</small></span></button>`).join("")}<button class="primary-button wide" data-view="lab">Compare a cost scenario</button></div>`;
 }
 
 function wellFilters() {
   return `${field("Licence, well or recorded licensee", "well-search", `<input type="search" id="well-search" data-state="query" value="${esc(state.query)}" placeholder="Search the loaded records" autocomplete="off">`)}${field(
-    "Province",
+    "Province or territory",
     "province",
     `<select id="province" data-state="province">${[
-      ["all", "All covered provinces"],
+      ["all", "All covered jurisdictions"],
       ...data.coverage.provinces.map(p => [p.code,p.name]),
     ]
       .map(([v, l]) => option(v, l, state.province))
@@ -462,7 +468,7 @@ function eventChart() {
   );
   const years = [...counts.keys()].sort();
   const max = Math.max(1, ...counts.values());
-  return `<details id="event-options" class="events-explorer" ${state.eventYear !== "all" || state.eventType !== "all" ? "open" : ""}><summary class="small" style="cursor:pointer">Explore documented events</summary><p class="micro">Source event counts by year in the selected province. This is not a reconstruction of historical inventories.</p>${field(
+  return `<details id="event-options" class="events-explorer" ${state.eventYear !== "all" || state.eventType !== "all" ? "open" : ""}><summary class="small" style="cursor:pointer">Explore documented events</summary><p class="micro">Source event counts by year in the selected jurisdiction. This is not a reconstruction of historical inventories.</p>${field(
     "Recorded event type",
     "event-type",
     `<select id="event-type" data-state="eventType">${[
@@ -505,8 +511,9 @@ function wellsPanel() {
 
 function wellDetail(w) {
   const events = eventTimeline(w);
+  const source = data.catalog.sources.find(item => item.id === w.sourceId);
   const position = filtered.findIndex((record) => record.id === w.id);
-  return `<div class="panel-head"><button class="text-link well-back" data-action="back-wells">← All matching wells</button><span class="eyebrow">${esc(w.province)} / SOURCE RECORD ${esc(w.sourceRecordId)}</span><h1>${esc(w.name)}</h1><p>${esc(w.locationLabel || "Surface location from the source record")}</p></div><div class="panel-section"><div class="record-row"><p class="record-label">Orphan designation</p><div class="record-value">${pill(statusNames[w.orphanStatus] || "Unknown", w.orphanStatus === "designated" ? "amber" : "gray")}</div></div><div class="record-row"><p class="record-label">Whole-well closure</p><div class="record-value">${pill(statusNames[w.closureStatus] || w.closureStatus)}</div></div><div class="record-row"><p class="record-label">Reclamation status as recorded</p><div class="record-value">${esc(w.reclamationStatus || "Not supplied")}</div></div><div class="record-row"><p class="record-label">Recorded licensee</p><div class="record-value">${esc(w.operator || "Not supplied")}</div></div><p class="micro">A recorded licensee is not proof of current ownership or liability. Orphan designation can coexist with abandonment, reclamation or a later transfer.</p><div class="action-row"><a class="primary-button" href="${esc(w.sourceUrl)}" target="_blank" rel="noopener">Open regulator record</a><button class="secondary-button" data-action="focus">Locate on map</button></div></div><div class="panel-section"><div class="record-navigation"><button data-next-well="-1" ${position <= 0 ? "disabled" : ""}>Previous record</button><button data-next-well="1" ${position < 0 || position >= filtered.length - 1 ? "disabled" : ""}>Next record</button></div><h3 style="margin-top:20px">Documented history</h3>${events.length ? `<ol class="timeline">${events.map((e) => `<li><time>${esc(e.date)}</time><strong>${esc(e.label)}</strong></li>`).join("")}</ol>` : '<p class="small muted">This source does not supply dated lifecycle events. No history has been inferred.</p>'}<p class="note">Only events explicitly recorded in the source appear here. Missing steps and dates remain unknown.</p></div><div class="panel-section"><h3>Evidence & coordinates</h3><div class="receipt-row"><span>Licence</span><span>${esc(w.license || "Not supplied")}</span></div><div class="receipt-row"><span>Latitude / longitude</span><span>${w.lat.toFixed(5)} / ${w.lon.toFixed(5)}</span></div><div class="receipt-row"><span>Snapshot retrieved</span><span>${esc(localDate(data.wells.retrievedAt))}</span></div>${sourceButton(w.sourceId)}<details style="margin-top:16px"><summary class="small">Original status fields</summary>${Object.entries(
+  return `<div class="panel-head"><button class="text-link well-back" data-action="back-wells">← All matching wells</button><span class="eyebrow">${esc(w.province)} / SOURCE RECORD ${esc(w.sourceRecordId)}</span><h1>${esc(w.name)}</h1><p>${esc(w.locationLabel || "Surface location from the source record")}</p>${source?.observationsThrough ? `<p class="callout">Historical record · observations through ${esc(source.observationsThrough)}. Status is not verified as current.</p>` : ""}</div><div class="panel-section"><div class="record-row"><p class="record-label">Orphan designation</p><div class="record-value">${pill(statusNames[w.orphanStatus] || "Unknown", w.orphanStatus === "designated" ? "amber" : "gray")}</div></div><div class="record-row"><p class="record-label">Whole-well closure</p><div class="record-value">${pill(statusNames[w.closureStatus] || w.closureStatus)}</div></div><div class="record-row"><p class="record-label">Reclamation status as recorded</p><div class="record-value">${esc(w.reclamationStatus || "Not supplied")}</div></div><div class="record-row"><p class="record-label">Recorded licensee</p><div class="record-value">${esc(w.operator || "Not supplied")}</div></div><p class="micro">A recorded licensee is not proof of current ownership or liability. Orphan designation can coexist with abandonment, reclamation or a later transfer.</p><div class="action-row"><a class="primary-button" href="${esc(w.sourceUrl)}" target="_blank" rel="noopener">Open regulator record</a><button class="secondary-button" data-action="focus">Locate on map</button></div></div><div class="panel-section"><div class="record-navigation"><button data-next-well="-1" ${position <= 0 ? "disabled" : ""}>Previous record</button><button data-next-well="1" ${position < 0 || position >= filtered.length - 1 ? "disabled" : ""}>Next record</button></div><h3 style="margin-top:20px">Documented history</h3>${events.length ? `<ol class="timeline">${events.map((e) => `<li><time>${esc(e.date)}</time><strong>${esc(e.label)}</strong></li>`).join("")}</ol>` : '<p class="small muted">This source does not supply dated lifecycle events. No history has been inferred.</p>'}<p class="note">Only events explicitly recorded in the source appear here. Missing steps and dates remain unknown.</p></div><div class="panel-section"><h3>Evidence & coordinates</h3><div class="receipt-row"><span>Licence</span><span>${esc(w.license || "Not supplied")}</span></div><div class="receipt-row"><span>Latitude / longitude</span><span>${w.lat.toFixed(5)} / ${w.lon.toFixed(5)}</span></div><div class="receipt-row"><span>Snapshot retrieved</span><span>${esc(localDate(source?.retrievedAt || data.wells.retrievedAt))}</span></div>${sourceButton(w.sourceId)}<details style="margin-top:16px"><summary class="small">Original status fields</summary>${Object.entries(
     w.raw || {},
   )
     .map(
@@ -592,7 +599,7 @@ function showEvidence(id) {
       list
         .map(
           (s) =>
-            `<article class="source-entry"><div class="source-meta">${esc(s.publisher)} ${s.asOf ? " · " + esc(s.asOf) : ""} ${s.retrievedAt ? " · Retrieved " + esc(s.retrievedAt) : ""}</div><h3>${esc(s.title)}</h3><a href="${esc(s.url)}" target="_blank" rel="noopener">Open original source</a>${s.method ? `<p><strong>Method.</strong> ${esc(textList(s.method))}</p>` : ""}${s.limitations ? `<p><strong>Limits.</strong> ${esc(textList(s.limitations))}</p>` : ""}${s.license ? `<p><strong>Licence.</strong> ${esc(s.license)}</p>` : ""}${
+            `<article class="source-entry"><div class="source-meta">${esc(s.publisher)} ${s.asOf ? " · " + esc(s.asOf) : ""} ${s.observationsThrough ? " · Historical observations through " + esc(s.observationsThrough) : ""} ${s.retrievedAt ? " · Retrieved " + esc(s.retrievedAt) : ""}</div><h3>${esc(s.title)}</h3><a href="${esc(s.url)}" target="_blank" rel="noopener">Open original source</a>${s.method ? `<p><strong>Method.</strong> ${esc(textList(s.method))}</p>` : ""}${s.limitations ? `<p><strong>Limits.</strong> ${esc(textList(s.limitations))}</p>` : ""}${s.license ? `<p><strong>Licence.</strong> ${esc(s.license)}</p>` : ""}${
               s.definitions
                 ? `<details><summary class="small">Normalization definitions</summary>${Object.entries(
                     s.definitions,
@@ -608,9 +615,25 @@ function showEvidence(id) {
         .join(""),
   );
 }
+function showHistoricalInfrastructure() {
+  const layer = data.historicalInfrastructure;
+  const metadata = layer.metadata;
+  const refineries = layer.features.filter(feature => feature.properties.kind === "refinery");
+  openDialog(`<h3>Historical pipelines and refineries</h3><p>${esc(metadata.scope)}</p><p>${fmt(metadata.counts.pipeline)} pipeline segments and ${fmt(metadata.counts.refinery)} refinery points at 1:250,000 scale. Pipeline feature dates extend through ${esc(metadata.observationRanges.pipeline.latest.slice(0,4))}; refinery dates extend through ${esc(metadata.observationRanges.refinery.latest.slice(0,4))}. Archive modification date: ${esc(metadata.source.upstreamModifiedAt || "not supplied on this retrieval")}.</p><p>${esc(metadata.licence.attribution)} <a href="${esc(metadata.licence.url)}" target="_blank" rel="noopener">Licence</a>.</p><p><a href="data/context/historical-infrastructure.geojson" download>Download mapped features and source dates</a> · <a href="${esc(metadata.source.url)}" target="_blank" rel="noopener">Original NRCan archive</a></p><h3>Refinery records</h3><p>Historical locations. Current operating status is not established.</p>${refineries.map(feature => `<p><strong>${esc(feature.properties.name)}</strong><br>${esc(feature.properties.sourceDateMin)} to ${esc(feature.properties.sourceDateMax)} · ${feature.geometry.coordinates[1].toFixed(4)}, ${feature.geometry.coordinates[0].toFixed(4)}</p>`).join("")}`);
+}
+function benchmarkRows(index) {
+  const system = data.benchmarkTolls.systems[index];
+  if (!system) return '<p>No benchmark observations for this system.</p>';
+  return `<p><strong>Observation date ${esc(system.latestObservationDate)}</strong><br>${fmt(system.snapshotRowCount)} observations on this date. Historical benchmarks are not current offers or all-in prices.</p><p><a href="${esc(system.source.url)}" target="_blank" rel="noopener">Download full CER history</a></p>${system.rows.map(row => `<article class="source-entry"><h3>${esc(row.Path || row['Pipeline Name'])}</h3><div class="receipt-row"><span>Published benchmark</span><strong>${esc(row.Toll)} ${esc(row.Unit)}</strong></div><p>${esc(row.Service)} · ${esc(row.Product)}<br>${esc(row['Corporate Entity'])}<br>Tariff ${esc(row['Tariff Number'] || 'not supplied')}</p></article>`).join("")}`;
+}
+function showBenchmarkTolls() {
+  const tolls = data.benchmarkTolls;
+  openDialog(`<h3>CER benchmark tolls</h3><p>${esc(tolls.scope)}</p><p>${esc(tolls.licence.attribution)} <a href="${esc(tolls.licence.url)}" target="_blank" rel="noopener">Licence</a>.</p>${field("Pipeline system", "benchmark-system", `<select id="benchmark-system" data-benchmark-system>${tolls.systems.map((system,index) => `<option value="${index}">${esc(system.name)}</option>`).join("")}</select>`)}<div id="benchmark-records">${benchmarkRows(0)}</div><p><a href="data/context/benchmark-tolls.json" download>Download all benchmark snapshots with provenance</a></p>`);
+}
+
 function coverageTable() {
   const statusLabel = {partial:"Partial coverage",unavailable:"Not available", "permission-required":"Permission required",complete:"Verified complete"};
-  return `<p>National coverage is incomplete. Retrieval dates show when files were checked, not when the underlying records were last updated.</p><div class="table-scroll" role="region" aria-label="National well inventory coverage" tabindex="0"><table class="coverage-table"><thead><tr><th>Province</th><th>Published records</th><th>Coverage</th></tr></thead><tbody>${data.coverage.provinces.map(p => {const loaded=data.catalog.sources.filter(s => s.province===p.code);return `<tr><td>${esc(p.name)}</td><td>${loaded.length ? fmt(loaded.reduce((n,s)=>n+s.count,0)) : "Not loaded"}</td><td>${esc(statusLabel[p.topics["well-inventory"].status] || p.topics["well-inventory"].status)}</td></tr>`;}).join("")}</tbody></table></div><h3>Source freshness</h3>${data.catalog.sources.map(s=>`<p><strong>${esc(s.title)}</strong><br>Retrieved ${esc(localDate(s.retrievedAt))} · ${snapshotFreshness(s.retrievedAt)==="stale"?"refresh overdue":"recent retrieval"}<br>Source date: ${esc(s.sourceDateText || (typeof s.upstreamModifiedAt === "number" ? new Date(s.upstreamModifiedAt).toISOString() : s.upstreamModifiedAt) || "not supplied")}<br>${esc(s.limitations)}</p>`).join("")}<p><a href="data/national-coverage.json" target="_blank" rel="noopener">Download coverage and source register</a></p>`;
+  return `<p>National coverage is incomplete. Retrieval dates show when files were checked, not when the underlying records were last updated.</p><div class="table-scroll" role="region" aria-label="National well inventory coverage" tabindex="0"><table class="coverage-table"><thead><tr><th>Jurisdiction</th><th>Published records</th><th>Coverage</th></tr></thead><tbody>${data.coverage.provinces.map(p => {const loaded=data.catalog.sources.filter(s => s.province===p.code);return `<tr><td>${esc(p.name)}</td><td>${loaded.length ? fmt(loaded.reduce((n,s)=>n+s.count,0)) : "Not loaded"}</td><td>${esc(statusLabel[p.topics["well-inventory"].status] || p.topics["well-inventory"].status)}</td></tr>`;}).join("")}</tbody></table></div><h3>Source freshness</h3>${data.catalog.sources.map(s=>`<p><strong>${esc(s.title)}</strong><br>Retrieved ${esc(localDate(s.retrievedAt))} · ${snapshotFreshness(s.retrievedAt)==="stale"?"refresh overdue":"recent retrieval"}<br>${s.observationsThrough ? `Historical observations through ${esc(s.observationsThrough)}<br>` : ""}Source date: ${esc(s.sourceDateText || (typeof s.upstreamModifiedAt === "number" ? new Date(s.upstreamModifiedAt).toISOString() : s.upstreamModifiedAt) || "not supplied")}<br>${esc(s.limitations)}</p>`).join("")}<p><a href="data/national-coverage.json" target="_blank" rel="noopener">Download coverage and source register</a></p>`;
 }
 function showReceiptEvidence() {
   const rate = getRate(),
@@ -830,6 +853,7 @@ document.addEventListener("input", (e) => {
 document.addEventListener("change", (e) => {
   if (!data) return;
   const t = e.target;
+  if (t.dataset.benchmarkSystem !== undefined) { $("benchmark-records").innerHTML = benchmarkRows(Number(t.value)); return; }
   if (t.dataset.state) {
     const key = t.dataset.state;
     if (key === "route") {
@@ -1010,6 +1034,8 @@ document.addEventListener("click", async (e) => {
   }
   if (a === "retry-detail") { detailError = null; render(); return; }
   if (a === "retry-wells") { wellLoadError = null; render(); return; }
+  if (a === "historical-infrastructure") showHistoricalInfrastructure();
+  if (a === "benchmark-tolls") showBenchmarkTolls();
   if (a === "coverage")
     openDialog(
       `<div class="source-entry"><h3>Well-data coverage</h3>${coverageTable()}</div>`,
@@ -1030,6 +1056,10 @@ document.addEventListener("click", async (e) => {
         "lon",
         "sourceId",
         "sourceUrl",
+        "observationsThrough",
+        "sourceRetrievedAt",
+        "sourceDateDetail",
+        "sourceLimitations",
       ]),
       "text/csv",
     );

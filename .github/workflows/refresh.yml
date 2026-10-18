@@ -46,8 +46,19 @@ jobs:
           github-token: ${{ github.token }}
       - name: Acquire all enabled approved sources atomically
         run: python pipeline/refresh.py
+      - name: Refresh openly licensed context when seven days old
+        run: python pipeline/refresh_context.py
       - name: Build private review candidate
         run: node scripts/build-public.mjs
+      - name: Report beta technical readiness without authorizing launch
+        run: node scripts/launch-readiness.mjs > data/beta-readiness.json
+      - name: Preserve beta readiness report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: beta-readiness-${{ github.run_id }}
+          path: data/beta-readiness.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Upload complete candidate
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -82,5 +93,6 @@ jobs:
           path: |
             data/catalog.json
             data/source-monitor.json
+            data/context/
           retention-days: 90
           if-no-files-found: error

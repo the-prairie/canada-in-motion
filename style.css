@@ -1336,6 +1336,14 @@ dialog::backdrop {
 .dialog-header h2 {
   font-size: 19px;
 }
+#evidence-body > p,
+#evidence-body > h3,
+#evidence-body > .field,
+#benchmark-records > p {
+  margin-left: 24px;
+  margin-right: 24px;
+  overflow-wrap: anywhere;
+}
 .icon-button {
   min-width: 44px;
   font-size: 24px;
@@ -1726,6 +1734,13 @@ dialog::backdrop {
   }
   .source-entry {
     padding: 18px;
+  }
+  #evidence-body > p,
+  #evidence-body > h3,
+  #evidence-body > .field,
+  #benchmark-records > p {
+    margin-left: 18px;
+    margin-right: 18px;
   }
   .toast {
     bottom: 44px;

@@ -34,15 +34,19 @@
         },
         "infrastructure": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": null,
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-canvec-historical"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
+          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
         },
         "carrier-rates": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": null,
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "cer-benchmark-tolls"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
+          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
         },
         "government-charges": {
           "status": "partial",
@@ -83,15 +87,19 @@
         },
         "infrastructure": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": null,
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-canvec-historical"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
+          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
         },
         "carrier-rates": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": null,
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "cer-benchmark-tolls"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
+          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
         },
         "government-charges": {
           "status": "partial",
@@ -132,15 +140,19 @@
         },
         "infrastructure": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": null,
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-canvec-historical"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
+          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
         },
         "carrier-rates": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": null,
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "cer-benchmark-tolls"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
+          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
         },
         "government-charges": {
           "status": "partial",
@@ -181,15 +193,19 @@
         },
         "infrastructure": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": null,
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-canvec-historical"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
+          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
         },
         "carrier-rates": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": null,
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "cer-benchmark-tolls"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
+          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
         },
         "government-charges": {
           "status": "partial",
@@ -230,15 +246,19 @@
         },
         "infrastructure": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": null,
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-canvec-historical"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
+          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
         },
         "carrier-rates": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": null,
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "cer-benchmark-tolls"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
+          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
         },
         "government-charges": {
           "status": "partial",
@@ -273,15 +293,19 @@
         },
         "infrastructure": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://sigpeg.mrn.gouv.qc.ca/gpg/hydrocarbures/Licence_utilisation.pdf",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-canvec-historical"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
+          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
         },
         "carrier-rates": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://sigpeg.mrn.gouv.qc.ca/gpg/hydrocarbures/Licence_utilisation.pdf",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "cer-benchmark-tolls"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
+          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
         },
         "government-charges": {
           "status": "partial",
@@ -316,15 +340,19 @@
         },
         "infrastructure": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://www2.gnb.ca/content/gnb/en/departments/erd/energy/content/minerals/content/GeoNB.html",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-canvec-historical"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
+          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
         },
         "carrier-rates": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://www2.gnb.ca/content/gnb/en/departments/erd/energy/content/minerals/content/GeoNB.html",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "cer-benchmark-tolls"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
+          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
         },
         "government-charges": {
           "status": "partial",
@@ -340,34 +368,47 @@
       "jurisdictionType": "province",
       "topics": {
         "well-inventory": {
-          "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://data.novascotia.ca/api/views/5q4c-27fh.json",
-          "note": "Complete national coverage has not been established."
+          "status": "partial",
+          "sourceIds": [
+            "ns-onshore-open-historical",
+            "ns-offshore-open-directory"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/6278d435-fdd6-4889-a3fb-7f31134cf8eb",
+          "note": "Historical openly licensed onshore and offshore source records. Onshore observations through 2016; offshore directory2020/layer2022. Re-entries are separate records. Current complete inventory remains unverified."
         },
         "orphan-status": {
           "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://data.novascotia.ca/api/views/5q4c-27fh.json",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "ns-onshore-open-historical",
+            "ns-offshore-open-directory"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/6278d435-fdd6-4889-a3fb-7f31134cf8eb",
+          "note": "Neither open inventory supplies orphan designation. Abandonment does not establish orphan status."
         },
         "abandonment-status": {
-          "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://data.novascotia.ca/api/views/5q4c-27fh.json",
-          "note": "Complete national coverage has not been established."
+          "status": "partial",
+          "sourceIds": [
+            "ns-onshore-open-historical",
+            "ns-offshore-open-directory"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/6278d435-fdd6-4889-a3fb-7f31134cf8eb",
+          "note": "Historical openly licensed onshore and offshore source records. Onshore observations through 2016; offshore directory2020/layer2022. Re-entries are separate records. Current complete inventory remains unverified."
         },
         "infrastructure": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://data.novascotia.ca/api/views/5q4c-27fh.json",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-canvec-historical"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
+          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
         },
         "carrier-rates": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://data.novascotia.ca/api/views/5q4c-27fh.json",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "cer-benchmark-tolls"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
+          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
         },
         "government-charges": {
           "status": "partial",
@@ -402,15 +443,19 @@
         },
         "infrastructure": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.princeedwardisland.ca/en/topic/energy",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-canvec-historical"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
+          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
         },
         "carrier-rates": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.princeedwardisland.ca/en/topic/energy",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "cer-benchmark-tolls"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
+          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
         },
         "government-charges": {
           "status": "partial",
@@ -445,15 +490,19 @@
         },
         "infrastructure": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.gov.nl.ca/iet/energy/petroleum/onshore/",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-canvec-historical"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
+          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
         },
         "carrier-rates": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.gov.nl.ca/iet/energy/petroleum/onshore/",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "cer-benchmark-tolls"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
+          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
         },
         "government-charges": {
           "status": "partial",
@@ -469,34 +518,44 @@
       "jurisdictionType": "territory",
       "topics": {
         "well-inventory": {
-          "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://yukon.ca/en/oil-and-gas",
-          "note": "Complete national coverage has not been established."
+          "status": "partial",
+          "sourceIds": [
+            "yt-oil-gas-wells"
+          ],
+          "evidenceUrl": "https://www.arcgis.com/sharing/rest/content/items/11aabfb914c2469090d8488961b88e5d?f=pjson",
+          "note": "Published historic and active oil and gas well locations are approximate; full source layer contained 76 records during verification. No orphan designation or reclamation completion in source. OPERATOR may be null; recorded WELL_LICENSEE is separate and preserved in raw. Source has no verified data-as-of stamp, so retrieval must not be represented as status effective date. The displayed recorded licensee comes from WELL_LICENSEE, not OPERATOR. No present ownership or liability is inferred."
         },
         "orphan-status": {
           "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://yukon.ca/en/oil-and-gas",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "yt-oil-gas-wells"
+          ],
+          "evidenceUrl": "https://mapservices.gov.yk.ca/arcgis/rest/services/GeoYukon/GY_OilGas/MapServer/0",
+          "note": "Source does not provide an orphan designation. Unknown does not mean not orphan."
         },
         "abandonment-status": {
-          "status": "unavailable",
-          "sourceIds": [],
-          "evidenceUrl": "https://yukon.ca/en/oil-and-gas",
-          "note": "Complete national coverage has not been established."
+          "status": "partial",
+          "sourceIds": [
+            "yt-oil-gas-wells"
+          ],
+          "evidenceUrl": "https://www.arcgis.com/sharing/rest/content/items/11aabfb914c2469090d8488961b88e5d?f=pjson",
+          "note": "Published historic and active oil and gas well locations are approximate; full source layer contained 76 records during verification. No orphan designation or reclamation completion in source. OPERATOR may be null; recorded WELL_LICENSEE is separate and preserved in raw. Source has no verified data-as-of stamp, so retrieval must not be represented as status effective date. The displayed recorded licensee comes from WELL_LICENSEE, not OPERATOR. No present ownership or liability is inferred."
         },
         "infrastructure": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://yukon.ca/en/oil-and-gas",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-canvec-historical"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
+          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
         },
         "carrier-rates": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://yukon.ca/en/oil-and-gas",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "cer-benchmark-tolls"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
+          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
         },
         "government-charges": {
           "status": "partial",
@@ -531,15 +590,19 @@
         },
         "infrastructure": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.orogo.gov.nt.ca",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-canvec-historical"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
+          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
         },
         "carrier-rates": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.orogo.gov.nt.ca",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "cer-benchmark-tolls"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
+          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
         },
         "government-charges": {
           "status": "partial",
@@ -574,15 +637,19 @@
         },
         "infrastructure": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.cer-rec.gc.ca/en/about/north-offshore/",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "nrcan-canvec-historical"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/92dbea79-f644-4a62-b25e-8eb993ca0264",
+          "note": "National historical cartographic context is loaded. This does not establish current infrastructure or a record in every jurisdiction. Feature dates are preserved."
         },
         "carrier-rates": {
           "status": "partial",
-          "sourceIds": [],
-          "evidenceUrl": "https://www.cer-rec.gc.ca/en/about/north-offshore/",
-          "note": "Complete national coverage has not been established."
+          "sourceIds": [
+            "cer-benchmark-tolls"
+          ],
+          "evidenceUrl": "https://open.canada.ca/data/en/dataset/e00172b8-35c2-4651-a8c5-13ab30bd7236",
+          "note": "Dated benchmark observations for25federally regulated systems are loaded. Coverage depends on the actual path, service and commodity. They are not current all-in quotes or interprovincial government tariffs."
         },
         "government-charges": {
           "status": "partial",

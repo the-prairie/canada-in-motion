@@ -8,3 +8,5 @@ ts	phase	decision	why	evidence	result
 2026-10-18T04:53:51.696782+00:00	verification	Verify private hosted acquisition	Configured schedules alone do not prove execution	docs/HOSTED-VERIFICATION.json	316717 records reproduced
 2026-10-18T04:53:51.697086+00:00	ux	Distinguish unavailable inventory from zero	Missing source coverage must not imply zero wells	app.js	Verified desktop and mobile
 2026-10-18T04:53:51.697088+00:00	evidence	Supersede local investigation paths with committed evidence	Repository reviewers need durable references	docs/VERIFICATION.md	Local and hosted proof recorded
+2026-10-17	Open-data expansion	Model the Domain	Keep historical geometry and dated benchmark tolls separate from current infrastructure and quote eligibility; preserve orphan/abandonment/reclamation as distinct facts.
+2026-10-17	Refresh reliability	Prove It Works	Acquire actual full sources, audit six empty placeholders, preserve composite offshore identity, test failed acquisition and weekly cache age, and verify hosted execution.

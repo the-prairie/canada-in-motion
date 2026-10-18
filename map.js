@@ -57,6 +57,14 @@ export class AtlasMap {
         layer.on("click", () => this.callbacks.onProvince(f.properties));
       },
     }).addTo(this.map);
+    this.historicalLayer = L.geoJSON(geography.historicalInfrastructure, {
+      style: {color: "#726a85", weight: 1.5, opacity: 0.8},
+      pointToLayer: (feature, latlng) => L.circleMarker(latlng, {radius: 4, color: "#726a85", fillColor: "#f7f4e9", fillOpacity: 1, weight: 2}),
+      onEachFeature: (feature, layer) => {
+        const p = feature.properties;
+        layer.bindTooltip(`${esc(p.name)} · historical ${esc(p.kind)}<br>Source dates ${esc(p.sourceDateMin)} to ${esc(p.sourceDateMax)}<br>Current operation not established`, {sticky: true});
+      },
+    });
     this.cityLayer = L.layerGroup().addTo(this.map);
     this.routeLayer = L.layerGroup().addTo(this.map);
     this.facilityLayer = L.layerGroup().addTo(this.map);
@@ -83,6 +91,13 @@ export class AtlasMap {
   update(state, filtered) {
     this.state = state;
     this.filtered = filtered;
+    if (state.layers.historical && !this.map.hasLayer(this.historicalLayer)) {
+      this.historicalLayer.addTo(this.map);
+      this.map.attributionControl.addAttribution('NRCan CanVec · OGL Canada · historical');
+    } else if (!state.layers.historical && this.map.hasLayer(this.historicalLayer)) {
+      this.map.removeLayer(this.historicalLayer);
+      this.map.attributionControl.removeAttribution('NRCan CanVec · OGL Canada · historical');
+    }
     this.routeLayer.clearLayers();
     this.facilityLayer.clearLayers();
     this.selectionLayer.clearLayers();

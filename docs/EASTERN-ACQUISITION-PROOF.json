@@ -1,0 +1,34 @@
+{
+  "researchDateEdmonton": "2026-10-17",
+  "onshorePublishedFeatures": 131,
+  "onshoreAcceptedRecords": 125,
+  "onshoreExcludedEmptyPlaceholders": [
+    "126",
+    "127",
+    "128",
+    "129",
+    "130",
+    "131"
+  ],
+  "onshoreStatusCounts": {
+    "Plugged and Abandoned": 115,
+    "Suspended": 10
+  },
+  "offshoreEnumeratedRecords": 211,
+  "offshoreReceivedRecords": 211,
+  "offshoreUniqueCompositeIds": 211,
+  "offshoreStatusCounts": {
+    "P&A": 211
+  },
+  "nearestOnshoreOffshoreCoordinateDistanceDegrees": 0.4291728172741307,
+  "exactNamesSharedAcrossOnshoreOffshore": [],
+  "countMeaning": "Source records, including re-entries. These counts do not establish unique physical sites or current complete coverage.",
+  "sha256": {
+    "ns-onshore-data.json": "587fc9fe295a502e179bba9a129dd1f3bb5913a4a00ca3a08ce811e372573812",
+    "NS-onshore-open.zip": "aa5ada744aa410b8df666eb2a011fcfd4564376cbd42dbe37acf3ab3e700692f",
+    "ns-offshore-wells.json": "9a96c016b364ceb12b2312dc32345addb9221557e9e38e603252fc784d107207",
+    "ns-offshore-ids.json": "8a6fe868c5cf30686e745779a104ac22e34d0258622ff08c1c5ac348a31e2476",
+    "ns-offshore.json": "58023de3c0bb06031fc52a59ec3e044660b143819bd9a07e0c990490bb367e23",
+    "ns-onshore-meta.json": "9fb34f3bceec6797ce8f239de90d6dd8f6199821fe0aa6d0372e6bb233f4f610"
+  }
+}

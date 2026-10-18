@@ -94,6 +94,24 @@ def shapefile_source(source,cache):
     return features,{'sourceCount':len(features),'upstreamModifiedAt':headers.get('Last-Modified'),'upstreamSha256':digest,'enumerationVerified':True}
 
 
+def exclude_reviewed_placeholders(features,source):
+    rule=source.get('reviewedExclusion')
+    if not rule: return features,[]
+    kept=[];excluded=[]
+    for feature in features:
+        attrs=feature['attributes'];value=attrs.get(source['objectIdField'])
+        record_id=str(int(value)) if isinstance(value,(int,float)) and value==int(value) else str(value)
+        matches=(all(attrs.get(field) is None or attrs.get(field)=='' for field in rule['allNullFields'])
+                 and all(attrs.get(field) in [0,'0'] for field in rule['zeroFields'])
+                 and feature['geometry']['y']==rule['geometryLatitudeEquals'])
+        if matches:
+            if record_id not in rule['sourceRecordIds']: raise ValueError('Unreviewed empty source record: '+record_id)
+            excluded.append({'sourceRecordId':record_id,'reason':rule['reason']})
+        else: kept.append(feature)
+    if len(excluded)>rule['maximumCount']: raise ValueError('Source exclusions exceed reviewed bound')
+    return kept,excluded
+
+
 def validate(wells,source,previous_count=None,max_drop=.05):
     if not wells: raise ValueError('Empty normalized source')
     ids=set()
@@ -143,7 +161,8 @@ def _refresh(root=ROOT,source_ids=None):
                     features,evidence=arcgis(source) if source['format']=='arcgis' else shapefile_source(source,root/'.data-cache')
                     evidence['retrievedAt']=now()
                     write_json(cachefile,{'features':features,'evidence':evidence})
-                wells=[adapters.normalize(source,feature) for feature in features]
+                valid_features,excluded=exclude_reviewed_placeholders(features,source)
+                wells=[adapters.normalize(source,feature) for feature in valid_features]
                 if source.get('orphanJoin'):
                     join=source['orphanJoin']
                     join_source={'id':source['id']+'-orphan-join','url':join['url'],'requiredFields':['OBJECTID',join['foreignField']],'objectIdField':'OBJECTID'}
@@ -154,10 +173,10 @@ def _refresh(root=ROOT,source_ids=None):
                     evidence['orphanJoinEvidence']={**orphan_evidence,'url':join['url'],'retrievedAt':now()}
                 old=next((s for s in (previous or {}).get('sources',[]) if s['id']==source['id']),{})
                 validate(wells,source,old.get('count'),config['maxCountDecreaseFraction'])
-                assert len(wells)==evidence['sourceCount']
+                assert len(wells)+len(excluded)==evidence['sourceCount']
                 wells.sort(key=lambda w:w['id'])
                 source_dates=sorted({str(w.get('raw',{}).get('EXTRACT_DATE')) for w in wells if w.get('raw',{}).get('EXTRACT_DATE')})
-                snapshot={**source,**evidence,'sourceDateText':'; '.join(source_dates) if source_dates else None,'count':len(wells),'retrievedAt':evidence['retrievedAt'],'scope':'full published source layer','droppedRecords':0}
+                snapshot={**source,**evidence,'sourceDateText':'; '.join(source_dates) if source_dates else None,'count':len(wells),'retrievedAt':evidence['retrievedAt'],'scope':'full published source layer','droppedRecords':len(excluded),'excludedRecords':excluded}
                 index=[]
                 snapshot['detailFiles']=[]
                 for offset in range(0,len(wells),1000):

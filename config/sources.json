@@ -265,5 +265,187 @@
     ],
     "license": "https://www.gov.mb.ca/asset_library/en/legal/OpenMB-Information-Data-Use-Licence.pdf",
     "researchReferenceDate": "2026-08-26"
+  },
+  {
+    "id": "yt-oil-gas-wells",
+    "province": "YT",
+    "title": "Yukon oil and gas wells",
+    "publisher": "Government of Yukon",
+    "url": "https://mapservices.gov.yk.ca/arcgis/rest/services/GeoYukon/GY_OilGas/MapServer/0",
+    "objectIdField": "OBJECTID",
+    "stableIdField": "WELL_LICENCE_NUMBER",
+    "countVerified": 76,
+    "fields": {
+      "name": "WELL_NAME",
+      "license": "WELL_LICENCE_NUMBER",
+      "operator": "WELL_LICENSEE",
+      "wellType": "WELL_CLASSIFICATION",
+      "status": "WELL_STATUS",
+      "locationLabel": "GRID_LOCATION"
+    },
+    "closureMapping": {
+      "Abandoned": "abandoned",
+      "Suspended": "suspended"
+    },
+    "dates": {
+      "abandoned": "ABANDONED_DATE"
+    },
+    "rawFields": [
+      "WELL_STATUS",
+      "WELL_UWI",
+      "WELL_LICENSEE",
+      "WELL_TYPE",
+      "LICENSED_DATE",
+      "ABANDONED_DATE"
+    ],
+    "publication": "open",
+    "licenceUrl": "https://yukon.ca/en/your-government/open-government/open-government-licence-yukon",
+    "licenceEvidence": "https://www.arcgis.com/sharing/rest/content/items/11aabfb914c2469090d8488961b88e5d?f=pjson",
+    "limitations": "Published historic and active oil and gas well locations are approximate; full source layer contained 76 records during verification. No orphan designation or reclamation completion in source. OPERATOR may be null; recorded WELL_LICENSEE is separate and preserved in raw. Source has no verified data-as-of stamp, so retrieval must not be represented as status effective date. The displayed recorded licensee comes from WELL_LICENSEE, not OPERATOR. No present ownership or liability is inferred.",
+    "format": "arcgis",
+    "enabled": true,
+    "license": "Contains information licensed under the Open Government Licence – Yukon.",
+    "requiredFields": [
+      "OBJECTID",
+      "WELL_LICENCE_NUMBER",
+      "WELL_STATUS"
+    ]
+  },
+  {
+    "id": "ns-onshore-open-historical",
+    "province": "NS",
+    "title": "Nova Scotia onshore petroleum wells, historical 2016 inventory",
+    "publisher": "Government of Nova Scotia, Department of Energy",
+    "url": "https://data.novascotia.ca/api/geospatial/5q4c-27fh?method=export&format=Shapefile",
+    "format": "shapefile",
+    "shapeSuffix": ".shp",
+    "requiredFields": [
+      "well_id",
+      "well_name",
+      "company",
+      "status_des",
+      "spud_date"
+    ],
+    "fields": {
+      "name": "well_name",
+      "license": "well_id",
+      "operator": "company",
+      "status": "status_des",
+      "locationLabel": "geographic"
+    },
+    "closureMapping": {
+      "Plugged and Abandoned": "abandoned",
+      "Active": "active",
+      "Suspended": "suspended"
+    },
+    "dates": {},
+    "rawFields": [
+      "status_des",
+      "spud_date",
+      "rig_releas",
+      "latitude",
+      "longitude",
+      "nts",
+      "total_dept",
+      "objectid",
+      "easting__1",
+      "northing_1"
+    ],
+    "publication": "open",
+    "enabled": true,
+    "license": "Open Government Licence Nova Scotia",
+    "licenceUrl": "https://novascotia.ca/opendata/licence.asp",
+    "licenceEvidence": "https://data.novascotia.ca/api/views/5q4c-27fh.json",
+    "observationsThrough": "2016-02-01",
+    "countVerified": 125,
+    "limitations": "Historical onshore inventory through February 1, 2016. Source metadata update time is not a new well observation date. Current viewer has 143 records and is separately licensed. No orphan or reclamation fields. Spud dates have mixed precision and remain raw. Coordinates are approximate. Published export has 131 features, including six entirely empty placeholders with latitude zero. Exactly 125 named well records are valid. Any exclusion must be narrowly matched and counted in the release, never silently discarded. Valid well_id values are unique.",
+    "stableIdField": "well_id",
+    "publishedFeatureCount": 131,
+    "reviewedExcludedCount": 6,
+    "reviewedExclusion": {
+      "reason": "Empty source placeholders projected from zero easting/northing to latitude zero. These are not identifiable well records.",
+      "allNullFields": [
+        "well_id",
+        "well_name",
+        "company",
+        "spud_date",
+        "rig_releas",
+        "latitude",
+        "longitude",
+        "geographic",
+        "nts",
+        "status_des",
+        "total_dept"
+      ],
+      "zeroFields": [
+        "easting__1",
+        "northing_1",
+        "total_de_1",
+        "total_de_2"
+      ],
+      "geometryLatitudeEquals": 0,
+      "maximumCount": 6,
+      "sourceRecordIds": [
+        "126",
+        "127",
+        "128",
+        "129",
+        "130",
+        "131"
+      ]
+    },
+    "objectIdField": "objectid"
+  },
+  {
+    "id": "ns-offshore-open-directory",
+    "province": "NS",
+    "title": "Nova Scotia offshore directory of wells, historical inventory",
+    "publisher": "Canada-Nova Scotia Offshore Energy Regulator via Natural Resources Canada",
+    "url": "https://maps-cartes.services.geo.ca/server_serveur/rest/services/NRCan/Nova_Scotia_Offshore_Petroleum_en/MapServer/0",
+    "format": "arcgis",
+    "objectIdField": "OBJECTID",
+    "stableIdFields": [
+      "Well_Name",
+      "Well_Nam_1",
+      "Spud_Date"
+    ],
+    "requiredFields": [
+      "OBJECTID",
+      "Well_Name",
+      "Well_Nam_1",
+      "Spud_Date",
+      "Well_1"
+    ],
+    "fields": {
+      "name": "Well_Name",
+      "license": "Well_Nam_1",
+      "operator": "Company",
+      "status": "Well_1",
+      "wellType": "Well_Type"
+    },
+    "closureMapping": {
+      "P&A": "abandoned"
+    },
+    "dates": {},
+    "rawFields": [
+      "D__",
+      "Well_Nam_1",
+      "Spud_Date",
+      "Well_Termi",
+      "Well",
+      "Well_1",
+      "Drilling_U",
+      "Latitude",
+      "Longitude"
+    ],
+    "publication": "open",
+    "enabled": true,
+    "license": "Open Government Licence Canada",
+    "licenceUrl": "https://open.canada.ca/en/open-government-licence-canada",
+    "licenceEvidence": "https://open.canada.ca/data/en/dataset/6278d435-fdd6-4889-a3fb-7f31134cf8eb",
+    "sourceDateDetail": "Catalogue says directory last updated January 2020; current service layer title says Directory of Wells 2022. Exact record observation date is unresolved. Catalogue separately states all projects abandoned and decommissioned by November 2020.",
+    "countVerified": 211,
+    "limitations": "Historical offshore well and re-entry records. Catalogue directory date January 2020 conflicts with 2022 layer title; preserve both rather than infer current observation. All 211 source records report P&A. Spud and termination dates are drilling events, not abandonment dates. D__ has two zero values and name plus number repeats Evangeline H-98, so stable identity uses name, number and spud date. No orphan designation or reclamation fields. Use service-transformed WGS84 geometry, not original-datum latitude attributes.",
+    "observationsThrough": "2020 directory / 2022 layer title"
   }
 ]

@@ -13,3 +13,5 @@ data/well-sources.json
 .env
 .env.*
 data/source-monitor.json
+data/context/
+data/beta-readiness.json

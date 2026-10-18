@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
 import urllib.parse
+import hashlib
+import json
 
 
 def date_value(value):
@@ -17,8 +19,13 @@ def date_value(value):
 
 def normalize(source,feature):
     a=feature['attributes'];g=feature['geometry'];fields=source.get('fields',{})
-    stable=str(a[source['stableIdField']]).strip()
-    if not stable or stable=='None': raise ValueError('Missing stable source ID')
+    if source.get('stableIdFields'):
+        values=[a[field] for field in source['stableIdFields']]
+        if any(value is None or str(value).strip()=='' for value in values): raise ValueError('Missing composite source ID')
+        stable=hashlib.sha256(json.dumps(values,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
+    else:
+        stable=str(a[source['stableIdField']]).strip()
+        if not stable or stable=='None': raise ValueError('Missing stable source ID')
     if source['province']=='BC': stable=str(int(stable))
     rid=str(a.get(source.get('objectIdField'),stable))
     w={'id':source['id']+':'+stable,'province':source['province'],'lon':round(g['x'],6),'lat':round(g['y'],6),'sourceId':source['id'],'sourceRecordId':rid,'license':stable,'name':'Well '+stable,'operator':None,'closureStatus':'unknown','orphanStatus':'unknown','reclamationStatus':'Unknown','dates':{},'events':[],'sourceUrl':source['url'],'raw':{k:a.get(k) for k in source.get('rawFields',[])}}

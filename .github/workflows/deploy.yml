@@ -40,6 +40,8 @@ jobs:
           run-id: ${{ steps.baseline.outputs.run }}
           github-token: ${{ github.token }}
       - run: python pipeline/refresh.py
+      - name: Refresh openly licensed context when seven days old
+        run: python pipeline/refresh_context.py
       - name: Require enabled launch, rights, freshness and national completeness
         run: node scripts/release-gate.mjs
       - run: node scripts/build-public.mjs

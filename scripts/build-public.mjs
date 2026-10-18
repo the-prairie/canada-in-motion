@@ -2,11 +2,12 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+export const CONTEXT_FILES = ['historical-infrastructure.geojson','benchmark-tolls.json','pipeline-attributes.json'];
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const CSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
 export const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
-export const PUBLIC_FILES = ['index.html','app.js','map.js','model.mjs','data-store.mjs','style.css', 'vendor/leaflet.js','vendor/leaflet.css','vendor/supercluster.js', 'vendor/fonts/ibm-plex-sans-400.ttf','vendor/fonts/ibm-plex-sans-500.ttf','vendor/fonts/ibm-plex-sans-600.ttf','vendor/fonts/ibm-plex-mono-400.ttf','vendor/fonts/ibm-plex-mono-500.ttf', 'data/network.json','data/tariffs.json','data/tariff-sources.json','data/countries.geojson','data/provinces.geojson','data/national-coverage.json'];
+export const PUBLIC_FILES = ['index.html','app.js','map.js','model.mjs','data-store.mjs','style.css', 'vendor/leaflet.js','vendor/leaflet.css','vendor/supercluster.js', 'vendor/fonts/ibm-plex-sans-400.ttf','vendor/fonts/ibm-plex-sans-500.ttf','vendor/fonts/ibm-plex-sans-600.ttf','vendor/fonts/ibm-plex-mono-400.ttf','vendor/fonts/ibm-plex-mono-500.ttf', 'data/network.json','data/tariffs.json','data/tariff-sources.json','data/countries.geojson','data/provinces.geojson','data/national-coverage.json', 'data/context/manifest.json', ...CONTEXT_FILES.map(name => 'data/context/'+name)];
 export function safeRelative(value) {
   if (typeof value !== 'string' || !value || value.includes('\\') || value.includes('%') || value.includes('\0') || path.posix.isAbsolute(value) || value.split('/').some(x => !x || x === '.' || x === '..' || x.startsWith('.')) || !/^[A-Za-z0-9_./-]+$/.test(value)) throw new Error(`Unsafe release path: ${value}`);
   return value;
@@ -41,7 +42,13 @@ export async function validateRelease(root = ROOT) {
     const definition = registry.find(item => item.id === source.id);
     assert(definition?.enabled && ['open','noncommercial'].includes(definition.publication) && source.publication === definition.publication, `Unapproved publication rights: ${source.id}`);
     assert(source.publication !== 'noncommercial' || config.purpose === 'noncommercial', `Noncommercial source in commercial build: ${source.id}`);
-    assert(source.enumerationVerified === true && source.droppedRecords === 0 && Number.isSafeInteger(source.count) && source.count > 0 && source.sourceCount === source.count, `Incomplete source enumeration: ${source.id}`);
+    const exclusions = source.excludedRecords || [];
+    const rule = definition.reviewedExclusion;
+    assert(Array.isArray(exclusions) && source.droppedRecords === exclusions.length, `Unaccounted exclusions: ${source.id}`);
+    if (exclusions.length) {
+      assert(rule && exclusions.length <= rule.maximumCount && new Set(exclusions.map(row => row.sourceRecordId)).size === exclusions.length && exclusions.every(row => rule.sourceRecordIds.includes(row.sourceRecordId) && row.reason === rule.reason), `Unreviewed exclusions: ${source.id}`);
+    }
+    assert(source.enumerationVerified === true && Number.isSafeInteger(source.count) && source.count > 0 && source.sourceCount === source.count + exclusions.length, `Incomplete source enumeration: ${source.id}`);
     assert(Number.isFinite(Date.parse(source.retrievedAt)), `Missing retrieval date: ${source.id}`);
     assert(Array.isArray(source.detailFiles) && source.detailFiles.length > 0, `Missing detail checksums: ${source.id}`);
     const readVerified = async (file, digest) => {
@@ -80,8 +87,57 @@ export async function validateRelease(root = ROOT) {
     total += source.count;
   }
   assert(total === catalog.totalRecords, 'Catalog total mismatch');
-  return { config, catalog, registry, files: [...files].sort() };
+  assert(registry.filter(source => source.enabled && ['open','noncommercial'].includes(source.publication)).every(source => ids.has(source.id)), 'Catalog omits an enabled permitted source');
+  const context = await validateContext(root);
+  return { config, catalog, registry, context, files: [...files].sort() };
 }
+const licence = value => value?.name === 'Open Government Licence - Canada' && value.url === 'https://open.canada.ca/en/open-government-licence-canada' && value.attribution?.trim();
+export async function validateContext(root) {
+  const manifest = await readJSON(root,'data/context/manifest.json');
+  assert(manifest.schemaVersion === 1 && Number.isFinite(Date.parse(manifest.retrievedAt)), 'Invalid context manifest');
+  assert(manifest.files?.length === CONTEXT_FILES.length, 'Incomplete context file group');
+  const payloads = {};
+  for (const name of CONTEXT_FILES) {
+    const entries = manifest.files.filter(entry => entry.file === name);
+    assert(entries.length === 1, 'Missing or duplicated context file: '+name);
+    const bytes = await safeRead(root,'data/context/'+name);
+    assert(sha256(bytes) === entries[0].sha256, 'Context checksum mismatch: '+name);
+    payloads[name] = JSON.parse(bytes);
+  }
+  const geometry = payloads['historical-infrastructure.geojson'];
+  assert(geometry.type === 'FeatureCollection' && licence(geometry.metadata?.licence) && geometry.features.length > 0, 'Invalid historical geography or licence');
+  const identities = new Set();
+  for (const feature of geometry.features) {
+    assert(feature.properties?.historical === true && !identities.has(feature.id), 'Invalid or duplicate historical feature');
+    identities.add(feature.id);
+    const kind = feature.properties.kind;
+    assert(kind === 'pipeline' || kind === 'refinery', 'Unknown context feature kind');
+    assert(feature.geometry.type === (kind === 'pipeline' ? 'MultiLineString' : 'Point'), 'Unexpected context geometry');
+    const points = kind === 'pipeline' ? feature.geometry.coordinates.flat() : [feature.geometry.coordinates];
+    assert(points.length > 0 && points.every(p => p.length === 2 && p.every(Number.isFinite) && Math.abs(p[0]) <= 180 && Math.abs(p[1]) <= 90), 'Invalid context coordinates');
+  }
+  for (const kind of ['pipeline','refinery']) assert(geometry.features.filter(f => f.properties.kind === kind).length === manifest.counts.geometry[kind] && manifest.counts.geometry[kind] === geometry.metadata.counts[kind], 'Context feature count mismatch');
+  const tolls = payloads['benchmark-tolls.json'];
+  assert(licence(tolls.licence) && tolls.currentValidity === 'not-verified' && tolls.eligibleForQuote === false, 'Benchmark quote boundary or licence missing');
+  assert(/^\d{4}-\d{2}-\d{2}$/.test(tolls.snapshotAsOf) && Number.isFinite(Date.parse(tolls.snapshotAsOf)), 'Invalid benchmark observation cutoff');
+  assert(!tolls.pendingSources?.length && tolls.systems?.length === tolls.systemCount && tolls.systemCount === manifest.counts.benchmarkSystems, 'Incomplete benchmark system count');
+  let rows = 0;
+  for (const system of tolls.systems) {
+    assert(system.eligibleForQuote === false && system.currentValidity === 'not-verified' && system.rows.length === system.snapshotRowCount && system.rows.length > 0, 'Invalid benchmark system');
+    assert(/^https:\/\//.test(system.source?.url || '') && /^[a-f0-9]{64}$/.test(system.source?.sha256 || '') && Number.isFinite(Date.parse(system.source.retrievedAt)), 'Missing benchmark provenance');
+    assert(/^\d{4}-\d{2}-\d{2}$/.test(system.latestObservationDate) && system.latestObservationDate <= tolls.snapshotAsOf, 'Future or invalid benchmark observation');
+    for (const row of system.rows) assert(row.Date === system.latestObservationDate && row.Unit?.trim() && row['Pipeline Name']?.trim() && row.Toll?.trim() && Number.isFinite(Number(row.Toll)), 'Malformed benchmark row');
+    rows += system.rows.length;
+  }
+  assert(rows === tolls.rowCount && rows === manifest.counts.benchmarkRows, 'Benchmark row count mismatch');
+  const attributes = payloads['pipeline-attributes.json'];
+  assert(licence(attributes.licence) && attributes.rows?.length === attributes.rowCount && attributes.rowCount === manifest.counts.pipelineAttributes, 'Invalid pipeline attributes');
+  const evidence = [geometry.metadata.source, geometry.metadata.catalogue, tolls.catalogue, attributes.source, attributes.catalogue, ...tolls.systems.map(system => system.source)];
+  assert(evidence.every(item => /^https:\/\//.test(item?.url || '') && /^[a-f0-9]{64}$/.test(item?.sha256 || '') && Number.isFinite(Date.parse(item?.retrievedAt))), 'Missing context acquisition provenance');
+  assert(Date.parse(manifest.retrievedAt) === Math.min(...evidence.map(item => Date.parse(item.retrievedAt))), 'Context freshness must preserve the oldest acquisition');
+  return manifest;
+}
+
 export async function buildPublic(root = ROOT) {
   const { catalog, files } = await validateRelease(root);
   const stage = await fs.mkdtemp(path.join(root, '.public-build-'));

@@ -150,7 +150,9 @@
       "effectiveFrom": "2026-05-01",
       "effectiveTo": null,
       "publicationGate": "Resolve later filings and settlement effects; unknown end date is not perpetual validity.",
-      "regulatorUrl": "https://www.rec-cer.gc.ca/en/applications-hearings/view-applications-projects/trans-mountain-application-interim-tolls/"
+      "regulatorUrl": "https://www.rec-cer.gc.ca/en/applications-hearings/view-applications-projects/trans-mountain-application-interim-tolls/",
+      "monitorUrl": "https://docs.transmountain.com/Tolls-and-Tariffs/Interim-Tariff-No.-123.pdf",
+      "monitorLimitations": "Document change monitor only. Does not discover a differently named successor tariff. Pair with CER proceeding and benchmark feed."
     },
     {
       "id": "enbridge-canadian-mainline",
@@ -259,6 +261,32 @@
       "coverage": "National overview includes proposed projects and dated expectations. Current page still describes LNGCanada firstexports as future2025.",
       "adapter": "Manual facility register with source-levelasOf, operating vs proposed and explicit commissioning evidence.",
       "publicationGate": "Do not infer current operations from a recently crawled page with old content."
+    },
+    {
+      "id": "tm-tolls-proceeding",
+      "name": "CER Trans Mountain tolls proceeding",
+      "url": "https://www.rec-cer.gc.ca/en/applications-hearings/view-applications-projects/trans-mountain-application-interim-tolls/",
+      "domain": "carrier-tariffs",
+      "status": "reference",
+      "license": {
+        "status": "government-reference"
+      },
+      "coverage": "Official proceeding records September 28, 2026 settlement approval. Human review required for applicability.",
+      "promotesRates": false
+    },
+    {
+      "id": "cer-pipeline-toll-catalogue",
+      "name": "CER openly licensed benchmark toll catalogue",
+      "url": "https://open.canada.ca/data/api/action/package_show?id=e00172b8-35c2-4651-a8c5-13ab30bd7236",
+      "domain": "carrier-tariffs",
+      "status": "dated-reference",
+      "license": {
+        "status": "open",
+        "name": "Open Government Licence - Canada",
+        "url": "https://open.canada.ca/en/open-government-licence-canada"
+      },
+      "coverage": "Dated benchmark observations, not a complete tariff or current all-in shipment quote.",
+      "promotesRates": false
     }
   ]
 }

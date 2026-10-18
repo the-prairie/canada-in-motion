@@ -20,6 +20,10 @@ export async function loadWells(catalog) {
     if (!Array.isArray(index.fields) || !Array.isArray(index.rows) || index.rows.length !== source.count) throw new Error('Inventory count does not match the release manifest.');
     return index.rows.map(row => {
       const well = Object.fromEntries(index.fields.map((field,i) => [field,row[i]]));
+      well.observationsThrough = source.observationsThrough || '';
+      well.sourceRetrievedAt = source.retrievedAt;
+      well.sourceDateDetail = source.sourceDateDetail || source.sourceDateText || (typeof source.upstreamModifiedAt === 'number' ? new Date(source.upstreamModifiedAt).toISOString() : source.upstreamModifiedAt) || 'Not supplied';
+      well.sourceLimitations = source.limitations;
       well.sourceUrl = source.format === 'arcgis' ? source.url + '/query?' + new URLSearchParams({where: source.objectIdField+'='+well.sourceRecordId,outFields:'*',returnGeometry:'false',f:'pjson'}) : source.url;
       well.events = Object.entries(well.dates || {}).filter(([key]) => eventKinds[key]).map(([key,date]) => ({type:eventKinds[key][0],label:eventKinds[key][1],date,sourceId:source.id}));
       return well;

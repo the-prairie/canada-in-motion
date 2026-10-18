@@ -23,3 +23,9 @@ A fresh agent accepted the scoped private candidate after repair of its findings
 Model the Domain drove separate orphan, abandonment, reclamation, government-charge and carrier-charge fields. Prove It Works required real acquisition, failure tests, browser inspection and an actual hosted run rather than relying on configuration alone.
 
 The standalone candidate ZIP was extracted and its bundled server returned HTTP 200 for the application.
+
+## Expanded open-data candidate follow-up
+
+The earlier runs and test totals above describe earlier commits. The expanded local candidate passes 23 Node and 15 Python tests and builds 363 public files containing 317,129 source records. New failure tests cover weekly acquisition-date retention, failed context acquisition, checksum/path tampering and stale research-cache rejection. Context validation accepts 1,253 historical pipeline segments, 21 refinery point records, 25 benchmark systems/216 observations and 26 pipeline attribute records. An independent reviewer also tested actual-data tampering, quote promotion, future dates, freshness relabelling and restricted licences; see FOLLOWUP-INDEPENDENT-REVIEW.md.
+
+Desktop and mobile browser checks verified CER system switching, original units and dates, historical layer controls and provenance, and Nova Scotia's historical observation warning above its status fields. The mobile benchmark dialog was repaired to retain readable side margins. New hosted-run results will be appended when verified; these local results do not claim hosted execution of the new code.
