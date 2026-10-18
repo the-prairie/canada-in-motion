@@ -1,5 +1,7 @@
 # National transport source research
 
+Follow-up implementation: NRCan CanVec historical pipeline/refinery geometry, CER dated benchmark snapshots across 25 systems and 26 pipeline attribute records are now integrated under OGL Canada. See OPEN-TRANSPORT-SOURCES.md for full acquisition evidence and limitations. The Trans Mountain monitor now fetches the official tariff 123 PDF and is paired with CER reference monitors. All 15 monitors succeeded in hosted run 39102260809. These additions do not establish current national infrastructure or current all-in prices.
+
 Checked October 17, 2026. This is a source registry and implementation assessment. No source was imported into the app, no publisher was contacted, and no public release was made.
 
 ## What can ship honestly

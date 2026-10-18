@@ -291,5 +291,29 @@
       }
     ],
     "note": "Page checks are not rate validation. A successful fetch never changes verified shipment dates or prices."
+  },
+  "secondRun": {
+    "workflowRun": "https://github.com/the-prairie/canada-in-motion/actions/runs/39102493378",
+    "commit": "9d4ce97",
+    "conclusion": "success",
+    "trigger": "workflow_dispatch",
+    "releaseId": "c12d6f115177e3e64127",
+    "records": 317129,
+    "restoredContextByteIdentical": true,
+    "contextAcquisitionDatePreserved": true,
+    "beta": {
+      "technicalReady": true,
+      "launchAuthorized": false,
+      "releaseId": "c12d6f115177e3e64127",
+      "records": 317129,
+      "checkedAt": "2026-10-18T06:02:26.088Z",
+      "scope": "Public beta with explicit national coverage gaps",
+      "requiredDecisions": [
+        "Approve a public beta with disclosed incomplete coverage.",
+        "Approve making the source repository public for the free GitHub Pages hosting path, or choose an eligible private-repository host."
+      ],
+      "errors": []
+    },
+    "monitorFailures": []
   }
 }
