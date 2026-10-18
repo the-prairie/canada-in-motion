@@ -1,5 +1,7 @@
 # Independent review — production candidate
 
+Historical prelaunch review. See [current launch status](LAUNCH-STATUS.md) and [design verification](DESIGN-VERIFICATION.md) for the subsequently approved public beta.
+
 Status: **accepted for the scoped private release-candidate stage after repairs**, based on code review, tests and actual release integrity validation on 2026-10-17 (America/Edmonton). Public national launch remains blocked. This verdict does not certify complete national coverage or approve public deployment.
 
 ## Scope and checks

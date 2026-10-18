@@ -1,0 +1,50 @@
+{
+  "url": "https://the-prairie.github.io/canada-in-motion/",
+  "manualDeployment": "https://github.com/the-prairie/canada-in-motion/actions/runs/39106500975",
+  "commit": "00f4b7b",
+  "health": {
+    "status": "public-beta",
+    "releaseId": "a06c64fe91f76e5ed479",
+    "records": 317129,
+    "retrievedAt": "2026-10-18T07:10:00Z",
+    "builtAt": "2026-10-18T07:10:42.601Z",
+    "nationalComplete": false
+  },
+  "bc": {
+    "counts": {
+      "pipeline-permit": 6144,
+      "facility-permit": 11717,
+      "orphan-pipeline-row": 27
+    },
+    "retrievedAt": "2026-10-18T07:10:10.255963+00:00"
+  },
+  "catalog": {
+    "records": 317129,
+    "releaseId": "a06c64fe91f76e5ed479",
+    "sources": 8
+  },
+  "automaticRefresh": "https://github.com/the-prairie/canada-in-motion/actions/runs/39106671252",
+  "automaticDeployment": "https://github.com/the-prairie/canada-in-motion/actions/runs/39106844305",
+  "automaticDeploymentEvent": "workflow_run",
+  "automaticDeploymentConclusion": "success",
+  "latestHealth": {
+    "status": "public-beta",
+    "releaseId": "948554d5cee0d0a641b1",
+    "records": 317129,
+    "retrievedAt": "2026-10-18T07:14:44Z",
+    "builtAt": "2026-10-18T07:14:48.283Z",
+    "nationalComplete": false
+  },
+  "latestBC": {
+    "counts": {
+      "pipeline-permit": 6144,
+      "facility-permit": 11717,
+      "orphan-pipeline-row": 27
+    },
+    "retrievedAt": "2026-10-18T07:12:24.619103+00:00"
+  },
+  "verifiedBCReuse": [
+    "2026-10-18T07:13:25.4325202Z BCER: retained verified weekly snapshot from 2026-10-12T00:00:00+00:00",
+    "2026-10-18T07:14:44.6869154Z BCER: retained verified weekly snapshot from 2026-10-18T07:12:24.619103+00:00"
+  ]
+}

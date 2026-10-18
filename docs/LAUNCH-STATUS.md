@@ -1,8 +1,8 @@
 # Public-beta launch status
 
-Owner approval recorded October 18, 2026 for public repository visibility and incomplete national coverage. The beta release gate passes locally; the national-completeness gate remains intentionally unsatisfied. Public deployment verification will be recorded below after the hosted run completes.
+Owner approval recorded October 18, 2026 for public repository visibility and incomplete national coverage. The beta release gate passes locally; the national-completeness gate remains intentionally unsatisfied. The first hosted deployment succeeded. HTTPS, the live app and automatic refresh-to-deploy execution were verified.
 
-Target: https://the-prairie.github.io/canada-in-motion/
+Live public beta: https://the-prairie.github.io/canada-in-motion/
 
 ## Included
 
@@ -18,4 +18,12 @@ Québec, NL, NB, PEI and current NS petroleum well inventories still need the au
 
 ## Validation
 
-28 Node tests and 21 Python tests pass locally. Independent code review identified comparison-track sizing, schedule-date context and filter keyboard-focus issues; these were corrected. Additional browser and hosted results are recorded after deployment. No claim of physical-device certification, formal accessibility conformance, security audit or national completeness is made.
+28 Node tests and 21 Python tests pass locally. Independent code review identified comparison-track sizing, schedule-date context and filter keyboard-focus issues; these were corrected. Browser and hosted results are recorded below and in DESIGN-VERIFICATION.md. No claim of physical-device certification, formal accessibility conformance, security audit or national completeness is made.
+
+## Hosted publication
+
+[First public deployment](https://github.com/the-prairie/canada-in-motion/actions/runs/39106500975) succeeded at commit `00f4b7b`. Public health confirms release `a06c64fe91f76e5ed479`, 317,129 records and `nationalComplete: false`. All eight checked app/context/BC file endpoints return HTTP 200 with correct MIME types. Live mobile benchmark data, BC source disclosures and Saskatchewan filtering loaded without browser console errors.
+
+[Fresh data run](https://github.com/the-prairie/canada-in-motion/actions/runs/39106671252) succeeded and triggered [automatic public deployment](https://github.com/the-prairie/canada-in-motion/actions/runs/39106844305) via `workflow_run`, also successful. Latest verified public release: `948554d5cee0d0a641b1`. BC weekly reuse preserved its prior acquisition timestamp. Daily schedule remains 10:17 UTC; the timer itself has not yet fired since this launch, while its refresh-to-publication path has been exercised end to end.
+
+No further hosting setup is required from the owner. Full national expansion still requires the authority-specific data/redistribution grants or authorization to send the prepared requests; no external requests have been sent.
