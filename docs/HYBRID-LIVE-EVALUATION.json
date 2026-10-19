@@ -1,0 +1,127 @@
+{
+  "createdAt": "2026-10-19T21:46:14.183Z",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "scope": "Live Cloudflare planning, live Jev decision, deterministic source-backed findings and client contract validation. Browser interaction and deployed Turnstile checks are separate.",
+  "results": [
+    {
+      "id": "gdp",
+      "passed": true,
+      "milliseconds": 2936,
+      "llmCalls": 1,
+      "types": [
+        "province-comparison",
+        "province-map"
+      ],
+      "decision": {
+        "provider": "jev",
+        "model": "jev-1.14.0",
+        "status": "accepted",
+        "planStatus": "valid",
+        "presentation": "comparison",
+        "coverage": "partial"
+      },
+      "plan": {
+        "regions": [
+          "AB",
+          "ON",
+          "QC"
+        ],
+        "topics": [
+          "gdp"
+        ],
+        "metricIds": [],
+        "includeMap": true,
+        "requestedMeasure": "available",
+        "year": 2030,
+        "scenario": "Current Measures",
+        "oilShock": 10,
+        "duration": "persistent"
+      }
+    },
+    {
+      "id": "electricity",
+      "passed": true,
+      "milliseconds": 2718,
+      "llmCalls": 1,
+      "types": [
+        "scenario-comparison"
+      ],
+      "decision": {
+        "provider": "jev",
+        "model": "jev-1.14.0",
+        "status": "accepted",
+        "planStatus": "valid",
+        "presentation": "scenario",
+        "coverage": "supported"
+      },
+      "plan": {
+        "regions": [
+          "AB",
+          "ON",
+          "QC"
+        ],
+        "topics": [
+          "scenario"
+        ],
+        "metricIds": [
+          "electricity-generation"
+        ],
+        "includeMap": true,
+        "requestedMeasure": "available",
+        "year": 2040,
+        "scenario": "Higher",
+        "oilShock": 10,
+        "duration": "persistent"
+      }
+    },
+    {
+      "id": "missing-flow",
+      "passed": true,
+      "milliseconds": 2923,
+      "llmCalls": 1,
+      "types": [
+        "coverage-note",
+        "infrastructure-map"
+      ],
+      "decision": {
+        "provider": "jev",
+        "model": "jev-1.14.0",
+        "status": "accepted",
+        "planStatus": "valid",
+        "presentation": "evidence",
+        "coverage": "partial"
+      },
+      "plan": {
+        "regions": [
+          "AB",
+          "BC"
+        ],
+        "topics": [
+          "infrastructure"
+        ],
+        "metricIds": [],
+        "includeMap": true,
+        "requestedMeasure": "measured-flow",
+        "year": 2030,
+        "scenario": "Current Measures",
+        "oilShock": 10,
+        "duration": "persistent"
+      }
+    }
+  ],
+  "usage": [
+    {
+      "inputTokens": 3002,
+      "estimatedUsd": 0.000126084
+    },
+    {
+      "inputTokens": 1214,
+      "estimatedUsd": 0.00005098800000000001
+    },
+    {
+      "inputTokens": 1045,
+      "estimatedUsd": 0.00004389
+    }
+  ],
+  "lifetimeJevReservedUsd": 0.2284799999999998
+}

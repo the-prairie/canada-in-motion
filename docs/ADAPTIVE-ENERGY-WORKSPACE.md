@@ -1,6 +1,6 @@
 # Adaptive energy workspace: architecture proposal
 
-Status: researched proposal, 19 October 2026. The public app has not changed. Jev credential setup, a server-only decision adapter and a development benchmark are implemented; the first live run is complete. An OpenUI integration and a new economic model are not implemented. Approval covers up to US$1 for the Jev benchmark, not recurring production Jev charges.
+Status: implemented release candidate, 19 October 2026. The isolated OpenUI component library, question-driven planning, Jev decision adapter, pinned source-data panels and deterministic written findings are implemented and tested. See [HYBRID-IMPLEMENTATION.md](HYBRID-IMPLEMENTATION.md) for the release record. Public Jev use still requires a production spending limit; the existing US$1 authorization covers testing.
 
 ## Product objective
 

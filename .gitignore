@@ -19,3 +19,5 @@ data/source-monitor.json
 data/context/
 data/beta-readiness.json
 data/bc-infrastructure/
+vendor/energy-workspace.js
+vendor/LICENSE-OpenUI.txt

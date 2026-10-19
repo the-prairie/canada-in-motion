@@ -1,4 +1,4 @@
-// Experimental, server-only decision adapter. Not imported by the public Worker.
+// Server-only decision adapter. Inference requires an explicit budget reservation.
 export const JEV_MODEL='jev-1.14.0';
 export const JEV_INPUT_USD_PER_MILLION=0.042;
 // Reserve the full documented default context for each attempt, even a timeout.
@@ -40,9 +40,22 @@ export function createJevDecider({apiKey,fetchImpl=fetch,reserveAttempt}) {
     // Must persist the reservation before any network request. No automatic retry.
     await reserveAttempt(JEV_ATTEMPT_RESERVE_USD);
     try{
-      const response=await fetchImpl('https://api.typesafe.ai/v1/systemone',{method:'POST',redirect:'error',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},body,signal:signal?AbortSignal.any([signal,AbortSignal.timeout(15000)]):AbortSignal.timeout(15000)});
+      const response=await fetchImpl('https://api.typesafe.ai/v1/systemone',{method:'POST',redirect:'manual',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},body,signal:signal?AbortSignal.any([signal,AbortSignal.timeout(15000)]):AbortSignal.timeout(15000)});
       if(!response.ok)throw new JevError([401,403].includes(response.status)?'authentication_failed':response.status===429?'rate_limited':'provider_unavailable');
-      return validateJevAnswers(await response.json(),questions);
+      if(Number(response.headers.get('Content-Length'))>65536||!response.body)throw new JevError('invalid_decision');
+      const reader=response.body.getReader(),chunks=[];
+      let size=0;
+      while(true){
+        const {value,done}=await reader.read();
+        if(done)break;
+        size+=value.byteLength;
+        if(size>65536){void reader.cancel();throw new JevError('invalid_decision');}
+        chunks.push(value);
+      }
+      const bytes=new Uint8Array(size);
+      let offset=0;
+      for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
+      return validateJevAnswers(JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes)),questions);
     }catch(error){if(error instanceof JevError)throw error;throw new JevError('provider_unavailable');}
   };
 }

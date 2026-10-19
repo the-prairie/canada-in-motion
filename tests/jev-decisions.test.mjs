@@ -5,7 +5,7 @@ const request={state:{request:'Compare energy GDP by province.'},questions:{view
 const valid=()=>({model:JEV_MODEL,answers:{view:{type:'choice',choice:'bars',confidence:0.8,probabilities:{bars:0.9,map:0.1}}},usage:{input_tokens:100}});
 test('Jev requires a budget reservation before sending and pins endpoint/model without redirects',async()=>{
   const events=[];
-  const decide=createJevDecider({apiKey:'fake-key',reserveAttempt:async amount=>{assert.equal(amount,JEV_ATTEMPT_RESERVE_USD);events.push('reserved');},fetchImpl:async(url,options)=>{events.push('called');assert.equal(url,'https://api.typesafe.ai/v1/systemone');assert.equal(options.redirect,'error');assert.equal(JSON.parse(options.body).model,JEV_MODEL);return Response.json(valid());}});
+  const decide=createJevDecider({apiKey:'fake-key',reserveAttempt:async amount=>{assert.equal(amount,JEV_ATTEMPT_RESERVE_USD);events.push('reserved');},fetchImpl:async(url,options)=>{events.push('called');assert.equal(url,'https://api.typesafe.ai/v1/systemone');assert.equal(options.redirect,'manual');assert.equal(JSON.parse(options.body).model,JEV_MODEL);return Response.json(valid());}});
   assert.equal((await decide(request)).answers.view.choice,'bars');assert.deepEqual(events,['reserved','called']);
 });
 test('Jev budget refusal prevents inference entirely',async()=>{
@@ -37,4 +37,13 @@ test('oversized or malformed Jev requests cannot spend the budget',async()=>{
   await assert.rejects(()=>decide({...request,state:'a'.repeat(24001)}),{code:'request_too_large'});
   await assert.rejects(()=>decide({...request,questions:{bad:{type:'text',instructions:'Generate HTML'}}}),{code:'invalid_questions'});
   assert.equal(reservations,0);
+});
+
+test('Jev refuses redirects and oversized responses without a second request',async()=>{
+  for(const response of [new Response('',{status:302,headers:{Location:'https://attacker.example'}}),new Response('a'.repeat(65537)),new Response('{}',{headers:{'Content-Length':'65537'}})]){
+    let calls=0;
+    const decide=createJevDecider({apiKey:'fake-key',reserveAttempt:async()=>{},fetchImpl:async(_url,options)=>{calls++;assert.equal(options.redirect,'manual');return response;}});
+    await assert.rejects(()=>decide(request),error=>['provider_unavailable','invalid_decision'].includes(error.code));
+    assert.equal(calls,1);
+  }
 });

@@ -19,7 +19,7 @@ async function readBody(request,maxBytes) {
   try{return await Promise.race([read(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new AnalysisError('request_timeout','The request body took too long.',408)),5000);})]);}
   finally{clearTimeout(timer);}
 }
-export async function createAnalysisServer({directory=path.join(ROOT,'dist'),analyze,model=DEFAULT_MODEL,available=Boolean(analyze),publicOrigin=null,maxConcurrent=2,perMinute=6,dailyLimit=20,maxBodyBytes=8192,now=Date.now}={}) {
+export async function createAnalysisServer({directory=path.join(ROOT,'dist'),analyze,model=DEFAULT_MODEL,provider='openai',workspaceEnabled=false,jevEnabled=false,available=Boolean(analyze),publicOrigin=null,maxConcurrent=2,perMinute=6,dailyLimit=20,maxBodyBytes=8192,now=Date.now}={}) {
   if(publicOrigin) { const url=new URL(publicOrigin);if(url.protocol!=='https:'||url.origin!==publicOrigin)throw new Error('PUBLIC_ORIGIN must be an HTTPS origin without a path'); }
   for(const value of [maxConcurrent,perMinute,dailyLimit,maxBodyBytes])if(!Number.isInteger(value)||value<1)throw new Error('Limits must be positive integers');
   const server=await createPublicServer(directory);
@@ -37,7 +37,7 @@ export async function createAnalysisServer({directory=path.join(ROOT,'dist'),ana
     const requestPath=request.url.split('?')[0];
     if(!requestPath.startsWith('/api/')){serve(request,response);return;}
     if(request.headers.origin&&request.headers.origin!==origin){reply(response,403,{error:{code:'origin_forbidden',message:'Use the app on the same origin.'}});return;}
-    if(requestPath==='/api/analysis/status'&&request.method==='GET'){reply(response,200,{available,model,provider:'openai'});return;}
+    if(requestPath==='/api/analysis/status'&&request.method==='GET'){reply(response,200,{available,model,provider,workspaceEnabled,jevEnabled:workspaceEnabled&&jevEnabled});return;}
     if(requestPath!=='/api/analysis'){reply(response,404,{error:{code:'not_found',message:'Not found.'}});return;}
     if(request.method!=='POST'){response.setHeader('Allow','POST');reply(response,405,{error:{code:'method_not_allowed',message:'Use POST.'}});return;}
     if(request.headers.origin!==origin||request.headers['sec-fetch-site']==='cross-site'){reply(response,403,{error:{code:'origin_forbidden',message:'Use the app on the same origin.'}});return;}
@@ -69,14 +69,16 @@ async function main() {
   if(!Number.isInteger(port)||port<1||port>65535)throw new Error('Invalid PORT');
   const limit=(name,fallback)=>{const value=Number(process.env[name]||fallback);if(!Number.isInteger(value)||value<1)throw new Error(`Invalid ${name}`);return value;};
   let analyze;
+  const workspaceEnabled=process.env.WORKSPACE_ENABLED==='1';
   if(process.env.OPENAI_API_KEY) {
     const {validateEconomy,normalizeEconomyState,summarizeEconomy}=await import('../economy-model.mjs');
     const data=JSON.parse(await fs.readFile(path.join(ROOT,'data/economy.json'),'utf8'));
     validateEconomy(data);
     const debate=JSON.parse(await fs.readFile(new URL('../data/energy-debate.json',import.meta.url),'utf8'));
-    analyze=createEnergyAnalyzer({data,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,debate,model,provider:createOpenAIProvider({apiKey:process.env.OPENAI_API_KEY,model}),timeoutMs:limit('AI_TIMEOUT_MS',60000)});
+    const network=workspaceEnabled?JSON.parse(await fs.readFile(new URL('../data/network.json',import.meta.url),'utf8')):undefined;
+    analyze=createEnergyAnalyzer({data,network,workspaceEnabled,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,debate,model,provider:createOpenAIProvider({apiKey:process.env.OPENAI_API_KEY,model}),timeoutMs:limit('AI_TIMEOUT_MS',60000)});
   }
-  const server=await createAnalysisServer({analyze,model,publicOrigin,maxConcurrent:limit('AI_CONCURRENCY',2),perMinute:limit('AI_PER_MINUTE',6),dailyLimit:limit('AI_DAILY_LIMIT',20)});
+  const server=await createAnalysisServer({analyze,model,workspaceEnabled,publicOrigin,maxConcurrent:limit('AI_CONCURRENCY',2),perMinute:limit('AI_PER_MINUTE',6),dailyLimit:limit('AI_DAILY_LIMIT',20)});
   server.listen(port,host,()=>console.log(`Canada in Motion: http://${host}:${port}/. AI ${analyze?'configured':'disabled'}.`));
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url))main().catch(()=>{console.error('The analysis server could not start. Check the build, data, environment and hosting settings.');process.exitCode=1;});

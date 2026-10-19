@@ -1,5 +1,6 @@
 import {AnalysisError, createEnergyAnalyzer, createOpenAIProvider, createCloudflareProvider, DEFAULT_MODEL, FREE_MODEL, validateAnalysisRequest} from './energy-analysis.mjs';
 import {normalizeEconomyState, summarizeEconomy, validateEconomy} from '../economy-model.mjs';
+import {createJevDecider,JevError,JEV_ATTEMPT_RESERVE_USD} from './jev-decisions.mjs';
 
 const SITE_ORIGIN = 'https://the-prairie.github.io';
 const DATA_ROOT = SITE_ORIGIN + '/canada-in-motion/data/';
@@ -29,6 +30,14 @@ export function providerConfig(env) {
   if(env.AI_PROVIDER==='openai')return {provider:'openai',model:DEFAULT_MODEL,ready:Boolean(env.OPENAI_API_KEY)};
   return {provider:null,model:null,ready:false};
 }
+function jevBudget(env) {
+  const value=env.JEV_BUDGET_MICRO_USD;
+  return typeof value==='string'&&/^[1-9][0-9]{0,9}$/.test(value)&&Number.isSafeInteger(Number(value))?Number(value):0;
+}
+export function workspaceConfig(env) {
+  const workspaceEnabled=env.WORKSPACE_ENABLED==='1';
+  return {workspaceEnabled,jevEnabled:workspaceEnabled&&env.JEV_ENABLED==='1'&&typeof env.TYPESAFE_API_KEY==='string'&&env.TYPESAFE_API_KEY.length>0&&jevBudget(env)>0};
+}
 function configured(env) {
   const testKey=value=>/^[123]x0{10,}/.test(value||'');
   return env.AI_ENABLED==='1' && providerConfig(env).ready && Boolean(env.TURNSTILE_SECRET_KEY && env.VISITOR_HASH_KEY?.length>=32 && env.TURNSTILE_SITE_KEY && env.AI_QUOTA) && !testKey(env.TURNSTILE_SITE_KEY) && !testKey(env.TURNSTILE_SECRET_KEY);
@@ -51,6 +60,22 @@ async function visitorID(ip, secret, now) {
 }
 
 let evidenceCache;
+let networkCache;
+export async function loadPublishedNetwork(fetchImpl=fetch,now=Date.now()) {
+  if(networkCache?.expires>now)return networkCache.data;
+  try{
+    const response=await fetchImpl(DATA_ROOT+'network.json',{signal:AbortSignal.timeout(8000),redirect:'manual',headers:{Accept:'application/json'}});
+    if(!response.ok)return null;
+    const data=await boundedJSON(response,1048576,8000);
+    if(!Array.isArray(data.routes)||!Array.isArray(data.facilities)||!Array.isArray(data.sources)||data.routes.length>1000||data.facilities.length>1000||data.sources.length>50)return null;
+    const sources=new Set(data.sources.map(source=>source.id));
+    if(sources.size!==data.sources.length||data.sources.some(source=>typeof source.id!=='string'||typeof source.title!=='string'||!/^https:\/\//.test(source.url)))return null;
+    const validRecord=record=>typeof record.id==='string'&&/^[a-z0-9-]{1,100}$/.test(record.id)&&sources.has(record.sourceId);
+    if([...data.routes,...data.facilities].some(record=>!validRecord(record))||data.routes.some(route=>!Array.isArray(route.provinces)||route.provinces.some(code=>!['AB','BC','SK','MB','ON','QC','NB','NS','PE','NL','YT','NT','NU'].includes(code))))return null;
+    networkCache={data,expires:now+300000};
+    return data;
+  }catch{return null;}
+}
 export async function loadPublishedEvidence(fetchImpl=fetch, now=Date.now()) {
   if(evidenceCache?.expires>now)return evidenceCache;
   const read=async file=>{
@@ -75,6 +100,7 @@ export class AnalysisQuota {
     this.sql=ctx.storage.sql;
     this.sql.exec('CREATE TABLE IF NOT EXISTS counters (key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires INTEGER NOT NULL)');
     this.sql.exec('CREATE TABLE IF NOT EXISTS leases (id TEXT PRIMARY KEY, expires INTEGER NOT NULL)');
+    this.sql.exec('CREATE TABLE IF NOT EXISTS inference_spend (provider TEXT PRIMARY KEY, reserved_micro_usd INTEGER NOT NULL)');
   }
   async fetch(request) {
     if(new URL(request.url).pathname==='/api/analysis')return this.analyze(request);
@@ -87,6 +113,15 @@ export class AnalysisQuota {
     return json(await this.reserve(input.visitor));
   }
   release(id) {this.sql.exec('DELETE FROM leases WHERE id = ?',id);}
+  reserveJev(amount) {
+    const reservation=Math.round(amount*1e6);
+    if(reservation!==Math.round(JEV_ATTEMPT_RESERVE_USD*1e6)||!workspaceConfig(this.env).jevEnabled)throw new JevError('budget_exhausted');
+    this.ctx.storage.transactionSync(()=>{
+      const spent=this.sql.exec('SELECT reserved_micro_usd FROM inference_spend WHERE provider = ?','jev').toArray()[0]?.reserved_micro_usd||0;
+      if(spent+reservation>jevBudget(this.env))throw new JevError('budget_exhausted');
+      this.sql.exec('INSERT INTO inference_spend (provider,reserved_micro_usd) VALUES (?,?) ON CONFLICT(provider) DO UPDATE SET reserved_micro_usd=reserved_micro_usd+excluded.reserved_micro_usd','jev',reservation);
+    });
+  }
   async reserve(visitor) {
     const now=Date.now();
     const date=new Date(now).toISOString();
@@ -130,8 +165,11 @@ export class AnalysisQuota {
       if(!admission.allowed)return json({error:{code:admission.code,message:admission.message}},429,{'Retry-After':String(admission.retryAfter)});
       reservation=admission.id;
       const selected=providerConfig(env);
+      const workspace=workspaceConfig(env);
       const provider=selected.provider==='cloudflare'?createCloudflareProvider({ai:env.AI}):createOpenAIProvider({apiKey:env.OPENAI_API_KEY});
-      const analyze=createEnergyAnalyzer({data,debate,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider,model:selected.model,timeoutMs:60000,answerMode:selected.provider==='cloudflare'?'claims':'prose'});
+      const network=workspace.workspaceEnabled?await loadPublishedNetwork():undefined;
+      const decider=workspace.jevEnabled?createJevDecider({apiKey:env.TYPESAFE_API_KEY,reserveAttempt:amount=>this.reserveJev(amount)}):undefined;
+      const analyze=createEnergyAnalyzer({data,debate,network,decider,workspaceEnabled:workspace.workspaceEnabled,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider,model:selected.model,timeoutMs:60000,answerMode:selected.provider==='cloudflare'?'claims':'prose'});
       const result=await analyze(input);
       return json({...result,provider:selected.provider,dataVersion:data.generatedAt});
     } catch(error) {
@@ -164,7 +202,7 @@ export default {
     }
     if(path==='/api/analysis/status'&&request.method==='GET'){
       const selected=providerConfig(env);
-      return reply({available:configured(env),model:selected.model,provider:selected.provider,turnstileSiteKey:configured(env)?env.TURNSTILE_SITE_KEY:null,limits:LIMITS});
+      return reply({available:configured(env),model:selected.model,provider:selected.provider,turnstileSiteKey:configured(env)?env.TURNSTILE_SITE_KEY:null,limits:LIMITS,...workspaceConfig(env)});
     }
     if(path!=='/api/analysis'||request.method!=='POST')return reply({error:{message:'Method not allowed.'}},405);
     if(origin!==SITE_ORIGIN)return reply({error:{message:'Open the public app to ask a question.'}},403);

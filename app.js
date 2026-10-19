@@ -1274,7 +1274,7 @@ document.addEventListener("click", async (e) => {
     history.replaceState(null, "", url);
     try {
       await navigator.clipboard.writeText(url);
-      announce("View link copied.");
+      announce(state.view === "economy" && energyEconomy?.answer?.workspace ? "Original data view link copied. Use Export data to save the question workspace." : "View link copied.");
     } catch {
       openDialog(
         `<div class="source-entry"><h3>Copy view link</h3><p>Copy the link below to reopen this view with the same settings.</p><textarea aria-label="View link" readonly style="width:100%;height:120px">${esc(url)}</textarea></div>`,
@@ -1283,7 +1283,7 @@ document.addEventListener("click", async (e) => {
   }
   if (a === "about")
     openDialog(
-      `<div class="source-entry"><span class="eyebrow">CANADA IN MOTION</span><h3>About Canada in Motion</h3><p>Explore Canadian pipeline routes, published tolls and provincial well records. Use scenarios to estimate how changes in costs or budgets affect the results.</p><p>This free, noncommercial public beta has partial national coverage. Data dates vary by source. The app cannot confirm current operations, route availability or the full cost of a shipment.</p><p>Searches and scenarios stay in this browser. This application has no analytics or advertising trackers. Hosting providers may retain access logs. Use a private browser window to avoid retaining scenarios on a shared device.</p><p><a href="https://github.com/the-prairie/canada-in-motion" target="_blank" rel="noopener">Project repository</a>. Source records retain their original licences. AER data is reproduced for noncommercial use with attribution and is not an official version or endorsement.</p><p>Open Sources for data dates and methods. Share a view link, download filtered records or export a calculation.</p><div class="action-row"><button class="primary-button" data-action="evidence">View sources</button></div></div>`,
+      `<div class="source-entry"><span class="eyebrow">CANADA IN MOTION</span><h3>About Canada in Motion</h3><p>Explore Canadian pipeline routes, published tolls and provincial well records. Use scenarios to estimate how changes in costs or budgets affect the results.</p><p>This free, noncommercial public beta has partial national coverage. Data dates vary by source. The app cannot confirm current operations, route availability or the full cost of a shipment.</p><p>Map searches and manual scenarios stay in this browser. Questions submitted for live analysis are sent to the providers named beside the question form. This application has no analytics or advertising trackers. Hosting providers may retain access logs. Use a private browser window to avoid retaining scenarios on a shared device.</p><p><a href="https://github.com/the-prairie/canada-in-motion" target="_blank" rel="noopener">Project repository</a>. Source records retain their original licences. AER data is reproduced for noncommercial use with attribution and is not an official version or endorsement.</p><p>Open Sources for data dates and methods. Share a view link, download filtered records or export a calculation.</p><div class="action-row"><button class="primary-button" data-action="evidence">View sources</button></div></div>`,
     );
 });
 boot().catch((error) => {
