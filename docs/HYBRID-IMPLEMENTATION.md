@@ -31,13 +31,14 @@ Contract rejection, truthful missing-data handling, calculation consistency, Jev
 
 ## Completed verification
 
-- 114 application tests and 18 edge-runtime tests passed. The beta release gate passed, the public artifact contains 438 files, and the dependency audit reports no known vulnerabilities. The scripted live development report is in `HYBRID-LIVE-EVALUATION.json`; it is not a held-out accuracy benchmark.
+- 115 application tests and 18 edge-runtime tests passed. The beta release gate passed, the public artifact contains 438 files, and the dependency audit reports no known vulnerabilities. The scripted live development report is in `HYBRID-LIVE-EVALUATION.json`; it is not a held-out accuracy benchmark.
 
 - Live Cloudflare planning → Jev decision → source resolution → OpenUI rendering exercised in the real browser. GDP, electricity and missing-flow regression cases passed with one LLM call each. The latest scripted run took 2.7–2.9 seconds per case; this small development sample is not a performance guarantee.
 - Province selection, comparison measure, table view, scenario/year changes, undo, export, cancellation and unsupported-price recovery exercised in the browser. The 390px phone viewport had no horizontal overflow or console errors.
 - Independent review found seven integration/release defects. All were fixed: clean CI generation of the bundle; linked infrastructure selection; national scope preservation; visible oil assumptions; isolated infrastructure failures; required-topic retention; pinned infrastructure records in exports.
 - Live testing found false shipment-gap classifications and a contradictory legacy text answer. The workspace now produces both charts and written findings from the same resolved data. A second LLM text-selection call is unnecessary and has been removed for workspace mode.
 - The independent reviewer also checked mixed GDP/electricity dates and unsupported historical GDP years after a narrow clause-binding repair.
+- Public-browser verification exposed stale JavaScript after a GitHub Pages deployment. The build now stamps the entry scripts, styles and all application module imports with one content-derived version, including the lazy OpenUI bundle. A regression test checks that changing a nested module invalidates the whole code graph while data-only refreshes preserve the code version.
 - The renderer is loaded only when an answer contains a workspace. The compressed bundle is approximately 168 KiB. No OpenUI hosted gateway, telemetry transport or external JavaScript CDN is used.
 
 ## Deployment and budget

@@ -6,7 +6,7 @@ import path from 'node:path';
 import os from 'node:os';
 import http from 'node:http';
 import { gunzipSync } from 'node:zlib';
-import { buildPublic, validateRelease, PUBLIC_FILES, sha256 } from '../scripts/build-public.mjs';
+import { buildPublic, validateRelease, PUBLIC_FILES, sha256, versionApplicationAssets } from '../scripts/build-public.mjs';
 import { createPublicServer } from '../scripts/serve-public.mjs';
 import { releaseGate } from '../scripts/release-gate.mjs';
 import { betaReadiness } from '../scripts/launch-readiness.mjs';
@@ -158,4 +158,23 @@ test('faithful source downloads preserve publisher bytes and reject altered appl
   await f.write(f.catalog.basePath+f.source.detailFiles[0].file,details);
   f.source.reproductions=f.source.reproductions.filter(entry=>!entry.file.endsWith('publisher-native.json'));await f.write('data/catalog.json',f.catalog);
   await assert.rejects(validateRelease(f.root),/Missing original publisher/);
+});
+
+
+test('release versions entry points, static imports and lazy modules together', () => {
+  const fixture = () => new Map(Object.entries({
+    'index.html': '<script type="module" src="app.js"></script><link href="style.css" rel="stylesheet"><script src="https://example.org/external.js"></script>',
+    'app.js': `import {x} from './model.mjs'; const load=()=>import('./vendor/energy-workspace.js'); const data='./data/economy.json';`,
+    'model.mjs': 'export const x=1;', 'style.css': 'body{color:black}',
+    'vendor/energy-workspace.js': 'export const mountWorkspace=()=>{};', 'data/economy.json': '{}'
+  }).map(([file,text])=>[file,Buffer.from(text)]));
+  const output=fixture();const version=versionApplicationAssets(output);
+  assert.match(version,/^[a-f0-9]{20}$/);
+  for(const target of ['app.js','style.css'])assert.ok(output.get('index.html').toString().includes(`${target}?v=${version}`));
+  for(const target of ['./model.mjs','./vendor/energy-workspace.js'])assert.ok(output.get('app.js').toString().includes(`${target}?v=${version}`));
+  assert.ok(output.get('app.js').toString().includes("'./data/economy.json'"));
+  assert.ok(output.get('index.html').toString().includes('https://example.org/external.js"'));
+  assert.equal(versionApplicationAssets(fixture()),version);
+  const changed=fixture();changed.set('model.mjs',Buffer.from('export const x=2;'));assert.notEqual(versionApplicationAssets(changed),version);
+  const dataOnly=fixture();dataOnly.set('data/economy.json',Buffer.from('{"new":true}'));assert.equal(versionApplicationAssets(dataOnly),version);
 });

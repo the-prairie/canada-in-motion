@@ -209,6 +209,25 @@ export async function validateContext(root) {
   return manifest;
 }
 
+// GitHub Pages caches subresources for ten minutes. Give every module in a
+// release the same content-derived version so a new document cannot mix old
+// imports with a new entry point. Data snapshots keep their existing URLs.
+export function versionApplicationAssets(output) {
+  const codeFiles = [...output.keys()].filter(file => /\.(?:m?js|css)$/.test(file)).sort();
+  const version = sha256(codeFiles.map(file => `${file}:${sha256(output.get(file))}`).join('\n')).slice(0, 20);
+  for (const file of codeFiles.filter(file => /\.m?js$/.test(file) && !file.startsWith('vendor/'))) {
+    const source = output.get(file).toString().replace(/(['"`])((?:\.\.?\/)[A-Za-z0-9_./-]+\.m?js)\1/g, (match, quote, target) => {
+      const resolved = path.posix.normalize(path.posix.join(path.posix.dirname(file), target));
+      return output.has(resolved) ? `${quote}${target}?v=${version}${quote}` : match;
+    });
+    output.set(file, Buffer.from(source));
+  }
+  const html = output.get('index.html').toString().replace(/((?:src|href)=)(['"])([^'"?#]+\.(?:m?js|css))\2/g, (match, attribute, quote, target) =>
+    output.has(target.replace(/^\.\//, '')) ? `${attribute}${quote}${target}?v=${version}${quote}` : match);
+  output.set('index.html', Buffer.from(html));
+  return version;
+}
+
 export async function buildPublic(root = ROOT) {
   const { catalog, files, config } = await validateRelease(root);
   validateEconomy(await readJSON(root, 'data/economy.json'));
@@ -234,10 +253,11 @@ export async function buildPublic(root = ROOT) {
       }
       output.set(file, bytes);
     }
-    output.set('health.json', Buffer.from(JSON.stringify({status:config.publicLaunchEnabled && config.releaseScope === 'public-beta' ? 'public-beta' : 'candidate',releaseId:catalog.releaseId,records:catalog.totalRecords,retrievedAt:catalog.retrievedAt,builtAt:new Date().toISOString(),nationalComplete:catalog.nationalComplete === true})));
+    const codeVersion = versionApplicationAssets(output);
+    output.set('health.json', Buffer.from(JSON.stringify({codeVersion,status:config.publicLaunchEnabled && config.releaseScope === 'public-beta' ? 'public-beta' : 'candidate',releaseId:catalog.releaseId,records:catalog.totalRecords,retrievedAt:catalog.retrievedAt,builtAt:new Date().toISOString(),nationalComplete:catalog.nationalComplete === true})));
     output.set('robots.txt', Buffer.from('User-agent: *\nAllow: /\n'));
     output.set('_headers', Buffer.from(`/*\n  Content-Security-Policy: ${contentSecurityPolicy}\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  X-Frame-Options: DENY\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n  Cache-Control: no-cache\n/data/releases/*\n  Cache-Control: public, max-age=31536000, immutable\n`));
-    const manifest = {schemaVersion:1,releaseId:catalog.releaseId,contentSecurityPolicy,files:[]};
+    const manifest = {schemaVersion:1,releaseId:catalog.releaseId,codeVersion,contentSecurityPolicy,files:[]};
     for (const [file, bytes] of output) {
       await fs.mkdir(path.dirname(path.join(stage,file)),{recursive:true});
       await fs.writeFile(path.join(stage,file),bytes);
