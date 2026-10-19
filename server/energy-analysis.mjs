@@ -1,6 +1,6 @@
 import {buildClaimCatalog,claimSelectionSchema,renderClaimSelection} from './grounded-answer.mjs';
 import {hasUnsupportedOilChange} from './oil-request-bounds.mjs';
-import {buildWorkspaceAnalysis,createEnergyWorkspace,INVESTIGATION_SCHEMA,WORKSPACE_METRICS,WORKSPACE_PLANNING_INSTRUCTIONS} from './energy-workspace.mjs';
+import {buildWorkspaceAnalysis,createEnergyWorkspace,requestedScenarioYears,INVESTIGATION_SCHEMA,WORKSPACE_METRICS,WORKSPACE_PLANNING_INSTRUCTIONS} from './energy-workspace.mjs';
 export const DEFAULT_MODEL = 'gpt-6-luna';
 export const FREE_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 export const REGIONS = ['CA','AB','BC','SK','MB','ON','QC','NB','NS','PE','NL','YT','NT','NU'];
@@ -145,6 +145,8 @@ export function createEnergyAnalyzer({data,normalizeState,summarize,provider,deb
   return async input=>{
     const request=validateAnalysisRequest(input);
     if(hasUnsupportedOilChange(request.question))throw new AnalysisError('unsupported_scenario','The oil-price calculation supports changes from −20% to +20%. This request is outside that range, so your scenario has not changed.',422);
+    const requestedYears=workspaceEnabled?requestedScenarioYears(request.question):[];
+    if(requestedYears.length>1||requestedYears.some(year=>!data.years.includes(year)))throw new AnalysisError('unsupported_period',`This app supports one scenario year per analysis, from ${Math.min(...data.years)} to ${Math.max(...data.years)}. Ask for a single year within that range.`,422);
     const selectModelState = value => Object.fromEntries(Object.keys(STATE_SCHEMA.properties).map(key => [key, value[key]]));
     const initial=selectModelState(normalizeState(request.state,data));
     const controller=new AbortController();
@@ -155,8 +157,9 @@ export function createEnergyAnalyzer({data,normalizeState,summarize,provider,deb
       controller.signal.throwIfAborted();
       if(!exactKeys(plan,['state'])&&!(workspaceEnabled&&exactKeys(plan,['state','investigation'])))throw badOutput();
       try{validateState(plan.state);}catch{throw badOutput();}
-      const state=selectModelState(normalizeState(plan.state,data));
-      if(Object.keys(STATE_SCHEMA.properties).some(key=>state[key]!==plan.state[key]))throw badOutput();
+      const modelState=selectModelState(normalizeState(plan.state,data));
+      if(Object.keys(STATE_SCHEMA.properties).some(key=>modelState[key]!==plan.state[key]))throw badOutput();
+      const state=requestedYears.length?{...modelState,year:requestedYears[0]}:modelState;
       const summary=summarize(data,state);
       if(workspaceEnabled){
         const workspace=await createEnergyWorkspace({data,network,summary,summarize,state,investigation:plan.investigation,question:request.question,decider,signal:controller.signal});

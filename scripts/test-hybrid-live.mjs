@@ -2,18 +2,19 @@ import {readFile,writeFile,mkdir,rename,rmdir} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {createCloudflareProvider,createEnergyAnalyzer,FREE_MODEL} from '../server/energy-analysis.mjs';
-import {createJevDecider} from '../server/jev-decisions.mjs';
+import {createJevDecider,JEV_ATTEMPT_RESERVE_USD} from '../server/jev-decisions.mjs';
 import {normalizeEconomyState,summarizeEconomy,validateEconomy} from '../economy-model.mjs';
 import {validateWorkspace} from '../workspace-contract.mjs';
 
 const root=new URL('../',import.meta.url);
 export const HYBRID_LIVE_CASES=[
   {id:'gdp',question:'Compare energy GDP in Alberta, Ontario and Québec. Include a map.',types:['province-map','province-comparison']},
-  {id:'electricity',question:'Compare electricity generation in Alberta, Ontario and Québec in the Higher scenario in 2040.',types:['scenario-comparison']},
+  {id:'electricity',question:'Compare electricity generation in Alberta, Ontario and Québec in the Higher scenario in 2040.',types:['scenario-comparison'],year:2040,scenario:'Higher'},
+  {id:'compound',question:'Compare 2022 energy GDP in Alberta and Québec, their electricity generation in the Higher scenario in 2040, and map their pipeline routes and facilities.',types:['province-map','province-comparison','scenario-comparison','infrastructure-map'],year:2040,scenario:'Higher'},
   {id:'missing-flow',question:'Map the energy routes between Alberta and British Columbia. Can we measure how much flows between them?',types:['infrastructure-map','coverage-note']},
 ];
 if(!process.argv.includes('--run')&&!process.argv.includes('--serve')){
-  console.log(JSON.stringify({mode:'dry-run',cases:HYBRID_LIVE_CASES.length,maximumJevReserveUsd:0.008064,authorization:'Shares the existing lifetime US$1 Jev testing budget. No live calls without --run.'}));
+  console.log(JSON.stringify({mode:'dry-run',cases:HYBRID_LIVE_CASES.length,maximumJevReserveUsd:HYBRID_LIVE_CASES.length*JEV_ATTEMPT_RESERVE_USD,authorization:'Shares the existing lifetime US$1 Jev testing budget. No live calls without --run.'}));
 }else{
   const cache=new URL('.data-cache/',root),lock=new URL('jev-benchmark.lock/',cache),ledgerFile=new URL('jev-benchmark-budget.json',cache);
   let locked=false;
@@ -58,7 +59,7 @@ if(!process.argv.includes('--run')&&!process.argv.includes('--serve')){
         const state={region:'CA',year:2030,scenario:'Current Measures',oilShock:10,duration:'persistent'};
         const answer=await analyze({question:item.question,state});validateWorkspace(answer.workspace);
         const types=answer.workspace.panels.map(p=>p.type);
-        const passed=answer.answerMode==='source-backed-workspace'&&llmCalls-callsBefore===1&&item.types.every(type=>types.includes(type))&&(item.id==='missing-flow'?answer.workspace.plan.requestedMeasure==='measured-flow':answer.workspace.plan.requestedMeasure==='available')&&answer.workspace.decision.provider==='jev'&&(item.id!=='electricity'||(answer.workspace.plan.year===2040&&answer.workspace.plan.scenario==='Higher'));
+        const passed=answer.answerMode==='source-backed-workspace'&&llmCalls-callsBefore===1&&item.types.every(type=>types.includes(type))&&(item.id==='missing-flow'?answer.workspace.plan.requestedMeasure==='measured-flow':answer.workspace.plan.requestedMeasure==='available')&&answer.workspace.decision.provider==='jev'&&(!item.year||(answer.workspace.plan.year===item.year&&answer.workspace.plan.scenario===item.scenario))&&JSON.stringify(answer.workspace.economySnapshot)===JSON.stringify(data);
         results.push({id:item.id,passed,milliseconds:Date.now()-start,llmCalls:llmCalls-callsBefore,types,decision:answer.workspace.decision,plan:answer.workspace.plan});
         await writeFile(new URL(`hybrid-live-${item.id}.json`,cache),JSON.stringify({...answer,question:item.question},null,2)+'\n',{mode:0o600});
       }catch(error){results.push({id:item.id,passed:false,error:['unsupported_scenario','provider_unavailable','analysis_unavailable','invalid_model_output'].includes(error.code)?error.code:'test_failed',milliseconds:Date.now()-start});}

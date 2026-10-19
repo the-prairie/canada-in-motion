@@ -31,16 +31,19 @@ Contract rejection, truthful missing-data handling, calculation consistency, Jev
 
 ## Completed verification
 
-- 118 application tests and 18 edge-runtime tests passed. The beta release gate passed, the public artifact contains 438 files, and the dependency audit reports no known vulnerabilities. The scripted live development report is in `HYBRID-LIVE-EVALUATION.json`; it is not a held-out accuracy benchmark.
+- 121 application tests and 18 edge-runtime tests passed. The beta release gate passed, the public artifact contains 438 files, and the dependency audit reports no known vulnerabilities. The scripted live development report is in `HYBRID-LIVE-EVALUATION.json`; it is not a held-out accuracy benchmark.
 
-- Live Cloudflare planning → Jev decision → source resolution → OpenUI rendering exercised in the real browser. GDP, electricity and missing-flow regression cases passed with one LLM call each. The latest scripted run took 2.7–2.9 seconds per case; this small development sample is not a performance guarantee.
+- Live Cloudflare planning → Jev decision → source resolution → OpenUI rendering exercised in the real browser. GDP, electricity, a compound GDP/electricity/infrastructure question and missing-flow regression cases passed with one LLM call each. The latest scripted run took 2.6–3.3 seconds per case; this small development sample is not a performance guarantee.
 - Province selection, comparison measure, table view, scenario/year changes, undo, export, cancellation and unsupported-price recovery exercised in the browser. The 390px phone viewport had no horizontal overflow or console errors.
 - Independent review found seven integration/release defects. All were fixed: clean CI generation of the bundle; linked infrastructure selection; national scope preservation; visible oil assumptions; isolated infrastructure failures; required-topic retention; pinned infrastructure records in exports.
 - Live testing found false shipment-gap classifications and a contradictory legacy text answer. The workspace now produces both charts and written findings from the same resolved data. A second LLM text-selection call is unnecessary and has been removed for workspace mode.
 - The independent reviewer also checked mixed GDP/electricity dates and unsupported historical GDP years after a narrow clause-binding repair.
 - Public-browser verification exposed stale JavaScript after a GitHub Pages deployment. The build now stamps the entry scripts, styles and all application module imports with one content-derived version, including the lazy OpenUI bundle. A regression test checks that changing a nested module invalidates the whole code graph while data-only refreshes preserve the code version.
 - A production question used live Jev successfully, but exposed a browser/server snapshot mismatch after the nightly data refresh. Responses now pin the economic snapshot as well as the infrastructure records; both newer and older browser caches are regression-tested. Snapshots are never included in Jev prompts.
-- The renderer is loaded only when an answer contains a workspace. The compressed bundle is approximately 168 KiB. No OpenUI hosted gateway, telemetry transport or external JavaScript CDN is used.
+- The live compound fixture also exposed a planner year error and a GDP/scenario clause-binding error. Explicit single scenario years now override the planner before calculations. Multiple or out-of-range requested scenario years receive an explicit scope error; they cannot silently produce a substituted year.
+- Final browser regression used live Cloudflare and Jev after the date fixes: GDP 2022 plus electricity Higher/2040 and infrastructure rendered together. Selecting Québec and Lower/2050 exported exactly 257348.125 and 237444.145 GWh/year, Canadian Mainline and Suncor Montréal. A 2060 request returned the scope error and retained the previous workspace. Independent review cleared the period guard.
+- The production browser completed a real Jev answer. The final repeat public inference hit the existing three-questions-per-network daily allowance; final control/date checks therefore used the same code in the loopback browser harness with live providers. The quota was not bypassed.
+- The renderer is loaded only when an answer contains a workspace. The compressed bundle is approximately 169 KiB. No OpenUI hosted gateway, telemetry transport or external JavaScript CDN is used.
 
 ## Deployment and budget
 
@@ -54,4 +57,4 @@ Jev advises presentation and reports an evidence assessment; it is not an econom
 
 ## Reproduce
 
-Run `npm ci`, `npm test`, `npm run test:ai:edge`, `npm run build`, and `node scripts/beta-release-gate.mjs`. Run `node scripts/test-hybrid-live.mjs` for a no-call preview of the live test. `--run` executes three fixtures using the existing secure local credentials and persistent testing ledger. `--serve` exposes a loopback-only browser test server on port 4182. Never run these modes without the applicable inference budget. The public build allowlist excludes all credentials, development reports and test servers.
+Run `npm ci`, `npm test`, `npm run test:ai:edge`, `npm run build`, and `node scripts/beta-release-gate.mjs`. Run `node scripts/test-hybrid-live.mjs` for a no-call preview of the live test. `--run` executes four fixtures using the existing secure local credentials and persistent testing ledger. `--serve` exposes a loopback-only browser test server on port 4182. Never run these modes without the applicable inference budget. The public build allowlist excludes all credentials, development reports and test servers.

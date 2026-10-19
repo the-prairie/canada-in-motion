@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {createEnergyAnalyzer} from '../server/energy-analysis.mjs';
-import {createEnergyWorkspace,buildWorkspaceAnalysis,buildWorkspacePanels,validateInvestigation} from '../server/energy-workspace.mjs';
+import {AnalysisError,createEnergyAnalyzer} from '../server/energy-analysis.mjs';
+import {createEnergyWorkspace,buildWorkspaceAnalysis,buildWorkspacePanels,requestedScenarioYears,validateInvestigation} from '../server/energy-workspace.mjs';
 import {JEV_MODEL,JevError} from '../server/jev-decisions.mjs';
 import {normalizeEconomyState,summarizeEconomy} from '../economy-model.mjs';
 const data=JSON.parse(await readFile(new URL('../data/economy.json',import.meta.url)));
@@ -228,4 +228,51 @@ test('GDP observation dates do not inherit years or forecast adjectives from a s
       assert.equal(workspace.panels.find(panel=>panel.type==='province-comparison').period,'2022');assert.equal(workspace.panels.find(panel=>panel.type==='scenario-comparison').period,'2040');
     }
   }
+});
+
+test('the live compound question binds observed GDP and forecast generation to their requested years',async()=>{
+  const question='Compare 2022 energy GDP in Alberta and Québec, their electricity generation in the Higher scenario in 2040, and map their pipeline routes and facilities.';
+  let calls=0,decisions=0;
+  const analyze=createEnergyAnalyzer({data,debate,network,workspaceEnabled:true,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider:async({input,name})=>{
+    calls++;assert.equal(name,'energy_scenario');return {state:{...input.state,year:2024,scenario:'Higher'},investigation:{...investigation,topics:['gdp','scenario','infrastructure'],metricIds:['electricity-generation']}};
+  },decider:async({state:decisionState})=>{decisions++;assert.equal(decisionState.plan.year,2040);return {answers:{presentation:{choice:'comparison'},coverage:{choice:'supported'}}};}});
+  const result=await analyze({question,state:{region:'AB',scenario:'Higher',year:2030,oilShock:-10,duration:'persistent'}});
+  assert.equal(calls,1);assert.equal(decisions,1);
+  assert.equal(result.state.year,2040);assert.equal(result.summary.state.year,2040);assert.equal(result.workspace.plan.year,2040);
+  assert.equal(result.workspace.plan.requestedMeasure,'available');assert.ok(result.workspace.panels.every(panel=>panel.type!=='coverage-note'));
+  assert.equal(result.workspace.panels.find(panel=>panel.type==='province-comparison').period,'2022');
+  const generation=result.workspace.panels.find(panel=>panel.type==='scenario-comparison');
+  assert.equal(generation.period,'2040');assert.equal(generation.scenario,'Higher');
+  assert.deepEqual(generation.rows.map(row=>row.code),['AB','QC']);
+  for(const row of generation.rows){
+    const expected=summarizeEconomy(data,{...result.state,region:row.code}).metrics.find(metric=>metric.id==='electricity-generation');
+    assert.equal(expected.year,2040);assert.equal(row.selected,expected.selected);assert.equal(row.baseline,expected.baseline);
+  }
+  assert.equal(result.summary.metrics.find(metric=>metric.id==='electricity-generation').selected,generation.rows.find(row=>row.code==='AB').selected);
+  assert.ok(result.workspace.panels.some(panel=>panel.type==='infrastructure-map'));assert.doesNotMatch(JSON.stringify(result.analysis),/GDP is unavailable for the requested period/);
+});
+
+test('forecast-year reconciliation excludes GDP dates while preserving unsupported GDP coverage',async()=>{
+  const analyze=createEnergyAnalyzer({data,debate,network,workspaceEnabled:true,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider:async({input})=>({state:{...input.state,year:2024},investigation:{...investigation,topics:['gdp','scenario'],metricIds:['electricity-generation']}})});
+  for(const gdpYear of [1990,2030]){
+    const question=`Compare ${gdpYear} energy GDP in Alberta and Québec, their electricity generation in 2040.`;
+    assert.deepEqual(requestedScenarioYears(question),[2040]);
+    const {state:corrected,workspace}=await analyze({question,state:{region:'AB',scenario:'Higher',year:2030,oilShock:-10,duration:'persistent'}});
+    assert.equal(corrected.year,2040);
+    assert.equal(workspace.plan.requestedMeasure,'other-unavailable');assert.equal(workspace.panels[0].type,'coverage-note');
+    assert.equal(workspace.panels.find(panel=>panel.type==='scenario-comparison').period,'2040');
+  }
+  assert.deepEqual(requestedScenarioYears('Compare GDP in Alberta in 2030.'),[]);
+});
+
+test('multiple or unavailable scenario years fail before model calls or calculations',async()=>{
+  let calls=0,decisions=0,calculations=0;
+  const analyze=createEnergyAnalyzer({data,debate,network,workspaceEnabled:true,normalizeState:normalizeEconomyState,summarize:(...args)=>{calculations++;return summarizeEconomy(...args);},provider:async({input})=>{calls++;return {state:{...input.state,year:2024},investigation:{...investigation,topics:['scenario'],metricIds:['electricity-generation']}};},decider:async()=>{decisions++;return {answers:{presentation:{choice:'scenario'},coverage:{choice:'supported'}}};}});
+  for(const question of ['Compare electricity generation in 2030 and 2040.','Compare electricity generation in 2040 with gas production in 2030.','Compare electricity generation in 2060.']){
+    await assert.rejects(analyze({question,state:{region:'AB',scenario:'Higher',year:2030,oilShock:-10,duration:'persistent'}}),error=>{
+      assert.ok(error instanceof AnalysisError);assert.equal(error.code,'unsupported_period');assert.equal(error.status,422);
+      assert.match(error.message,/one scenario year per analysis/);assert.match(error.message,/2023 to 2050/);return true;
+    });
+  }
+  assert.equal(calls,0);assert.equal(decisions,0);assert.equal(calculations,0);
 });

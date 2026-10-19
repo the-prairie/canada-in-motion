@@ -1,12 +1,12 @@
 {
-  "createdAt": "2026-10-19T21:46:14.183Z",
+  "createdAt": "2026-10-19T22:18:42.060Z",
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
   "scope": "Live Cloudflare planning, live Jev decision, deterministic source-backed findings and client contract validation. Browser interaction and deployed Turnstile checks are separate.",
   "results": [
     {
       "id": "gdp",
       "passed": true,
-      "milliseconds": 2936,
+      "milliseconds": 3296,
       "llmCalls": 1,
       "types": [
         "province-comparison",
@@ -41,7 +41,7 @@
     {
       "id": "electricity",
       "passed": true,
-      "milliseconds": 2718,
+      "milliseconds": 2904,
       "llmCalls": 1,
       "types": [
         "scenario-comparison"
@@ -75,9 +75,49 @@
       }
     },
     {
+      "id": "compound",
+      "passed": true,
+      "milliseconds": 2812,
+      "llmCalls": 1,
+      "types": [
+        "province-comparison",
+        "province-map",
+        "scenario-comparison",
+        "infrastructure-map"
+      ],
+      "decision": {
+        "provider": "jev",
+        "model": "jev-1.14.0",
+        "status": "accepted",
+        "planStatus": "valid",
+        "presentation": "comparison",
+        "coverage": "partial"
+      },
+      "plan": {
+        "regions": [
+          "AB",
+          "QC"
+        ],
+        "topics": [
+          "gdp",
+          "scenario",
+          "infrastructure"
+        ],
+        "metricIds": [
+          "electricity-generation"
+        ],
+        "includeMap": true,
+        "requestedMeasure": "available",
+        "year": 2040,
+        "scenario": "Higher",
+        "oilShock": 10,
+        "duration": "persistent"
+      }
+    },
+    {
       "id": "missing-flow",
       "passed": true,
-      "milliseconds": 2923,
+      "milliseconds": 2636,
       "llmCalls": 1,
       "types": [
         "coverage-note",
@@ -119,9 +159,13 @@
       "estimatedUsd": 0.00005098800000000001
     },
     {
+      "inputTokens": 3554,
+      "estimatedUsd": 0.000149268
+    },
+    {
       "inputTokens": 1045,
       "estimatedUsd": 0.00004389
     }
   ],
-  "lifetimeJevReservedUsd": 0.2284799999999998
+  "lifetimeJevReservedUsd": 0.24729599999999977
 }
