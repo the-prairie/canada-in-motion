@@ -1,0 +1,1427 @@
+{
+  "createdAt": "2026-10-19T20:50:35.799Z",
+  "model": "jev-1.14.0",
+  "scope": "Authored development fixtures with supplied test contexts. Not held-out, not an LLM comparison, not end-to-end evidence of app quality.",
+  "priceBasis": {
+    "inputUsdPerMillion": 0.042,
+    "source": "https://docs.typesafe.ai/models",
+    "checkedAt": "2026-10-19"
+  },
+  "plannedAttempts": 72,
+  "completedAttempts": 72,
+  "correct": 67,
+  "estimatedUsd": 0.0013986000000000007,
+  "reservedUsd": 0.19353599999999985,
+  "medianMilliseconds": 79,
+  "results": [
+    {
+      "id": "gdp",
+      "group": "intent",
+      "repeat": 0,
+      "expected": "contribution",
+      "selected": "contribution",
+      "correct": true,
+      "confidence": 0.99,
+      "probabilities": {
+        "contribution": 0.99,
+        "distribution": 0.01,
+        "scenario": 0,
+        "flows": 0,
+        "closure": 0,
+        "multiple": 0
+      },
+      "inputTokens": 447,
+      "estimatedUsd": 0.000018774,
+      "milliseconds": 207
+    },
+    {
+      "id": "gdp",
+      "group": "intent",
+      "repeat": 1,
+      "expected": "contribution",
+      "selected": "contribution",
+      "correct": true,
+      "confidence": 0.95,
+      "probabilities": {
+        "multiple": 0.01,
+        "closure": 0,
+        "flows": 0,
+        "scenario": 0,
+        "distribution": 0.03,
+        "contribution": 0.96
+      },
+      "inputTokens": 447,
+      "estimatedUsd": 0.000018774,
+      "milliseconds": 70
+    },
+    {
+      "id": "gdp",
+      "group": "intent",
+      "repeat": 2,
+      "expected": "contribution",
+      "selected": "contribution",
+      "correct": true,
+      "confidence": 0.99,
+      "probabilities": {
+        "distribution": 0.01,
+        "scenario": 0,
+        "flows": 0,
+        "closure": 0,
+        "multiple": 0,
+        "contribution": 0.99
+      },
+      "inputTokens": 447,
+      "estimatedUsd": 0.000018774,
+      "milliseconds": 153
+    },
+    {
+      "id": "beneficiaries",
+      "group": "intent",
+      "repeat": 0,
+      "expected": "distribution",
+      "selected": "distribution",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "contribution": 0,
+        "distribution": 1,
+        "scenario": 0,
+        "flows": 0,
+        "closure": 0,
+        "multiple": 0
+      },
+      "inputTokens": 448,
+      "estimatedUsd": 0.000018816000000000004,
+      "milliseconds": 78
+    },
+    {
+      "id": "beneficiaries",
+      "group": "intent",
+      "repeat": 1,
+      "expected": "distribution",
+      "selected": "distribution",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "multiple": 0,
+        "closure": 0,
+        "flows": 0,
+        "scenario": 0,
+        "distribution": 1,
+        "contribution": 0
+      },
+      "inputTokens": 448,
+      "estimatedUsd": 0.000018816000000000004,
+      "milliseconds": 74
+    },
+    {
+      "id": "beneficiaries",
+      "group": "intent",
+      "repeat": 2,
+      "expected": "distribution",
+      "selected": "distribution",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "distribution": 1,
+        "scenario": 0,
+        "flows": 0,
+        "closure": 0,
+        "multiple": 0,
+        "contribution": 0
+      },
+      "inputTokens": 448,
+      "estimatedUsd": 0.000018816000000000004,
+      "milliseconds": 89
+    },
+    {
+      "id": "shock",
+      "group": "intent",
+      "repeat": 0,
+      "expected": "scenario",
+      "selected": "scenario",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "contribution": 0,
+        "distribution": 0,
+        "scenario": 1,
+        "flows": 0,
+        "closure": 0,
+        "multiple": 0
+      },
+      "inputTokens": 448,
+      "estimatedUsd": 0.000018816000000000004,
+      "milliseconds": 82
+    },
+    {
+      "id": "shock",
+      "group": "intent",
+      "repeat": 1,
+      "expected": "scenario",
+      "selected": "scenario",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "multiple": 0,
+        "closure": 0,
+        "flows": 0,
+        "scenario": 1,
+        "distribution": 0,
+        "contribution": 0
+      },
+      "inputTokens": 448,
+      "estimatedUsd": 0.000018816000000000004,
+      "milliseconds": 75
+    },
+    {
+      "id": "shock",
+      "group": "intent",
+      "repeat": 2,
+      "expected": "scenario",
+      "selected": "scenario",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "distribution": 0,
+        "scenario": 1,
+        "flows": 0,
+        "closure": 0,
+        "multiple": 0,
+        "contribution": 0
+      },
+      "inputTokens": 448,
+      "estimatedUsd": 0.000018816000000000004,
+      "milliseconds": 130
+    },
+    {
+      "id": "electricity-flows",
+      "group": "intent",
+      "repeat": 0,
+      "expected": "flows",
+      "selected": "flows",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "contribution": 0,
+        "distribution": 0,
+        "scenario": 0,
+        "flows": 1,
+        "closure": 0,
+        "multiple": 0
+      },
+      "inputTokens": 446,
+      "estimatedUsd": 0.000018732000000000003,
+      "milliseconds": 70
+    },
+    {
+      "id": "electricity-flows",
+      "group": "intent",
+      "repeat": 1,
+      "expected": "flows",
+      "selected": "flows",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "multiple": 0,
+        "closure": 0,
+        "flows": 1,
+        "scenario": 0,
+        "distribution": 0,
+        "contribution": 0
+      },
+      "inputTokens": 446,
+      "estimatedUsd": 0.000018732000000000003,
+      "milliseconds": 67
+    },
+    {
+      "id": "electricity-flows",
+      "group": "intent",
+      "repeat": 2,
+      "expected": "flows",
+      "selected": "flows",
+      "correct": true,
+      "confidence": 0.99,
+      "probabilities": {
+        "distribution": 0.01,
+        "scenario": 0,
+        "flows": 0.99,
+        "closure": 0,
+        "multiple": 0,
+        "contribution": 0
+      },
+      "inputTokens": 446,
+      "estimatedUsd": 0.000018732000000000003,
+      "milliseconds": 67
+    },
+    {
+      "id": "wells",
+      "group": "intent",
+      "repeat": 0,
+      "expected": "closure",
+      "selected": "closure",
+      "correct": true,
+      "confidence": 0.95,
+      "probabilities": {
+        "contribution": 0,
+        "distribution": 0.04,
+        "scenario": 0,
+        "flows": 0,
+        "closure": 0.96,
+        "multiple": 0
+      },
+      "inputTokens": 446,
+      "estimatedUsd": 0.000018732000000000003,
+      "milliseconds": 80
+    },
+    {
+      "id": "wells",
+      "group": "intent",
+      "repeat": 1,
+      "expected": "closure",
+      "selected": "closure",
+      "correct": true,
+      "confidence": 0.98,
+      "probabilities": {
+        "multiple": 0,
+        "closure": 0.98,
+        "flows": 0,
+        "scenario": 0,
+        "distribution": 0.02,
+        "contribution": 0
+      },
+      "inputTokens": 446,
+      "estimatedUsd": 0.000018732000000000003,
+      "milliseconds": 102
+    },
+    {
+      "id": "wells",
+      "group": "intent",
+      "repeat": 2,
+      "expected": "closure",
+      "selected": "closure",
+      "correct": true,
+      "confidence": 0.95,
+      "probabilities": {
+        "distribution": 0.04,
+        "scenario": 0,
+        "flows": 0,
+        "closure": 0.96,
+        "multiple": 0,
+        "contribution": 0
+      },
+      "inputTokens": 446,
+      "estimatedUsd": 0.000018732000000000003,
+      "milliseconds": 137
+    },
+    {
+      "id": "compound",
+      "group": "intent",
+      "repeat": 0,
+      "expected": "multiple",
+      "selected": "multiple",
+      "correct": true,
+      "confidence": 0.98,
+      "probabilities": {
+        "contribution": 0,
+        "distribution": 0.02,
+        "scenario": 0,
+        "flows": 0,
+        "closure": 0,
+        "multiple": 0.98
+      },
+      "inputTokens": 450,
+      "estimatedUsd": 0.000018900000000000002,
+      "milliseconds": 70
+    },
+    {
+      "id": "compound",
+      "group": "intent",
+      "repeat": 1,
+      "expected": "multiple",
+      "selected": "multiple",
+      "correct": true,
+      "confidence": 0.95,
+      "probabilities": {
+        "multiple": 0.96,
+        "closure": 0,
+        "flows": 0,
+        "scenario": 0,
+        "distribution": 0.03,
+        "contribution": 0.01
+      },
+      "inputTokens": 450,
+      "estimatedUsd": 0.000018900000000000002,
+      "milliseconds": 74
+    },
+    {
+      "id": "compound",
+      "group": "intent",
+      "repeat": 2,
+      "expected": "multiple",
+      "selected": "multiple",
+      "correct": true,
+      "confidence": 0.99,
+      "probabilities": {
+        "distribution": 0.01,
+        "scenario": 0,
+        "flows": 0,
+        "closure": 0,
+        "multiple": 0.99,
+        "contribution": 0
+      },
+      "inputTokens": 450,
+      "estimatedUsd": 0.000018900000000000002,
+      "milliseconds": 71
+    },
+    {
+      "id": "french-gdp",
+      "group": "intent",
+      "repeat": 0,
+      "expected": "contribution",
+      "selected": "contribution",
+      "correct": true,
+      "confidence": 0.99,
+      "probabilities": {
+        "contribution": 0.99,
+        "distribution": 0,
+        "scenario": 0,
+        "flows": 0,
+        "closure": 0,
+        "multiple": 0.01
+      },
+      "inputTokens": 452,
+      "estimatedUsd": 0.000018984000000000003,
+      "milliseconds": 102
+    },
+    {
+      "id": "french-gdp",
+      "group": "intent",
+      "repeat": 1,
+      "expected": "contribution",
+      "selected": "contribution",
+      "correct": true,
+      "confidence": 0.96,
+      "probabilities": {
+        "multiple": 0.02,
+        "closure": 0,
+        "flows": 0,
+        "scenario": 0,
+        "distribution": 0.01,
+        "contribution": 0.97
+      },
+      "inputTokens": 452,
+      "estimatedUsd": 0.000018984000000000003,
+      "milliseconds": 107
+    },
+    {
+      "id": "french-gdp",
+      "group": "intent",
+      "repeat": 2,
+      "expected": "contribution",
+      "selected": "contribution",
+      "correct": true,
+      "confidence": 0.99,
+      "probabilities": {
+        "distribution": 0,
+        "scenario": 0,
+        "flows": 0,
+        "closure": 0,
+        "multiple": 0.01,
+        "contribution": 0.99
+      },
+      "inputTokens": 452,
+      "estimatedUsd": 0.000018984000000000003,
+      "milliseconds": 157
+    },
+    {
+      "id": "french-shock",
+      "group": "intent",
+      "repeat": 0,
+      "expected": "scenario",
+      "selected": "scenario",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "contribution": 0,
+        "distribution": 0,
+        "scenario": 1,
+        "flows": 0,
+        "closure": 0,
+        "multiple": 0
+      },
+      "inputTokens": 457,
+      "estimatedUsd": 0.000019194000000000003,
+      "milliseconds": 85
+    },
+    {
+      "id": "french-shock",
+      "group": "intent",
+      "repeat": 1,
+      "expected": "scenario",
+      "selected": "scenario",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "multiple": 0,
+        "closure": 0,
+        "flows": 0,
+        "scenario": 1,
+        "distribution": 0,
+        "contribution": 0
+      },
+      "inputTokens": 457,
+      "estimatedUsd": 0.000019194000000000003,
+      "milliseconds": 111
+    },
+    {
+      "id": "french-shock",
+      "group": "intent",
+      "repeat": 2,
+      "expected": "scenario",
+      "selected": "scenario",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "distribution": 0,
+        "scenario": 1,
+        "flows": 0,
+        "closure": 0,
+        "multiple": 0,
+        "contribution": 0
+      },
+      "inputTokens": 457,
+      "estimatedUsd": 0.000019194000000000003,
+      "milliseconds": 96
+    },
+    {
+      "id": "value-added",
+      "group": "evidence",
+      "repeat": 0,
+      "expected": "contradicted",
+      "selected": "contradicted",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "supported": 0,
+        "contradicted": 1,
+        "insufficient": 0
+      },
+      "inputTokens": 434,
+      "estimatedUsd": 0.000018228000000000002,
+      "milliseconds": 175
+    },
+    {
+      "id": "value-added",
+      "group": "evidence",
+      "repeat": 1,
+      "expected": "contradicted",
+      "selected": "contradicted",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "insufficient": 0,
+        "contradicted": 1,
+        "supported": 0
+      },
+      "inputTokens": 434,
+      "estimatedUsd": 0.000018228000000000002,
+      "milliseconds": 143
+    },
+    {
+      "id": "value-added",
+      "group": "evidence",
+      "repeat": 2,
+      "expected": "contradicted",
+      "selected": "contradicted",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "contradicted": 1,
+        "insufficient": 0,
+        "supported": 0
+      },
+      "inputTokens": 434,
+      "estimatedUsd": 0.000018228000000000002,
+      "milliseconds": 381
+    },
+    {
+      "id": "national-scope",
+      "group": "evidence",
+      "repeat": 0,
+      "expected": "insufficient",
+      "selected": "insufficient",
+      "correct": true,
+      "confidence": 0.31,
+      "probabilities": {
+        "supported": 0,
+        "contradicted": 0.46,
+        "insufficient": 0.54
+      },
+      "inputTokens": 436,
+      "estimatedUsd": 0.000018312,
+      "milliseconds": 523
+    },
+    {
+      "id": "national-scope",
+      "group": "evidence",
+      "repeat": 1,
+      "expected": "insufficient",
+      "selected": "insufficient",
+      "correct": true,
+      "confidence": 0.34,
+      "probabilities": {
+        "insufficient": 0.56,
+        "contradicted": 0.44,
+        "supported": 0
+      },
+      "inputTokens": 436,
+      "estimatedUsd": 0.000018312,
+      "milliseconds": 232
+    },
+    {
+      "id": "national-scope",
+      "group": "evidence",
+      "repeat": 2,
+      "expected": "insufficient",
+      "selected": "insufficient",
+      "correct": true,
+      "confidence": 0.37,
+      "probabilities": {
+        "contradicted": 0.42,
+        "insufficient": 0.58,
+        "supported": 0
+      },
+      "inputTokens": 436,
+      "estimatedUsd": 0.000018312,
+      "milliseconds": 144
+    },
+    {
+      "id": "share-not-incidence",
+      "group": "evidence",
+      "repeat": 0,
+      "expected": "insufficient",
+      "selected": "insufficient",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "supported": 0,
+        "contradicted": 0,
+        "insufficient": 1
+      },
+      "inputTokens": 448,
+      "estimatedUsd": 0.000018816000000000004,
+      "milliseconds": 157
+    },
+    {
+      "id": "share-not-incidence",
+      "group": "evidence",
+      "repeat": 1,
+      "expected": "insufficient",
+      "selected": "insufficient",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "insufficient": 1,
+        "contradicted": 0,
+        "supported": 0
+      },
+      "inputTokens": 448,
+      "estimatedUsd": 0.000018816000000000004,
+      "milliseconds": 173
+    },
+    {
+      "id": "share-not-incidence",
+      "group": "evidence",
+      "repeat": 2,
+      "expected": "insufficient",
+      "selected": "insufficient",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "contradicted": 0,
+        "insufficient": 1,
+        "supported": 0
+      },
+      "inputTokens": 448,
+      "estimatedUsd": 0.000018816000000000004,
+      "milliseconds": 218
+    },
+    {
+      "id": "dated-observation",
+      "group": "evidence",
+      "repeat": 0,
+      "expected": "contradicted",
+      "selected": "contradicted",
+      "correct": true,
+      "confidence": 0.97,
+      "probabilities": {
+        "supported": 0,
+        "contradicted": 0.98,
+        "insufficient": 0.02
+      },
+      "inputTokens": 445,
+      "estimatedUsd": 0.000018690000000000002,
+      "milliseconds": 167
+    },
+    {
+      "id": "dated-observation",
+      "group": "evidence",
+      "repeat": 1,
+      "expected": "contradicted",
+      "selected": "contradicted",
+      "correct": true,
+      "confidence": 0.97,
+      "probabilities": {
+        "insufficient": 0.02,
+        "contradicted": 0.98,
+        "supported": 0
+      },
+      "inputTokens": 445,
+      "estimatedUsd": 0.000018690000000000002,
+      "milliseconds": 105
+    },
+    {
+      "id": "dated-observation",
+      "group": "evidence",
+      "repeat": 2,
+      "expected": "contradicted",
+      "selected": "contradicted",
+      "correct": true,
+      "confidence": 0.95,
+      "probabilities": {
+        "contradicted": 0.97,
+        "insufficient": 0.03,
+        "supported": 0
+      },
+      "inputTokens": 445,
+      "estimatedUsd": 0.000018690000000000002,
+      "milliseconds": 68
+    },
+    {
+      "id": "missing-zero",
+      "group": "evidence",
+      "repeat": 0,
+      "expected": "insufficient",
+      "selected": "insufficient",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "supported": 0,
+        "contradicted": 0,
+        "insufficient": 1
+      },
+      "inputTokens": 433,
+      "estimatedUsd": 0.000018186,
+      "milliseconds": 72
+    },
+    {
+      "id": "missing-zero",
+      "group": "evidence",
+      "repeat": 1,
+      "expected": "insufficient",
+      "selected": "insufficient",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "insufficient": 1,
+        "contradicted": 0,
+        "supported": 0
+      },
+      "inputTokens": 433,
+      "estimatedUsd": 0.000018186,
+      "milliseconds": 72
+    },
+    {
+      "id": "missing-zero",
+      "group": "evidence",
+      "repeat": 2,
+      "expected": "insufficient",
+      "selected": "insufficient",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "contradicted": 0,
+        "insufficient": 1,
+        "supported": 0
+      },
+      "inputTokens": 433,
+      "estimatedUsd": 0.000018186,
+      "milliseconds": 161
+    },
+    {
+      "id": "scenario-causality",
+      "group": "evidence",
+      "repeat": 0,
+      "expected": "contradicted",
+      "selected": "contradicted",
+      "correct": true,
+      "confidence": 0.97,
+      "probabilities": {
+        "supported": 0,
+        "contradicted": 0.98,
+        "insufficient": 0.02
+      },
+      "inputTokens": 439,
+      "estimatedUsd": 0.000018438000000000002,
+      "milliseconds": 70
+    },
+    {
+      "id": "scenario-causality",
+      "group": "evidence",
+      "repeat": 1,
+      "expected": "contradicted",
+      "selected": "contradicted",
+      "correct": true,
+      "confidence": 0.97,
+      "probabilities": {
+        "insufficient": 0.02,
+        "contradicted": 0.98,
+        "supported": 0
+      },
+      "inputTokens": 439,
+      "estimatedUsd": 0.000018438000000000002,
+      "milliseconds": 71
+    },
+    {
+      "id": "scenario-causality",
+      "group": "evidence",
+      "repeat": 2,
+      "expected": "contradicted",
+      "selected": "contradicted",
+      "correct": true,
+      "confidence": 0.97,
+      "probabilities": {
+        "contradicted": 0.98,
+        "insufficient": 0.02,
+        "supported": 0
+      },
+      "inputTokens": 439,
+      "estimatedUsd": 0.000018438000000000002,
+      "milliseconds": 66
+    },
+    {
+      "id": "faithful",
+      "group": "evidence",
+      "repeat": 0,
+      "expected": "supported",
+      "selected": "supported",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "supported": 1,
+        "contradicted": 0,
+        "insufficient": 0
+      },
+      "inputTokens": 456,
+      "estimatedUsd": 0.000019152000000000002,
+      "milliseconds": 73
+    },
+    {
+      "id": "faithful",
+      "group": "evidence",
+      "repeat": 1,
+      "expected": "supported",
+      "selected": "supported",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "insufficient": 0,
+        "contradicted": 0,
+        "supported": 1
+      },
+      "inputTokens": 456,
+      "estimatedUsd": 0.000019152000000000002,
+      "milliseconds": 66
+    },
+    {
+      "id": "faithful",
+      "group": "evidence",
+      "repeat": 2,
+      "expected": "supported",
+      "selected": "supported",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "contradicted": 0,
+        "insufficient": 0,
+        "supported": 1
+      },
+      "inputTokens": 456,
+      "estimatedUsd": 0.000019152000000000002,
+      "milliseconds": 74
+    },
+    {
+      "id": "french-scope",
+      "group": "evidence",
+      "repeat": 0,
+      "expected": "supported",
+      "selected": "supported",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "supported": 1,
+        "contradicted": 0,
+        "insufficient": 0
+      },
+      "inputTokens": 448,
+      "estimatedUsd": 0.000018816000000000004,
+      "milliseconds": 105
+    },
+    {
+      "id": "french-scope",
+      "group": "evidence",
+      "repeat": 1,
+      "expected": "supported",
+      "selected": "supported",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "insufficient": 0,
+        "contradicted": 0,
+        "supported": 1
+      },
+      "inputTokens": 448,
+      "estimatedUsd": 0.000018816000000000004,
+      "milliseconds": 270
+    },
+    {
+      "id": "french-scope",
+      "group": "evidence",
+      "repeat": 2,
+      "expected": "supported",
+      "selected": "supported",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "contradicted": 0,
+        "insufficient": 0,
+        "supported": 1
+      },
+      "inputTokens": 448,
+      "estimatedUsd": 0.000018816000000000004,
+      "milliseconds": 77
+    },
+    {
+      "id": "locations",
+      "group": "view",
+      "repeat": 0,
+      "expected": "map",
+      "selected": "map",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "map": 1,
+        "flows": 0,
+        "comparison": 0,
+        "scenario": 0,
+        "evidence": 0,
+        "combined": 0
+      },
+      "inputTokens": 486,
+      "estimatedUsd": 0.000020412000000000004,
+      "milliseconds": 176
+    },
+    {
+      "id": "locations",
+      "group": "view",
+      "repeat": 1,
+      "expected": "map",
+      "selected": "map",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "combined": 0,
+        "evidence": 0,
+        "scenario": 0,
+        "comparison": 0,
+        "flows": 0,
+        "map": 1
+      },
+      "inputTokens": 486,
+      "estimatedUsd": 0.000020412000000000004,
+      "milliseconds": 75
+    },
+    {
+      "id": "locations",
+      "group": "view",
+      "repeat": 2,
+      "expected": "map",
+      "selected": "map",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "flows": 0,
+        "comparison": 0,
+        "scenario": 0,
+        "evidence": 0,
+        "combined": 0,
+        "map": 1
+      },
+      "inputTokens": 486,
+      "estimatedUsd": 0.000020412000000000004,
+      "milliseconds": 67
+    },
+    {
+      "id": "measured-flows",
+      "group": "view",
+      "repeat": 0,
+      "expected": "flows",
+      "selected": "flows",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "map": 0,
+        "flows": 1,
+        "comparison": 0,
+        "scenario": 0,
+        "evidence": 0,
+        "combined": 0
+      },
+      "inputTokens": 497,
+      "estimatedUsd": 0.000020874000000000004,
+      "milliseconds": 71
+    },
+    {
+      "id": "measured-flows",
+      "group": "view",
+      "repeat": 1,
+      "expected": "flows",
+      "selected": "flows",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "combined": 0,
+        "evidence": 0,
+        "scenario": 0,
+        "comparison": 0,
+        "flows": 1,
+        "map": 0
+      },
+      "inputTokens": 497,
+      "estimatedUsd": 0.000020874000000000004,
+      "milliseconds": 71
+    },
+    {
+      "id": "measured-flows",
+      "group": "view",
+      "repeat": 2,
+      "expected": "flows",
+      "selected": "flows",
+      "correct": true,
+      "confidence": 1,
+      "probabilities": {
+        "flows": 1,
+        "comparison": 0,
+        "scenario": 0,
+        "evidence": 0,
+        "combined": 0,
+        "map": 0
+      },
+      "inputTokens": 497,
+      "estimatedUsd": 0.000020874000000000004,
+      "milliseconds": 72
+    },
+    {
+      "id": "geometry-not-flow",
+      "group": "view",
+      "repeat": 0,
+      "expected": "evidence",
+      "selected": "map",
+      "correct": false,
+      "confidence": 0.45,
+      "probabilities": {
+        "map": 0.54,
+        "flows": 0.01,
+        "comparison": 0,
+        "scenario": 0,
+        "evidence": 0.45,
+        "combined": 0
+      },
+      "inputTokens": 489,
+      "estimatedUsd": 0.000020538,
+      "milliseconds": 72
+    },
+    {
+      "id": "geometry-not-flow",
+      "group": "view",
+      "repeat": 1,
+      "expected": "evidence",
+      "selected": "map",
+      "correct": false,
+      "confidence": 0.59,
+      "probabilities": {
+        "combined": 0,
+        "evidence": 0.34,
+        "scenario": 0,
+        "comparison": 0,
+        "flows": 0,
+        "map": 0.66
+      },
+      "inputTokens": 489,
+      "estimatedUsd": 0.000020538,
+      "milliseconds": 156
+    },
+    {
+      "id": "geometry-not-flow",
+      "group": "view",
+      "repeat": 2,
+      "expected": "evidence",
+      "selected": "map",
+      "correct": false,
+      "confidence": 0.53,
+      "probabilities": {
+        "flows": 0.01,
+        "comparison": 0,
+        "scenario": 0,
+        "evidence": 0.38,
+        "combined": 0,
+        "map": 0.61
+      },
+      "inputTokens": 489,
+      "estimatedUsd": 0.000020538,
+      "milliseconds": 72
+    },
+    {
+      "id": "gdp-ranking",
+      "group": "view",
+      "repeat": 0,
+      "expected": "comparison",
+      "selected": "comparison",
+      "correct": true,
+      "confidence": 0.92,
+      "probabilities": {
+        "map": 0,
+        "flows": 0,
+        "comparison": 0.93,
+        "scenario": 0,
+        "evidence": 0.06,
+        "combined": 0.01
+      },
+      "inputTokens": 496,
+      "estimatedUsd": 0.000020832,
+      "milliseconds": 74
+    },
+    {
+      "id": "gdp-ranking",
+      "group": "view",
+      "repeat": 1,
+      "expected": "comparison",
+      "selected": "comparison",
+      "correct": true,
+      "confidence": 0.86,
+      "probabilities": {
+        "combined": 0.02,
+        "evidence": 0.1,
+        "scenario": 0,
+        "comparison": 0.88,
+        "flows": 0,
+        "map": 0
+      },
+      "inputTokens": 496,
+      "estimatedUsd": 0.000020832,
+      "milliseconds": 83
+    },
+    {
+      "id": "gdp-ranking",
+      "group": "view",
+      "repeat": 2,
+      "expected": "comparison",
+      "selected": "comparison",
+      "correct": true,
+      "confidence": 0.96,
+      "probabilities": {
+        "flows": 0,
+        "comparison": 0.97,
+        "scenario": 0,
+        "evidence": 0.02,
+        "combined": 0.01,
+        "map": 0
+      },
+      "inputTokens": 496,
+      "estimatedUsd": 0.000020832,
+      "milliseconds": 78
+    },
+    {
+      "id": "supported-shock",
+      "group": "view",
+      "repeat": 0,
+      "expected": "scenario",
+      "selected": "scenario",
+      "correct": true,
+      "confidence": 0.92,
+      "probabilities": {
+        "map": 0,
+        "flows": 0,
+        "comparison": 0.01,
+        "scenario": 0.93,
+        "evidence": 0.06,
+        "combined": 0
+      },
+      "inputTokens": 502,
+      "estimatedUsd": 0.000021084,
+      "milliseconds": 157
+    },
+    {
+      "id": "supported-shock",
+      "group": "view",
+      "repeat": 1,
+      "expected": "scenario",
+      "selected": "scenario",
+      "correct": true,
+      "confidence": 0.9,
+      "probabilities": {
+        "combined": 0,
+        "evidence": 0.08,
+        "scenario": 0.92,
+        "comparison": 0,
+        "flows": 0,
+        "map": 0
+      },
+      "inputTokens": 502,
+      "estimatedUsd": 0.000021084,
+      "milliseconds": 72
+    },
+    {
+      "id": "supported-shock",
+      "group": "view",
+      "repeat": 2,
+      "expected": "scenario",
+      "selected": "scenario",
+      "correct": true,
+      "confidence": 0.95,
+      "probabilities": {
+        "flows": 0,
+        "comparison": 0,
+        "scenario": 0.96,
+        "evidence": 0.04,
+        "combined": 0,
+        "map": 0
+      },
+      "inputTokens": 502,
+      "estimatedUsd": 0.000021084,
+      "milliseconds": 73
+    },
+    {
+      "id": "unsupported-shock",
+      "group": "view",
+      "repeat": 0,
+      "expected": "evidence",
+      "selected": "evidence",
+      "correct": true,
+      "confidence": 0.84,
+      "probabilities": {
+        "map": 0,
+        "flows": 0,
+        "comparison": 0.09,
+        "scenario": 0.04,
+        "evidence": 0.87,
+        "combined": 0
+      },
+      "inputTokens": 501,
+      "estimatedUsd": 0.000021042000000000003,
+      "milliseconds": 75
+    },
+    {
+      "id": "unsupported-shock",
+      "group": "view",
+      "repeat": 1,
+      "expected": "evidence",
+      "selected": "evidence",
+      "correct": true,
+      "confidence": 0.87,
+      "probabilities": {
+        "combined": 0.01,
+        "evidence": 0.89,
+        "scenario": 0.05,
+        "comparison": 0.05,
+        "flows": 0,
+        "map": 0
+      },
+      "inputTokens": 501,
+      "estimatedUsd": 0.000021042000000000003,
+      "milliseconds": 75
+    },
+    {
+      "id": "unsupported-shock",
+      "group": "view",
+      "repeat": 2,
+      "expected": "evidence",
+      "selected": "evidence",
+      "correct": true,
+      "confidence": 0.78,
+      "probabilities": {
+        "flows": 0,
+        "comparison": 0.1,
+        "scenario": 0.08,
+        "evidence": 0.82,
+        "combined": 0,
+        "map": 0
+      },
+      "inputTokens": 501,
+      "estimatedUsd": 0.000021042000000000003,
+      "milliseconds": 86
+    },
+    {
+      "id": "linked-views",
+      "group": "view",
+      "repeat": 0,
+      "expected": "combined",
+      "selected": "combined",
+      "correct": true,
+      "confidence": 0.96,
+      "probabilities": {
+        "map": 0.01,
+        "flows": 0,
+        "comparison": 0.02,
+        "scenario": 0,
+        "evidence": 0,
+        "combined": 0.97
+      },
+      "inputTokens": 504,
+      "estimatedUsd": 0.000021168,
+      "milliseconds": 140
+    },
+    {
+      "id": "linked-views",
+      "group": "view",
+      "repeat": 1,
+      "expected": "combined",
+      "selected": "combined",
+      "correct": true,
+      "confidence": 0.89,
+      "probabilities": {
+        "combined": 0.91,
+        "evidence": 0,
+        "scenario": 0,
+        "comparison": 0.04,
+        "flows": 0,
+        "map": 0.05
+      },
+      "inputTokens": 504,
+      "estimatedUsd": 0.000021168,
+      "milliseconds": 73
+    },
+    {
+      "id": "linked-views",
+      "group": "view",
+      "repeat": 2,
+      "expected": "combined",
+      "selected": "combined",
+      "correct": true,
+      "confidence": 0.92,
+      "probabilities": {
+        "flows": 0,
+        "comparison": 0.03,
+        "scenario": 0,
+        "evidence": 0,
+        "combined": 0.93,
+        "map": 0.04
+      },
+      "inputTokens": 504,
+      "estimatedUsd": 0.000021168,
+      "milliseconds": 71
+    },
+    {
+      "id": "french-no-flows",
+      "group": "view",
+      "repeat": 0,
+      "expected": "evidence",
+      "selected": "evidence",
+      "correct": true,
+      "confidence": 0.53,
+      "probabilities": {
+        "map": 0.38,
+        "flows": 0.01,
+        "comparison": 0,
+        "scenario": 0,
+        "evidence": 0.61,
+        "combined": 0
+      },
+      "inputTokens": 492,
+      "estimatedUsd": 0.000020664,
+      "milliseconds": 70
+    },
+    {
+      "id": "french-no-flows",
+      "group": "view",
+      "repeat": 1,
+      "expected": "evidence",
+      "selected": "map",
+      "correct": false,
+      "confidence": 0.45,
+      "probabilities": {
+        "combined": 0,
+        "evidence": 0.46,
+        "scenario": 0,
+        "comparison": 0,
+        "flows": 0,
+        "map": 0.54
+      },
+      "inputTokens": 492,
+      "estimatedUsd": 0.000020664,
+      "milliseconds": 80
+    },
+    {
+      "id": "french-no-flows",
+      "group": "view",
+      "repeat": 2,
+      "expected": "evidence",
+      "selected": "map",
+      "correct": false,
+      "confidence": 0.45,
+      "probabilities": {
+        "flows": 0,
+        "comparison": 0,
+        "scenario": 0,
+        "evidence": 0.46,
+        "combined": 0,
+        "map": 0.54
+      },
+      "inputTokens": 492,
+      "estimatedUsd": 0.000020664,
+      "milliseconds": 81
+    }
+  ],
+  "p95Milliseconds": 232,
+  "totalInputTokens": 33300,
+  "groupSummary": {
+    "intent": {
+      "correct": 24,
+      "attempts": 24,
+      "uniqueCases": 8
+    },
+    "evidence": {
+      "correct": 24,
+      "attempts": 24,
+      "uniqueCases": 8
+    },
+    "view": {
+      "correct": 19,
+      "attempts": 24,
+      "uniqueCases": 8
+    }
+  },
+  "choiceOrderInconsistentCases": [
+    "french-no-flows"
+  ],
+  "fixtureSha256": "65be3fdd912f360221da3373eaf1db5a0e7f05ad837834df298178e7e66f3632",
+  "interpretation": {
+    "decision": "Proceed with an experimental hybrid, not a public deployment or replacement of the LLM.",
+    "strongestObservedUses": [
+      "Classifying the analytical task",
+      "Checking claims against a short supplied evidence context"
+    ],
+    "failure": "Five of 24 UI-selection attempts chose a location map for a request for unavailable pipeline volumes. A map can be useful context, but does not answer the requested quantity; coverage must be explicit.",
+    "nextControl": "Use validated data capabilities and requested measures to constrain generated views. Keep model confidence separate from deterministic availability checks.",
+    "limitations": [
+      "24 authored development cases, repeated three times; 72 calls are not 72 independent cases.",
+      "Short supplied contexts; not full documents or complete app workflows.",
+      "No paired LLM comparison or measured end-to-end speedup.",
+      "The five errors had confidence between 0.45 and 0.59. A threshold selected after this run is not independently calibrated.",
+      "Four French fixtures do not establish bilingual reliability.",
+      "Estimated cost uses reported input tokens and the checked public price, not an invoice.",
+      "No recurring production Jev spend approved; public app unchanged."
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtemp,readFile,stat,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {once} from 'node:events';
+import http from 'node:http';
+import {createJevSetup} from '../scripts/setup-jev.mjs';
+
+test('Jev setup protects the credential, rejects cross-origin posts and never overwrites it',async t=>{
+  const directory=await mkdtemp(join(tmpdir(),'jev-setup-'));
+  const destination=join(directory,'.env.jev.local');
+  let savedCount=0;
+  const {server,route}=createJevSetup({destination,onSaved:()=>savedCount++});
+  server.listen(0,'127.0.0.1');await once(server,'listening');
+  t.after(async()=>{server.closeAllConnections();await new Promise(resolve=>server.close(resolve));await rm(directory,{recursive:true,force:true});});
+  const origin=`http://127.0.0.1:${server.address().port}`;
+  const url=origin+route;
+  const key='test-only-fake-credential-12345';
+  const post=(extra={})=>fetch(url,{method:'POST',redirect:'manual',headers:{Origin:origin,'Content-Type':'application/x-www-form-urlencoded',...extra},body:new URLSearchParams({key})});
+  const page=await fetch(url);
+  assert.equal(page.headers.get('cache-control'),'no-store');
+  assert.equal(page.headers.get('referrer-policy'),'same-origin');
+  assert.match(page.headers.get('content-security-policy'),/frame-ancestors 'none'/);
+  assert.match(await page.text(),/type="password"/);
+  assert.equal((await post({Origin:'https://attacker.example'})).status,403);
+  assert.equal((await post({'Sec-Fetch-Site':'cross-site'})).status,403);
+  const hostileHostStatus=await new Promise((resolve,reject)=>http.get(url,{headers:{Host:'attacker.example'}},response=>{response.resume();resolve(response.statusCode);}).on('error',reject));
+  assert.equal(hostileHostStatus,403);
+  assert.equal((await fetch(origin+'/')).status,403);
+  assert.equal((await post()).status,303);
+  assert.equal(savedCount,1);
+  assert.equal(await readFile(destination,'utf8'),`TYPESAFE_API_KEY=${key}\n`);
+  assert.equal((await stat(destination)).mode&0o777,0o600);
+  const complete=await(await fetch(url)).text();
+  assert.match(complete,/Jev key saved/);assert.ok(!complete.includes(key));
+  assert.equal((await post()).status,409);
+});
