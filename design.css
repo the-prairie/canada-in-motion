@@ -293,3 +293,8 @@ dialog::backdrop { background: #18201db3; }
   .workspace { display: block; }
   .detail-panel { border: 0; }
 }
+
+@media (max-width:760px) {
+  body[data-view='atlas'] .app-shell { height:auto; min-height:100dvh; }
+  body[data-view='atlas'] #record-atlas { flex:none; }
+}

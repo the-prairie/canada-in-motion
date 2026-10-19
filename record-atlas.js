@@ -197,6 +197,7 @@ export class RecordAtlas {
     } catch { this.fallback(); }
   }
   fallback() {
+    if(this.state?.exploration?.arrangement==='compare')this.host.querySelector('.ra-record-key').textContent='Matching source records';
     this.canvas.hidden=true;
     this.host.querySelector('.ra-renderer-note').hidden=false;
     this.draw();
