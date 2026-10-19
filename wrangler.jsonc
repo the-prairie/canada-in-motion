@@ -14,8 +14,8 @@
     "AI_ENABLED": "1",
     "AI_PROVIDER": "cloudflare",
     "WORKSPACE_ENABLED": "1",
-    "JEV_ENABLED": "0",
-    "JEV_BUDGET_MICRO_USD": "0",
+    "JEV_ENABLED": "1",
+    "JEV_BUDGET_MICRO_USD": "1000000",
     "TURNSTILE_SITE_KEY": "0x4AAAAAAFbE-EHrmceVEeJi"
   },
   "ai": {

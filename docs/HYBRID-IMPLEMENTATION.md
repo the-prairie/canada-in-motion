@@ -42,7 +42,7 @@ Contract rejection, truthful missing-data handling, calculation consistency, Jev
 
 ## Deployment and budget
 
-The existing GitHub Pages frontend and free Cloudflare Worker remain the hosting setup. `WORKSPACE_ENABLED=1` enables question-driven source-backed panels. `JEV_ENABLED=0` and `JEV_BUDGET_MICRO_USD=0` keep paid Jev inference off in production until a budget is approved. The app uses standard presentation rules in that state. The LLM still selects the question's topics, regions and published scenarios.
+The existing GitHub Pages frontend and free Cloudflare Worker remain the hosting setup. `WORKSPACE_ENABLED=1` enables question-driven source-backed panels. The owner approved a separate US$1 lifetime production cap on 19 October 2026. `JEV_ENABLED=1` and `JEV_BUDGET_MICRO_USD=1000000` enable Jev within that cap, with no automatic reset. The encrypted `TYPESAFE_API_KEY` Worker secret is installed. Standard presentation rules take over if Jev is unavailable or its cap is exhausted. The LLM still selects the question's topics, regions and published scenarios.
 
 To enable Jev, store `TYPESAFE_API_KEY` as an encrypted Worker secret, set `JEV_ENABLED=1`, and set a positive lifetime cap in micro-US dollars. The Durable Object reserves 2,688 micro-US dollars before each attempt and never automatically resets or refunds that reservation. Failure, timeout or exhaustion retains the same source-backed views with the standard presentation order. The cap is based on the checked provider tariff and is not an account-wide billing control.
 
