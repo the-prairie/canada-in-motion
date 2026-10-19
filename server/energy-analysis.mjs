@@ -1,4 +1,5 @@
 import {buildClaimCatalog,claimSelectionSchema,renderClaimSelection} from './grounded-answer.mjs';
+import {hasUnsupportedOilChange} from './oil-request-bounds.mjs';
 export const DEFAULT_MODEL = 'gpt-6-luna';
 export const FREE_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 export const REGIONS = ['CA','AB','BC','SK','MB','ON','QC','NB','NS','PE','NL','YT','NT','NU'];
@@ -142,6 +143,7 @@ export function createCloudflareProvider({ai,model=FREE_MODEL}) {
 export function createEnergyAnalyzer({data,normalizeState,summarize,provider,debate,model=DEFAULT_MODEL,timeoutMs=60000,answerMode='prose'}) {
   return async input=>{
     const request=validateAnalysisRequest(input);
+    if(hasUnsupportedOilChange(request.question))throw new AnalysisError('unsupported_scenario','The oil-price calculation supports changes from −20% to +20%. This request is outside that range, so your scenario has not changed.',422);
     const selectModelState = value => Object.fromEntries(Object.keys(STATE_SCHEMA.properties).map(key => [key, value[key]]));
     const initial=selectModelState(normalizeState(request.state,data));
     const controller=new AbortController();

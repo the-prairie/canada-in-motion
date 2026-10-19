@@ -54,3 +54,10 @@ test('free claim-selection stage returns source-backed text and rejects invented
     assert.equal(calls,2);
   }
 });
+test('supported findings do not contradict their scope and missing price effects lead partial answers',()=>{
+  const f=fixture('CA');
+  const supported=renderClaimSelection({answerability:'supported',claimIds:['oil-gdp','outside-data']},f.claims,f.regionName);
+  assert.equal(supported.blocks.length,1);assert.match(supported.blocks[0].text,/oil-price change/);
+  const partial=renderClaimSelection({answerability:'partial',claimIds:['observed-contribution','unsupported-price-response','outside-data']},f.claims,f.regionName);
+  assert.equal(partial.blocks.length,2);assert.match(partial.blocks[0].text,/do not provide provincial GDP/);
+});

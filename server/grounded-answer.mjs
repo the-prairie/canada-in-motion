@@ -73,6 +73,11 @@ export function renderClaimSelection(selection,claims,regionName) {
   const limitations=['unsupported-price-response','distribution-limits','outside-data'];
   let ids=[...selection.claimIds];
   if(selection.answerability!=='supported'&&!ids.some(id=>limitations.includes(id)))throw Error('A partial or unsupported answer needs its relevant limitation');
+  // A supported answer must not also say the whole question is out of scope.
+  if(selection.answerability==='supported'&&ids.some(id=>!limitations.includes(id)))ids=ids.filter(id=>id!=='outside-data');
+  // Lead a partially unsupported price request with the missing calculation;
+  // observed GDP is useful context, but cannot stand in for a bill forecast.
+  if(selection.answerability==='partial'&&ids.includes('unsupported-price-response')&&!ids.includes('oil-gdp'))ids=['unsupported-price-response',...ids.filter(id=>!['unsupported-price-response','outside-data'].includes(id))];
   // An unanswerable request needs a direct limitation, not unrelated figures.
   if(selection.answerability==='unsupported')ids=[ids.find(id=>limitations.includes(id))];
   if(!ids.length)throw Error('Empty answer');

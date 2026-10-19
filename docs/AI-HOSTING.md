@@ -6,6 +6,20 @@ The user approved Workers Free and encrypted secret storage on 18 October 2026. 
 
 The free service uses **Llama 3.3 70B** through the Workers AI binding. It does not need an OpenAI key or funded OpenAI account. The model selects a supported scenario and relevant findings from a source-backed catalog. The server supplies wording, numbers, units, scope and citations; the free model cannot write arbitrary economic claims. [JSON Mode](https://developers.cloudflare.com/workers-ai/features/json-mode/)
 
+## OpenRouter evaluation
+
+On 19 October 2026 the owner completed OpenRouter's PKCE authorization. The key was saved in an owner-readable, Git-ignored local file and transferred through stdin to the Worker's encrypted `OPENROUTER_API_KEY` secret. It was never printed or included in the public build. The account reported 1,000 free-model calls per day and zero usage charges during the evaluation. Account allowances can change; no credits were purchased.
+
+Cloudflare remains the public provider. The eight-question comparison found SuperVL's fast mode quicker, but weaker on Québec benefits and equally vulnerable to misreading an unsupported percentage. Its bounded reasoning mode returned only three valid, correctly selected answers out of eight; four requests timed out. Ultra timed out in its single test. These are limited application tests, not a general ranking. See [the recorded comparison](OPENROUTER-EVALUATION.json).
+
+`scripts/probe-openrouter.mjs` uses fixed public questions and the existing state, evidence and citation validators. Its adapter permits only named `:free` models, sets all provider maximum prices to zero, disables fallbacks and enables no paid plugins. It is not wired into the live Worker. If reconsidering a switch, repeat the benchmark and update the public recipient/privacy notice first: OpenRouter and the chosen model host would receive the question and public evidence, and free-provider retention policies vary.
+
+The comparison also found a shared percentage-parsing defect. The server now rejects explicit English oil-price requests outside its supported range before inference, including numeric, spelled-out and fraction forms. The check matches a price-change phrase, so unrelated gas changes, GDP shares and durations do not trigger it. It is not a complete natural-language parser. Supported answers no longer include a contradictory general out-of-scope paragraph; partial unsupported price questions lead with the missing calculation.
+
+To reconnect after revoking the key, run `node scripts/setup-openrouter.mjs` and complete its one-use, loopback-only authorization page. An existing credential file causes setup to stop rather than overwrite it. For evaluation, use `node scripts/probe-openrouter.mjs --extended`; `--no-reasoning` selects the faster comparison profile. Reports are saved privately in `.data-cache/`; only reviewed fixed-question results should be committed. No key is read by browser code.
+
+## Cloudflare launch
+
 Cloudflare authorization is complete and the account was verified as Workers Free in the dashboard on 19 October 2026. The Worker is deployed at `https://canada-in-motion-ai.thelaurenzary.workers.dev`. A managed Turnstile widget is restricted to `the-prairie.github.io`; its secret and the visitor-hash secret are stored in the Worker's encrypted secret store. No OpenAI key was uploaded.
 
 The live four-question evaluation passed for Alberta oil sensitivity, Québec contribution and benefits, unsupported gas/GDP/bill estimates, and attempted invented figures. An independent reviewer accepted the constrained answer catalog for a bounded release. The results establish this sample, not universal relevance. Arbitrary free-form Llama and GPT-OSS answers did not meet the app's checks and are not enabled. The public browser completed a real Turnstile-verified question and downloaded its answer, calculations and sources on 19 October 2026. An initial Turnstile stall recovered with Try again. See `AI-LAUNCH-VERIFICATION.json` for the verified revision, data timestamp and test scope.
