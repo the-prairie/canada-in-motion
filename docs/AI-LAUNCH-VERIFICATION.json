@@ -1,23 +1,28 @@
 {
-  "verifiedAt": "2026-10-19",
+  "verifiedAt": "2026-10-19T06:28:03.640441+00:00",
   "deployment": {
     "publicWebsite": "https://the-prairie.github.io/canada-in-motion/",
     "apiHost": "Cloudflare Workers",
     "workerName": "canada-in-motion-ai",
     "remoteApiDeployed": true,
-    "publicAiEnabled": false,
+    "publicAiEnabled": true,
     "hostingTier": "Workers Free",
     "apiOrigin": "https://canada-in-motion-ai.thelaurenzary.workers.dev",
-    "workerVersion": "0234a8a5-5400-4a3e-95a6-acf89cb05a62"
+    "workerVersion": "0234a8a5-5400-4a3e-95a6-acf89cb05a62",
+    "frontendRevision": "a3a0ffb4e5e69794fe01dc3b502f3498f1f8c5f9",
+    "pagesRun": "https://github.com/the-prairie/canada-in-motion/actions/runs/39209275495"
   },
   "checks": {
-    "nodeTests": 73,
+    "nodeTests": 74,
     "workerdTests": 12,
     "publicBuildPassed": true,
     "publicFilesScannedForExistingKey": 436,
     "secretFound": false,
     "independentReview": "Constrained free model accepted for bounded release; four live cases passed",
-    "freeTierRemoteCpuMeasured": false
+    "freeTierRemoteCpuMeasured": false,
+    "publicBrowserAnswer": true,
+    "publicAnswerDownload": true,
+    "publicTurnstileRetry": true
   },
   "providerProbe": {
     "modelMetadataStatus": 200,
@@ -26,10 +31,7 @@
     "errorType": "insufficient_quota",
     "completedAnswer": false
   },
-  "pending": [
-    "Publish frontend endpoint configuration",
-    "Public browser and Turnstile acceptance test"
-  ],
+  "pending": [],
   "testScope": "73 Node tests and 12 workerd tests pass. Four real Cloudflare model cases pass with independent review. Claims and numeric/source validation do not establish universal question relevance. No paid fallback.",
   "freeProvider": {
     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
@@ -49,8 +51,8 @@
   },
   "lastDeploymentAttempt": {
     "deployed": true,
-    "enabledForVisitors": false,
-    "reason": "Frontend not yet connected"
+    "enabledForVisitors": true,
+    "reason": "Public browser completed an actual Turnstile-verified analysis"
   },
   "secrets": {
     "encrypted": [
@@ -58,5 +60,15 @@
       "VISITOR_HASH_KEY"
     ],
     "openAIKeyUploaded": false
+  },
+  "browserAcceptance": {
+    "question": "If oil prices fall by 10%, what changes for Alberta and Canada?",
+    "provider": "cloudflare",
+    "answerMode": "source-backed-findings",
+    "sourceCount": 5,
+    "dataVersion": "2026-10-19T06:22:33.008712+00:00",
+    "outcome": "Cited national oil sensitivity and observed Alberta contribution displayed; JSON download verified. Initial Turnstile error 300030 recovered with Try again.",
+    "scope": "Public success and retry observed. Quota persistence, cancellation and exact-origin rejection additionally covered by workerd/Node tests; remote CPU not measured.",
+    "followup": "Defers widget removal until callback finishes and acknowledges handled Turnstile errors; regression test passes."
   }
 }

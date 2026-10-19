@@ -8,7 +8,7 @@ The free service uses **Llama 3.3 70B** through the Workers AI binding. It does 
 
 Cloudflare authorization is complete and the account was verified as Workers Free in the dashboard on 19 October 2026. The Worker is deployed at `https://canada-in-motion-ai.thelaurenzary.workers.dev`. A managed Turnstile widget is restricted to `the-prairie.github.io`; its secret and the visitor-hash secret are stored in the Worker's encrypted secret store. No OpenAI key was uploaded.
 
-The live four-question evaluation passed for Alberta oil sensitivity, Québec contribution and benefits, unsupported gas/GDP/bill estimates, and attempted invented figures. An independent reviewer accepted the constrained answer catalog for a bounded release. The results establish this sample, not universal relevance. Arbitrary free-form Llama and GPT-OSS answers did not meet the app's checks and are not enabled. See `AI-LAUNCH-VERIFICATION.json` for public-browser completion status.
+The live four-question evaluation passed for Alberta oil sensitivity, Québec contribution and benefits, unsupported gas/GDP/bill estimates, and attempted invented figures. An independent reviewer accepted the constrained answer catalog for a bounded release. The results establish this sample, not universal relevance. Arbitrary free-form Llama and GPT-OSS answers did not meet the app's checks and are not enabled. The public browser completed a real Turnstile-verified question and downloaded its answer, calculations and sources on 19 October 2026. An initial Turnstile stall recovered with Try again. See `AI-LAUNCH-VERIFICATION.json` for the verified revision, data timestamp and test scope.
 
 ## Free allowance and cost controls
 

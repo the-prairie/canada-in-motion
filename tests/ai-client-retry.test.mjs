@@ -3,8 +3,24 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {EnergyEconomy} from '../energy-economy.js';
 import {normalizeEconomyState} from '../economy-model.mjs';
+import {requestChallengeToken} from '../ai-client.mjs';
 
 const data=JSON.parse(await readFile(new URL('../data/economy.json',import.meta.url)));
+
+test('verification failure is handled without removing the widget inside its callback',async t=>{
+  const original=globalThis.turnstile;t.after(()=>{if(original===undefined)delete globalThis.turnstile;else globalThis.turnstile=original;});
+  let inCallback=false,removed=0,attempt=0;
+  globalThis.turnstile={render(_node,options){const id=++attempt;queueMicrotask(()=>{
+    inCallback=true;
+    if(id===1){assert.equal(options['error-callback']('300030'),true);assert.equal(removed,0);}
+    else options.callback('fresh-token');
+    inCallback=false;
+  });return id;},remove(){assert.equal(inCallback,false);removed++;}};
+  await assert.rejects(requestChallengeToken('public-key',{isConnected:true},new AbortController().signal),/security check could not complete/);
+  assert.equal(removed,1);
+  assert.equal(await requestChallengeToken('public-key',{isConnected:true},new AbortController().signal),'fresh-token');
+  assert.equal(removed,2);
+});
 
 for(const interruption of ['cancel','change'])test(`a new question completes immediately after ${interruption} during verification`,async t=>{
   const originals={document:globalThis.document,turnstile:globalThis.turnstile,fetch:globalThis.fetch};

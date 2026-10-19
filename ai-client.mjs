@@ -39,14 +39,15 @@ export async function requestChallengeToken(siteKey,container,signal) {
     let widget,timer,settled=false;
     const finish=(error,value)=>{
       if(settled)return;settled=true;clearTimeout(timer);signal.removeEventListener('abort',cancel);
-      if(widget!==undefined)turnstile.remove(widget);
+      // Let Turnstile finish its callback before removing its own container.
+      queueMicrotask(()=>{if(widget!==undefined){try{turnstile.remove(widget);}catch{/* A completed or cancelled widget may already be detached. */}}});
       error?reject(error):resolve(value);
     };
     const cancel=()=>finish(new DOMException('Cancelled','AbortError'));
     signal.addEventListener('abort',cancel,{once:true});
     timer=setTimeout(()=>finish(new Error('The security check timed out. Try again.')),90000);
     try {
-      widget=turnstile.render(container,{sitekey:siteKey,action:'energy_analysis',theme:'light',size:'flexible',retry:'never',callback:token=>finish(null,token),'error-callback':()=>finish(new Error('The security check could not complete. Try again.')),'expired-callback':()=>finish(new Error('The security check expired. Try again.'))});
+      widget=turnstile.render(container,{sitekey:siteKey,action:'energy_analysis',theme:'light',size:'flexible',retry:'never',callback:token=>finish(null,token),'error-callback':()=>{finish(new Error('The security check could not complete. Try again.'));return true;},'expired-callback':()=>finish(new Error('The security check expired. Try again.'))});
     } catch {finish(new Error('The security check could not start. Try again.'));}
   });
 }
