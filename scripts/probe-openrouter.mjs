@@ -1,3 +1,4 @@
+import {gradeTrial} from './ai-trial-grading.mjs';
 import {BENCHMARK_CASES} from './ai-benchmark-cases.mjs';
 // Fixed public questions only. Credentials, reasoning and upstream error bodies
 // are never printed or written to the evaluation report.
@@ -32,8 +33,8 @@ try{
     const start=Date.now();
     try{
       const result=await analyze({question:item.question,state:item.state});
-      results.push({id:item.id,question:item.question,validated:true,stateMatched:Object.entries(item.expected).every(([key,value])=>result.state[key]===value),milliseconds:Date.now()-start,state:result.state,analysis:result.analysis});
-    }catch(error){results.push({id:item.id,question:item.question,validated:error.code===item.expectedError,stateMatched:error.code===item.expectedError,requestRejected:error.code===item.expectedError,errorCode:error.code||'failed',milliseconds:Date.now()-start});}
+      results.push({id:item.id,question:item.question,...gradeTrial(item,{result}),milliseconds:Date.now()-start,state:result.state,analysis:result.analysis});
+    }catch(error){results.push({id:item.id,question:item.question,...gradeTrial(item,{error}),milliseconds:Date.now()-start});}
     console.log(JSON.stringify({model,...Object.fromEntries(Object.entries(results.at(-1)).filter(([key])=>!['state','analysis','question'].includes(key)))}));
     if(authFailed)break;
   }
@@ -42,5 +43,5 @@ try{
   const filename=`.data-cache/openrouter-${model.split('/')[1].replace(':','-')}${reasoningEnabled?'':'-no-reasoning'}${option('case')?'-'+option('case'):''}.json`;
   await writeFile(new URL(filename,root),JSON.stringify(report,null,2)+'\n',{mode:0o600});
   console.log(JSON.stringify({report:filename,totalCost:calls.reduce((s,x)=>s+(x.cost||0),0)}));
-  if(results.length!==selected.length||results.some(x=>!x.validated||!x.stateMatched))process.exitCode=1;
+  if(results.length!==selected.length||results.some(x=>!x.passed))process.exitCode=1;
 }catch{console.error('OpenRouter evaluation could not start. Check the secure connection and local data. No credential details were printed.');process.exitCode=1;}

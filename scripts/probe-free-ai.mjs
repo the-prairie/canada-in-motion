@@ -1,3 +1,4 @@
+import {gradeTrial} from './ai-trial-grading.mjs';
 import {BENCHMARK_CASES} from './ai-benchmark-cases.mjs';
 // Uses only fixed public questions/data. Wrangler supplies credentials in memory;
 // neither tokens nor upstream errors are printed or saved. No paid fallback.
@@ -43,15 +44,14 @@ try{
     const start=Date.now();
     try{
       const result=await analyze({question:item.question,state:item.state});
-      const stateMatched=Object.entries(item.expected).every(([key,value])=>result.state[key]===value);
-      results.push({id:item.id,validated:true,stateMatched,milliseconds:Date.now()-start,state:result.state,analysis:result.analysis});
-    }catch(error){results.push({id:item.id,validated:error.code===item.expectedError,stateMatched:error.code===item.expectedError,requestRejected:error.code===item.expectedError,errorCode:error.code||'failed',milliseconds:Date.now()-start});}
+      results.push({id:item.id,...gradeTrial(item,{result}),milliseconds:Date.now()-start,state:result.state,analysis:result.analysis});
+    }catch(error){results.push({id:item.id,...gradeTrial(item,{error}),milliseconds:Date.now()-start});}
     if(authorizationFailure)break;
   }
   const report={verifiedAt:new Date().toISOString(),model:trialModel,calls,results,humanContentReviewRequired:true};
   const directory=path.join(root,'.data-cache');await mkdir(directory,{recursive:true});
   await writeFile(path.join(directory,process.argv.includes('--extended')?'free-ai-evaluation-extended.json':'free-ai-evaluation.json'),JSON.stringify(report,null,2)+'\n',{mode:0o600});
-  console.log(JSON.stringify({model:trialModel,results:results.map(({id,validated,stateMatched,errorCode,milliseconds})=>({id,validated,stateMatched,errorCode,milliseconds})),report:process.argv.includes('--extended')?'.data-cache/free-ai-evaluation-extended.json':'.data-cache/free-ai-evaluation.json'}));
+  console.log(JSON.stringify({model:trialModel,results:results.map(({id,passed,outcome,validated,stateMatched,errorCode,milliseconds})=>({id,passed,outcome,validated,stateMatched,errorCode,milliseconds})),report:process.argv.includes('--extended')?'.data-cache/free-ai-evaluation-extended.json':'.data-cache/free-ai-evaluation.json'}));
   if(authorizationFailure)console.log('Cloudflare authorization needs Workers AI access. No further model calls were attempted.');
-  if(results.length!==selected.length||results.some(r=>!r.validated||!r.stateMatched))process.exitCode=1;
+  if(results.length!==selected.length||results.some(r=>!r.passed))process.exitCode=1;
 }catch{console.error('The free-model evaluation could not start. Check Wrangler authorization and local public data. No credentials were printed.');process.exitCode=1;}
