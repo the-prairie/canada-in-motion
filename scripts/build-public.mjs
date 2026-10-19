@@ -1,3 +1,4 @@
+import { validateEconomy } from '../economy-model.mjs';
 import { BC_FILES, validateBC } from './bc-validation.mjs';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
@@ -9,7 +10,7 @@ export const CONTEXT_FILES = ['historical-infrastructure.geojson','benchmark-tol
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const CSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
 export const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
-export const PUBLIC_FILES = ['index.html','app.js','record-atlas.js','record-atlas.css','atlas-model.mjs','map.js','model.mjs','data-store.mjs','insights.mjs','style.css','design.css', 'vendor/leaflet.js','vendor/leaflet.css','vendor/supercluster.js', 'vendor/fonts/ibm-plex-sans-400.ttf','vendor/fonts/ibm-plex-sans-500.ttf','vendor/fonts/ibm-plex-sans-600.ttf','vendor/fonts/ibm-plex-mono-400.ttf','vendor/fonts/ibm-plex-mono-500.ttf', 'data/network.json','data/tariffs.json','data/tariff-sources.json','data/countries.geojson','data/provinces.geojson','data/national-coverage.json', 'data/context/manifest.json', ...CONTEXT_FILES.map(name => 'data/context/'+name)];
+export const PUBLIC_FILES = ['energy-economy.js','energy-economy.css','economy-model.mjs','data/economy.json','data/energy-debate.json','index.html','app.js','record-atlas.js','record-atlas.css','atlas-model.mjs','map.js','model.mjs','data-store.mjs','insights.mjs','style.css','design.css', 'vendor/leaflet.js','vendor/leaflet.css','vendor/supercluster.js', 'vendor/fonts/ibm-plex-sans-400.ttf','vendor/fonts/ibm-plex-sans-500.ttf','vendor/fonts/ibm-plex-sans-600.ttf','vendor/fonts/ibm-plex-mono-400.ttf','vendor/fonts/ibm-plex-mono-500.ttf', 'data/network.json','data/tariffs.json','data/tariff-sources.json','data/countries.geojson','data/provinces.geojson','data/national-coverage.json', 'data/context/manifest.json', ...CONTEXT_FILES.map(name => 'data/context/'+name)];
 export function safeRelative(value) {
   if (typeof value !== 'string' || !value || value.includes('\\') || value.includes('%') || value.includes('\0') || path.posix.isAbsolute(value) || value.split('/').some(x => !x || x === '.' || x === '..' || x.startsWith('.')) || !/^[A-Za-z0-9_./-]+$/.test(value)) throw new Error(`Unsafe release path: ${value}`);
   return value;
@@ -199,6 +200,7 @@ export async function validateContext(root) {
 
 export async function buildPublic(root = ROOT) {
   const { catalog, files, config } = await validateRelease(root);
+  validateEconomy(await readJSON(root, 'data/economy.json'));
   const stage = await fs.mkdtemp(path.join(root, '.public-build-'));
   try {
     const vendorExtras = [];

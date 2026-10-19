@@ -1,0 +1,211 @@
+{
+  "reviewDate": "2026-10-18",
+  "sources": [
+    {
+      "id": "equalization",
+      "title": "Equalization Program",
+      "publisher": "Finance Canada",
+      "url": "https://www.canada.ca/en/department-finance/programs/federal-transfers/equalization.html",
+      "published": null,
+      "accessed": "2026-10-18",
+      "kind": "primary institutional",
+      "supports": "Federal financing, fiscal-capacity formula and lag; separate territorial program",
+      "limitations": "Not a complete provincial net fiscal balance."
+    },
+    {
+      "id": "internal-trade",
+      "title": "Advancing internal trade",
+      "publisher": "Intergovernmental Affairs",
+      "url": "https://www.canada.ca/en/intergovernmental-affairs/services/internal-trade/federal-investments-internal-trade.html",
+      "published": null,
+      "accessed": "2026-10-18",
+      "kind": "primary institutional",
+      "supports": "No provincial-border tariffs; regulatory barriers differ",
+      "limitations": "Not a service-specific fee or carrier toll schedule."
+    },
+    {
+      "id": "coastal",
+      "title": "Oil transport and impacts statements",
+      "publisher": "Coastal First Nations",
+      "url": "https://coastalfirstnations.ca/resources/category/oil-transport-and-impacts/",
+      "published": null,
+      "accessed": "2026-10-18",
+      "kind": "primary stakeholder",
+      "supports": "Current coastal Nations statements, including July 2 2026",
+      "limitations": "Attribute to named organization and members; not all Indigenous peoples."
+    },
+    {
+      "id": "haisla",
+      "title": "Cedar LNG Project Update",
+      "publisher": "Haisla Nation",
+      "url": "https://haisla.ca/wp-content/uploads/2024/12/CedarLNG-Project-Update-December2024-v03-20241126-WEB.pdf",
+      "published": "2024-12",
+      "accessed": "2026-10-18",
+      "kind": "primary stakeholder",
+      "supports": "Majority ownership, construction, anticipated operations",
+      "limitations": "Project update is dated; projected operation is not actual operation."
+    },
+    {
+      "id": "boc-oil",
+      "title": "Middle East war transmission channels and inflation risks",
+      "publisher": "Bank of Canada",
+      "url": "https://www.bankofcanada.ca/publications/mpr/mpr-2026-04-29/in-focus-1/",
+      "published": "2026-04-29",
+      "accessed": "2026-10-18",
+      "kind": "primary institutional analysis",
+      "supports": "Shock origin, income, inflation, ownership and growth channels",
+      "limitations": "Conditional macroeconomic analysis; not a calibrated provincial model."
+    },
+    {
+      "id": "capp",
+      "title": "Energy and the Canadian economy",
+      "publisher": "Canadian Association of Petroleum Producers",
+      "url": "https://www.capp.ca/en/our-priorities/energy-and-the-canadian-economy/",
+      "published": null,
+      "accessed": "2026-10-18",
+      "kind": "primary stakeholder",
+      "supports": "Producer priorities, claimed economic contribution",
+      "limitations": "Industry association; reconcile scope, price basis and direct/indirect/induced metrics against official accounts."
+    },
+    {
+      "id": "unifor",
+      "title": "Run-to-fail energy strategy warning",
+      "publisher": "Unifor",
+      "url": "https://www.unifor.org/news/all-news/unifor-warns-parliament-run-fail-energy-strategy-threatens-canadas-security",
+      "published": "2026-05-05",
+      "accessed": "2026-10-18",
+      "kind": "primary stakeholder",
+      "supports": "Labour interests in investment, maintenance and jobs",
+      "limitations": "Union statement is evidence of position; claims require independent statistical validation."
+    },
+    {
+      "id": "ieso",
+      "title": "2026 Annual Planning Outlook",
+      "publisher": "Independent Electricity System Operator",
+      "url": "https://ieso.ca/en/Sector-Participants/Planning-and-Forecasting/Annual-Planning-Outlook",
+      "published": "2026-03-20",
+      "accessed": "2026-10-18",
+      "kind": "primary system operator",
+      "supports": "Ontario demand scenarios, capacity/energy needs and data tables",
+      "limitations": "Planning forecast, not realized demand or all-in consumer prices."
+    },
+    {
+      "id": "poverty",
+      "title": "Estimation of Energy Poverty Rates Using 2021 Census",
+      "publisher": "Statistics Canada",
+      "url": "https://www150.statcan.gc.ca/n1/pub/46-28-0001/2024001/article/00001-eng.htm",
+      "published": "2024",
+      "accessed": "2026-10-18",
+      "kind": "primary statistical analysis",
+      "supports": "Household burden and regional variation under specified definition",
+      "limitations": "2021 census observation; not 2026 burden estimate; definition and household coverage matter."
+    },
+    {
+      "id": "nir",
+      "title": "National greenhouse gas inventory",
+      "publisher": "Environment and Climate Change Canada",
+      "url": "https://www.canada.ca/en/environment-climate-change/services/climate-change/greenhouse-gas-emissions/inventory.html",
+      "published": null,
+      "accessed": "2026-10-18",
+      "kind": "primary national inventory",
+      "supports": "Annual territorial emissions and data sources",
+      "limitations": "Observation lag; territorial versus consumption/lifecycle boundaries differ."
+    },
+    {
+      "id": "iea-lng",
+      "title": "Assessing emissions from LNG supply and abatement options",
+      "publisher": "International Energy Agency",
+      "url": "https://www.iea.org/reports/assessing-emissions-from-lng-supply-and-abatement-options",
+      "published": "2025",
+      "accessed": "2026-10-18",
+      "kind": "primary analytical report",
+      "supports": "Lifecycle LNG emissions and abatement",
+      "limitations": "Fuel comparison does not establish project-specific market displacement."
+    },
+    {
+      "id": "pembina-lng",
+      "title": "The LNG Gamble",
+      "publisher": "Pembina Institute",
+      "url": "https://www.pembina.org/pub/lng-gamble",
+      "published": "2026-06-17",
+      "accessed": "2026-10-18",
+      "kind": "primary stakeholder research",
+      "supports": "Climate and commercial-risk perspective on LNG expansion",
+      "limitations": "Research/advocacy organization; conditional demand and market assumptions, not observed project returns."
+    }
+  ],
+  "facts": [
+    {
+      "id": "equalization",
+      "text": "Equalization is funded from federal general revenues. Provincial governments do not pay equalization to each other. Fiscal capacity and federal transfers are separate from pipeline tolls and shipment value.",
+      "sourceIds": [
+        "equalization"
+      ]
+    },
+    {
+      "id": "trade",
+      "text": "Canada has no general provincial-border tariffs. Regulatory barriers, carrier tolls, royalties and applicable government fees are distinct.",
+      "sourceIds": [
+        "internal-trade"
+      ]
+    },
+    {
+      "id": "oil-shock",
+      "text": "The Bank of Canada distinguishes oil-price increases caused by supply disruptions from increases driven by stronger global demand. Producer income can rise while households and energy-using businesses face higher costs. Shock origin, persistence, ownership and exchange rates affect the net result.",
+      "sourceIds": [
+        "boc-oil"
+      ]
+    },
+    {
+      "id": "rights-positions",
+      "text": "Haisla Nation describes majority ownership and construction of the Cedar LNG project in its dated project update. Coastal First Nations state opposition to northern oil tanker traffic. These are named organizations discussing different projects and places. Neither position represents all Indigenous peoples, and a dated construction update does not establish current operating status.",
+      "sourceIds": [
+        "haisla",
+        "coastal"
+      ]
+    },
+    {
+      "id": "labour",
+      "text": "Unifor argues for investment, maintenance, safe infrastructure and stable employment. Its statement is evidence of the union position, not an independently measured jobs forecast.",
+      "sourceIds": [
+        "unifor"
+      ]
+    },
+    {
+      "id": "producer",
+      "text": "CAPP emphasizes investment, market access and petroleum economic contribution. It represents producer interests. Its claimed contributions require consistent direct, indirect and induced accounting before comparison with official GDP.",
+      "sourceIds": [
+        "capp"
+      ]
+    },
+    {
+      "id": "climate",
+      "text": "ECCC inventories measure territorial emissions. Lifecycle emissions, emissions intensity and total emissions answer different questions. Lower lifecycle emissions than coal do not establish that a particular LNG project displaces coal.",
+      "sourceIds": [
+        "nir",
+        "iea-lng"
+      ]
+    },
+    {
+      "id": "lng-risk",
+      "text": "Pembina Institute questions LNG expansion through conditional climate, demand and market-risk analysis. Treat this as attributed stakeholder research, not observed future project returns.",
+      "sourceIds": [
+        "pembina-lng"
+      ]
+    },
+    {
+      "id": "electricity",
+      "text": "IESO planning separates annual electricity demand from capacity and system adequacy. Planning scenarios are not realized demand or all-in retail bills.",
+      "sourceIds": [
+        "ieso"
+      ]
+    },
+    {
+      "id": "households",
+      "text": "Statistics Canada measures household energy burden under a specified census definition. Provincial GDP does not describe how costs and incomes are distributed within a province. The census analysis is historical, not a current household bill estimate.",
+      "sourceIds": [
+        "poverty"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "reviewDate": "2026-10-18",
+  "scope": "static public beta",
+  "nationalComplete": false,
+  "nodeTests": 56,
+  "pythonTests": 36,
+  "liveEconomicRefresh": "passed; GDP and metrics unchanged from reviewed fixtures",
+  "liveAiTests": [
+    "Canada persistent +10% WTI; Finance Canada nominal and real GDP separation",
+    "BC Higher 2040 residential electricity and gas indices; household bill limits"
+  ],
+  "independentReview": {
+    "result": "Accepted after repairs",
+    "reviewer": "energy_redesign_acceptance",
+    "tested": "Actual desktop journeys; mobile override unavailable for this reviewer"
+  },
+  "designerMobileChecks": {
+    "sizes": [
+      "320x568",
+      "390x844"
+    ],
+    "incomeFirstAnswerY": 352,
+    "inventoryExportRows": 3693,
+    "notes": "Measured browser checks by implementing designers; distinct from independent acceptance."
+  },
+  "repairs": [
+    "Committed selection history",
+    "Electricity shortcut destination and focus",
+    "Stable inventory denominator and matching overlay",
+    "Keyboard map and table focus",
+    "Contextual rate coverage",
+    "Historical versus projected series labels",
+    "Negative-zero and tiny-change formatting",
+    "Private-model state excludes presentation defaults"
+  ],
+  "publicAi": "Not hosted; local server tested. Pages serves deterministic views.",
+  "buildFiles": 433,
+  "wellRecords": 317936,
+  "remaining": [
+    "Complete bilateral physical flow accounts",
+    "Calibrated provincial price-to-GDP and jobs model",
+    "Public same-origin AI hosting with durable quotas"
+  ]
+}

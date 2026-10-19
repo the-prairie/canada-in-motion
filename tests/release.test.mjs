@@ -23,6 +23,7 @@ async function fixture(t) {
   const catalog={schemaVersion:2,releaseId:'a'.repeat(20),basePath:`data/releases/${'a'.repeat(20)}/`,purpose:'noncommercial',retrievedAt:DATE,nationalComplete:false,totalRecords:1,sources:[source]};
   const coverage={provinces:config.requiredProvinces.map(code=>({code,topics:Object.fromEntries(config.requiredTopics.map(topic=>[topic,{status:'partial',sourceIds:['example'],evidenceUrl:'https://example.org/evidence',retrievedAt:DATE}]))}))};
   for(const file of PUBLIC_FILES) await write(file,file==='index.html'?'<html><head></head><body>Atlas</body></html>':file.endsWith('.json')?{}:'/* fixture */');
+  await write('data/economy.json', JSON.parse(await fs.readFile(new URL('../data/economy.json',import.meta.url),'utf8')));
   await write('vendor/LICENSE.txt','Third party notice');await write('vendor/fonts/OFL.txt','Font notice');
   await write('config/publication.json',config);await write('config/sources.json',[definition]);await write('data/catalog.json',catalog);await write('data/national-coverage.json',coverage);
   await write(catalog.basePath+source.indexFile,index);await write(catalog.basePath+source.detailFiles[0].file,details);
@@ -38,9 +39,9 @@ async function fixture(t) {
   return {root,write,config,catalog,coverage,source};
 }
 test('public package is an allowlist; source-only and extra release files cannot leak',async t=>{
-  const f=await fixture(t);await f.write('secret.txt','sensitive');await f.write('data/wells.json','old restricted data');await f.write(f.catalog.basePath+'example/raw.json','raw private metadata');
+  const f=await fixture(t);await f.write('secret.txt','sensitive');await f.write('.env.local','OPENAI_API_KEY=fixture-secret');await f.write('data/wells.json','old restricted data');await f.write(f.catalog.basePath+'example/raw.json','raw private metadata');
   const result=await buildPublic(f.root);assert.equal(result.records,1);
-  for(const file of ['secret.txt','data/wells.json','config/publication.json','data/refresh-report.json',f.catalog.basePath+'example/raw.json']) await assert.rejects(fs.stat(path.join(f.root,'dist',file)),{code:'ENOENT'});
+  for(const file of ['secret.txt','.env.local','server/server.mjs','data/wells.json','config/publication.json','data/refresh-report.json',f.catalog.basePath+'example/raw.json']) await assert.rejects(fs.stat(path.join(f.root,'dist',file)),{code:'ENOENT'});
   assert.match(await fs.readFile(path.join(f.root,'dist/index.html'),'utf8'),/Content-Security-Policy/);
 });
 test('release rejects restricted sources, commercial misuse, altered data and traversal',async t=>{

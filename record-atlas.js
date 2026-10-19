@@ -12,6 +12,7 @@ export class RecordAtlas {
     this.host = host;
     this.options = options;
     this.wells = options.wells;
+    this.inventory = summarize(this.wells);
     this.catalog = options.catalog;
     this.projected = this.wells.map(well => project(well.lon,well.lat));
     this.ids = new Map(this.wells.map((well,index) => [well.id,index]));
@@ -43,6 +44,7 @@ export class RecordAtlas {
     this.host.innerHTML = `<section class="ra-workspace" aria-label="Well record atlas">
       <div class="ra-main">
         <header class="ra-toolbar"><div class="ra-arrangements" role="group" aria-label="Arrange well records"><button type="button" data-ra-arrangement="geography" aria-pressed="true">Geography</button><button type="button" data-ra-arrangement="compare" aria-pressed="false">Compare inventories</button><button type="button" data-ra-arrangement="table" aria-pressed="false">Table</button></div><span class="ra-record-key">One point · one source record</span></header><div class="ra-legend" aria-label="Recorded closure status legend">${STATUSES.map(status=>`<span><i style="background:${status.colour}"></i>${status.label}</span>`).join('')}</div>
+        <div class="ra-comparison-summary" hidden><div><strong>Published inventory composition</strong><p class="ra-comparison-selection" aria-live="polite"></p><p class="ra-comparison-key">Full bars show published records. Dark strips show matches.</p></div><button type="button" data-ra-command="clear-filters">Clear filters</button></div>
         <div class="ra-stage" tabindex="0" role="group" aria-label="Map of published well records. Arrow keys pan. Plus and minus zoom. Enter starts an area selection." aria-describedby="ra-map-help"><canvas class="ra-boundaries" aria-hidden="true"></canvas><canvas class="ra-points" aria-hidden="true"></canvas><div class="ra-map-tools" role="group" aria-label="Map controls"><button type="button" data-ra-command="pan" aria-pressed="true">Pan</button><button type="button" data-ra-command="select" aria-pressed="false">Select area</button><button type="button" data-ra-command="in" aria-label="Zoom in">+</button><button type="button" data-ra-command="out" aria-label="Zoom out">−</button><button type="button" data-ra-command="fit">Fit Canada</button></div><div class="ra-coordinate" aria-hidden="true"></div><div class="ra-chart" hidden></div><div class="ra-table-wrap" hidden></div><div class="ra-renderer-note" hidden>A simpler map is shown. All records and counts remain available.</div></div>
         <footer class="ra-stage-footer"><p class="ra-map-help" id="ra-map-help">Drag to pan. Select an area to inspect its records.</p><span class="ra-projection">Canada Albers · equal area<br><a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener">Boundaries · Natural Earth</a></span></footer>
         <p class="ra-comparison-note" hidden>Each row spans 100% of its matching records. Inventories have different scopes and dates. Alberta contains only the published abandoned-well layer; these rows do not measure provincial closure performance.</p>
@@ -114,10 +116,11 @@ export class RecordAtlas {
     this.host.querySelector('.ra-table-wrap').hidden=arrangement!=='table';
     this.host.querySelector('.ra-map-tools').hidden=arrangement!=='geography';
     this.host.querySelector('.ra-comparison-note').hidden=arrangement==='geography';
-    this.host.querySelector('.ra-record-key').textContent=arrangement==='table'?'Exact source-record counts':arrangement==='compare'&&!this.gl?'Matching source records':'One point · one source record';
-    this.host.querySelector('.ra-projection').innerHTML=arrangement==='geography'?'Canada Albers · equal area<br><a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener">Boundaries · Natural Earth</a>':arrangement==='compare'?'100% = matching records in that row':'Counts from the matching source records';
-    this.host.querySelector('.ra-comparison-note').textContent=(arrangement==='compare'?'Each row spans 100% of its matching records. ':'')+'Inventories have different scopes and dates. Alberta contains only the published abandoned-well layer; these counts do not measure provincial closure performance.';
-    this.stage.setAttribute('aria-label',arrangement==='geography'?'Map of published well records. Arrow keys pan. Plus and minus zoom. Enter starts an area selection.':'Matching records by province and recorded closure status');
+    this.host.querySelector('.ra-comparison-summary').hidden=arrangement!=='compare';
+    this.host.querySelector('.ra-record-key').textContent=arrangement==='table'?'Exact source-record counts':arrangement==='compare'?'Published inventory + matching subset':'One point · one source record';
+    this.host.querySelector('.ra-projection').innerHTML=arrangement==='geography'?'Canada Albers · equal area<br><a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener">Boundaries · Natural Earth</a>':arrangement==='compare'?'100% = published records in that row':'Counts from the matching source records';
+    this.host.querySelector('.ra-comparison-note').textContent=(arrangement==='compare'?'Bars retain the full published inventory. Dark strips show the matching subset. ':'')+'Inventories have different scopes and dates. Alberta contains only the published abandoned-well layer; these counts do not measure provincial closure performance.';
+    this.stage.setAttribute('aria-label',arrangement==='geography'?'Map of published well records. Arrow keys pan. Plus and minus zoom. Enter starts an area selection.':'Published inventory composition and matching subset by province and recorded closure status');
     this.syncMode();
     if(arrangement!==oldArrangement)this.animate(arrangement==='compare'?1:0);else this.draw();
   }
@@ -157,20 +160,40 @@ export class RecordAtlas {
     this.host.querySelector('.ra-preview-list').innerHTML=this.filtered.length?this.filtered.slice(0,3).map(well=>`<button type="button" data-ra-well="${escape(well.id)}"><span>${escape(well.name || well.license || 'Well record')}</span><small>${escape(well.province)} · ${escape(well.identifierLabel || 'Licence')} ${escape(well.license)}${well.observationsThrough?' · Historical':''}</small></button>`).join(''):'<p>No records match these filters. Clear the area or change the province and status.</p>';
   }
   updateChart() {
-    const rows=this.summary.rows;
-    this.host.querySelector('.ra-chart').innerHTML=`<div class="ra-chart-axis"><span>0%</span><span>50%</span><span>100%</span></div>${rows.map(row=>`<div class="ra-chart-row"><button type="button" data-ra-province="${row.code}" aria-pressed="${this.state.province===row.code}" title="${row.name}"><span>${row.code}</span><small>${row.code==='AB'?'Abandoned layer':row.code==='SK'?'Orphan inventory':row.name}</small></button><div class="ra-row-bar" aria-label="${escape(row.name)}. ${format(row.total)} matching ${row.total===1?'record':'records'}. ${STATUSES.map((status,i)=>status.label+' '+format(row.counts[i])).join(', ')}">${STATUSES.map((status,i)=>`<button type="button" data-ra-status="${status.id}" data-ra-segment-province="${row.code}" aria-label="Filter ${status.label}. ${format(row.counts[i])} matching ${row.counts[i]===1?'record':'records'} in ${row.name}." style="width:${row.total?row.counts[i]/row.total*100:0}%;--ra-status:${status.colour}" ${row.counts[i]?'':'hidden'} tabindex="-1"></button>`).join('')}${row.total?'':'<span>No matches</span>'}</div><strong>${format(row.total)}</strong></div>`).join('')}`;
-    this.host.querySelector('.ra-table-wrap').innerHTML=`<table><caption>Matching records by province and recorded closure status</caption><thead><tr><th scope="col">Province / territory</th><th scope="col">Records</th>${STATUSES.map(status=>`<th scope="col">${status.label}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr><th scope="row"><button type="button" data-ra-province="${row.code}">${row.name}</button></th><td>${format(row.total)}</td>${row.counts.map(count=>`<td>${format(count)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    const chart=this.host.querySelector('.ra-chart');
+    const table=this.host.querySelector('.ra-table-wrap');
+    const focused=this.host.contains(document.activeElement)?document.activeElement:null;
+    const focusRegion=focused?.dataset.raSegmentProvince || focused?.dataset.raProvince;
+    const focusStatus=focused?.dataset.raStatus;
+    const focusContainer=focused && chart.contains(focused)?chart:focused && table.contains(focused)?table:null;
+    const matches=new Map(this.summary.rows.map(row=>[row.code,row]));
+    const filtered=this.summary.total!==this.inventory.total;
+    const selection=[names[this.state.province],STATUSES.find(status=>status.id===this.state.closure)?.label,this.state.orphan!=='all'?'Orphan designation filter':null,this.state.query?'Search filter':null,this.state.exploration?.area?'Selected area':null,this.state.cohort==='cleanup'?'Cleanup records':null,this.state.eventYear!=='all'||this.state.eventType!=='all'?'Event filter':null].filter(Boolean);
+    this.host.querySelector('.ra-comparison-selection').textContent=`${format(this.summary.total)} matching of ${format(this.inventory.total)} published records${selection.length?' · '+selection.join(' · '):' · No filters'}.`;
+    this.host.querySelector('.ra-comparison-summary button').hidden=!filtered&&!selection.length;
+    chart.innerHTML=`<div class="ra-chart-axis"><span>0%</span><span>50%</span><span>100%</span></div><div class="ra-count-heading">Matching / published</div>${this.inventory.rows.map(row=>{
+      const match=matches.get(row.code);
+      return `<div class="ra-chart-row" data-ra-row="${row.code}"><button type="button" data-ra-province="${row.code}" aria-pressed="${this.state.province===row.code}" aria-label="${row.name}. ${format(match.total)} matching of ${format(row.total)} published records. Select province." title="${row.name}"><span>${row.code}</span><small>${row.code==='AB'?'Abandoned layer':row.code==='SK'?'Orphan inventory':row.name}</small></button><div class="ra-row-bar" aria-label="${escape(row.name)}. Published inventory ${format(row.total)} records. ${format(match.total)} match filters.">${STATUSES.map((status,i)=>`<button type="button" data-ra-status="${status.id}" data-ra-segment-province="${row.code}" aria-label="Filter ${status.label} in ${row.name}. ${format(match.counts[i])} matching of ${format(row.counts[i])} published records." aria-pressed="${this.state.province===row.code&&this.state.closure===status.id}" title="${status.label}: ${format(match.counts[i])} matching / ${format(row.counts[i])} published" style="width:${row.total?row.counts[i]/row.total*100:0}%;--ra-status:${status.colour}" ${row.counts[i]?'':'hidden'} tabindex="-1"><span class="ra-subset" aria-hidden="true" style="width:${row.counts[i]?match.counts[i]/row.counts[i]*100:0}%"></span></button>`).join('')}${row.total?'':'<span>No published records</span>'}</div><div class="ra-row-count"><strong>${format(match.total)}</strong><span>/ ${format(row.total)}</span></div></div>`;
+    }).join('')}`;
+    table.innerHTML=`<table><caption>Published inventory and matching records. Status counts use your filters. Select a status count to filter that province.</caption><thead><tr><th scope="col">Province / territory</th><th scope="col">Published</th><th scope="col">Matching</th>${STATUSES.map(status=>`<th scope="col">${status.label}</th>`).join('')}</tr></thead><tbody>${this.inventory.rows.map(row=>{
+      const match=matches.get(row.code);
+      return `<tr><th scope="row"><button type="button" data-ra-province="${row.code}" aria-pressed="${this.state.province===row.code}">${row.name}</button></th><td>${format(row.total)}</td><td>${format(match.total)}</td>${match.counts.map((count,index)=>`<td><button type="button" data-ra-status="${STATUSES[index].id}" data-ra-segment-province="${row.code}" aria-pressed="${this.state.province===row.code&&this.state.closure===STATUSES[index].id}" aria-label="${row.name}, ${STATUSES[index].label}. ${format(count)} matching of ${format(row.counts[index])} published records. Select status." ${row.counts[index]?'':'disabled'}>${format(count)}</button></td>`).join('')}</tr>`;
+    }).join('')}</tbody></table>`;
+    if(focusContainer&&focusRegion){
+      const selector=focusStatus?`[data-ra-segment-province="${focusRegion}"][data-ra-status="${focusStatus}"]`:`[data-ra-province="${focusRegion}"]`;
+      focusContainer.querySelector(selector)?.focus({preventScroll:true});
+    }
   }
   chartPositions() {
     if(!this.summary)return;
-    const left=this.width<600?72:180, right=this.width<600?62:84;
+    const left=this.width<600?56:180, right=this.width<600?98:124;
     const span=Math.max(60,this.width-left-right);
     const top=64, step=(this.height-top-20)/13;
-    const rows=new Map(this.summary.rows.map((row,index)=>[row.code,{...row,index,cursor:[0,0,0,0],offsets:row.counts.map((_,status)=>row.counts.slice(0,status).reduce((a,b)=>a+b,0))}]));
+    const rows=new Map(this.inventory.rows.map((row,index)=>[row.code,{...row,index,cursor:[0,0,0,0],offsets:row.counts.map((_,status)=>row.counts.slice(0,status).reduce((a,b)=>a+b,0))}]));
     this.wells.forEach((well,index)=>{
       const row=rows.get(well.province), status=statusIndex(well);
       if(!row)return;
-      const rank=this.matched?.has(well.id)?row.offsets[status]+row.cursor[status]++:0;
+      const rank=row.offsets[status]+row.cursor[status]++;
       this.buffer[index*6+2]=left+(row.total?(rank+.5)/row.total:0)*span;
       const seed=Math.sin((index+1)*127.1)*43758.5453;
       this.buffer[index*6+3]=top+(row.index+.5)*step+(seed-Math.floor(seed)-.5)*Math.min(18,step*.5);
@@ -197,7 +220,7 @@ export class RecordAtlas {
     } catch { this.fallback(); }
   }
   fallback() {
-    if(this.state?.exploration?.arrangement==='compare')this.host.querySelector('.ra-record-key').textContent='Matching source records';
+    if(this.state?.exploration?.arrangement==='compare')this.host.querySelector('.ra-record-key').textContent='Published inventory + matching subset';
     this.canvas.hidden=true;
     this.host.querySelector('.ra-renderer-note').hidden=false;
     this.draw();
@@ -266,7 +289,7 @@ export class RecordAtlas {
   syncMode() {
     this.stage.classList.toggle('ra-selecting',this.mode==='select');
     for(const mode of ['pan','select'])this.host.querySelector(`[data-ra-command="${mode}"]`).setAttribute('aria-pressed',String(this.mode===mode));
-    this.host.querySelector('.ra-map-help').textContent=!this.isMap()?'Select a jurisdiction or a recorded status to filter.':this.mode==='select'?'Drag a rectangle. Keyboard: Enter starts an area; arrows move it, Shift + arrows resize it. Escape returns to pan.':'Drag to pan. Use + / − to zoom. Faint points are outside your filters.';
+    this.host.querySelector('.ra-map-help').textContent=!this.isMap()?'Select a province or status to filter. Use the Table for keyboard access to every status. Bar widths retain the published inventory.':this.mode==='select'?'Drag a rectangle. Keyboard: Enter starts an area; arrows move it, Shift + arrows resize it. Escape returns to pan.':'Drag to pan. Use + / − to zoom. Faint points are outside your filters.';
   }
   zoom(factor, point=[this.width/2,this.height/2]) {
     if(!this.isMap())return;

@@ -12,6 +12,7 @@ import {
 } from "./model.mjs";
 import { wellStatusSummary, comparisonWidths, revealPanel } from "./insights.mjs";
 import { AtlasMap } from "./map.js";
+import { EnergyEconomy } from "./energy-economy.js";
 import { RecordAtlas } from "./record-atlas.js";
 import { fetchJSON, loadWells, loadDetail, snapshotFreshness } from "./data-store.mjs";
 const $ = (id) => document.getElementById(id);
@@ -69,6 +70,7 @@ let state = normalizeState(),
   data,
   atlas,
   recordAtlas,
+  energyEconomy,
   provinceGeometry,
   filtered = [],
   resultLimit = 30,
@@ -192,9 +194,11 @@ function validNumericInputs() {
     s.costHigh <= 1e8
   );
 }
-function persist() {
+function persist(mode = "replace") {
   if (!validNumericInputs()) return;
-  history.replaceState(null, "", location.pathname + encodeState(state));
+  const next = location.pathname + encodeState(state);
+  if (mode === "push" && next !== location.pathname + location.hash) history.pushState(null, "", next);
+  else history.replaceState(null, "", next);
   try {
     localStorage.setItem("cim-state-v1", JSON.stringify(state));
   } catch {}
@@ -249,18 +253,53 @@ async function ensureSelectedDetail(record) {
     if (state.well === record.id && state.view === "wells") render();
   }
 }
+function renderNavigation() {
+  const inventory = state.view === "atlas" || state.view === "wells" || (state.view === "lab" && state.labTab === "cleanup");
+  const destination = state.view === "economy" ? "economy" : inventory ? "atlas" : "journey";
+  document.querySelectorAll("[data-destination]").forEach(button => {
+    const active = button.dataset.destination === destination;
+    button.classList.toggle("selected", active);
+    if (active) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current");
+  });
+  const nav = $("workspace-nav");
+  nav.hidden = destination === "economy";
+  const items = inventory ? [["atlas", "", "Map & comparison"], ["wells", "", "Find a well"], ["lab", "cleanup", "Closure budget"]] : [["journey", "", "Carrier quotes"], ["lab", "transport", "Cost experiment"]];
+  nav.innerHTML = items.map(([view, tab, label]) => `<button data-workspace="${view}" data-tab="${tab}" aria-current="${state.view === view && (!tab || state.labTab === tab) ? "page" : "false"}">${label}</button>`).join("");
+}
+function showEconomicEvidence() {
+  const snapshot = energyEconomy?.data;
+  if (!snapshot) {announce("Economic sources are still loading.");return;}
+  openDialog(`<p>GDP is observed in ${snapshot.gdp.year}. Energy Futures 2026 contains conditional projections through 2050. The national oil-price experiment uses Finance Canada’s 2026 calibration.</p>${snapshot.sources.map(source => `<section class="source-entry"><h3>${esc(source.title)}</h3><p><a href="${esc(source.url)}" target="_blank" rel="noopener">Open source</a></p></section>`).join("")}<h3>Calculation limits</h3><ul>${snapshot.limitations.map(note => `<li>${esc(note)}</li>`).join("")}</ul>`, "Economic sources & methods");
+}
+function showRateCoverage() {
+  const route = getRoute();
+  openDialog(`<p class="eyebrow">${esc(route.name || route.id)}</p><h3>${esc(route.origin)} → ${esc(route.destination)}</h3><p>No service-specific carrier rate is loaded for this corridor. A comparable quote needs the commodity, service, origin, destination, effective date and unit.</p><p>Government charges have not been established for this shipment. The app cannot calculate its total transport cost.</p><button class="secondary-button" data-action="benchmark-tolls">Browse published benchmark tolls</button><p class="micro">Benchmark observations cover different services and dates. They cannot substitute for a shipment quote.</p>`, "Rate coverage for this corridor");
+}
 function render() {
   const exploring = state.view === "atlas";
   document.body.dataset.view = state.view;
+  const economy = state.view === "economy";
+  $("energy-economy").hidden = !economy;
   $("record-atlas").hidden = !exploring;
-  document.querySelector(".workspace").hidden = exploring;
-  document.querySelector(".skip-link").href = exploring ? "#record-atlas" : "#panel";
+  document.querySelector(".workspace").hidden = exploring || economy;
+  document.querySelector(".skip-link").href = economy ? "#energy-economy" : exploring ? "#record-atlas" : "#panel";
+  renderNavigation();
+  if (!economy) energyEconomy?.deactivate?.();
   document.querySelectorAll("[data-view]").forEach(button => {
     button.classList.toggle("selected", button.dataset.view === state.view);
     button.setAttribute("aria-current", button.dataset.view === state.view ? "page" : "false");
   });
   $("coverage-line").textContent = `${fmt(data.catalog.totalRecords)} records · ${new Set(data.catalog.sources.map(source => source.province)).size} jurisdictions · coverage gaps`;
   recordAtlas?.setVisible(exploring);
+  if (economy) {
+    clearTimeout(resultTimer);
+    if (!energyEconomy) energyEconomy = new EnergyEconomy($("energy-economy"), {provinces:provinceGeometry,onChange: value => {state.economy = value;persist("push");},onInventory: province => {state.province = province;state.cohort="all";state.query="";state.orphan="all";state.closure="all";state.eventYear="all";state.eventType="all";state.exploration.area=null;chooseView("atlas");}});
+    $("coverage-line").textContent = "Economic sources & methods";
+    $("snapshot-label").textContent = "GDP · 2022 observation / Energy futures · 2026 edition";
+    energyEconomy.update(state.economy);
+    return;
+  }
+  $("snapshot-label").textContent = `${snapshotFreshness(data.catalog.retrievedAt) === "stale" ? "Refresh overdue" : "Retrieved"} · ${localDate(data.catalog.retrievedAt)}`;
   if (exploring) {
     clearTimeout(resultTimer);
     if (!wellsReady) {
@@ -271,7 +310,7 @@ function render() {
     filtered = filterWells(data.wells.wells, state);
     if (!recordAtlas) recordAtlas = new RecordAtlas($("record-atlas"), {
       wells: data.wells.wells, provinces: provinceGeometry, catalog: data.catalog,
-      onChange: patch => { state = normalizeState({...state, ...patch, well:null}); render(); persist(); },
+      onChange: patch => { state = normalizeState({...state, ...patch, well:null}); render(); persist("push"); },
       onRecords: () => chooseView("wells"), onExport: exportWellRecords,
       onWell: chooseWell, onSource: showEvidence,
     });
@@ -443,7 +482,7 @@ function receipt() {
   const rate = getRate(),
     q = getQuote();
   if (!rate)
-    return `<section class="panel-section" id="receipt-region"><h3>Transport estimate unavailable</h3><p class="small">No service-specific rate is loaded for this corridor.</p><div class="receipt-row"><span>Carrier charge</span><strong>Not sourced</strong></div><div class="receipt-row"><span>Government charges</span><strong>Not established</strong></div><button class="text-link" data-action="evidence">View rate coverage</button></section>`;
+    return `<section class="panel-section" id="receipt-region"><h3>Transport estimate unavailable</h3><p class="small">No service-specific rate is loaded for this corridor.</p><div class="receipt-row"><span>Carrier charge</span><strong>Not sourced</strong></div><div class="receipt-row"><span>Government charges</span><strong>Not established</strong></div><button class="text-link" data-action="rate-coverage">View rate coverage</button></section>`;
   return `<section class="panel-section" id="receipt-region"><div class="receipt-topline"><h3>Carrier subtotal</h3>${pill("Published schedule")}</div>${q.status === "partial" ? `<div class="receipt-total" data-testid="receipt-total">${money(q.carrier)}<small>CAD</small></div><p class="receipt-label">Base transport only · ${precise(rate.rate)} CAD / m³</p>` : `<div class="callout amber" role="status">${esc(q.reason)} ${["unverified-date", "out-of-period"].includes(q.status) ? `<button class="text-link" data-action="rate-date">Use ${rate.effectiveFrom}</button>` : ""}</div>`}<div class="receipt-row"><span>Government charges</span><strong>Not established</strong></div><p class="micro">No tariff solely for crossing a provincial border. Other applicable charges are not included.</p><div class="price-caption"><span>Schedule · ${rate.effectiveFrom}</span><button class="text-link" data-action="receipt-evidence">Calculation & source</button></div><details id="receipt-conditions" class="disclosure"><summary>Carrier breakdown & conditions</summary><p class="micro">${esc(rate.commodity)} · ${esc(rate.service)}<br>Payable to ${esc(rate.operator)}</p>${rate.components
     .filter((c) => c.additive)
     .map(
@@ -461,7 +500,7 @@ function destinationComparison() {
 }
 function journeyPanel() {
   const route = getRoute();
-  return `<div class="panel-head"><span class="eyebrow">01 / TRANSPORT</span><h1>Transport costs</h1><p>Compare published pipeline tolls and estimate carrier charges.</p></div><div class="panel-section shipment-form"><div class="route-identity"><span>${esc(route.origin.split(",")[0])}</span><span aria-hidden="true">↗</span><strong>${esc(route.destination.split(",")[0])}</strong></div>${routeSelect()}${getRate() ? `<details class="disclosure" id="shipment-inputs"><summary>Shipment assumptions <span class="assumption-preview">${fmt(state.volume)} ${state.unit === "m3" ? "m³" : "bbl"} · ${esc(state.date)}</span></summary>${shipmentFields()}</details>` : ""}</div>${receipt()}${getRate() ? `<section class="panel-section destination-section"><span class="eyebrow">SAME SERVICE · SAME SCHEDULE</span><h3>Compare destinations</h3><p class="micro">Published schedule: May 1, 2026 · Edmonton origin · light crude · CAD per m³. Select a destination to see its route.</p>${destinationComparison()}<button class="primary-button wide" data-view="lab">Test a cost scenario <span aria-hidden="true">↗</span></button></section>` : ""}<div class="panel-section benchmark-entry"><span class="eyebrow">CER BENCHMARK TOLLS</span><h3>Other pipeline systems</h3><p class="micro">Browse published tolls for 25 pipeline systems. Dates, units and services vary.</p><button class="secondary-button wide" data-action="benchmark-tolls">Browse benchmark tolls <span aria-hidden="true">↗</span></button></div>`;
+  return `<div class="panel-head"><span class="eyebrow">01 / TRANSPORT</span><h1>Transport costs</h1><p>Compare published pipeline tolls and estimate carrier charges.</p></div><div class="panel-section shipment-form"><div class="route-identity"><span>${esc(route.origin.split(",")[0])}</span><span aria-hidden="true">↗</span><strong>${esc(route.destination.split(",")[0])}</strong></div>${routeSelect()}${getRate() ? `<details class="disclosure" id="shipment-inputs"><summary>Shipment assumptions <span class="assumption-preview">${fmt(state.volume)} ${state.unit === "m3" ? "m³" : "bbl"} · ${esc(state.date)}</span></summary>${shipmentFields()}</details>` : ""}</div>${receipt()}${getRate() ? `<section class="panel-section destination-section"><span class="eyebrow">SAME SERVICE · SAME SCHEDULE</span><h3>Compare destinations</h3><p class="micro">Published schedule: May 1, 2026 · Edmonton origin · light crude · CAD per m³. Select a destination to see its route.</p>${destinationComparison()}<button class="primary-button wide" data-workspace="lab" data-tab="transport">Test a cost scenario <span aria-hidden="true">↗</span></button></section>` : ""}<div class="panel-section benchmark-entry"><span class="eyebrow">CER BENCHMARK TOLLS</span><h3>Other pipeline systems</h3><p class="micro">Browse published tolls for 25 pipeline systems. Dates, units and services vary.</p><button class="secondary-button wide" data-action="benchmark-tolls">Browse benchmark tolls <span aria-hidden="true">↗</span></button></div>`;
 }
 
 function wellFilters() {
@@ -553,7 +592,7 @@ function wellsPanel() {
     state.eventType !== "all";
   const scope = state.province === "all" ? "Records from the sources listed in Coverage" : (data.catalog.sources.filter(s => s.province === state.province).map(s => s.title).join("; ") || "No well inventory is available in the app for this jurisdiction");
   const controls = wellFilters();
-  return `<div class="panel-head"><span class="eyebrow">02 / WELLS</span><h1>Well records</h1><p>Search well records by name, location or status.</p></div><div class="panel-section">${state.cohort === "cleanup" ? '<div class="callout">Showing records used in the closure-budget scenario. Clear filters to browse all records.</div>' : ""}${state.exploration.area ? '<div class="callout">Within the area selected in Atlas. <button class="text-link" data-action="clear-atlas-area">Clear area</button> <button class="text-link" data-view="atlas">Return to atlas</button></div>' : ""}${controls}${wellInsights(inventoryGap)}<div class="result-count" role="status"><span>${inventoryGap ? "Inventory not loaded" : `<strong>${fmt(filtered.length)}</strong> loaded ${filtered.length === 1 ? "record" : "records"}`}</span><button class="text-link" data-action="clear-well-filters">Clear filters</button></div><p class="coverage-note">${inventoryGap ? esc(provinceCoverage?.topics["well-inventory"].note || scope) : esc(scope) + ". Counts cover these sources only."} <button class="text-link" data-action="coverage">Coverage</button></p><details id="well-filter-options" class="disclosure" ${advanced ? "open" : ""}><summary>Status & event filters${advanced ? " · active" : ""}</summary>${wellAdvancedFilters()}${eventChart()}</details><button class="text-link" data-action="well-csv" ${inventoryGap ? "disabled" : ""}>Download filtered records</button></div><div class="well-results" aria-label="Matching well records">${
+  return `<div class="panel-head well-list-heading"><h1>Find a well</h1><div class="result-count" role="status"><span>${inventoryGap ? "Inventory not loaded" : `<strong>${fmt(filtered.length)}</strong> matching ${filtered.length === 1 ? "record" : "records"}`}</span><button class="text-link" data-action="clear-well-filters">Reset</button></div></div><div class="panel-section well-search-controls">${state.cohort === "cleanup" ? '<div class="callout">Closure-budget records. Reset to browse all inventories.</div>' : ""}${state.exploration.area ? '<div class="callout">Within the selected map area. <button class="text-link" data-action="clear-atlas-area">Clear area</button></div>' : ""}${controls}<details id="well-filter-options" class="disclosure"><summary>Status & event filters${advanced ? ` · ${esc([state.orphan !== "all" ? "orphan " + state.orphan : "", state.closure !== "all" ? state.closure : "", state.eventYear !== "all" ? state.eventYear : "", state.eventType !== "all" ? state.eventType : ""].filter(Boolean).join(" / "))}` : ""}</summary>${wellAdvancedFilters()}${eventChart()}</details><details id="well-source-scope" class="disclosure"><summary>Source coverage & status counts</summary><p class="coverage-note">${inventoryGap ? esc(provinceCoverage?.topics["well-inventory"].note || scope) : esc(scope) + ". Counts cover these sources only."} <button class="text-link" data-action="coverage">Coverage</button></p>${wellInsights(inventoryGap)}</details><button class="text-link" data-action="well-csv" ${inventoryGap ? "disabled" : ""}>Download matching records</button></div><div class="well-results" aria-label="Matching well records">${
     filtered.length
       ? filtered
           .slice(0, resultLimit)
@@ -580,7 +619,7 @@ function wellDetail(w) {
     .join("")}</details></div>`;
 }
 function labPanel() {
-  return `<div class="panel-head"><span class="eyebrow">03 / SCENARIOS</span><h1>Scenarios</h1><div class="tab-switch" role="group" aria-label="Scenario type"><button data-lab="transport" class="${state.labTab === "transport" ? "active" : ""}" aria-pressed="${state.labTab === "transport"}">Transport costs</button><button data-lab="cleanup" class="${state.labTab === "cleanup" ? "active" : ""}" aria-pressed="${state.labTab === "cleanup"}">Closure budget</button></div></div>${state.labTab === "transport" ? transportLab() : cleanupLab()}<div class="panel-section"><h3>Save or export</h3><p class="micro">Save scenarios in this browser, or download the inputs, results and sources.</p><div class="action-row"><button class="primary-button" data-action="save-scenario">Save scenario</button><button class="secondary-button" data-action="saved-scenarios">Saved scenarios</button><button class="secondary-button" data-action="export-scenario">Download scenario</button><button class="text-link" data-action="reset-scenario">Reset assumptions</button></div></div>`;
+  return `<div class="panel-head"><span class="eyebrow">CALCULATE FROM YOUR ASSUMPTIONS</span><h1>${state.labTab === "transport" ? "Cost experiment" : "Closure budget"}</h1></div>${state.labTab === "transport" ? transportLab() : cleanupLab()}<div class="panel-section"><h3>Save or export</h3><p class="micro">Save scenarios in this browser, or download the inputs, results and sources.</p><div class="action-row"><button class="primary-button" data-action="save-scenario">Save scenario</button><button class="secondary-button" data-action="saved-scenarios">Saved scenarios</button><button class="secondary-button" data-action="export-scenario">Download scenario</button><button class="text-link" data-action="reset-scenario">Reset assumptions</button></div></div>`;
 }
 
 function scenarioChart(base, alternative) {
@@ -631,16 +670,17 @@ function chooseWell(id) {
   heading?.setAttribute("tabindex", "-1");
   heading?.focus({ preventScroll: true });
 }
-function chooseView(view) {
-  history.pushState(null, "", location.href);
+function chooseView(view, labTab = state.labTab) {
   setSurface("details");
   state.view = view;
+  state.labTab = labTab;
   state.well = null;
   render();
-  if (view !== "atlas") atlas.focus();
-  persist();
+  if (!["atlas", "economy"].includes(view)) atlas.focus();
+  persist("push");
   $("panel").scrollTop = 0;
-  if (view === "atlas") $("record-atlas").focus({preventScroll:true});
+  if (view === "economy") $("energy-economy").focus({preventScroll:true});
+  else if (view === "atlas") $("record-atlas").focus({preventScroll:true});
   else revealPanel($("panel").firstElementChild);
 }
 function openDialog(html, title) {
@@ -997,7 +1037,7 @@ document.addEventListener("change", (e) => {
     }
     render();
     if (key === "province") atlas.focus();
-    persist();
+    persist("push");
   }
   if (t.dataset.layer) {
     state.layers[t.dataset.layer] = t.checked;
@@ -1022,9 +1062,11 @@ document.addEventListener("click", async (e) => {
   if (!b || !data) return;
   if (b.matches("a.brand")) {
     e.preventDefault();
-    chooseView("atlas");
+    chooseView("economy");
     return;
   }
+  if (b.dataset.action === "rate-coverage") {showRateCoverage();return;}
+  if (state.view === "economy" && ["coverage", "evidence"].includes(b.dataset.action)) {showEconomicEvidence();return;}
   if (b.dataset.statusFilter) {
     state.orphan = ['designated','both'].includes(b.dataset.statusFilter) ? 'designated' : 'all';
     state.closure = ['abandoned','both'].includes(b.dataset.statusFilter) ? 'abandoned' : 'all';
@@ -1051,6 +1093,8 @@ document.addEventListener("click", async (e) => {
     showFacility(data.network.facilities[Number(b.dataset.facility)]);
     return;
   }
+  if (b.dataset.destination) {chooseView(b.dataset.destination);return;}
+  if (b.dataset.workspace) {chooseView(b.dataset.workspace, b.dataset.tab || state.labTab);return;}
   if (b.dataset.view) {
     chooseView(b.dataset.view);
     return;

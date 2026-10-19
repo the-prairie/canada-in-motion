@@ -15,6 +15,7 @@ export class AtlasMap {
     this.filtered = [];
     this.map = L.map("map", {
       zoomControl: false,
+      scrollWheelZoom: false,
       preferCanvas: true,
       minZoom: 2,
       maxZoom: 15,
@@ -39,18 +40,18 @@ export class AtlasMap {
     );
     this.land = L.geoJSON(geography.countries, {
       style: {
-        color: "#31474f",
+        color: "#bac8c4",
         weight: 0.8,
-        fillColor: "#19313b",
+        fillColor: "#f3f2e8",
         fillOpacity: 1,
       },
       interactive: false,
     }).addTo(this.map);
     this.provinces = L.geoJSON(geography.provinces, {
       style: (f) => ({
-        color: "#354d56",
+        color: "#afc1bb",
         weight: 0.75,
-        fillColor: f.properties.admin === "Canada" ? "#19313b" : "#142a34",
+        fillColor: f.properties.admin === "Canada" ? "#f3f2e8" : "#e9ede6",
         fillOpacity: 1,
       }),
       onEachFeature: (f, layer) => {
@@ -58,16 +59,16 @@ export class AtlasMap {
       },
     }).addTo(this.map);
     this.historicalLayer = L.geoJSON(null, {
-      style: {color: "#b3a4d4", weight: 1.5, opacity: 0.8},
-      pointToLayer: (feature, latlng) => L.circleMarker(latlng, {radius: 4, color: "#b3a4d4", fillColor: "#142a34", fillOpacity: 1, weight: 2}),
+      style: {color: "#80639a", weight: 1.5, opacity: 0.8},
+      pointToLayer: (feature, latlng) => L.circleMarker(latlng, {radius: 4, color: "#80639a", fillColor: "#e9ede6", fillOpacity: 1, weight: 2}),
       onEachFeature: (feature, layer) => {
         const p = feature.properties;
         layer.bindTooltip(`${esc(p.name)} · historical ${esc(p.kind)}<br>Source dates ${esc(p.sourceDateMin)} to ${esc(p.sourceDateMax)}<br>Current operating status unknown`, {sticky: true});
       },
     });
     this.bcLayer = L.geoJSON(null, {
-      style: {color: "#d7be83", weight: 1.5, opacity: 0.8},
-      pointToLayer: (feature, latlng) => L.circleMarker(latlng, {radius: 3, color: "#d7be83", fillColor: "#d7be83", fillOpacity: 0.65, weight: 1}),
+      style: {color: "#8e732b", weight: 1.5, opacity: 0.8},
+      pointToLayer: (feature, latlng) => L.circleMarker(latlng, {radius: 3, color: "#8e732b", fillColor: "#8e732b", fillOpacity: 0.65, weight: 1}),
       onEachFeature: (feature, layer) => {
         layer.bindTooltip(`${esc(feature.id)}<br>Permit status: ${esc(feature.properties.sourceStatus)}<br>Operating status unknown`, {sticky:true});
         layer.on("click", () => this.callbacks.onBCFeature(feature));
@@ -152,10 +153,10 @@ export class AtlasMap {
           color: closed
             ? "#a33d3d"
             : active
-              ? "#55d8c7"
+              ? "#147c78"
               : r.commodity === "oil"
-                ? "#93b5a5"
-                : "#81b5dc",
+                ? "#8d5b35"
+                : "#3179a5",
           weight: active ? 3.5 : 1.5,
           opacity: active ? 1 : 0.55,
           dashArray: closed ? "3 8" : active ? "10 5" : "5 5",
@@ -370,8 +371,8 @@ export class AtlasMap {
           renderer: this.renderer,
           radius: 7,
           weight: p.orphan ? 2 : 1,
-          color: p.orphan ? "#e4ad68" : "#a8bcc3",
-          fillColor: p.orphan ? "#e4ad68" : "#213f48",
+          color: p.orphan ? "#a34c32" : "#58777c",
+          fillColor: p.orphan ? "#a34c32" : "#719598",
           fillOpacity: 1,
         })
           .on("click", () => this.callbacks.onWell(p.id))

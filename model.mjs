@@ -1,7 +1,9 @@
+import { normalizeEconomyState } from './economy-model.mjs';
 import { normalizeArea, inArea } from './atlas-model.mjs';
 export const BARRELS_PER_CUBIC_METRE = 6.2898107704321;
 export const DEFAULT_STATE = Object.freeze({
-  view: "atlas",
+  view: "economy",
+  economy: {region:"CA",scenario:"Current Measures",year:2030,oilShock:10,duration:"persistent"},
   exploration: { arrangement: "geography", area: null },
   labTab: "transport",
   cohort: "all",
@@ -49,7 +51,8 @@ export function normalizeState(raw = {}) {
     scenario: { ...DEFAULT_STATE.scenario, ...raw.scenario },
     layers: { ...DEFAULT_STATE.layers, ...raw.layers },
   };
-  if (!["atlas", "journey", "wells", "lab"].includes(s.view)) s.view = "atlas";
+  if (!["economy", "atlas", "journey", "wells", "lab"].includes(s.view)) s.view = "economy";
+  s.economy = normalizeEconomyState(raw.economy);
   s.exploration = {
     arrangement: ["geography", "compare", "table"].includes(raw.exploration?.arrangement) ? raw.exploration.arrangement : "geography",
     area: normalizeArea(raw.exploration?.area),

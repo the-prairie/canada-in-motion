@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#222923" />
     <meta
       name="description"
-      content="Explore Canadian energy routes, published transport rates and provincial well records. Compare costs and budget scenarios."
+      content="Explore provincial energy GDP, official energy scenarios, published transport rates and well records."
     />
-    <title>Canada in Motion | Energy atlas</title>
+    <title>Canada in Motion | The energy economy</title>
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23222923'/%3E%3Cpath d='M9 28V12h8v16h7V12h7' fill='none' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E"
@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="design.css" />
     <link rel="stylesheet" href="record-atlas.css" />
+    <link rel="stylesheet" href="energy-economy.css" />
     <script src="vendor/leaflet.js" defer></script>
     <script src="vendor/supercluster.js" defer></script>
     <script type="module" src="app.js"></script>
@@ -31,25 +32,26 @@
             <circle cx="8" cy="28" r="2" />
             <circle cx="32" cy="12" r="2" />
           </svg>
-          <span>Canada in Motion<small>ENERGY ATLAS <em class="beta-tag">PUBLIC BETA</em></small></span>
+          <span>Canada in Motion<small>ENERGY & ECONOMY <em class="beta-tag">PUBLIC BETA</em></small></span>
         </a>
-        <nav class="main-nav" aria-label="Explore the atlas">
-          <button data-view="atlas" class="selected">Atlas</button>
-          <button data-view="journey">Transport costs</button>
-          <button data-view="wells">Well records</button>
-          <button data-view="lab">Scenarios</button>
+        <nav class="main-nav" aria-label="Main navigation">
+          <button data-destination="economy" class="selected">Economy</button>
+          <button data-destination="atlas">Well atlas</button>
+          <button data-destination="journey">Transport</button>
         </nav>
         <div class="header-actions">
           <button class="quiet" data-action="coverage">Coverage</button><button class="quiet" data-action="evidence">Sources</button
           ><button class="share-button" data-action="share">
-            Copy view link <span aria-hidden="true">↗</span>
+            Share view <span aria-hidden="true">↗</span>
           </button>
         </div>
       </header>
+      <nav id="workspace-nav" class="workspace-nav" aria-label="Workspace tools" hidden></nav>
       <div class="mobile-surface" role="group" aria-label="Workspace view">
         <button data-surface="details" aria-pressed="true">Details</button
         ><button data-surface="map" aria-pressed="false">Map</button>
       </div>
+      <main id="energy-economy" tabindex="-1" hidden aria-label="Canadian energy economy"></main>
       <main id="record-atlas" tabindex="-1" hidden aria-label="Interactive well atlas"></main>
       <main class="workspace">
         <aside

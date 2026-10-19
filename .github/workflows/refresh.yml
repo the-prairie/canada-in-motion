@@ -50,6 +50,8 @@ jobs:
         run: python pipeline/refresh_bcer.py
       - name: Refresh openly licensed context when seven days old
         run: python pipeline/refresh_context.py
+      - name: Refresh observed GDP and official energy scenarios
+        run: python pipeline/refresh_economy.py
       - name: Build verified beta candidate
         run: node scripts/build-public.mjs
       - name: Report beta technical readiness without authorizing launch

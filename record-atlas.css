@@ -139,3 +139,30 @@
 #record-atlas .ra-projection a { color:inherit; text-underline-offset:3px; }
 #record-atlas .ra-clear-filters { min-height:44px; text-align:left; font-size:12px; text-decoration:underline; text-underline-offset:4px; }
 @media (max-width:760px) { #record-atlas .ra-legend { padding-inline:18px; gap:13px; font-size:10px; } }
+
+#record-atlas .ra-comparison-summary { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:20px 28px 8px; }
+#record-atlas .ra-comparison-summary strong { font-size:14px; font-weight:550; }
+#record-atlas .ra-comparison-summary p { margin:6px 0 0; font-size:12px; line-height:1.5; color:var(--ra-muted); }
+#record-atlas .ra-comparison-summary button { flex:none; min-height:44px; padding:8px 0 8px 12px; font-size:12px; text-decoration:underline; text-underline-offset:4px; }
+#record-atlas .ra-count-heading { position:absolute; top:-34px; right:12px; width:calc(var(--ra-chart-right) - 24px); font-size:10px; line-height:1.4; color:var(--ra-muted); }
+#record-atlas .ra-row-count { padding-left:12px; font:11px/1.5 ui-monospace,monospace; font-variant-numeric:tabular-nums; }
+#record-atlas .ra-row-count strong { font-weight:500; }
+#record-atlas .ra-row-count span { display:block; color:var(--ra-muted); font-size:10px; }
+#record-atlas .ra-row-bar button { position:relative; opacity:1; background:color-mix(in srgb,var(--ra-status) 25%,var(--ra-paper)); }
+#record-atlas .ra-row-bar button:hover { opacity:1; box-shadow:inset 0 0 0 1px var(--ra-ink); }
+#record-atlas .ra-row-bar button[aria-pressed="true"] { outline:2px solid var(--ra-ink); outline-offset:2px; z-index:1; }
+#record-atlas .ra-row-bar .ra-subset { position:absolute; left:0; bottom:0; height:6px; background:var(--ra-status); pointer-events:none; }
+#record-atlas .ra-table-wrap td button { min-width:44px; min-height:44px; padding:4px 8px; font:inherit; }
+#record-atlas .ra-table-wrap td button[aria-pressed="true"] { background:var(--ra-ink); color:white; }
+#record-atlas[data-arrangement="compare"] .ra-stage { min-height:510px; }
+@media (min-width:761px) { #record-atlas[data-arrangement="compare"] .ra-main { overflow-y:auto; scrollbar-width:thin; } }
+@media (max-width:760px) {
+  #record-atlas .ra-comparison-summary { padding:18px 18px 4px; align-items:flex-start; gap:8px; }
+  #record-atlas .ra-comparison-summary strong { font-size:13px; }
+  #record-atlas .ra-comparison-summary p { font-size:12px; }
+  #record-atlas .ra-comparison-summary button { font-size:11px; padding-left:4px; }
+  #record-atlas .ra-count-heading { right:8px; width:calc(var(--ra-chart-right) - 16px); }
+  #record-atlas .ra-row-count { padding-left:8px; font-size:11px; }
+  #record-atlas .ra-row-bar { height:24px; }
+  #record-atlas .ra-row-bar .ra-subset { height:7px; }
+}
