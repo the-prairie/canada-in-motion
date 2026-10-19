@@ -1,4 +1,4 @@
-import {summarizeEconomy} from './economy-model.mjs';
+import {summarizeEconomy,validateEconomy} from './economy-model.mjs';
 import {selectInfrastructure} from './infrastructure-model.mjs';
 
 export const PANEL_COMPONENTS = Object.freeze({
@@ -12,6 +12,7 @@ const fail = () => {throw new Error('This workspace could not be verified. The w
 
 export function validateWorkspace(value) {
   if(!value || value.schemaVersion!==1 || !Array.isArray(value.panels) || !value.panels.length || value.panels.length>6 || !Array.isArray(value.sources) || value.sources.length>30 || !Array.isArray(value.plan?.regions) || !value.plan.regions.length || value.plan.regions.some(code=>!REGION_CODES.includes(code)))fail();
+  if(value.economySnapshot){try{validateEconomy(value.economySnapshot);if(value.economySnapshot.generatedAt!==value.dataVersion)fail();}catch{fail();}}
   const sources=new Set();
   for(const source of value.sources){
     if(typeof source.id!=='string'||typeof source.title!=='string'||source.title.length>500||typeof source.url!=='string')fail();
@@ -49,6 +50,7 @@ export function initialSelection(workspace) {
 
 export function resolveWorkspace(workspace,selection,economy) {
   validateWorkspace(workspace);
+  economy=workspace.economySnapshot||economy;
   if(workspace.dataVersion!==economy.generatedAt)return workspace;
   if(!Array.isArray(selection.regions)||selection.regions.some(code=>!REGION_CODES.includes(code)||code==='CA')||!economy.years.includes(selection.year)||!economy.scenarios.includes(selection.scenario))fail();
   const regionCodes=selection.regions.length?selection.regions:economy.regions.filter(row=>row.code!=='CA').map(row=>row.code);

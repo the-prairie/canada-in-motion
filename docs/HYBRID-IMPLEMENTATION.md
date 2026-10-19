@@ -13,7 +13,7 @@ Implemented 19 October 2026. The release uses OpenUI 1.0.1 with a custom React c
 
 The LLM chooses regions, topics and approved measures. Jev proposes a presentation and evidence decision in one batch. Code checks capabilities and retrieves numbers from the existing source snapshots. The server returns at most six typed panels with period, unit, source IDs and answer/context roles. OpenUI receives only a compiler-produced layout of registered components and verified panel IDs. It receives no executable model code, arbitrary network destinations or authoritative model-written chart numbers.
 
-The question is intentionally ephemeral. Province selection, sorting, chart/table view and map inspection run locally without another inference call. A reset returns to the submitted plan; a JSON export includes the exact workspace, source records and local selection. This version does not promise persistent share links or a historical-release archive.
+The question is intentionally ephemeral. Province selection, sorting, chart/table view and map inspection run locally without another inference call. Every answer pins the complete economic snapshot and selected infrastructure source set. Controls use that snapshot even if the browser has cached an older dataset or a nightly refresh publishes a newer one. A reset returns to the submitted plan; a JSON export includes the exact workspace, economic series, source records and local selection. This version does not promise persistent share links or a historical-release archive.
 
 ## Visual contract
 
@@ -31,7 +31,7 @@ Contract rejection, truthful missing-data handling, calculation consistency, Jev
 
 ## Completed verification
 
-- 115 application tests and 18 edge-runtime tests passed. The beta release gate passed, the public artifact contains 438 files, and the dependency audit reports no known vulnerabilities. The scripted live development report is in `HYBRID-LIVE-EVALUATION.json`; it is not a held-out accuracy benchmark.
+- 118 application tests and 18 edge-runtime tests passed. The beta release gate passed, the public artifact contains 438 files, and the dependency audit reports no known vulnerabilities. The scripted live development report is in `HYBRID-LIVE-EVALUATION.json`; it is not a held-out accuracy benchmark.
 
 - Live Cloudflare planning → Jev decision → source resolution → OpenUI rendering exercised in the real browser. GDP, electricity and missing-flow regression cases passed with one LLM call each. The latest scripted run took 2.7–2.9 seconds per case; this small development sample is not a performance guarantee.
 - Province selection, comparison measure, table view, scenario/year changes, undo, export, cancellation and unsupported-price recovery exercised in the browser. The 390px phone viewport had no horizontal overflow or console errors.
@@ -39,6 +39,7 @@ Contract rejection, truthful missing-data handling, calculation consistency, Jev
 - Live testing found false shipment-gap classifications and a contradictory legacy text answer. The workspace now produces both charts and written findings from the same resolved data. A second LLM text-selection call is unnecessary and has been removed for workspace mode.
 - The independent reviewer also checked mixed GDP/electricity dates and unsupported historical GDP years after a narrow clause-binding repair.
 - Public-browser verification exposed stale JavaScript after a GitHub Pages deployment. The build now stamps the entry scripts, styles and all application module imports with one content-derived version, including the lazy OpenUI bundle. A regression test checks that changing a nested module invalidates the whole code graph while data-only refreshes preserve the code version.
+- A production question used live Jev successfully, but exposed a browser/server snapshot mismatch after the nightly data refresh. Responses now pin the economic snapshot as well as the infrastructure records; both newer and older browser caches are regression-tested. Snapshots are never included in Jev prompts.
 - The renderer is loaded only when an answer contains a workspace. The compressed bundle is approximately 168 KiB. No OpenUI hosted gateway, telemetry transport or external JavaScript CDN is used.
 
 ## Deployment and budget

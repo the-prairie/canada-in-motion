@@ -43,7 +43,7 @@ test('changing scenario or year reads published series and retains missing data'
   assert.throws(()=>resolveWorkspace(workspace,{...selection,year:2999},data));
 });
 test('an older answer is preserved when current data cannot reproduce its snapshot',()=>{
-  const workspace=make();workspace.dataVersion='2020-01-01';
+  const workspace=make();delete workspace.economySnapshot;workspace.dataVersion='2020-01-01';
   assert.equal(resolveWorkspace(workspace,{...initialSelection(workspace),regions:['ON']},data),workspace);
 });
 test('linked infrastructure selection uses the pinned network snapshot and exports those records',()=>{
@@ -54,4 +54,24 @@ test('linked infrastructure selection uses the pinned network snapshot and expor
   assert.deepEqual(panel.facilityIds,['montreal-suncor']);
   assert.deepEqual(selected.networkSnapshot.facilities,network.facilities);
   assert.ok(!panel.facilityIds.includes('imperial-strathcona'));
+});
+
+
+test('answer-pinned data keeps controls accurate when browser data is stale or newer',()=>{
+  const workspace=make(['gdp','scenario'],['electricity-generation']);
+  workspace.economySnapshot=structuredClone(data);
+  for(const date of ['2020-01-01T00:00:00Z','2030-01-01T00:00:00Z']){
+    const other=structuredClone(data);other.generatedAt=date;other.gdp.regions.find(row=>row.code==='ON').energy=1;
+    const selection={...initialSelection(workspace),regions:['ON'],year:2050,scenario:'Lower'};
+    const result=resolveWorkspace(workspace,selection,other);
+    assert.equal(result.panels.find(p=>p.type==='province-comparison').rows[0].value,data.gdp.regions.find(row=>row.code==='ON').energy);
+    const scenario=result.panels.find(p=>p.type==='scenario-comparison');
+    assert.equal(scenario.rows[0].selected,summarizeEconomy(data,{...selection,region:'ON'}).metrics.find(m=>m.id==='electricity-generation').selected);
+    assert.equal(result.economySnapshot.generatedAt,workspace.dataVersion);
+  }
+});
+test('malformed or mismatched pinned economic snapshots are rejected',()=>{
+  const workspace=make();workspace.economySnapshot=structuredClone(data);
+  workspace.economySnapshot.generatedAt='2020-01-01T00:00:00Z';assert.throws(()=>validateWorkspace(workspace));
+  workspace.economySnapshot=structuredClone(data);workspace.economySnapshot.gdp.regions[0].energy=Infinity;assert.throws(()=>validateWorkspace(workspace));
 });

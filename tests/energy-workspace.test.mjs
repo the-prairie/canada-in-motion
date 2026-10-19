@@ -40,6 +40,21 @@ test('national comparisons preserve emphasis and apply explicit exclusions',()=>
   assert.deepEqual(limited.plan.regions,['ON','QC']);
 });
 
+test('economic controls receive the exact detached source snapshot used to build the answer',()=>{
+  const source=structuredClone(data);
+  const workspace=buildWorkspacePanels({...input,data:source,summary:summarizeEconomy(source,state),investigation:{...investigation,topics:['gdp','scenario'],metricIds:['electricity-generation']}});
+  assert.deepEqual(workspace.economySnapshot,data);
+  assert.equal(workspace.economySnapshot.generatedAt,workspace.dataVersion);
+  const snapshotGDP=workspace.economySnapshot.gdp.regions.find(row=>row.code==='AB');
+  assert.equal(snapshotGDP.energy,workspace.panels.find(panel=>panel.type==='province-comparison').rows.find(row=>row.code==='AB').value);
+  const scenario=workspace.panels.find(panel=>panel.type==='scenario-comparison');
+  const snapshotScenario=summarizeEconomy(workspace.economySnapshot,state).metrics.find(metric=>metric.id===scenario.metricId);
+  assert.equal(snapshotScenario.selected,scenario.rows.find(row=>row.code==='AB').selected);
+  source.generatedAt='replacement';source.gdp.regions.find(row=>row.code==='AB').energy=-1;
+  source.metrics[0].series[0].values[0]=-1;
+  assert.deepEqual(JSON.parse(JSON.stringify(workspace.economySnapshot)),data);
+});
+
 test('the exact live GDP and generation questions repair a false measured-flow classification',()=>{
   const examples=[
     {question:'Compare energy GDP in Alberta, Ontario and Québec. Include a map.',topics:['gdp'],metricIds:['gas-production','oil-production','electricity-generation'],type:'province-comparison'},
@@ -153,12 +168,13 @@ test('workspace analysis uses one LLM planning call and one batched Jev call',as
   let calls=0,decisions=0;
   const provider=async({name,input,schema})=>{
     calls++;
-    if(name==='energy_scenario'){assert.ok(schema.properties.investigation);return {state:input.state,investigation};}
+    if(name==='energy_scenario'){assert.ok(schema.properties.investigation);assert.deepEqual(Object.keys(input).sort(),['capabilities','question','regions','scenarios','state']);return {state:input.state,investigation};}
     return {answerability:'supported',claimIds:['observed-contribution']};
   };
-  const analyze=createEnergyAnalyzer({data,debate,network,workspaceEnabled:true,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider,answerMode:'claims',decider:async()=>{decisions++;return {answers:{presentation:{choice:'comparison'},coverage:{choice:'supported'}}};}});
+  const analyze=createEnergyAnalyzer({data,debate,network,workspaceEnabled:true,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider,answerMode:'claims',decider:async({state:decisionState})=>{decisions++;assert.deepEqual(Object.keys(decisionState).sort(),['panels','plan','question']);assert.ok(!JSON.stringify(decisionState).includes(data.generatedAt));return {answers:{presentation:{choice:'comparison'},coverage:{choice:'supported'}}};}});
   const result=await analyze({question:input.question,state:{region:'AB',scenario:'Higher',year:2030,oilShock:-10,duration:'persistent'}});
   assert.equal(calls,1);assert.equal(decisions,1);assert.equal(result.workspace.decision.model,JEV_MODEL);
+  assert.deepEqual(result.workspace.economySnapshot,data);
   assert.equal(result.workspace.panels[0].rows[0].value,163605.9);assert.ok(result.analysis.sources.length);
   assert.equal(result.answerMode,'source-backed-workspace');assert.equal(result.analysis.blocks.length,1);
   assert.match(result.analysis.blocks[0].text,/163,605\.9 for Alberta/);assert.match(result.analysis.blocks[0].text,/18,248\.5 for Quebec/);assert.match(result.analysis.blocks[0].text,/2022/);

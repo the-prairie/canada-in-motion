@@ -154,7 +154,7 @@ export function buildWorkspacePanels({data,network,summary,summarize,state,inves
   for(const panel of panels.filter(panel=>!selected.includes(panel)))limitations.push(`${panel.title} is omitted from this result to keep the requested comparisons together. Its source data remain available.`);
   const sourceIds=new Set(selected.flatMap(panel=>panel.sourceIds));
   const sources=[...registry.values()].filter(source=>sourceIds.has(source.id));
-  return {schemaVersion:WORKSPACE_SCHEMA_VERSION,dataVersion:data.generatedAt,sourceHashes:Object.fromEntries(sources.filter(source=>source.sha256).map(source=>[source.id,source.sha256])),plan:{...plan,year:state.year,scenario:state.scenario,oilShock:state.oilShock,duration:state.duration},panels:selected,sources,limitations:unique(limitations),...(network&&selected.some(panel=>panel.type==='infrastructure-map')?{networkSnapshot:{routes:network.routes,facilities:network.facilities,sources:network.sources}}:{})};
+  return {schemaVersion:WORKSPACE_SCHEMA_VERSION,dataVersion:data.generatedAt,economySnapshot:structuredClone(data),sourceHashes:Object.fromEntries(sources.filter(source=>source.sha256).map(source=>[source.id,source.sha256])),plan:{...plan,year:state.year,scenario:state.scenario,oilShock:state.oilShock,duration:state.duration},panels:selected,sources,limitations:unique(limitations),...(network&&selected.some(panel=>panel.type==='infrastructure-map')?{networkSnapshot:{routes:network.routes,facilities:network.facilities,sources:network.sources}}:{})};
 }
 
 export async function createEnergyWorkspace({data,network,summary,summarize,state,investigation,question,decider,signal}) {
