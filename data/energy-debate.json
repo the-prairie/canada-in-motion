@@ -158,7 +158,7 @@
     },
     {
       "id": "rights-positions",
-      "text": "Haisla Nation describes majority ownership and construction of the Cedar LNG project in its dated project update. Coastal First Nations state opposition to northern oil tanker traffic. These are named organizations discussing different projects and places. Neither position represents all Indigenous peoples, and a dated construction update does not establish current operating status.",
+      "text": "Haisla Nation’s December 2024 update described its majority ownership and construction of Cedar LNG. Coastal First Nations opposes northern oil tanker traffic. These organizations address different projects and places. Their positions do not represent all Indigenous peoples. The dated update does not establish Cedar LNG’s current operating status.",
       "sourceIds": [
         "haisla",
         "coastal"
@@ -166,14 +166,14 @@
     },
     {
       "id": "labour",
-      "text": "Unifor argues for investment, maintenance, safe infrastructure and stable employment. Its statement is evidence of the union position, not an independently measured jobs forecast.",
+      "text": "Unifor calls for investment, maintenance, safe infrastructure and stable employment. Its statement sets out worker priorities; it does not provide an independently measured jobs forecast.",
       "sourceIds": [
         "unifor"
       ]
     },
     {
       "id": "producer",
-      "text": "CAPP emphasizes investment, market access and petroleum economic contribution. It represents producer interests. Its claimed contributions require consistent direct, indirect and induced accounting before comparison with official GDP.",
+      "text": "CAPP emphasizes investment, market access and petroleum’s economic contribution. The association represents producers. Its economic estimates may include indirect and induced effects beyond the direct value added shown in the GDP account.",
       "sourceIds": [
         "capp"
       ]
@@ -188,7 +188,7 @@
     },
     {
       "id": "lng-risk",
-      "text": "Pembina Institute questions LNG expansion through conditional climate, demand and market-risk analysis. Treat this as attributed stakeholder research, not observed future project returns.",
+      "text": "Pembina Institute questions LNG expansion through its analysis of climate, demand and market risks. Its projected outcomes depend on those assumptions; they are not observed project returns.",
       "sourceIds": [
         "pembina-lng"
       ]
