@@ -8,7 +8,6 @@
   "preview_urls": false,
   "send_metrics": false,
   "observability": {"enabled": false},
-  "limits": {"cpu_ms": 100},
   "vars": {"AI_ENABLED": "0", "TURNSTILE_SITE_KEY": ""},
   "durable_objects": {"bindings": [{"name": "AI_QUOTA", "class_name": "AnalysisQuota"}]},
   "migrations": [{"tag": "v1", "new_sqlite_classes": ["AnalysisQuota"]}]

@@ -5,15 +5,17 @@
     "apiHost": "Cloudflare Workers",
     "workerName": "canada-in-motion-ai",
     "remoteApiDeployed": false,
-    "publicAiEnabled": false
+    "publicAiEnabled": false,
+    "hostingTier": "Workers Free"
   },
   "checks": {
     "nodeTests": 64,
-    "workerdTests": 9,
+    "workerdTests": 10,
     "publicBuildPassed": true,
     "publicFilesScannedForExistingKey": 436,
     "secretFound": false,
-    "independentReview": "accepted after cancel/change retry repair"
+    "independentReview": "accepted after cancel/change retry repair",
+    "freeTierRemoteCpuMeasured": false
   },
   "providerProbe": {
     "modelMetadataStatus": 200,
@@ -24,9 +26,9 @@
   },
   "pending": [
     "Cloudflare Workers and Turnstile authorization",
-    "Approval for paid hosting and remote secret storage",
+    "Approval for remote secret storage",
     "OpenAI credit and approved project spending limit",
     "Deployed public browser acceptance test"
   ],
-  "testScope": "Workerd tests use simulated upstream verification and model responses. They do not establish funded public inference access."
+  "testScope": "Workerd tests use simulated upstream verification and model responses. They do not establish funded public inference access. Free-tier source configuration is verified; deployed CPU and actual account-level free-tier usage require remote acceptance."
 }

@@ -65,19 +65,24 @@ export async function loadPublishedEvidence(fetchImpl=fetch, now=Date.now()) {
 }
 
 export class AnalysisQuota {
-  constructor(ctx) {
-    this.ctx=ctx;
+  constructor(ctx,env) {
+    this.ctx=ctx;this.env=env;
     this.sql=ctx.storage.sql;
     this.sql.exec('CREATE TABLE IF NOT EXISTS counters (key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires INTEGER NOT NULL)');
     this.sql.exec('CREATE TABLE IF NOT EXISTS leases (id TEXT PRIMARY KEY, expires INTEGER NOT NULL)');
   }
   async fetch(request) {
+    if(new URL(request.url).pathname==='/api/analysis')return this.analyze(request);
     const input=await request.json();
     if(input.action==='release'){
-      this.sql.exec('DELETE FROM leases WHERE id = ?',input.id);
+      this.release(input.id);
       return json({ok:true});
     }
     if(input.action!=='reserve'||typeof input.visitor!=='string'||!/^[a-f0-9]{64}$/.test(input.visitor))return json({error:'Invalid reservation'},400);
+    return json(await this.reserve(input.visitor));
+  }
+  release(id) {this.sql.exec('DELETE FROM leases WHERE id = ?',id);}
+  async reserve(visitor) {
     const now=Date.now();
     const date=new Date(now).toISOString();
     const day=date.slice(0,10),month=date.slice(0,7),minute=Math.floor(now/60000);
@@ -91,7 +96,7 @@ export class AnalysisQuota {
       const checks=[
         [`month:${month}`,LIMITS.monthly,nextMonth,'monthly_limit','The public analysis allowance has been used for this month. It resets on the first day of next month.'],
         [`day:${day}`,LIMITS.daily,nextDay,'daily_limit','The public analysis allowance has been used for today. It resets at midnight UTC.'],
-        [`visitor:${day}:${input.visitor}`,LIMITS.visitorDaily,nextDay,'visitor_limit','This network has reached its daily allowance of three questions. It resets at midnight UTC.'],
+        [`visitor:${day}:${visitor}`,LIMITS.visitorDaily,nextDay,'visitor_limit','This network has reached its daily allowance of three questions. It resets at midnight UTC.'],
         [`minute:${minute}`,LIMITS.minute,(minute+1)*60000,'rate_limit','Too many questions arrived at once. Try again in a minute.'],
       ];
       for(const [key,limit,expires,code,message] of checks){const rows=this.sql.exec('SELECT count FROM counters WHERE key = ?',key).toArray();if((rows[0]?.count||0)>=limit)return {allowed:false,code,message,retryAfter:Math.max(1,Math.ceil((expires-now)/1000))};}
@@ -101,7 +106,33 @@ export class AnalysisQuota {
       return {allowed:true,id};
     });
     await this.ctx.storage.setAlarm(now+DAY);
-    return json(result);
+    return result;
+  }
+  async analyze(request) {
+    const env=this.env;
+    let reservation;
+    if(request.method!=='POST'||request.headers.get('Origin')!==SITE_ORIGIN)return json({error:{message:'Open the public app to ask a question.'}},403);
+    try {
+      if(!configured(env))throw unavailable();
+      if(!/^application\/json(?:\s*;|$)/i.test(request.headers.get('Content-Type')||''))throw new AnalysisError('content_type','Send a JSON request.',415);
+      const input=validateAnalysisRequest(await boundedJSON(request));
+      const ip=request.headers.get('CF-Connecting-IP');
+      if(!ip)throw unavailable();
+      await verifyVisitor(request.headers.get('X-Turnstile-Token'),ip,env);
+      const {data,debate}=await loadPublishedEvidence();
+      const visitor=await visitorID(ip,env.VISITOR_HASH_KEY,Date.now());
+      const admission=await this.reserve(visitor);
+      if(!admission.allowed)return json({error:{code:admission.code,message:admission.message}},429,{'Retry-After':String(admission.retryAfter)});
+      reservation=admission.id;
+      const analyze=createEnergyAnalyzer({data,debate,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider:createOpenAIProvider({apiKey:env.OPENAI_API_KEY}),timeoutMs:60000});
+      const result=await analyze(input);
+      return json({...result,dataVersion:data.generatedAt});
+    } catch(error) {
+      const failure=error instanceof AnalysisError?error:unavailable();
+      return json({error:{code:failure.code,message:failure.message}},failure.status);
+    } finally {
+      if(reservation){try{this.release(reservation);}catch{/* Expiring leases recover interrupted storage writes. */}}
+    }
   }
   async alarm() {
     const now=Date.now();
@@ -112,7 +143,7 @@ export class AnalysisQuota {
 }
 
 export default {
-  async fetch(request,env,ctx) {
+  async fetch(request,env) {
     const origin=request.headers.get('Origin');
     const cors=origin===SITE_ORIGIN?{'Access-Control-Allow-Origin':SITE_ORIGIN,Vary:'Origin'}:{Vary:'Origin'};
     const reply=(value,status=200,headers={})=>json(value,status,{...cors,...headers});
@@ -127,30 +158,15 @@ export default {
     if(path==='/api/analysis/status'&&request.method==='GET')return reply({available:configured(env),model:DEFAULT_MODEL,turnstileSiteKey:configured(env)?env.TURNSTILE_SITE_KEY:null,limits:LIMITS});
     if(path!=='/api/analysis'||request.method!=='POST')return reply({error:{message:'Method not allowed.'}},405);
     if(origin!==SITE_ORIGIN)return reply({error:{message:'Open the public app to ask a question.'}},403);
-    let quota, reservation;
+    if(!configured(env))return reply({error:{code:'unavailable',message:unavailable().message}},503);
     try {
-      if(!configured(env))throw unavailable();
-      if(!/^application\/json(?:\s*;|$)/i.test(request.headers.get('Content-Type')||''))throw new AnalysisError('content_type','Send a JSON request.',415);
-      const input=validateAnalysisRequest(await boundedJSON(request));
-      const ip=request.headers.get('CF-Connecting-IP');
-      if(!ip)throw unavailable();
-      await verifyVisitor(request.headers.get('X-Turnstile-Token'),ip,env);
-      const {data,debate}=await loadPublishedEvidence();
-      const visitor=await visitorID(ip,env.VISITOR_HASH_KEY,Date.now());
-      quota=env.AI_QUOTA.get(env.AI_QUOTA.idFromName('public-analysis-v1'));
-      const decision=await quota.fetch('https://quota/reserve',{method:'POST',body:JSON.stringify({action:'reserve',visitor})});
-      if(!decision.ok)throw unavailable();
-      const admission=await decision.json();
-      if(!admission.allowed)return reply({error:{code:admission.code,message:admission.message}},429,{'Retry-After':String(admission.retryAfter)});
-      reservation=admission.id;
-      const analyze=createEnergyAnalyzer({data,debate,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider:createOpenAIProvider({apiKey:env.OPENAI_API_KEY}),timeoutMs:60000});
-      const result=await analyze(input);
-      return reply({...result,dataVersion:data.generatedAt});
-    } catch(error) {
-      const failure=error instanceof AnalysisError?error:unavailable();
-      return reply({error:{code:failure.code,message:failure.message}},failure.status);
-    } finally {
-      if(reservation)ctx.waitUntil(quota.fetch('https://quota/release',{method:'POST',body:JSON.stringify({action:'release',id:reservation})}).catch(()=>{}));
-    }
+      // Keep the public Free-plan Worker within its small CPU budget. The SQLite
+      // Durable Object owns validation, inference and transactional accounting.
+      const service=env.AI_QUOTA.get(env.AI_QUOTA.idFromName('public-analysis-v1'));
+      const response=await service.fetch(request);
+      const headers=new Headers(response.headers);
+      for(const [key,value] of Object.entries(cors))headers.set(key,value);
+      return new Response(response.body,{status:response.status,headers});
+    } catch {return reply({error:{code:'unavailable',message:unavailable().message}},503);}
   },
 };

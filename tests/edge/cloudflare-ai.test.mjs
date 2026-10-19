@@ -13,7 +13,7 @@ const debate=JSON.parse(await readFile(new URL('../../data/energy-debate.json',i
 const output=value=>new EdgeResponse(JSON.stringify(value),{headers:{'Content-Type':'application/json'}});
 let tokenCounter=0;
 
-async function fixture(t,{enabled=true,providerFailure=false,testKey=false,stale=false}={}) {
+async function fixture(t,{enabled=true,providerFailure=false,testKey=false,stale=false,onProvider=async()=>{}}={}) {
   const persist=await mkdtemp(path.join(os.tmpdir(),'energy-edge-'));
   const used=new Set();let calls=0,verifications=0,mf;
   const outbound=async request=>{
@@ -25,6 +25,7 @@ async function fixture(t,{enabled=true,providerFailure=false,testKey=false,stale
     if(url.pathname.endsWith('/economy.json'))return output({...economy,generatedAt:new Date(Date.now()-(stale?10*86400000:0)).toISOString()});
     if(url.pathname.endsWith('/energy-debate.json'))return output(debate);
     assert.equal(url.href,'https://api.openai.com/v1/responses');calls++;
+    await onProvider(calls);
     if(providerFailure)return new EdgeResponse('private provider message',{status:401});
     const body=await request.json();
     assert.equal(body.store,false);assert.equal(body.reasoning.effort,'low');assert.equal(body.max_output_tokens,2200);
@@ -92,6 +93,26 @@ test('atomic concurrency admission allows only two reservations and releases onl
   await quota.fetch('https://quota/release',{method:'POST',body:JSON.stringify({action:'release',id:admitted[0].id})});
   assert.equal((await reserve('e')).allowed,true);
   assert.equal((await reserve('f')).code,'busy');
+});
+
+test('two public analyses overlap while a third is rejected and internal quota routes stay private',async t=>{
+  let release,ready,timer;
+  const held=new Promise(resolve=>{release=resolve;});
+  const entered=new Promise(resolve=>{ready=resolve;});
+  const f=await fixture(t,{onProvider:async count=>{if(count===2)ready();if(count<=2)await held;}});
+  for(const route of ['/reserve','/release','/api/reserve','/api/release']){
+    const response=await f.mf.dispatchFetch('https://worker.example'+route,{method:'POST',headers:{Origin:SITE},body:JSON.stringify({action:'release',id:'any'})});
+    assert.equal(response.status,404);
+  }
+  const first=f.post(payload,{'CF-Connecting-IP':'203.0.113.11'});
+  const second=f.post(payload,{'CF-Connecting-IP':'203.0.113.12'});
+  try {
+    await Promise.race([entered,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('The second analysis was serialized behind the first')),3000);})]);
+    const third=await f.post(payload,{'CF-Connecting-IP':'203.0.113.13'});
+    assert.equal(third.status,429);assert.equal((await third.json()).error.code,'busy');assert.equal(f.calls,2);
+  } finally {clearTimeout(timer);release();}
+  const results=await Promise.all([first,second]);assert.deepEqual(results.map(response=>response.status),[200,200]);
+  assert.equal((await f.post(payload,{'CF-Connecting-IP':'203.0.113.13'})).status,200);assert.equal(f.calls,6);
 });
 
 test('failed provider calls consume allowance, release concurrency and never expose provider details',async t=>{
