@@ -4,17 +4,19 @@
     "publicWebsite": "https://the-prairie.github.io/canada-in-motion/",
     "apiHost": "Cloudflare Workers",
     "workerName": "canada-in-motion-ai",
-    "remoteApiDeployed": false,
+    "remoteApiDeployed": true,
     "publicAiEnabled": false,
-    "hostingTier": "Workers Free"
+    "hostingTier": "Workers Free",
+    "apiOrigin": "https://canada-in-motion-ai.thelaurenzary.workers.dev",
+    "workerVersion": "0234a8a5-5400-4a3e-95a6-acf89cb05a62"
   },
   "checks": {
-    "nodeTests": 69,
+    "nodeTests": 73,
     "workerdTests": 12,
     "publicBuildPassed": true,
     "publicFilesScannedForExistingKey": 436,
     "secretFound": false,
-    "independentReview": "free-provider routing accepted; live inference pending",
+    "independentReview": "Constrained free model accepted for bounded release; four live cases passed",
     "freeTierRemoteCpuMeasured": false
   },
   "providerProbe": {
@@ -25,19 +27,20 @@
     "completedAnswer": false
   },
   "pending": [
-    "Cloudflare sign-in and Workers, Workers AI and Turnstile authorization",
-    "Confirm account Free plan; deploy and store secrets",
-    "Real free-model quality and usage evaluation",
-    "Deployed public browser acceptance test"
+    "Publish frontend endpoint configuration",
+    "Public browser and Turnstile acceptance test"
   ],
-  "testScope": "Node and workerd tests use simulated model responses. They do not establish real Llama response quality or account access. No remote API or secrets were created. No paid fallback is configured.",
+  "testScope": "73 Node tests and 12 workerd tests pass. Four real Cloudflare model cases pass with independent review. Claims and numeric/source validation do not establish universal question relevance. No paid fallback.",
   "freeProvider": {
     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "liveInferenceVerified": false,
+    "liveInferenceVerified": true,
     "paidFallback": false,
     "dailyRequestLimit": 10,
     "monthlyRequestLimit": 100,
-    "mockedBindingTestsPassed": true
+    "mockedBindingTestsPassed": true,
+    "answerMode": "source-backed-findings",
+    "evaluatedCases": 4,
+    "passedCases": 4
   },
   "approvals": {
     "workersFree": true,
@@ -45,7 +48,15 @@
     "paidUpgrade": false
   },
   "lastDeploymentAttempt": {
-    "deployed": false,
-    "reason": "Existing Cloudflare credential lacks Workers access"
+    "deployed": true,
+    "enabledForVisitors": false,
+    "reason": "Frontend not yet connected"
+  },
+  "secrets": {
+    "encrypted": [
+      "TURNSTILE_SECRET_KEY",
+      "VISITOR_HASH_KEY"
+    ],
+    "openAIKeyUploaded": false
   }
 }

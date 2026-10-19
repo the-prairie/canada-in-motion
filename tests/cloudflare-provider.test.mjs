@@ -20,6 +20,15 @@ test('Workers AI accepts object and JSON string responses without changing state
     const provider=createCloudflareProvider({ai:{run:async(model,body)=>{
       calls.push(body);assert.equal(model,FREE_MODEL);assert.equal(body.response_format.type,'json_schema');assert.equal(body.stream,false);
       const input=JSON.parse(body.messages[1].content);
+      if(input.evidence){
+        const fields=body.response_format.json_schema.properties.blocks.items.properties;
+        assert.notEqual(fields.evidenceIds,fields.sourceIds);
+        assert.deepEqual(fields.evidenceIds.items.enum,[...input.evidence.numbers,...input.evidence.facts].map(item=>item.id));
+        assert.deepEqual(fields.sourceIds.items.enum,input.evidence.sources.map(item=>item.id));
+        assert.equal(fields.evidenceIds.minItems,1);assert.equal(fields.evidenceIds.maxItems,24);
+        assert.equal(fields.sourceIds.minItems,1);assert.equal(fields.sourceIds.maxItems,12);
+        assert.ok(fields.evidenceIds.items.enum.every(id=>!fields.sourceIds.items.enum.includes(id)));
+      }
       const result=!input.evidence?{state:input.state}:{headline:'Alberta contributes energy income',blocks:[{text:'Observed energy value added is [[n1]] million CAD.',sourceIds:input.evidence.numbers[1].sourceIds,evidenceIds:['n1']}]};
       return {response:asString?JSON.stringify(result):result};
     }}});

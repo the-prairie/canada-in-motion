@@ -4,19 +4,21 @@
 
 The user approved Workers Free and encrypted secret storage on 18 October 2026. Keep the website and its roughly 275 MB of data on GitHub Pages; deploy the small API to `canada-in-motion-ai` on Cloudflare Workers. The largest well index exceeds Workers' 25 MiB individual static-asset limit. [Workers limits](https://developers.cloudflare.com/workers/platform/limits/)
 
-The selected free inference candidate is **Llama 3.3 70B**, using the Workers AI binding. It does not need an OpenAI key or funded OpenAI account. Cloudflare explicitly supports its JSON-schema mode. Real model acceptance is still pending account authorization; mocked tests establish integration behavior, not model quality. [JSON Mode](https://developers.cloudflare.com/workers-ai/features/json-mode/)
+The free service uses **Llama 3.3 70B** through the Workers AI binding. It does not need an OpenAI key or funded OpenAI account. The model selects a supported scenario and relevant findings from a source-backed catalog. The server supplies wording, numbers, units, scope and citations; the free model cannot write arbitrary economic claims. [JSON Mode](https://developers.cloudflare.com/workers-ai/features/json-mode/)
 
-The existing Cloudflare grant only covers Pages. A deployment attempt on 19 October UTC failed with “No access to the specified resource.” The browser sign-in has been handed to the owner. No remote Worker or secrets were created. `AI_ENABLED` remains `0` and `config/ai-public.json` remains disconnected until the real model and public browser checks pass.
+Cloudflare authorization is complete and the account was verified as Workers Free in the dashboard on 19 October 2026. The Worker is deployed at `https://canada-in-motion-ai.thelaurenzary.workers.dev`. A managed Turnstile widget is restricted to `the-prairie.github.io`; its secret and the visitor-hash secret are stored in the Worker's encrypted secret store. No OpenAI key was uploaded.
+
+The live four-question evaluation passed for Alberta oil sensitivity, Québec contribution and benefits, unsupported gas/GDP/bill estimates, and attempted invented figures. An independent reviewer accepted the constrained answer catalog for a bounded release. The results establish this sample, not universal relevance. Arbitrary free-form Llama and GPT-OSS answers did not meet the app's checks and are not enabled. See `AI-LAUNCH-VERIFICATION.json` for public-browser completion status.
 
 ## Free allowance and cost controls
 
-Workers AI includes **10,000 neurons per account per UTC day**. On Workers Free, requests fail when the allowance is exhausted; more usage requires an explicit paid upgrade. Other apps on the account share the allowance. Confirm the account is on Free before activation. Do not upgrade it automatically. [Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/)
+Workers AI includes **10,000 neurons per account per UTC day**. On Workers Free, requests fail when the allowance is exhausted; more usage requires an explicit paid upgrade. Other apps on the account share the allowance. The account was confirmed on Free before activation. Do not upgrade it automatically. [Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/)
 
 The app allows ten admitted analyses per UTC day, 100 per calendar month, three per network address per UTC day, six per minute and two active analyses. These counts are conservative launch controls, not a guarantee of ten successful answers: provider capacity, free allowance and validation can stop an answer sooner. Failed admitted calls count. There are no automatic model retries or paid fallbacks.
 
 Each analysis has at most two calls: a 256-token scenario selection and a 1,200-token explanation. Input is bounded to 50,000 UTF-8 bytes per call. Repeated numeric contexts and source-download metadata are removed from the model payload; the full evidence remains available to validate and display the answer. No numbers, units, observation periods or source identities are discarded.
 
-Llama's published rates are 26,668 neurons per million input tokens and 204,805 per million output tokens. The combined output cap is about 298 neurons per analysis, plus input consumption. Measure actual token usage in the live evaluation; do not convert this output-only figure into a promised daily answer count. [Model rates](https://developers.cloudflare.com/workers-ai/platform/pricing/)
+Llama's published rates are 26,668 neurons per million input tokens and 204,805 per million output tokens. The combined output cap is about 298 neurons per analysis, plus input consumption. The reviewed four-case run used about 376 neurons in total and took 2.8–4.6 seconds per answer through the API. This is a small sample, not a promised daily answer count or public-browser latency. [Model rates](https://developers.cloudflare.com/workers-ai/platform/pricing/)
 
 The optional OpenAI adapter now defaults to **GPT-6 Luna**, at US$0.10 per million input tokens and US$0.50 per million output tokens for standard short-context requests. It is disabled for the public free configuration. Switching requires an explicit `AI_PROVIDER=openai` deployment and a funded API account. The existing key previously returned exhausted API credit; no successful Luna answer has been verified. A ChatGPT/Codex plan does not automatically fund this key. [Luna pricing](https://developers.openai.com/api/docs/models/gpt-6-luna)
 
@@ -30,14 +32,14 @@ The free object allocation includes 100,000 requests, 13,000 GB-s per day and 5 
 - Turnstile requires success, the exact hostname and the `energy_analysis` action. Tokens are single-use. [Validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/)
 - The database stores a date-rotated HMAC of the network address and temporary counters. It does not store raw IPs, questions or answers. Shared networks share the allowance.
 - Published economic and debate data are loaded from fixed public URLs and cached for five minutes. Economic snapshots older than eight days stop new analyses.
-- Scenario selection, numeric placeholders and citation IDs are validated. Calculation code supplies the numbers. Validation does not prove every qualitative sentence true.
+- Scenario selection and finding IDs are validated. The free route assembles source-backed findings with their mandatory scope and caveats. Unknown IDs, duplicate IDs, missing limitations and arbitrary output fields are rejected. The optional OpenAI prose path remains separately validated and disabled.
 - The browser identifies Cloudflare Workers AI as the recipient before submission. Cloudflare receives the question and selected public data; Turnstile processes verification signals. Provider policies still apply. No blanket zero-retention claim is made.
 - A 60-second application timeout prevents a late response from being shown or starting a second call. The Workers AI binding has no documented cancellation option, so an already-running upstream call may finish. The concurrency limit bounds active application requests, not guaranteed simultaneous GPU work.
 - Request-body logging is disabled. No API key or deployment credential is included in the public build.
 
 ## Activation sequence
 
-The free setup and secret destination are already approved. The remaining owner action is Cloudflare sign-in and authorization.
+The free setup and secret destination are already approved. Authorization, the Free-plan check, widget creation and encrypted secret storage are complete. The sequence below documents setup and future redeployment.
 
 1. Renew authorization, retaining Pages and adding the required services:
 

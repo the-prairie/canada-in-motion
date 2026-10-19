@@ -131,7 +131,7 @@ export class AnalysisQuota {
       reservation=admission.id;
       const selected=providerConfig(env);
       const provider=selected.provider==='cloudflare'?createCloudflareProvider({ai:env.AI}):createOpenAIProvider({apiKey:env.OPENAI_API_KEY});
-      const analyze=createEnergyAnalyzer({data,debate,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider,model:selected.model,timeoutMs:60000});
+      const analyze=createEnergyAnalyzer({data,debate,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider,model:selected.model,timeoutMs:60000,answerMode:selected.provider==='cloudflare'?'claims':'prose'});
       const result=await analyze(input);
       return json({...result,provider:selected.provider,dataVersion:data.generatedAt});
     } catch(error) {

@@ -7,9 +7,31 @@
   "workers_dev": true,
   "preview_urls": false,
   "send_metrics": false,
-  "observability": {"enabled": false},
-  "vars": {"AI_ENABLED": "0", "AI_PROVIDER": "cloudflare", "TURNSTILE_SITE_KEY": ""},
-  "ai": {"binding": "AI"},
-  "durable_objects": {"bindings": [{"name": "AI_QUOTA", "class_name": "AnalysisQuota"}]},
-  "migrations": [{"tag": "v1", "new_sqlite_classes": ["AnalysisQuota"]}]
+  "observability": {
+    "enabled": false
+  },
+  "vars": {
+    "AI_ENABLED": "1",
+    "AI_PROVIDER": "cloudflare",
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAFbE-EHrmceVEeJi"
+  },
+  "ai": {
+    "binding": "AI"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "AI_QUOTA",
+        "class_name": "AnalysisQuota"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "AnalysisQuota"
+      ]
+    }
+  ]
 }

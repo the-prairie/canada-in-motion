@@ -15,9 +15,9 @@ export class Model extends WorkerEntrypoint {
     if(model!==${JSON.stringify(FREE_MODEL)})throw Error('Wrong model');
     if(body.response_format.type!=='json_schema'||body.stream!==false)throw Error('Wrong schema mode');
     const input=JSON.parse(body.messages[1].content);
-    if(!input.evidence){if(body.max_tokens!==256)throw Error('Planner budget');return {response:{state:input.state}};}
-    if(body.max_tokens!==1200||!input.evidence.contexts)throw Error('Explanation contract');
-    return {response:JSON.stringify({headline:'Energy contributes to provincial income',blocks:[{text:'Observed energy value added is [[n1]] million CAD.',sourceIds:input.evidence.numbers[1].sourceIds,evidenceIds:['n1']}]})};
+    if(!input.claims){if(body.max_tokens!==256)throw Error('Planner budget');return {response:{state:input.state}};}
+    if(body.max_tokens!==1200||!input.claims.some(item=>item.id==='observed-contribution'))throw Error('Claim contract');
+    return {response:JSON.stringify({answerability:'supported',claimIds:['observed-contribution']})};
   }
 }`;
 async function fixture(t,{fail=false,missing=false}={}){
@@ -44,6 +44,7 @@ test('free binding completes both stages in workerd and identifies provider cons
   assert.equal(status.available,true);assert.equal(status.provider,'cloudflare');assert.equal(status.model,FREE_MODEL);assert.equal(status.limits.daily,10);
   const response=await f.post();assert.equal(response.status,200);const result=await response.json();
   assert.equal(result.provider,status.provider);assert.equal(result.model,status.model);assert.ok(result.analysis.sources.length);assert.equal(f.paidCalls,0);
+  assert.equal(result.answerMode,'source-backed-findings');assert.match(result.analysis.blocks[0].text,/2022/);assert.doesNotMatch(result.analysis.blocks[0].text,/2,022/);
 });
 test('free binding failure or absence never invokes OpenAI',async t=>{
   for(const options of [{fail:true},{missing:true}]){
