@@ -40,5 +40,13 @@
     "Complete bilateral physical flow accounts",
     "Calibrated provincial price-to-GDP and jobs model",
     "Public same-origin AI hosting with durable quotas"
-  ]
+  ],
+  "deployment": {
+    "url": "https://github.com/the-prairie/canada-in-motion/actions/runs/39184046189",
+    "commit": "29c1e8c609d6c76cd9a994b2912c4126aa1a9640",
+    "conclusion": "success",
+    "matchedReviewedAssets": 11,
+    "economicSnapshotRetrieved": "2026-10-19T01:13:58.908059+00:00",
+    "publicBrowserSmoke": "Canada observed GDP and Alberta Higher 2050 scenario rendered correctly"
+  }
 }
