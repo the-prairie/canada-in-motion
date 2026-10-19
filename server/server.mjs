@@ -37,7 +37,7 @@ export async function createAnalysisServer({directory=path.join(ROOT,'dist'),ana
     const requestPath=request.url.split('?')[0];
     if(!requestPath.startsWith('/api/')){serve(request,response);return;}
     if(request.headers.origin&&request.headers.origin!==origin){reply(response,403,{error:{code:'origin_forbidden',message:'Use the app on the same origin.'}});return;}
-    if(requestPath==='/api/analysis/status'&&request.method==='GET'){reply(response,200,{available,model});return;}
+    if(requestPath==='/api/analysis/status'&&request.method==='GET'){reply(response,200,{available,model,provider:'openai'});return;}
     if(requestPath!=='/api/analysis'){reply(response,404,{error:{code:'not_found',message:'Not found.'}});return;}
     if(request.method!=='POST'){response.setHeader('Allow','POST');reply(response,405,{error:{code:'method_not_allowed',message:'Use POST.'}});return;}
     if(request.headers.origin!==origin||request.headers['sec-fetch-site']==='cross-site'){reply(response,403,{error:{code:'origin_forbidden',message:'Use the app on the same origin.'}});return;}

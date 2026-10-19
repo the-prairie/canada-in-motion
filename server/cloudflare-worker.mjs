@@ -1,10 +1,10 @@
-import {AnalysisError, createEnergyAnalyzer, createOpenAIProvider, DEFAULT_MODEL, validateAnalysisRequest} from './energy-analysis.mjs';
+import {AnalysisError, createEnergyAnalyzer, createOpenAIProvider, createCloudflareProvider, DEFAULT_MODEL, FREE_MODEL, validateAnalysisRequest} from './energy-analysis.mjs';
 import {normalizeEconomyState, summarizeEconomy, validateEconomy} from '../economy-model.mjs';
 
 const SITE_ORIGIN = 'https://the-prairie.github.io';
 const DATA_ROOT = SITE_ORIGIN + '/canada-in-motion/data/';
 const DAY = 86400000;
-const LIMITS = Object.freeze({daily:20, monthly:100, visitorDaily:3, minute:6, concurrent:2});
+const LIMITS = Object.freeze({daily:10, monthly:100, visitorDaily:3, minute:6, concurrent:2});
 const encoder = new TextEncoder();
 const unavailable = () => new AnalysisError('unavailable', 'Live analysis is temporarily unavailable. The data and scenario calculations still work.', 503);
 const json = (value, status=200, headers={}) => new Response(JSON.stringify(value), {status, headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'none'",...headers}});
@@ -24,9 +24,14 @@ export async function boundedJSON(request, maximum=8192, timeoutMs=5000) {
   try{return await Promise.race([read(),timeout]);}finally{clearTimeout(timer);}
 }
 
+export function providerConfig(env) {
+  if(env.AI_PROVIDER==='cloudflare')return {provider:'cloudflare',model:FREE_MODEL,ready:typeof env.AI?.run==='function'};
+  if(env.AI_PROVIDER==='openai')return {provider:'openai',model:DEFAULT_MODEL,ready:Boolean(env.OPENAI_API_KEY)};
+  return {provider:null,model:null,ready:false};
+}
 function configured(env) {
   const testKey=value=>/^[123]x0{10,}/.test(value||'');
-  return env.AI_ENABLED==='1' && Boolean(env.OPENAI_API_KEY && env.TURNSTILE_SECRET_KEY && env.VISITOR_HASH_KEY?.length>=32 && env.TURNSTILE_SITE_KEY && env.AI_QUOTA) && !testKey(env.TURNSTILE_SITE_KEY) && !testKey(env.TURNSTILE_SECRET_KEY);
+  return env.AI_ENABLED==='1' && providerConfig(env).ready && Boolean(env.TURNSTILE_SECRET_KEY && env.VISITOR_HASH_KEY?.length>=32 && env.TURNSTILE_SITE_KEY && env.AI_QUOTA) && !testKey(env.TURNSTILE_SITE_KEY) && !testKey(env.TURNSTILE_SECRET_KEY);
 }
 
 export async function verifyVisitor(token, ip, env, fetchImpl=fetch) {
@@ -124,9 +129,11 @@ export class AnalysisQuota {
       const admission=await this.reserve(visitor);
       if(!admission.allowed)return json({error:{code:admission.code,message:admission.message}},429,{'Retry-After':String(admission.retryAfter)});
       reservation=admission.id;
-      const analyze=createEnergyAnalyzer({data,debate,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider:createOpenAIProvider({apiKey:env.OPENAI_API_KEY}),timeoutMs:60000});
+      const selected=providerConfig(env);
+      const provider=selected.provider==='cloudflare'?createCloudflareProvider({ai:env.AI}):createOpenAIProvider({apiKey:env.OPENAI_API_KEY});
+      const analyze=createEnergyAnalyzer({data,debate,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider,model:selected.model,timeoutMs:60000});
       const result=await analyze(input);
-      return json({...result,dataVersion:data.generatedAt});
+      return json({...result,provider:selected.provider,dataVersion:data.generatedAt});
     } catch(error) {
       const failure=error instanceof AnalysisError?error:unavailable();
       return json({error:{code:failure.code,message:failure.message}},failure.status);
@@ -155,7 +162,10 @@ export default {
       if(origin!==SITE_ORIGIN||request.headers.get('Access-Control-Request-Method')!=='POST'||headers.some(header=>!['content-type','x-turnstile-token'].includes(header)))return reply({error:{message:'Origin not allowed.'}},403);
       return new Response(null,{status:204,headers:{...cors,'Access-Control-Allow-Methods':'POST','Access-Control-Allow-Headers':'Content-Type, X-Turnstile-Token','Access-Control-Max-Age':'600'}});
     }
-    if(path==='/api/analysis/status'&&request.method==='GET')return reply({available:configured(env),model:DEFAULT_MODEL,turnstileSiteKey:configured(env)?env.TURNSTILE_SITE_KEY:null,limits:LIMITS});
+    if(path==='/api/analysis/status'&&request.method==='GET'){
+      const selected=providerConfig(env);
+      return reply({available:configured(env),model:selected.model,provider:selected.provider,turnstileSiteKey:configured(env)?env.TURNSTILE_SITE_KEY:null,limits:LIMITS});
+    }
     if(path!=='/api/analysis'||request.method!=='POST')return reply({error:{message:'Method not allowed.'}},405);
     if(origin!==SITE_ORIGIN)return reply({error:{message:'Open the public app to ask a question.'}},403);
     if(!configured(env))return reply({error:{code:'unavailable',message:unavailable().message}},503);

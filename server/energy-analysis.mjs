@@ -1,4 +1,5 @@
-export const DEFAULT_MODEL = 'gpt-6-astra';
+export const DEFAULT_MODEL = 'gpt-6-luna';
+export const FREE_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 export const REGIONS = ['CA','AB','BC','SK','MB','ON','QC','NB','NS','PE','NL','YT','NT','NU'];
 export const SCENARIOS = ['Current Measures','Higher','Lower','Canada Net-zero'];
 const object = properties => ({type:'object',properties,required:Object.keys(properties),additionalProperties:false});
@@ -89,6 +90,35 @@ export function createOpenAIProvider({apiKey,model=DEFAULT_MODEL,fetchImpl=fetch
     if(payload.status!=='completed')throw badOutput();
     const text=content.filter(item=>item.type==='output_text').map(item=>item.text).join('');
     try { return JSON.parse(text); } catch { throw badOutput(); }
+  };
+}
+export function compactEvidence(evidence) {
+  const contexts=[];
+  const numbers=evidence.numbers.map(({context,...record})=>{
+    let index=contexts.indexOf(context);
+    if(index<0){index=contexts.length;contexts.push(context);}
+    return {...record,contextId:`c${index}`};
+  });
+  return {numbers,contexts:Object.fromEntries(contexts.map((context,index)=>[`c${index}`,context])),facts:evidence.facts,sources:evidence.sources.map(({id,publisher,title,release})=>({id,publisher,title,release}))};
+}
+export function createCloudflareProvider({ai,model=FREE_MODEL}) {
+  return async ({schema,name,instructions,input,signal})=>{
+    signal?.throwIfAborted();
+    const compact=input?.evidence?{...input,evidence:compactEvidence(input.evidence)}:input;
+    const body={messages:[{role:'system',content:instructions+' Each number\'s contextId refers to its units, period and limitations in evidence.contexts.'},{role:'user',content:JSON.stringify(compact)}],response_format:{type:'json_schema',json_schema:schema},stream:false,temperature:0,max_tokens:name==='energy_scenario'?256:1200};
+    if(new TextEncoder().encode(JSON.stringify(body)).byteLength>50000)throw new AnalysisError('evidence_too_large','The evidence set is too large for this analysis. Try a narrower question.',422);
+    let payload;
+    try {payload=await ai.run(model,body);} catch {throw new AnalysisError('provider_unavailable','The free AI service is unavailable or its daily allowance has been used. The data and scenario calculations still work.',503);}
+    // Workers AI's binding has no documented AbortSignal option. A timed-out
+    // call may finish upstream, but cannot start the explanation or return it.
+    signal?.throwIfAborted();
+    let value=payload?.response;
+    if(typeof value==='string'){
+      if(value.length>24000)throw badOutput();
+      try{value=JSON.parse(value);}catch{throw badOutput();}
+    }
+    if(!value||typeof value!=='object'||Array.isArray(value)||JSON.stringify(value).length>24000)throw badOutput();
+    return value;
   };
 }
 export function createEnergyAnalyzer({data,normalizeState,summarize,provider,debate,model=DEFAULT_MODEL,timeoutMs=60000}) {

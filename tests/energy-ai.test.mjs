@@ -48,7 +48,7 @@ test('Responses request uses strict output, no stored responses and bounded toke
   let sent;
   const provider=createOpenAIProvider({apiKey:'test-private',fetchImpl:async(url,options)=>{sent={url,...options};return {ok:true,json:async()=>({status:'completed',output:[{type:'message',content:[{type:'output_text',text:'{"state":{}}'}]}]})};}});
   await provider({name:'check',schema:{type:'object'},instructions:'rules',input:{question:'q'}});
-  const body=JSON.parse(sent.body);assert.equal(body.store,false);assert.equal(body.text.format.strict,true);assert.equal(body.max_output_tokens,2200);assert.equal(body.model,'gpt-6-astra');assert.equal(sent.url,'https://api.openai.com/v1/responses');
+  const body=JSON.parse(sent.body);assert.equal(body.store,false);assert.equal(body.text.format.strict,true);assert.equal(body.max_output_tokens,2200);assert.equal(body.model,'gpt-6-luna');assert.equal(sent.url,'https://api.openai.com/v1/responses');
 });
 test('timeout aborts a stalled provider and makes no second call',async()=>{
   let calls=0,signal;

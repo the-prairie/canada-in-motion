@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-10-18",
+  "verifiedAt": "2026-10-19",
   "deployment": {
     "publicWebsite": "https://the-prairie.github.io/canada-in-motion/",
     "apiHost": "Cloudflare Workers",
@@ -9,12 +9,12 @@
     "hostingTier": "Workers Free"
   },
   "checks": {
-    "nodeTests": 64,
-    "workerdTests": 10,
+    "nodeTests": 69,
+    "workerdTests": 12,
     "publicBuildPassed": true,
     "publicFilesScannedForExistingKey": 436,
     "secretFound": false,
-    "independentReview": "accepted after cancel/change retry repair",
+    "independentReview": "free-provider routing accepted; live inference pending",
     "freeTierRemoteCpuMeasured": false
   },
   "providerProbe": {
@@ -25,10 +25,27 @@
     "completedAnswer": false
   },
   "pending": [
-    "Cloudflare Workers and Turnstile authorization",
-    "Approval for remote secret storage",
-    "OpenAI credit and approved project spending limit",
+    "Cloudflare sign-in and Workers, Workers AI and Turnstile authorization",
+    "Confirm account Free plan; deploy and store secrets",
+    "Real free-model quality and usage evaluation",
     "Deployed public browser acceptance test"
   ],
-  "testScope": "Workerd tests use simulated upstream verification and model responses. They do not establish funded public inference access. Free-tier source configuration is verified; deployed CPU and actual account-level free-tier usage require remote acceptance."
+  "testScope": "Node and workerd tests use simulated model responses. They do not establish real Llama response quality or account access. No remote API or secrets were created. No paid fallback is configured.",
+  "freeProvider": {
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "liveInferenceVerified": false,
+    "paidFallback": false,
+    "dailyRequestLimit": 10,
+    "monthlyRequestLimit": 100,
+    "mockedBindingTestsPassed": true
+  },
+  "approvals": {
+    "workersFree": true,
+    "encryptedSecretStorage": true,
+    "paidUpgrade": false
+  },
+  "lastDeploymentAttempt": {
+    "deployed": false,
+    "reason": "Existing Cloudflare credential lacks Workers access"
+  }
 }

@@ -1,81 +1,66 @@
 # Public AI launch
 
-## Chosen deployment
+## Deployment and current status
 
-Keep the website and its 275 MB of published data on GitHub Pages. Run the AI API on Cloudflare Workers, with a SQLite Durable Object for usage accounting and Turnstile for automated-request protection. The public app keeps its current address. A custom domain is optional.
+The user approved Workers Free and encrypted secret storage on 18 October 2026. Keep the website and its roughly 275 MB of data on GitHub Pages; deploy the small API to `canada-in-motion-ai` on Cloudflare Workers. The largest well index exceeds Workers' 25 MiB individual static-asset limit. [Workers limits](https://developers.cloudflare.com/workers/platform/limits/)
 
-The largest well index is about 50 MB, above Workers' 25 MiB individual static-asset limit. Moving the whole site would add data-storage work without improving the analyst. The small API bundle can deploy separately. [Workers limits](https://developers.cloudflare.com/workers/platform/limits/)
+The selected free inference candidate is **Llama 3.3 70B**, using the Workers AI binding. It does not need an OpenAI key or funded OpenAI account. Cloudflare explicitly supports its JSON-schema mode. Real model acceptance is still pending account authorization; mocked tests establish integration behavior, not model quality. [JSON Mode](https://developers.cloudflare.com/workers-ai/features/json-mode/)
 
-Use **Workers Free** for launch. The public Worker only checks the route, origin and configuration, then relays the request. Validation, evidence loading, accounting and inference execute inside the SQLite Durable Object, which has a default 30-second CPU allowance; network wait is separate. There is no paid CPU override or required US$5 subscription. [Durable Object limits](https://developers.cloudflare.com/durable-objects/platform/limits/)
+The existing Cloudflare grant only covers Pages. A deployment attempt on 19 October UTC failed with “No access to the specified resource.” The browser sign-in has been handed to the owner. No remote Worker or secrets were created. `AI_ENABLED` remains `0` and `config/ai-public.json` remains disconnected until the real model and public browser checks pass.
 
-The free tier includes 100,000 Durable Object requests and 13,000 GB-s of duration per day, plus 5 GB of storage. Our 20 admitted analyses/day at a 60-second inference timeout would consume roughly 150 GB-s/day for those inference waits, before verification and other work. This is a planning estimate, not an abuse-proof bound or deployed CPU measurement. Free limits are shared with other account workloads; exceeding them stops the affected operations rather than creating paid overages. Do not upgrade the account automatically. [Durable Object pricing](https://developers.cloudflare.com/durable-objects/platform/pricing/)
+## Free allowance and cost controls
 
-## Implemented
+Workers AI includes **10,000 neurons per account per UTC day**. On Workers Free, requests fail when the allowance is exhausted; more usage requires an explicit paid upgrade. Other apps on the account share the allowance. Confirm the account is on Free before activation. Do not upgrade it automatically. [Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/)
 
-- `server/cloudflare-worker.mjs`: HTTPS relay with exact GitHub Pages CORS origin. The internal Durable Object handles the strict input schema, bounded request body and timeouts, server-side Turnstile checks, and analysis. No question/answer logging.
-- `AnalysisQuota`: atomic SQLite reservations shared by every Worker instance, retained across restarts and deployments. Limits are 20 admitted analyses per UTC day, 100 per calendar month, three per network address per UTC day, six per minute and two concurrently. Failed admitted calls count. Leases recover after a terminated request.
-- Turnstile verification requires success, the exact website hostname and the `energy_analysis` action. Tokens expire and are single-use. [Turnstile validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/)
-- Only a daily HMAC of the edge-provided network address is stored. Raw IPs, questions and answers are not written to the app database. Daily counters expire; alarms remove expired rows. Shared networks share the allowance. This is a fair-use control, not individual identification.
-- The Worker reads the public `economy.json` and `energy-debate.json`, caches them for five minutes and validates them before analysis. Economic data older than eight days stops new analyses. Existing daily publication refreshes therefore reach the AI without redeploying Worker code.
-- The browser loads the public API origin from `ai-config.json`. The build permits only that HTTPS origin and Cloudflare's challenge host in CSP. No API key reaches the browser or public artifact.
-- The form supports verification, cancellation, timeout, retry, quota messages and retention of the previous answer. Nothing is sent to OpenAI until the visitor submits a question and passes verification.
-- `npm run test:ai:edge` runs the bundled Worker in Cloudflare's actual `workerd` runtime with simulated upstream responses. It covers CORS, validated answers, token replay, wrong hostname/action, restart persistence, overlapping public analyses, private accounting routes, concurrent admission, provider failures and the kill switch. Node tests additionally check UTC day/month rollover, expired leases and input bounds.
+The app allows ten admitted analyses per UTC day, 100 per calendar month, three per network address per UTC day, six per minute and two active analyses. These counts are conservative launch controls, not a guarantee of ten successful answers: provider capacity, free allowance and validation can stop an answer sooner. Failed admitted calls count. There are no automatic model retries or paid fallbacks.
 
-## Current blockers, verified 18 October 2026
+Each analysis has at most two calls: a 256-token scenario selection and a 1,200-token explanation. Input is bounded to 50,000 UTF-8 bytes per call. Repeated numeric contexts and source-download metadata are removed from the model payload; the full evidence remains available to validate and display the answer. No numbers, units, observation periods or source identities are discarded.
 
-1. Cloudflare is signed in to the intended account, but the OAuth grant covers Pages rather than Workers and Turnstile. It needs the additional scopes listed below.
-2. Copying the existing OpenAI key to Cloudflare has not been approved. Its current approved destination is only the ignored local `.env.local` file. Nothing has been uploaded.
-3. A real Responses request returned HTTP 429, `credit_balance_exhausted`, `insufficient_quota`. A read-only model lookup returned HTTP 200 for `gpt-6-astra`, so the key authenticates and the model is accessible. API credit must be replenished before a public answer can pass verification. [OpenAI billing](https://platform.openai.com/settings/organization/billing)
-4. No paid hosting subscription is required. The production API budget remains a separate decision. Suggested initial API ceiling: US$25/month; this is a spending cap, not a required subscription or purchase. Confirm the scope before setting a project limit: the existing key belongs to Default project, so its project limit may also affect other applications using that project.
+Llama's published rates are 26,668 neurons per million input tokens and 204,805 per million output tokens. The combined output cap is about 298 neurons per analysis, plus input consumption. Measure actual token usage in the live evaluation; do not convert this output-only figure into a promised daily answer count. [Model rates](https://developers.cloudflare.com/workers-ai/platform/pricing/)
 
-`AI_ENABLED` remains `0`, and the public origin remains `null`, until these are resolved. Status means configured, not a guarantee that a provider request will succeed. A real completed public answer is required for launch acceptance.
+The optional OpenAI adapter now defaults to **GPT-6 Luna**, at US$0.10 per million input tokens and US$0.50 per million output tokens for standard short-context requests. It is disabled for the public free configuration. Switching requires an explicit `AI_PROVIDER=openai` deployment and a funded API account. The existing key previously returned exhausted API credit; no successful Luna answer has been verified. A ChatGPT/Codex plan does not automatically fund this key. [Luna pricing](https://developers.openai.com/api/docs/models/gpt-6-luna)
 
-## Cost controls
+## Runtime and data handling
 
-The API uses `gpt-6-astra`, at most two Responses requests per answer, `store:false`, explicit low reasoning effort and a maximum of 2,200 output tokens per request. Requests are limited to 50,000 UTF-8 bytes, with duplicate evidence removed. There are no automatic paid retries or external model tools.
+The public Free Worker checks route, origin and configuration, then relays to a SQLite Durable Object. The object handles validation, evidence loading, inference and atomic usage accounting. Durable Objects have a default 30-second CPU allowance; network waits are separate. No paid CPU override is configured. [Object limits](https://developers.cloudflare.com/durable-objects/platform/limits/)
 
-Current published standard pricing is US$10 per million input tokens and US$50 per million output tokens. The output allowance alone can therefore cost up to US$0.22 per analysis, plus input tokens. Daily/monthly request limits do not constitute a dollar cap. [Model and pricing](https://developers.openai.com/api/docs/models/gpt-6-astra)
+The free object allocation includes 100,000 requests, 13,000 GB-s per day and 5 GB storage. Ten analyses waiting 60 seconds at 128 MB would use roughly 75 GB-s before verification and other work. This estimate is not an abuse-proof bound or a deployed CPU measurement. [Object pricing](https://developers.cloudflare.com/durable-objects/platform/pricing/)
 
-Use an OpenAI enforced project spend limit, not just an alert, after confirming the correct project scope. OpenAI documents a possible small overrun while usage propagates. The existing key has a 30-day expiry and needs rotation before its configured expiration. A longer-term production key should be project-scoped and stored only in the hosting secret store. [Spend limits](https://developers.openai.com/api/docs/guides/spend-limits)
-
-## ChatGPT plan versus API billing
-
-The API-key route uses separately billed API usage. A ChatGPT/Codex credit balance is not automatically available to this app’s API key. The verified exhausted-credit error concerns the API account, not the user’s Codex credit balance. [OpenAI pricing](https://learn.chatgpt.com/docs/pricing)
-
-Sign in with ChatGPT can let eligible users spend their own plan allowance in supported integrations. OpenAI’s current public documentation covers open-source, locally hosted apps and directs remotely hosted apps through an interest/application process. It is a possible later route, not an activated replacement for public API billing. Each user would authorize their own usage. [Integration scope](https://developers.openai.com/siwc/token-sharing-open-source)
+- Exact-origin CORS permits only `https://the-prairie.github.io`.
+- Turnstile requires success, the exact hostname and the `energy_analysis` action. Tokens are single-use. [Validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/)
+- The database stores a date-rotated HMAC of the network address and temporary counters. It does not store raw IPs, questions or answers. Shared networks share the allowance.
+- Published economic and debate data are loaded from fixed public URLs and cached for five minutes. Economic snapshots older than eight days stop new analyses.
+- Scenario selection, numeric placeholders and citation IDs are validated. Calculation code supplies the numbers. Validation does not prove every qualitative sentence true.
+- The browser identifies Cloudflare Workers AI as the recipient before submission. Cloudflare receives the question and selected public data; Turnstile processes verification signals. Provider policies still apply. No blanket zero-retention claim is made.
+- A 60-second application timeout prevents a late response from being shown or starting a second call. The Workers AI binding has no documented cancellation option, so an already-running upstream call may finish. The concurrency limit bounds active application requests, not guaranteed simultaneous GPU work.
+- Request-body logging is disabled. No API key or deployment credential is included in the public build.
 
 ## Activation sequence
 
-The owner approves free-tier Cloudflare authorization, the key destination and API spend-limit scope. Then:
+The free setup and secret destination are already approved. The remaining owner action is Cloudflare sign-in and authorization.
 
-1. Reauthorize the Cloudflare account using only the required scopes. Existing Pages access is retained:
+1. Renew authorization, retaining Pages and adding the required services:
 
    ```sh
-   npx wrangler login --scopes account:read user:read workers_scripts:write workers:write challenge-widgets.write pages:write offline_access
+   npx wrangler login --scopes account:read user:read workers_scripts:write workers:write ai:write challenge-widgets.write pages:write
    ```
 
-   Complete the authorization page. Use the free tier; do not enable Workers Paid.
+   Wrangler adds its refresh scope automatically. Complete the browser authorization. Confirm Workers Free in the dashboard; no paid subscription is required.
+2. Run `node scripts/probe-free-ai.mjs`. It uses the current Wrangler credential in memory, makes at most eight model calls for four fixed public questions, and saves a private local report in `.data-cache/free-ai-evaluation.json`. Review actual answers for Alberta oil sensitivity, Québec benefits, unsupported gas/GDP forecasts and prompt injection. It records validation, state selection, latency and token usage. A successful schema check alone does not authorize activation.
+3. Create a managed Turnstile widget named `Canada in Motion`, limited to `the-prairie.github.io`. Put its public site key in `wrangler.jsonc`. Keep `AI_ENABLED=0` for the first deployment.
+4. Run `npm test`, `npm run test:ai:edge`, then `npm run deploy:ai`. The account and Worker name are pinned in `wrangler.jsonc`.
+5. Store `TURNSTILE_SECRET_KEY` and a random, at least 32-character `VISITOR_HASH_KEY` in this Worker's encrypted secret store. Transfer values through stdin/in-memory tooling, never command arguments or chat. The approved OpenAI key can be stored there if the optional OpenAI route is needed; the free route neither requires nor uses it. Do not reset the visitor hash during ordinary deployments.
+6. After model acceptance, set `AI_ENABLED=1` and deploy. Run `node scripts/connect-public-ai.mjs <actual-HTTPS-Worker-origin>` to verify provider/model, CORS and the matching Turnstile site key before saving the public endpoint.
+7. Publish Pages with the generated CSP. In the actual public browser, submit a question through Turnstile and verify the cited answer, data version, retry/cancel behavior and quota response. Scan the build for secrets. Record both deployment revisions and measured runtime behavior.
 
-2. Create a managed Turnstile widget named `Canada in Motion`, limited to `the-prairie.github.io`. Save its public site key in `wrangler.jsonc` under `vars.TURNSTILE_SITE_KEY`. Keep `AI_ENABLED` set to `0` for the first deployment.
-3. Run `npm ci`, `npm test`, `npm run test:ai:edge`, then `npm run deploy:ai`. The account and Worker name are pinned in `wrangler.jsonc`.
-4. Put `OPENAI_API_KEY`, `TURNSTILE_SECRET_KEY` and a random, at least 32-character `VISITOR_HASH_KEY` in this Worker's encrypted secret store. Transfer the approved local OpenAI key through stdin/in-memory tooling; never put it in command arguments, a workflow variable, Git, a screenshot or chat. Do not rotate the visitor hash casually because that resets per-network accounting for the current day.
-5. Replenish OpenAI credit and configure the approved project spend limit. If Default project is shared, isolate the app before changing limits that would affect other applications.
-6. Set `AI_ENABLED` to `1`, deploy, and copy the actual HTTPS Worker origin returned by Cloudflare. Run `node scripts/connect-public-ai.mjs <actual-origin>`. This verifies the service's origin, configured status and matching Turnstile site key before writing the public configuration.
-7. Commit the public origin/site key and publish the GitHub Pages build. The build embeds the matching CSP. Do not use wildcard CORS or `unsafe-eval` to fix integration errors.
-8. In the public browser, complete Turnstile and ask a question. Verify a completed cited answer, correct data version, a second visitor request and the quota response. Verify the API key is absent from the public build. Record the actual Worker and Pages deployment revisions.
+No domain purchase or separate database service is needed. GitHub continues refreshing the datasets. CI tests changes without production credentials.
 
-No new domain, separate database service or GitHub credential is required. GitHub continues refreshing the datasets. Worker source updates are deployed from this authorized workspace; `.github/workflows/ai-checks.yml` verifies them in CI without production credentials.
+## Operations and tests
 
-## Operations
+Pause inference with `AI_ENABLED=0` and redeploy. To disconnect the frontend, restore `config/ai-public.json` to `{"apiOrigin":null}` and republish. Maps and deterministic calculations remain available.
 
-To pause AI, set `AI_ENABLED` to `0` and redeploy. Maps, records, published scenarios and calculations remain available. To disconnect the frontend completely, restore `config/ai-public.json` to `{"apiOrigin":null}` and republish Pages.
+Preserve the Durable Object namespace and `public-analysis-v1` identity through normal deployments and rollbacks so usage accounting is retained. Expired counters and leases are cleaned up automatically.
 
-Do not delete the Durable Object namespace or change the `public-analysis-v1` object identity during ordinary deployments, as doing so would reset accounting. Rollbacks use the previous Worker code with the same namespace and schema. The initial migration is additive.
+`npm run test:ai:edge` uses real workerd with simulated upstream responses. It covers the Cloudflare binding path and optional OpenAI path, exact-origin CORS, Turnstile validation, persistence, atomic quotas, overlapping requests, no paid fallback and the disabled state. Node tests cover evidence compaction, malformed outputs, citation/number checks, timeouts, UTC resets and input bounds.
 
-Cloudflare operational metrics can diagnose CPU/error rates. Request-body logging is disabled. OpenAI receives the visitor's question and selected public evidence with `store:false`; provider retention policies still apply. Turnstile processes browser verification signals and the network address.
-
-## Local development
-
-`npm run build && npm run start:ai` serves the existing Node development server on `127.0.0.1:4175`, using the approved ignored `.env.local`. It is for private testing only. Its per-process limits are not the public accounting mechanism. `npm run dev:ai:edge` runs the Worker locally; the shipped public Worker deliberately accepts only the public site's origin.
-
-The analyzer selects supported inputs, computes results deterministically, then explains the evidence with checked citations and numerical placeholders. It does not infer uncalibrated provincial GDP, jobs or household-bill responses. Qualitative model interpretation still needs review; validation does not prove every sentence true.
+`npm run build && npm run start:ai` runs the private local Node server on `127.0.0.1:4175` using the approved ignored `.env.local`. That local server uses the optional OpenAI adapter and its separate API billing. It is not the public free service.

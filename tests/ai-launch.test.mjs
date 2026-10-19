@@ -16,12 +16,12 @@ function quotaFixture(t) {
 
 test('global daily and monthly limits survive changing visitors and reset only at UTC boundaries',async t=>{
   const f=quotaFixture(t);const realNow=Date.now;let time=Date.parse('2026-10-01T00:00:00Z');Date.now=()=>time;t.after(()=>{Date.now=realNow;});
-  for(let day=0;day<5;day++){
-    time=Date.parse(`2026-10-0${day+1}T00:00:00Z`);
-    for(let i=0;i<20;i++){
+  for(let day=0;day<10;day++){
+    time=Date.parse(`2026-10-${String(day+1).padStart(2,'0')}T00:00:00Z`);
+    for(let i=0;i<10;i++){
       time+=61000;const result=await f.reserve(day*100+i);assert.equal(result.allowed,true);await f.release(result.id);
     }
-    const result=await f.reserve(999);assert.equal(result.code,day===4?'monthly_limit':'daily_limit');
+    const result=await f.reserve(999);assert.equal(result.code,day===9?'monthly_limit':'daily_limit');
   }
   time=Date.parse('2026-10-31T23:59:00Z');assert.equal((await f.reserve(999)).code,'monthly_limit');
   time=Date.parse('2026-11-01T00:00:00Z');assert.equal((await f.reserve(999)).allowed,true);
