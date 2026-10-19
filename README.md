@@ -19,11 +19,11 @@ npm run build
 npm run preview
 ```
 
-Initial acquisition requires network access and takes several minutes. Full CER histories download about 430 MB before reduction to dated reference snapshots. Historical geometry, benchmarks and BC permit geometry load only when requested. Well indexes load on entering the explorer; detailed records load on demand.
+Initial acquisition requires network access and takes several minutes. Full CER histories download about 430 MB before reduction to dated reference snapshots. Historical geometry, benchmarks and BC permit geometry load only when requested. The Atlas opens with well indexes; detailed source records load on demand.
 
 ## Coverage and meaning
 
-The verified launch snapshot contains 317,129 well source records from six provinces and Yukon; Nova Scotia records are historical. BC adds 6,144 pipeline permit segments, 11,717 facility permit points and 27 separate orphan-pipeline rows. Permits collected since July 2016 are not a complete operating inventory. These counts are kept separate from well counts.
+The October 18, 2026 release contains 317,936 well source records across all 13 provinces and territories. Coverage remains partial. BASIN supplies historical records for Québec, New Brunswick, Prince Edward Island, Newfoundland and Labrador, Northwest Territories and Nunavut. Nova Scotia includes a current onshore inventory and a historical offshore inventory. BC adds 6,144 pipeline permit segments, 11,717 facility permit points and 27 separate orphan-pipeline rows. Permits collected since July 2016 are not a complete operating inventory. These counts are kept separate from well counts.
 
 Read the in-app Coverage register and `data/national-coverage.json` before interpreting a count. Orphan designation, wellbore abandonment and site reclamation are independent facts. Missing data never means zero wells or zero charges. CanVec geometry and CER benchmarks retain observation dates and do not establish current operations or quotes. Dated transport schedules are available only for their verified date; government charges remain separately identified as unknown where unsupported.
 
@@ -38,3 +38,11 @@ Daily well refresh and weekly context/BC acquisition run in GitHub Actions. A su
 No visitor account is required. Scenarios stay in browser storage. There is no app analytics, advertising or server-side search collection. The host may retain access logs.
 
 Design work applies progressive disclosure, comparable scales and accessible interaction from [interactive-visualization-creator](https://github.com/oysteinkrog/dotfiles/tree/master/.claude/skills/interactive-visualization-creator), adapted to native JavaScript and Leaflet.
+
+## Atlas interaction
+
+The same source records appear as geographic points, province status comparisons and an exact-count table. A selected area filters the inspector, existing record list and CSV together. Shared links retain the area and filters. Province comparisons describe the loaded inventories, whose scopes and dates differ; they do not rank provincial closure performance.
+
+The point renderer uses WebGL, with Canvas and HTML fallbacks. Keyboard controls support area selection and navigation. Reduced motion skips the arrangement transition. The existing transport calculations, benchmarks, scenarios and source dialogs share the redesigned shell.
+
+See [design and research](docs/FRONTIER-DESIGN.md), [review and repairs](docs/FRONTIER-REVIEW.md) and [decision trail](docs/FRONTIER-DECISIONS.tsv).

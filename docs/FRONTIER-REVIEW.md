@@ -53,3 +53,5 @@ The segment-scope blocker remains. The rebuilt app still returns 14,776 Canada r
 The remaining segment-scope defect is fixed. Clicking BC Active in the actual rebuilt app selects British Columbia and Active, producing 11,262 records. Table mode now uses record-count labels with no percentage or point claim. These checks were performed by the parent, not an additional independent reviewer.
 
 The parent also verified a selected geographic area across Atlas, the existing record list and a shared-link reload. Québec's one historical GSC record exported through the existing CSV and opened its native details. A local fault-injection proxy verified unavailable WebGL and context loss without changing the production code. The fallback retained exact data and usable comparison/table controls.
+
+A final public check found the mobile footer sitting inside the longer atlas content. The mobile atlas now uses a content-height shell. A real-browser check at 574×724 confirmed that the footer starts exactly at the atlas bottom, with no horizontal overflow. This is the same mobile layout rule used below 760px.

@@ -1,0 +1,40 @@
+{
+  "checkedAt": "2026-10-19T00:37:03.092033+00:00",
+  "commit": "217841e256cc6d9bc800855ac4ffefa95daaecd4",
+  "workflow": "https://github.com/the-prairie/canada-in-motion/actions/runs/39181142451",
+  "status": "success",
+  "publicHealth": {
+    "status": "public-beta",
+    "releaseId": "78e7080d8e759b75e82f",
+    "records": 317936,
+    "retrievedAt": "2026-10-19T00:33:12Z",
+    "builtAt": "2026-10-19T00:33:17.573Z",
+    "nationalComplete": false
+  },
+  "matchingBuiltAssets": {
+    "app.js": "f313d63f3d0cfb9687fda16f806dd5674723a271f66af4f8eaae37d55e01c4ed",
+    "model.mjs": "467221090152e38b22119b3db03e043374dd1a63d4cad0d599ac6eb224edd4ca",
+    "record-atlas.js": "b15f4152ed6e6667c97b87b7e1a73ba0e454797979a832d4782729ad04e94c4f",
+    "record-atlas.css": "06cb1b7a7ba6a581bb2b0b500c4925942b31e7274b18c7e195a0095098a254d1",
+    "atlas-model.mjs": "136e2d9e0af9e69f82e72aaeb524793b952f1f2881b8829ea427d2fd091b47a3",
+    "design.css": "0e0f82c5663f25d4b8e90cdc2f1c68af555f151adca945a5c1fce2d5119a204b",
+    "index.html": "6c0c547ebc1cc83694a0f4e1ebc2d87219e68d1fb059740668223a8ac5d8cd1e"
+  },
+  "automated": {
+    "nodeTests": 34,
+    "pythonTests": 29,
+    "betaGatePassed": true
+  },
+  "browserEvidence": "docs/FRONTIER-REVIEW.md",
+  "verifiedRepairs": [
+    "province and status selected together",
+    "accurate table labels",
+    "mobile atlas ends before footer",
+    "budget cohort clears geographic area"
+  ],
+  "limits": [
+    "National coverage remains partial",
+    "No GDP or commodity-price economic model",
+    "WebGL fallback tested locally with fault injection"
+  ]
+}
