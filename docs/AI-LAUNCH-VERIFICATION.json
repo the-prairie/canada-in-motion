@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-10-19T06:28:03.640441+00:00",
+  "verifiedAt": "2026-10-19T06:49:00.433811+00:00",
   "deployment": {
     "publicWebsite": "https://the-prairie.github.io/canada-in-motion/",
     "apiHost": "Cloudflare Workers",
@@ -8,21 +8,24 @@
     "publicAiEnabled": true,
     "hostingTier": "Workers Free",
     "apiOrigin": "https://canada-in-motion-ai.thelaurenzary.workers.dev",
-    "workerVersion": "0234a8a5-5400-4a3e-95a6-acf89cb05a62",
-    "frontendRevision": "a3a0ffb4e5e69794fe01dc3b502f3498f1f8c5f9",
-    "pagesRun": "https://github.com/the-prairie/canada-in-motion/actions/runs/39209275495"
+    "workerVersion": "a144a704-5ac0-4717-acf7-0d78415cf0ff",
+    "frontendRevision": "170d74349f74ac4cb501ba43d6055ee933c87b1c",
+    "pagesRun": "https://github.com/the-prairie/canada-in-motion/actions/runs/39210079657",
+    "backendRevision": "9af4bc5"
   },
   "checks": {
-    "nodeTests": 74,
+    "nodeTests": 80,
     "workerdTests": 12,
     "publicBuildPassed": true,
     "publicFilesScannedForExistingKey": 436,
     "secretFound": false,
-    "independentReview": "Constrained free model accepted for bounded release; four live cases passed",
+    "independentReview": "Keep Cloudflare. Reject OpenRouter switch. Revised bounds and renderer repairs accepted; 7 targeted tests rerun independently.",
     "freeTierRemoteCpuMeasured": false,
     "publicBrowserAnswer": true,
     "publicAnswerDownload": true,
-    "publicTurnstileRetry": true
+    "publicTurnstileRetry": true,
+    "repositoryAndBuildFilesScannedForKeys": 573,
+    "publicBrowserBoundsRejection": true
   },
   "providerProbe": {
     "modelMetadataStatus": 200,
@@ -32,7 +35,7 @@
     "completedAnswer": false
   },
   "pending": [],
-  "testScope": "73 Node tests and 12 workerd tests pass. Four real Cloudflare model cases pass with independent review. Claims and numeric/source validation do not establish universal question relevance. No paid fallback.",
+  "testScope": "80 Node tests and 12 workerd tests pass. Extended pre-repair model comparison exposed unsupported percentage parsing in both providers; direct English bounds now checked before inference. The repaired public browser rejects the 90% request and preserves its nonzero state. Validation does not establish universal natural-language interpretation or relevance. No paid fallback.",
   "freeProvider": {
     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
     "liveInferenceVerified": true,
@@ -41,23 +44,26 @@
     "monthlyRequestLimit": 100,
     "mockedBindingTestsPassed": true,
     "answerMode": "source-backed-findings",
-    "evaluatedCases": 4,
-    "passedCases": 4
+    "evaluatedCases": 8,
+    "passedCases": 7,
+    "evaluationScope": "Extended pre-repair state/validation sample. The unsupported-magnitude defect was subsequently repaired deterministically and verified in the public browser."
   },
   "approvals": {
     "workersFree": true,
     "encryptedSecretStorage": true,
-    "paidUpgrade": false
+    "paidUpgrade": false,
+    "openRouterSetupAndBenchmark": true
   },
   "lastDeploymentAttempt": {
     "deployed": true,
     "enabledForVisitors": true,
-    "reason": "Public browser completed an actual Turnstile-verified analysis"
+    "reason": "Bounds and answer-order repairs deployed; public Turnstile-verified 90% request correctly rejected without changing scenario."
   },
   "secrets": {
     "encrypted": [
       "TURNSTILE_SECRET_KEY",
-      "VISITOR_HASH_KEY"
+      "VISITOR_HASH_KEY",
+      "OPENROUTER_API_KEY"
     ],
     "openAIKeyUploaded": false
   },
@@ -70,5 +76,19 @@
     "outcome": "Cited national oil sensitivity and observed Alberta contribution displayed; JSON download verified. Initial Turnstile error 300030 recovered with Try again.",
     "scope": "Public success and retry observed. Quota persistence, cancellation and exact-origin rejection additionally covered by workerd/Node tests; remote CPU not measured.",
     "followup": "Defers widget removal until callback finishes and acknowledges handled Turnstile errors; regression test passes."
+  },
+  "browserBoundsAcceptance": {
+    "question": "Cut the oil price by ninety percent and forecast Alberta GDP losses.",
+    "outcome": "Explicit supported-range message displayed. Existing Canada/Higher/2050/+10% state preserved.",
+    "modelCallRequired": false,
+    "verifiedWorkerVersion": "a144a704-5ac0-4717-acf7-0d78415cf0ff"
+  },
+  "openRouter": {
+    "connected": true,
+    "activeInPublicApp": false,
+    "usageUSD": 0,
+    "accountFreeRequestsPerDayAtCheck": 1000,
+    "benchmarkRequestsRecordedAtCheck": 37,
+    "report": "OPENROUTER-EVALUATION.json"
   }
 }
