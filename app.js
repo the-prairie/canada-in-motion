@@ -1206,6 +1206,7 @@ document.addEventListener("click", async (e) => {
   }
   if (a === "export-scenario") exportScenario();
   if (a === "view-cleanup-cohort") {
+    state.exploration.area = null;
     setSurface("details");
     state.cohort = "cleanup";
     state.view = "wells";
