@@ -1,0 +1,141 @@
+#record-atlas { --ra-ink:#26342f; --ra-muted:#667168; --ra-line:#d5d8cc; --ra-paper:#f4f4eb; --ra-accent:#a34c32; height:100%; color:var(--ra-ink); background:var(--ra-paper); }
+#record-atlas [hidden] { display:none!important; }
+#record-atlas * { box-sizing:border-box; }
+#record-atlas button, #record-atlas select { font:inherit; color:inherit; }
+#record-atlas button { cursor:pointer; border:0; border-radius:0; background:transparent; }
+#record-atlas button:focus-visible, #record-atlas select:focus-visible, #record-atlas .ra-stage:focus-visible, #record-atlas summary:focus-visible { outline:2px solid var(--ra-accent); outline-offset:3px; }
+#record-atlas button:hover { color:var(--ra-accent); }
+#record-atlas button:disabled { cursor:default; opacity:.45; }
+#record-atlas .ra-workspace { height:100%; min-height:0; display:grid; grid-template-columns:minmax(0,1fr) 320px; }
+#record-atlas .ra-main { display:flex; flex-direction:column; min-width:0; min-height:0; }
+#record-atlas .ra-toolbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; padding:16px 28px 0; }
+#record-atlas .ra-arrangements { display:flex; border-bottom:1px solid var(--ra-line); gap:20px; }
+#record-atlas .ra-arrangements button { min-height:44px; padding:8px 0; font-size:13px; color:var(--ra-muted); border-bottom:2px solid transparent; margin-bottom:-1px; }
+#record-atlas .ra-arrangements button[aria-pressed="true"] { border-color:var(--ra-accent); color:var(--ra-ink); }
+#record-atlas .ra-record-key { font:10px ui-monospace,monospace; color:var(--ra-muted); }
+#record-atlas .ra-stage { position:relative; min-height:0; flex:1; isolation:isolate; overflow:hidden; cursor:grab; touch-action:none; }
+#record-atlas .ra-stage:active { cursor:grabbing; }
+#record-atlas .ra-stage.ra-selecting { cursor:crosshair; }
+#record-atlas .ra-stage canvas { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+#record-atlas .ra-points { z-index:1; }
+#record-atlas .ra-map-tools { position:absolute; left:28px; top:20px; z-index:5; display:flex; border:1px solid var(--ra-line); background:rgba(249,249,242,.94); }
+#record-atlas .ra-map-tools button { min-height:44px; min-width:44px; padding:7px 12px; font-size:11px; border-right:1px solid var(--ra-line); }
+#record-atlas .ra-map-tools button:last-child { border-right:0; }
+#record-atlas .ra-map-tools button[aria-pressed="true"] { background:var(--ra-ink); color:#fff; }
+#record-atlas .ra-coordinate { position:absolute; right:22px; bottom:16px; font:10px ui-monospace,monospace; color:var(--ra-muted); }
+#record-atlas .ra-stage-footer { display:flex; justify-content:space-between; gap:16px; padding:12px 28px 17px; border-top:1px solid var(--ra-line); }
+#record-atlas .ra-stage-footer p { margin:0; font-size:11px; line-height:1.5; max-width:520px; color:var(--ra-muted); }
+#record-atlas .ra-projection { font:10px/1.6 ui-monospace,monospace; color:var(--ra-muted); text-align:right; white-space:nowrap; }
+#record-atlas .ra-inspector { border-left:1px solid var(--ra-line); overflow:auto; padding:27px 24px 32px; background:#f8f8f0; scrollbar-width:thin; }
+#record-atlas .ra-eyebrow { font:10px ui-monospace,monospace; letter-spacing:.08em; text-transform:uppercase; margin:0 0 14px; color:var(--ra-muted); }
+#record-atlas .ra-place { margin:0 0 13px; font-size:23px; font-weight:450; line-height:1.15; letter-spacing:-.5px; }
+#record-atlas .ra-total { font-size:clamp(38px,3.6vw,54px); line-height:1.06; letter-spacing:-2px; font-variant-numeric:tabular-nums; }
+#record-atlas .ra-match-label { font-size:12px; color:var(--ra-muted); margin:7px 0 24px; }
+#record-atlas .ra-field { display:block; font-size:11px; color:var(--ra-muted); }
+#record-atlas .ra-field select { display:block; width:100%; margin-top:7px; min-height:43px; padding:8px 10px; font-size:12px; background:var(--ra-paper); border:1px solid var(--ra-line); border-radius:0; }
+#record-atlas .ra-filter-summary { font-size:11px; line-height:1.6; color:var(--ra-muted); margin-top:9px; overflow-wrap:anywhere; }
+#record-atlas .ra-clear-area { min-height:36px; padding:7px 0; color:var(--ra-accent); font-size:12px; text-decoration:underline; text-underline-offset:4px; }
+#record-atlas .ra-status-heading { display:flex; justify-content:space-between; align-items:center; margin-top:25px; }
+#record-atlas h3 { margin:0; font-size:12px; font-weight:500; }
+#record-atlas .ra-status-heading button { font-size:11px; padding:8px 0 8px 10px; color:var(--ra-accent); }
+#record-atlas .ra-statuses { margin-top:10px; }
+#record-atlas .ra-statuses button { width:100%; min-height:48px; padding:7px 0 10px; display:grid; grid-template-columns:8px 1fr auto; gap:0 9px; text-align:left; font-size:12px; align-items:center; border-bottom:1px solid var(--ra-line); }
+#record-atlas .ra-statuses button[aria-pressed="true"] { color:var(--ra-accent); font-weight:600; }
+#record-atlas .ra-swatch { width:6px; height:6px; border-radius:50%; background:var(--ra-status); }
+#record-atlas .ra-statuses strong { font:12px ui-monospace,monospace; font-variant-numeric:tabular-nums; }
+#record-atlas .ra-status-track { grid-column:2/4; height:2px; margin-top:7px; background:#e3e5db; }
+#record-atlas .ra-status-track i { display:block; height:100%; background:var(--ra-status); }
+#record-atlas .ra-actions { display:grid; margin-top:23px; }
+#record-atlas .ra-actions button { display:flex; justify-content:space-between; align-items:center; min-height:43px; padding:10px 0; text-align:left; font-size:12px; border-bottom:1px solid var(--ra-line); }
+#record-atlas .ra-actions button:first-child { background:var(--ra-ink); color:#fff; padding:12px; }
+#record-atlas .ra-actions button:first-child:hover { background:#3d4c43; }
+#record-atlas .ra-scope { font-size:11px; line-height:1.65; color:var(--ra-muted); margin:18px 0; }
+#record-atlas .ra-sources { padding:13px 0; border-top:1px solid var(--ra-line); border-bottom:1px solid var(--ra-line); }
+#record-atlas .ra-sources summary { cursor:pointer; font-size:12px; }
+#record-atlas .ra-source-count { float:right; font:11px ui-monospace,monospace; color:var(--ra-muted); }
+#record-atlas .ra-source-list article { border-top:1px solid var(--ra-line); padding:12px 0; }
+#record-atlas .ra-source-list article:first-child { margin-top:12px; }
+#record-atlas .ra-source-list button { padding:0; text-align:left; line-height:1.5; font-size:12px; }
+#record-atlas .ra-source-list p { font-size:10px; line-height:1.4; color:var(--ra-muted); margin:5px 0 0; }
+#record-atlas .ra-preview { margin-top:22px; }
+#record-atlas .ra-preview-list button { width:100%; padding:12px 0; border-bottom:1px solid var(--ra-line); text-align:left; }
+#record-atlas .ra-preview-list button>span { display:block; font-size:12px; overflow:hidden; text-overflow:ellipsis; }
+#record-atlas .ra-preview-list small { display:block; font-size:10px; line-height:1.5; color:var(--ra-muted); margin-top:4px; }
+#record-atlas .ra-preview-list p { font-size:12px; line-height:1.6; color:var(--ra-muted); }
+#record-atlas .ra-chart { position:absolute; inset:64px 0 20px; display:grid; grid-template-rows:repeat(13,minmax(0,1fr)); z-index:2; cursor:default; }
+#record-atlas .ra-chart-axis { position:absolute; top:-29px; left:var(--ra-chart-left); right:var(--ra-chart-right); display:flex; justify-content:space-between; font:10px ui-monospace,monospace; color:var(--ra-muted); }
+#record-atlas .ra-chart-row { display:grid; grid-template-columns:var(--ra-chart-left) minmax(0,1fr) var(--ra-chart-right); align-items:center; }
+#record-atlas .ra-chart-row>button { padding:0 18px 0 28px; text-align:left; min-height:28px; font-size:12px; line-height:1.25; }
+#record-atlas .ra-chart-row>button span { display:block; font:12px ui-monospace,monospace; }
+#record-atlas .ra-chart-row>button small { display:block; font-size:9px; line-height:1.3; color:var(--ra-muted); }
+#record-atlas .ra-chart-row>button[aria-pressed="true"] { color:var(--ra-accent); }
+#record-atlas .ra-chart-row>strong { font:11px ui-monospace,monospace; padding-left:12px; }
+#record-atlas .ra-row-bar { display:flex; height:23px; background:rgba(211,214,201,.35); position:relative; }
+#record-atlas .ra-row-bar button { min-height:0; height:100%; padding:0; background:var(--ra-status); opacity:.25; min-width:0; }
+#record-atlas .ra-row-bar button:hover { opacity:.55; }
+#record-atlas .ra-row-bar>span { font:10px ui-monospace,monospace; color:var(--ra-muted); align-self:center; padding-left:6px; }
+#record-atlas .ra-comparison-note { font-size:11px; color:var(--ra-muted); line-height:1.65; margin:0; padding:0 28px 20px; max-width:850px; }
+#record-atlas .ra-table-wrap { position:absolute; inset:22px; overflow:auto; cursor:default; touch-action:auto; z-index:3; background:var(--ra-paper); }
+#record-atlas table { width:100%; border-collapse:collapse; font-size:11px; font-variant-numeric:tabular-nums; }
+#record-atlas caption { text-align:left; font-size:13px; margin-bottom:20px; }
+#record-atlas th, #record-atlas td { text-align:right; padding:12px 8px; border-bottom:1px solid var(--ra-line); white-space:nowrap; }
+#record-atlas th:first-child { text-align:left; font-weight:400; }
+#record-atlas td { font-family:ui-monospace,monospace; }
+#record-atlas th button { padding:0; min-height:30px; text-align:left; }
+#record-atlas thead th { font-weight:500; color:var(--ra-muted); }
+#record-atlas .ra-renderer-note { position:static; margin:10px 28px; padding:12px; background:#f9f9f1; border:1px solid var(--ra-line); font-size:12px; z-index:4; }
+#record-atlas[data-arrangement="compare"] .ra-stage, #record-atlas[data-arrangement="table"] .ra-stage { cursor:default; touch-action:pan-y; }
+#record-atlas[data-arrangement="compare"] .ra-coordinate, #record-atlas[data-arrangement="table"] .ra-coordinate { display:none; }
+@media (max-width:1050px) {
+  #record-atlas .ra-workspace { grid-template-columns:minmax(0,1fr) 285px; }
+  #record-atlas .ra-inspector { padding:24px 20px; }
+  #record-atlas .ra-toolbar { padding-inline:22px; }
+  #record-atlas .ra-record-key { width:100%; }
+  #record-atlas .ra-stage-footer { flex-direction:column; gap:5px; }
+  #record-atlas .ra-projection { text-align:left; }
+}
+@media (max-width:760px) {
+  #record-atlas { height:auto; }
+  #record-atlas .ra-workspace { display:block; min-height:0; }
+  #record-atlas .ra-main { display:block; }
+  #record-atlas .ra-toolbar { padding:12px 18px 0; gap:12px; }
+  #record-atlas .ra-arrangements { gap:22px; width:100%; }
+  #record-atlas .ra-arrangements button { font-size:12px; }
+  #record-atlas .ra-record-key { font-size:10px; }
+  #record-atlas .ra-stage { height:440px; min-height:440px; touch-action:pan-y; }
+  #record-atlas .ra-stage.ra-selecting { touch-action:none; }
+  #record-atlas .ra-map-tools { left:18px; top:18px; }
+  #record-atlas .ra-map-tools button { min-height:44px; min-width:40px; padding:8px 10px; }
+  #record-atlas .ra-stage-footer { padding:12px 18px; }
+  #record-atlas .ra-inspector { border-left:0; border-top:1px solid var(--ra-line); overflow:visible; padding:24px 22px; }
+  #record-atlas .ra-selection-heading { position:relative; padding-right:150px; min-height:96px; }
+  #record-atlas .ra-eyebrow { font-size:9px; }
+  #record-atlas .ra-place { font-size:23px; }
+  #record-atlas .ra-total { position:absolute; right:0; top:12px; font-size:38px; letter-spacing:-1.5px; }
+  #record-atlas .ra-match-label { position:absolute; right:0; top:55px; font-size:10px; }
+  #record-atlas .ra-statuses { display:grid; grid-template-columns:1fr 1fr; gap:0 20px; }
+  #record-atlas .ra-statuses button { min-height:54px; }
+  #record-atlas .ra-actions { grid-template-columns:1fr 1fr; gap:16px; }
+  #record-atlas .ra-actions button { min-height:48px; font-size:11px; }
+  #record-atlas .ra-preview-list button { min-height:48px; }
+  #record-atlas .ra-comparison-note { padding:0 18px 18px; }
+  #record-atlas .ra-chart-row>button { padding:0 8px 0 18px; min-height:42px; }
+  #record-atlas .ra-chart-row>button small { display:none; }
+  #record-atlas .ra-chart-row>strong { font-size:10px; padding-left:8px; }
+  #record-atlas .ra-row-bar { height:20px; }
+  #record-atlas[data-arrangement="compare"] .ra-stage { height:635px; min-height:635px; }
+  #record-atlas[data-arrangement="table"] .ra-stage { height:650px; min-height:650px; }
+  #record-atlas .ra-table-wrap { inset:22px 18px; }
+}
+@media (max-height:550px) and (min-width:761px) {
+  #record-atlas .ra-workspace { min-height:600px; }
+}
+
+@media (min-width:761px) { #record-atlas { height:auto; overflow:hidden; } }
+
+#record-atlas .ra-legend { display:flex; gap:16px; padding:12px 28px 0; flex-wrap:wrap; color:var(--ra-muted); font-size:11px; }
+#record-atlas .ra-legend span { display:flex; align-items:center; gap:6px; }
+#record-atlas .ra-legend i { width:7px; height:7px; border-radius:50%; }
+#record-atlas .ra-projection a { color:inherit; text-underline-offset:3px; }
+#record-atlas .ra-clear-filters { min-height:44px; text-align:left; font-size:12px; text-decoration:underline; text-underline-offset:4px; }
+@media (max-width:760px) { #record-atlas .ra-legend { padding-inline:18px; gap:13px; font-size:10px; } }

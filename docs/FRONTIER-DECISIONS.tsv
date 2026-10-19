@@ -1,0 +1,8 @@
+timestamp	phase	decision	why	evidence	result
+2026-10-18T23:40:55.153390+00:00	research	Evaluate two working concepts on actual well records	Interaction quality depends on identity and source scope	candidate-a and candidate-b	In progress
+2026-10-18T23:40:55.153875+00:00	research	Record Shadertoy access limit	Security verification prevented inspection	RESEARCH.md	No gallery-specific claims
+2026-10-18T23:40:55.153879+00:00	release	Publish data and copy before redesign	Preserve completed verified work	Actions run 39177093454 and public health.json	317936 records in 13 jurisdictions; partial coverage
+2026-10-18T23:40:55.153881+00:00	design	Prioritize viewport map over landing-page hero	The 1280 by 720 prototype hides the map below its title	Candidate A browser inspection	Compact heading in production
+2026-10-19T00:22:45.341681+00:00	design	Combine identity morph with geographic selection	Both concepts answer useful questions with the same records	IMPLEMENTATION.md and candidate rationales	Implemented in one record collection
+2026-10-19T00:22:45.342222+00:00	verification	Constrain chart segment selection to its jurisdiction and status	Reviewer reproduced global status selection from a provincial segment	ACCEPTANCE.md and actual browser BC Active click	11262 BC records now selected
+2026-10-19T00:22:45.342224+00:00	verification	Keep exact data available after graphics loss	Public browsers can lose GPU contexts	graphics-probe.mjs and browser no-WebGL/context-loss runs	Table and comparison retain correct counts

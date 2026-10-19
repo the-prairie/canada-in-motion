@@ -59,5 +59,22 @@
       "CSV identifier types"
     ]
   },
-  "publication": "pending"
+  "publication": {
+    "checkedAt": "2026-10-18T23:39:57.686013+00:00",
+    "commit": "f213c9ec6bfc2732d5670e29df3c886e22417b64",
+    "workflow": "https://github.com/the-prairie/canada-in-motion/actions/runs/39177093454",
+    "status": "success",
+    "health": {
+      "status": "public-beta",
+      "releaseId": "9ad306bcb1aa38606ce3",
+      "records": 317936,
+      "retrievedAt": "2026-10-18T23:36:15Z",
+      "builtAt": "2026-10-18T23:36:22.324Z",
+      "nationalComplete": false
+    },
+    "browserVerified": [
+      "317,936 records across 13 jurisdictions",
+      "new benchmark introduction"
+    ]
+  }
 }

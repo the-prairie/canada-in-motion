@@ -1,6 +1,8 @@
+import { normalizeArea, inArea } from './atlas-model.mjs';
 export const BARRELS_PER_CUBIC_METRE = 6.2898107704321;
 export const DEFAULT_STATE = Object.freeze({
-  view: "journey",
+  view: "atlas",
+  exploration: { arrangement: "geography", area: null },
   labTab: "transport",
   cohort: "all",
   route: "trans-mountain-burnaby",
@@ -47,7 +49,11 @@ export function normalizeState(raw = {}) {
     scenario: { ...DEFAULT_STATE.scenario, ...raw.scenario },
     layers: { ...DEFAULT_STATE.layers, ...raw.layers },
   };
-  if (!["journey", "wells", "lab"].includes(s.view)) s.view = "journey";
+  if (!["atlas", "journey", "wells", "lab"].includes(s.view)) s.view = "atlas";
+  s.exploration = {
+    arrangement: ["geography", "compare", "table"].includes(raw.exploration?.arrangement) ? raw.exploration.arrangement : "geography",
+    area: normalizeArea(raw.exploration?.area),
+  };
   s.labTab = s.labTab === "cleanup" ? "cleanup" : "transport";
   s.cohort = s.cohort === "cleanup" ? "cleanup" : "all";
   s.route = typeof s.route === "string" ? s.route : DEFAULT_STATE.route;
@@ -192,6 +198,7 @@ export function filterWells(wells, state) {
   const q = state.query.toLowerCase().trim();
   return wells.filter(
     (w) =>
+      inArea(w, state.exploration?.area) &&
       (state.cohort !== "cleanup" || isCleanupRecord(w)) &&
       (state.province === "all" || w.province === state.province) &&
       (state.orphan === "all" || w.orphanStatus === state.orphan) &&

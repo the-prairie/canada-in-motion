@@ -180,3 +180,11 @@ test("Empty and out-of-range closure drafts are invalid rather than zero budgets
   assert.equal(cleanupScenario(5000000, NaN, 150000, 3547).status, "invalid");
   assert.equal(cleanupScenario(0, 75000, 150000, 3547).low, 0);
 });
+
+test("Atlas arrangement and area survive sharing and constrain the record export cohort", () => {
+  const state = normalizeState({view:'atlas', exploration:{arrangement:'compare',area:[-100,-100,100,100]}});
+  assert.deepEqual(decodeState(encodeState(state)).exploration,state.exploration);
+  const wells = [{id:'inside',lon:-96,lat:58,province:'MB',closureStatus:'active'}, {id:'outside',lon:-120,lat:49,province:'BC',closureStatus:'active'}];
+  assert.deepEqual(filterWells(wells,state).map(w=>w.id),['inside']);
+  assert.equal(normalizeState({exploration:{area:[1,2,Infinity,4]}}).exploration.area,null);
+});

@@ -12,6 +12,7 @@ import {
 } from "./model.mjs";
 import { wellStatusSummary, comparisonWidths, revealPanel } from "./insights.mjs";
 import { AtlasMap } from "./map.js";
+import { RecordAtlas } from "./record-atlas.js";
 import { fetchJSON, loadWells, loadDetail, snapshotFreshness } from "./data-store.mjs";
 const $ = (id) => document.getElementById(id);
 const esc = (s) =>
@@ -67,6 +68,8 @@ const statusNames = {
 let state = normalizeState(),
   data,
   atlas,
+  recordAtlas,
+  provinceGeometry,
   filtered = [],
   resultLimit = 30,
   toastTimer,
@@ -99,6 +102,7 @@ async function boot() {
       "data/provinces.geojson",
     ].map(fetchJSON),
   );
+  provinceGeometry = provinces;
   const wells = { wells: [], retrievedAt: catalog.retrievedAt, coverage: catalog.sources.map(source => ({province:source.province, sourceId:source.id, included:source.count, totalAvailable:source.sourceCount, scope:source.scope, note:source.limitations})) };
   data = { network, wells, tariffs, catalog, coverage, historicalInfrastructure: null, benchmarkTolls: null, bcInfrastructure: null };
   sources = [...network.sources, ...catalog.sources, ...tariffSources];
@@ -230,7 +234,7 @@ async function ensureWellData() {
       if (!well) state.well = null;
     }
   } catch (error) { wellLoadError = error.message; wellsReady = false; }
-  finally { wellsLoading = false; render(); if (wellsReady && state.view !== "journey") atlas.focus(); }
+  finally { wellsLoading = false; render(); if (wellsReady && ["wells", "lab"].includes(state.view)) atlas.focus(); }
 }
 async function ensureSelectedDetail(record) {
   if (detailLoadingId === record.id) return;
@@ -246,6 +250,35 @@ async function ensureSelectedDetail(record) {
   }
 }
 function render() {
+  const exploring = state.view === "atlas";
+  document.body.dataset.view = state.view;
+  $("record-atlas").hidden = !exploring;
+  document.querySelector(".workspace").hidden = exploring;
+  document.querySelector(".skip-link").href = exploring ? "#record-atlas" : "#panel";
+  document.querySelectorAll("[data-view]").forEach(button => {
+    button.classList.toggle("selected", button.dataset.view === state.view);
+    button.setAttribute("aria-current", button.dataset.view === state.view ? "page" : "false");
+  });
+  $("coverage-line").textContent = `${fmt(data.catalog.totalRecords)} records · ${new Set(data.catalog.sources.map(source => source.province)).size} jurisdictions · coverage gaps`;
+  recordAtlas?.setVisible(exploring);
+  if (exploring) {
+    clearTimeout(resultTimer);
+    if (!wellsReady) {
+      $("record-atlas").innerHTML = `<div class="empty"><h1>${wellLoadError ? "Inventory unavailable" : "Loading well inventories"}</h1><p role="status">${wellLoadError ? esc(wellLoadError) : "Loading published records for the atlas."}</p>${wellLoadError ? '<button data-action="retry-wells" class="primary-button">Retry inventory</button>' : ""}</div>`;
+      if (!wellLoadError) void ensureWellData();
+      return;
+    }
+    filtered = filterWells(data.wells.wells, state);
+    if (!recordAtlas) recordAtlas = new RecordAtlas($("record-atlas"), {
+      wells: data.wells.wells, provinces: provinceGeometry, catalog: data.catalog,
+      onChange: patch => { state = normalizeState({...state, ...patch, well:null}); render(); persist(); },
+      onRecords: () => chooseView("wells"), onExport: exportWellRecords,
+      onWell: chooseWell, onSource: showEvidence,
+    });
+    recordAtlas.setVisible(true);
+    recordAtlas.update(state, filtered);
+    return;
+  }
   if (state.layers.bcPermits && !data.bcInfrastructure) void ensureBCData().catch(() => {});
   if (state.layers.historical && !data.historicalInfrastructure) void ensureHistoricalData().catch(() => {});
   const selectedRecord = wellsReady && state.view === "wells" && state.well ? data.wells.wells.find(w => w.id === state.well) : null;
@@ -520,7 +553,7 @@ function wellsPanel() {
     state.eventType !== "all";
   const scope = state.province === "all" ? "Records from the sources listed in Coverage" : (data.catalog.sources.filter(s => s.province === state.province).map(s => s.title).join("; ") || "No well inventory is available in the app for this jurisdiction");
   const controls = wellFilters();
-  return `<div class="panel-head"><span class="eyebrow">02 / WELLS</span><h1>Well records</h1><p>Search well records by name, location or status.</p></div><div class="panel-section">${state.cohort === "cleanup" ? '<div class="callout">Showing records used in the closure-budget scenario. Clear filters to browse all records.</div>' : ""}${controls}${wellInsights(inventoryGap)}<div class="result-count" role="status"><span>${inventoryGap ? "Inventory not loaded" : `<strong>${fmt(filtered.length)}</strong> loaded ${filtered.length === 1 ? "record" : "records"}`}</span><button class="text-link" data-action="clear-well-filters">Clear filters</button></div><p class="coverage-note">${inventoryGap ? esc(provinceCoverage?.topics["well-inventory"].note || scope) : esc(scope) + ". Counts cover these sources only."} <button class="text-link" data-action="coverage">Coverage</button></p><details id="well-filter-options" class="disclosure" ${advanced ? "open" : ""}><summary>Status & event filters${advanced ? " · active" : ""}</summary>${wellAdvancedFilters()}${eventChart()}</details><button class="text-link" data-action="well-csv" ${inventoryGap ? "disabled" : ""}>Download filtered records</button></div><div class="well-results" aria-label="Matching well records">${
+  return `<div class="panel-head"><span class="eyebrow">02 / WELLS</span><h1>Well records</h1><p>Search well records by name, location or status.</p></div><div class="panel-section">${state.cohort === "cleanup" ? '<div class="callout">Showing records used in the closure-budget scenario. Clear filters to browse all records.</div>' : ""}${state.exploration.area ? '<div class="callout">Within the area selected in Atlas. <button class="text-link" data-action="clear-atlas-area">Clear area</button> <button class="text-link" data-view="atlas">Return to atlas</button></div>' : ""}${controls}${wellInsights(inventoryGap)}<div class="result-count" role="status"><span>${inventoryGap ? "Inventory not loaded" : `<strong>${fmt(filtered.length)}</strong> loaded ${filtered.length === 1 ? "record" : "records"}`}</span><button class="text-link" data-action="clear-well-filters">Clear filters</button></div><p class="coverage-note">${inventoryGap ? esc(provinceCoverage?.topics["well-inventory"].note || scope) : esc(scope) + ". Counts cover these sources only."} <button class="text-link" data-action="coverage">Coverage</button></p><details id="well-filter-options" class="disclosure" ${advanced ? "open" : ""}><summary>Status & event filters${advanced ? " · active" : ""}</summary>${wellAdvancedFilters()}${eventChart()}</details><button class="text-link" data-action="well-csv" ${inventoryGap ? "disabled" : ""}>Download filtered records</button></div><div class="well-results" aria-label="Matching well records">${
     filtered.length
       ? filtered
           .slice(0, resultLimit)
@@ -604,10 +637,11 @@ function chooseView(view) {
   state.view = view;
   state.well = null;
   render();
-  atlas.focus();
+  if (view !== "atlas") atlas.focus();
   persist();
   $("panel").scrollTop = 0;
-  revealPanel($("panel").firstElementChild);
+  if (view === "atlas") $("record-atlas").focus({preventScroll:true});
+  else revealPanel($("panel").firstElementChild);
 }
 function openDialog(html, title) {
   dialogRevision++;
@@ -711,6 +745,31 @@ function exportFile(name, content, type) {
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   announce(`${name} exported.`);
+}
+function exportWellRecords() {
+    exportFile(
+      "canada-in-motion-well-records.csv",
+      csv(filtered, [
+        "id",
+        "name",
+        "province",
+        "license",
+        "identifierLabel",
+        "operator",
+        "closureStatus",
+        "orphanStatus",
+        "reclamationStatus",
+        "lat",
+        "lon",
+        "sourceId",
+        "sourceUrl",
+        "observationsThrough",
+        "sourceRetrievedAt",
+        "sourceDateDetail",
+        "sourceLimitations",
+      ]),
+      "text/csv",
+    );
 }
 function exportReceipt() {
   const rate = getRate();
@@ -963,7 +1022,7 @@ document.addEventListener("click", async (e) => {
   if (!b || !data) return;
   if (b.matches("a.brand")) {
     e.preventDefault();
-    chooseView("journey");
+    chooseView("atlas");
     return;
   }
   if (b.dataset.statusFilter) {
@@ -974,7 +1033,7 @@ document.addEventListener("click", async (e) => {
     return;
   }
   if (b.dataset.coverageProvince) {
-    state.province = b.dataset.coverageProvince; state.query = ''; state.orphan = 'all'; state.closure = 'all'; state.eventYear = 'all'; state.eventType = 'all'; state.cohort = 'all';
+    state.exploration.area = null; state.province = b.dataset.coverageProvince; state.query = ''; state.orphan = 'all'; state.closure = 'all'; state.eventYear = 'all'; state.eventType = 'all'; state.cohort = 'all';
     $("evidence-dialog").close(); chooseView('wells'); return;
   }
   if (b.dataset.surface) {
@@ -1086,8 +1145,10 @@ document.addEventListener("click", async (e) => {
     resultLimit += 30;
     render();
   }
+  if (a === "clear-atlas-area") { state.exploration.area = null; render(); persist(); }
   if (a === "clear-well-filters") {
     Object.assign(state, {
+      exploration: {...state.exploration, area:null},
       cohort: "all",
       province: "all",
       orphan: "all",
@@ -1110,30 +1171,7 @@ document.addEventListener("click", async (e) => {
     openDialog(
       `<div class="source-entry"><h3>Well-data coverage</h3>${coverageTable()}</div>`,
     );
-  if (a === "well-csv")
-    exportFile(
-      "canada-in-motion-well-records.csv",
-      csv(filtered, [
-        "id",
-        "name",
-        "province",
-        "license",
-        "identifierLabel",
-        "operator",
-        "closureStatus",
-        "orphanStatus",
-        "reclamationStatus",
-        "lat",
-        "lon",
-        "sourceId",
-        "sourceUrl",
-        "observationsThrough",
-        "sourceRetrievedAt",
-        "sourceDateDetail",
-        "sourceLimitations",
-      ]),
-      "text/csv",
-    );
+  if (a === "well-csv") exportWellRecords();
   if (a === "save-scenario") saveScenarioDialog();
   if (a === "saved-scenarios") showSaved();
   if (a === "confirm-save") {
