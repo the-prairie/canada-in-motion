@@ -1,0 +1,24 @@
+name: Verify public AI service
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths: ['server/**', 'tests/**', 'ai-client.mjs', 'energy-economy.js', 'economy-model.mjs', 'scripts/**', 'wrangler.jsonc', 'package*.json', '.github/workflows/ai-checks.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run test:ai:edge

@@ -1,0 +1,156 @@
+import {AnalysisError, createEnergyAnalyzer, createOpenAIProvider, DEFAULT_MODEL, validateAnalysisRequest} from './energy-analysis.mjs';
+import {normalizeEconomyState, summarizeEconomy, validateEconomy} from '../economy-model.mjs';
+
+const SITE_ORIGIN = 'https://the-prairie.github.io';
+const DATA_ROOT = SITE_ORIGIN + '/canada-in-motion/data/';
+const DAY = 86400000;
+const LIMITS = Object.freeze({daily:20, monthly:100, visitorDaily:3, minute:6, concurrent:2});
+const encoder = new TextEncoder();
+const unavailable = () => new AnalysisError('unavailable', 'Live analysis is temporarily unavailable. The data and scenario calculations still work.', 503);
+const json = (value, status=200, headers={}) => new Response(JSON.stringify(value), {status, headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'none'",...headers}});
+
+export async function boundedJSON(request, maximum=8192, timeoutMs=5000) {
+  if(Number(request.headers.get('Content-Length')) > maximum) throw new AnalysisError('body_too_large','The question is too long.',413);
+  if(!request.body) throw new AnalysisError('invalid_request','Enter a question.',400);
+  const reader=request.body.getReader();
+  let timer;
+  const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>{void reader.cancel().catch(()=>{});reject(new AnalysisError('request_timeout','The request took too long. Try again.',408));},timeoutMs);});
+  const read=async()=>{
+    const chunks=[];let size=0;
+    while(true){const {value,done}=await reader.read();if(done)break;size+=value.byteLength;if(size>maximum){void reader.cancel();throw new AnalysisError('body_too_large','The question is too long.',413);}chunks.push(value);}
+    const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
+    try{return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));}catch{throw new AnalysisError('invalid_request','The request could not be read.',400);}
+  };
+  try{return await Promise.race([read(),timeout]);}finally{clearTimeout(timer);}
+}
+
+function configured(env) {
+  const testKey=value=>/^[123]x0{10,}/.test(value||'');
+  return env.AI_ENABLED==='1' && Boolean(env.OPENAI_API_KEY && env.TURNSTILE_SECRET_KEY && env.VISITOR_HASH_KEY?.length>=32 && env.TURNSTILE_SITE_KEY && env.AI_QUOTA) && !testKey(env.TURNSTILE_SITE_KEY) && !testKey(env.TURNSTILE_SECRET_KEY);
+}
+
+export async function verifyVisitor(token, ip, env, fetchImpl=fetch) {
+  if(typeof token!=='string'||!token.length||token.length>2048)throw new AnalysisError('verification_required','Complete the security check and try again.',403);
+  let response, result;
+  try {
+    response=await fetchImpl('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({secret:env.TURNSTILE_SECRET_KEY,response:token,remoteip:ip}),signal:AbortSignal.timeout(8000)});
+    result=await boundedJSON(response,16384,8000);
+  } catch {throw new AnalysisError('verification_unavailable','The security check is unavailable. Try again in a moment.',503);}
+  if(!response.ok || result.success!==true || result.hostname!=='the-prairie.github.io' || result.action!=='energy_analysis')throw new AnalysisError('verification_failed','The security check expired or could not be verified. Try again.',403);
+}
+
+async function visitorID(ip, secret, now) {
+  const key=await crypto.subtle.importKey('raw',encoder.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+  const digest=await crypto.subtle.sign('HMAC',key,encoder.encode(`${new Date(now).toISOString().slice(0,10)}:${ip}`));
+  return [...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,'0')).join('');
+}
+
+let evidenceCache;
+export async function loadPublishedEvidence(fetchImpl=fetch, now=Date.now()) {
+  if(evidenceCache?.expires>now)return evidenceCache;
+  const read=async file=>{
+    const response=await fetchImpl(DATA_ROOT+file,{signal:AbortSignal.timeout(8000),redirect:'manual',headers:{Accept:'application/json'}});
+    if(!response.ok)throw unavailable();
+    return boundedJSON(response,1048576,8000);
+  };
+  const [data,debate]=await Promise.all([read('economy.json'),read('energy-debate.json')]);
+  validateEconomy(data);
+  const age=now-Date.parse(data.generatedAt);
+  if(!Number.isFinite(age)||age>8*DAY||age < -DAY)throw new AnalysisError('data_unavailable','The economic data needs a fresh update before live analysis can run.',503);
+  if(!Array.isArray(debate.sources)||!Array.isArray(debate.facts)||debate.sources.length>100||debate.facts.length>100)throw unavailable();
+  for(const source of debate.sources)if(typeof source.id!=='string'||typeof source.title!=='string'||!/^https:\/\//.test(source.url))throw unavailable();
+  for(const fact of debate.facts)if(typeof fact.id!=='string'||typeof fact.text!=='string'||fact.text.length>6000||!Array.isArray(fact.sourceIds)||fact.sourceIds.some(id=>!debate.sources.some(source=>source.id===id)))throw unavailable();
+  evidenceCache={data,debate,expires:now+300000};
+  return evidenceCache;
+}
+
+export class AnalysisQuota {
+  constructor(ctx) {
+    this.ctx=ctx;
+    this.sql=ctx.storage.sql;
+    this.sql.exec('CREATE TABLE IF NOT EXISTS counters (key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires INTEGER NOT NULL)');
+    this.sql.exec('CREATE TABLE IF NOT EXISTS leases (id TEXT PRIMARY KEY, expires INTEGER NOT NULL)');
+  }
+  async fetch(request) {
+    const input=await request.json();
+    if(input.action==='release'){
+      this.sql.exec('DELETE FROM leases WHERE id = ?',input.id);
+      return json({ok:true});
+    }
+    if(input.action!=='reserve'||typeof input.visitor!=='string'||!/^[a-f0-9]{64}$/.test(input.visitor))return json({error:'Invalid reservation'},400);
+    const now=Date.now();
+    const date=new Date(now).toISOString();
+    const day=date.slice(0,10),month=date.slice(0,7),minute=Math.floor(now/60000);
+    const nextDay=Date.parse(day)+DAY;
+    const nextMonth=Date.UTC(Number(date.slice(0,4)),Number(date.slice(5,7)),1);
+    const result=this.ctx.storage.transactionSync(()=>{
+      this.sql.exec('DELETE FROM leases WHERE expires <= ?',now);
+      this.sql.exec('DELETE FROM counters WHERE expires <= ?',now);
+      const active=this.sql.exec('SELECT count(*) AS count FROM leases').one().count;
+      if(active>=LIMITS.concurrent)return {allowed:false,code:'busy',message:'Other questions are being answered. Try again in a minute.',retryAfter:60};
+      const checks=[
+        [`month:${month}`,LIMITS.monthly,nextMonth,'monthly_limit','The public analysis allowance has been used for this month. It resets on the first day of next month.'],
+        [`day:${day}`,LIMITS.daily,nextDay,'daily_limit','The public analysis allowance has been used for today. It resets at midnight UTC.'],
+        [`visitor:${day}:${input.visitor}`,LIMITS.visitorDaily,nextDay,'visitor_limit','This network has reached its daily allowance of three questions. It resets at midnight UTC.'],
+        [`minute:${minute}`,LIMITS.minute,(minute+1)*60000,'rate_limit','Too many questions arrived at once. Try again in a minute.'],
+      ];
+      for(const [key,limit,expires,code,message] of checks){const rows=this.sql.exec('SELECT count FROM counters WHERE key = ?',key).toArray();if((rows[0]?.count||0)>=limit)return {allowed:false,code,message,retryAfter:Math.max(1,Math.ceil((expires-now)/1000))};}
+      for(const [key,,expires] of checks)this.sql.exec('INSERT INTO counters (key,count,expires) VALUES (?,1,?) ON CONFLICT(key) DO UPDATE SET count=count+1',key,expires);
+      const id=crypto.randomUUID();
+      this.sql.exec('INSERT INTO leases (id,expires) VALUES (?,?)',id,now+120000);
+      return {allowed:true,id};
+    });
+    await this.ctx.storage.setAlarm(now+DAY);
+    return json(result);
+  }
+  async alarm() {
+    const now=Date.now();
+    this.sql.exec('DELETE FROM leases WHERE expires <= ?',now);
+    this.sql.exec('DELETE FROM counters WHERE expires <= ?',now);
+    if(this.sql.exec('SELECT count(*) AS count FROM counters').one().count)await this.ctx.storage.setAlarm(now+DAY);
+  }
+}
+
+export default {
+  async fetch(request,env,ctx) {
+    const origin=request.headers.get('Origin');
+    const cors=origin===SITE_ORIGIN?{'Access-Control-Allow-Origin':SITE_ORIGIN,Vary:'Origin'}:{Vary:'Origin'};
+    const reply=(value,status=200,headers={})=>json(value,status,{...cors,...headers});
+    const path=new URL(request.url).pathname;
+    if(!['/api/analysis','/api/analysis/status'].includes(path))return reply({error:{message:'Not found.'}},404);
+    if(origin && origin!==SITE_ORIGIN)return reply({error:{message:'Origin not allowed.'}},403);
+    if(request.method==='OPTIONS'){
+      const headers=(request.headers.get('Access-Control-Request-Headers')||'').toLowerCase().split(',').map(value=>value.trim()).filter(Boolean);
+      if(origin!==SITE_ORIGIN||request.headers.get('Access-Control-Request-Method')!=='POST'||headers.some(header=>!['content-type','x-turnstile-token'].includes(header)))return reply({error:{message:'Origin not allowed.'}},403);
+      return new Response(null,{status:204,headers:{...cors,'Access-Control-Allow-Methods':'POST','Access-Control-Allow-Headers':'Content-Type, X-Turnstile-Token','Access-Control-Max-Age':'600'}});
+    }
+    if(path==='/api/analysis/status'&&request.method==='GET')return reply({available:configured(env),model:DEFAULT_MODEL,turnstileSiteKey:configured(env)?env.TURNSTILE_SITE_KEY:null,limits:LIMITS});
+    if(path!=='/api/analysis'||request.method!=='POST')return reply({error:{message:'Method not allowed.'}},405);
+    if(origin!==SITE_ORIGIN)return reply({error:{message:'Open the public app to ask a question.'}},403);
+    let quota, reservation;
+    try {
+      if(!configured(env))throw unavailable();
+      if(!/^application\/json(?:\s*;|$)/i.test(request.headers.get('Content-Type')||''))throw new AnalysisError('content_type','Send a JSON request.',415);
+      const input=validateAnalysisRequest(await boundedJSON(request));
+      const ip=request.headers.get('CF-Connecting-IP');
+      if(!ip)throw unavailable();
+      await verifyVisitor(request.headers.get('X-Turnstile-Token'),ip,env);
+      const {data,debate}=await loadPublishedEvidence();
+      const visitor=await visitorID(ip,env.VISITOR_HASH_KEY,Date.now());
+      quota=env.AI_QUOTA.get(env.AI_QUOTA.idFromName('public-analysis-v1'));
+      const decision=await quota.fetch('https://quota/reserve',{method:'POST',body:JSON.stringify({action:'reserve',visitor})});
+      if(!decision.ok)throw unavailable();
+      const admission=await decision.json();
+      if(!admission.allowed)return reply({error:{code:admission.code,message:admission.message}},429,{'Retry-After':String(admission.retryAfter)});
+      reservation=admission.id;
+      const analyze=createEnergyAnalyzer({data,debate,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider:createOpenAIProvider({apiKey:env.OPENAI_API_KEY}),timeoutMs:60000});
+      const result=await analyze(input);
+      return reply({...result,dataVersion:data.generatedAt});
+    } catch(error) {
+      const failure=error instanceof AnalysisError?error:unavailable();
+      return reply({error:{code:failure.code,message:failure.message}},failure.status);
+    } finally {
+      if(reservation)ctx.waitUntil(quota.fetch('https://quota/release',{method:'POST',body:JSON.stringify({action:'release',id:reservation})}).catch(()=>{}));
+    }
+  },
+};

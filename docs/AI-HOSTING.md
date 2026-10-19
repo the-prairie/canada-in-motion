@@ -1,93 +1,73 @@
-# Run the energy analyst
+# Public AI launch
 
-The analyst selects a supported scenario, runs the app's deterministic model, then explains the results with source references. It uses at most two OpenAI Responses API calls per question. The default model is `gpt-6-astra`. Model access and billing must be enabled on the API project.
+## Chosen deployment
 
-## Run locally
+Keep the website and its 275 MB of published data on GitHub Pages. Run the AI API on Cloudflare Workers, with a SQLite Durable Object for usage accounting and Turnstile for automated-request protection. The public app keeps its current address. A custom domain is optional.
 
-Use Node 22 or 24. From the repository root, build the public app and start the analysis server.
+The largest well index is about 50 MB, above Workers' 25 MiB individual static-asset limit. Moving the whole site would add data-storage work without improving the analyst. The small API bundle can deploy separately. [Workers limits](https://developers.cloudflare.com/workers/platform/limits/)
 
-```sh
-npm run build
-node server/server.mjs
-```
+Use Workers Paid for production: its US$5 monthly base subscription gives CPU headroom for validation and evidence formatting. The Worker has a 100 ms per-request CPU ceiling. Cloudflare usage above its included allowance can add charges; US$5 is not a hard account-wide spending cap. [Workers pricing](https://developers.cloudflare.com/workers/platform/pricing/)
 
-Open `http://127.0.0.1:4175/`. The server loads the approved `.env.local` file from the repository root. That file must contain `OPENAI_API_KEY`. Keep its permissions restricted to the account running the server. Never add the key to browser JavaScript, the build manifest, Git, screenshots or a Pages variable exposed to the browser.
+## Implemented
 
-`GET /api/analysis/status` reports whether the server has an analysis handler. `available: true` means configured, not that a billable provider request has succeeded. Without a key, the server serves the public app and reports AI unavailable.
+- `server/cloudflare-worker.mjs`: HTTPS API, exact GitHub Pages CORS origin, strict input schema, bounded request body and timeouts, server-side Turnstile checks, and no question/answer logging.
+- `AnalysisQuota`: atomic SQLite reservations shared by every Worker instance, retained across restarts and deployments. Limits are 20 admitted analyses per UTC day, 100 per calendar month, three per network address per UTC day, six per minute and two concurrently. Failed admitted calls count. Leases recover after a terminated request.
+- Turnstile verification requires success, the exact website hostname and the `energy_analysis` action. Tokens expire and are single-use. [Turnstile validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/)
+- Only a daily HMAC of the edge-provided network address is stored. Raw IPs, questions and answers are not written to the app database. Daily counters expire; alarms remove expired rows. Shared networks share the allowance. This is a fair-use control, not individual identification.
+- The Worker reads the public `economy.json` and `energy-debate.json`, caches them for five minutes and validates them before analysis. Economic data older than eight days stops new analyses. Existing daily publication refreshes therefore reach the AI without redeploying Worker code.
+- The browser loads the public API origin from `ai-config.json`. The build permits only that HTTPS origin and Cloudflare's challenge host in CSP. No API key reaches the browser or public artifact.
+- The form supports verification, cancellation, timeout, retry, quota messages and retention of the previous answer. Nothing is sent to OpenAI until the visitor submits a question and passes verification.
+- `npm run test:ai:edge` runs the bundled Worker in Cloudflare's actual `workerd` runtime with simulated upstream responses. It covers CORS, validated answers, token replay, wrong hostname/action, restart persistence, concurrent admission, provider failures and the kill switch. Node tests additionally check UTC day/month rollover, expired leases and input bounds.
 
-The existing static preview command does not run the analyst. GitHub Pages cannot execute this server. It continues to serve the deterministic data and scenarios.
+## Current blockers, verified 18 October 2026
 
-## Configure a hosted instance
+1. Cloudflare is signed in to the intended account, but the OAuth grant covers Pages rather than Workers and Turnstile. It needs the additional scopes listed below.
+2. Copying the existing OpenAI key to Cloudflare has not been approved. Its current approved destination is only the ignored local `.env.local` file. Nothing has been uploaded.
+3. A real Responses request returned HTTP 429, `credit_balance_exhausted`, `insufficient_quota`. A read-only model lookup returned HTTP 200 for `gpt-6-astra`, so the key authenticates and the model is accessible. API credit must be replenished before a public answer can pass verification. [OpenAI billing](https://platform.openai.com/settings/organization/billing)
+4. The paid hosting subscription and production API budget need approval. Recommended initial API budget: US$25/month. Confirm the scope before setting a project limit: the existing key belongs to Default project, so its project limit may also affect other applications using that project.
 
-Deploy the same public build and Node server behind an HTTPS reverse proxy. Keep the frontend and `/api/analysis` on the same origin. Configure the API key through the host's secret manager. Do not upload a local environment file into a public artifact.
+`AI_ENABLED` remains `0`, and the public origin remains `null`, until these are resolved. Status means configured, not a guarantee that a provider request will succeed. A real completed public answer is required for launch acceptance.
 
-Before binding a public address, configure these controls at the gateway.
+## Cost controls
 
-1. Authenticate users or issue rate-limited visitor sessions with abuse controls.
-2. Enforce persistent daily quotas across instances and restarts. Enforce per-session limits as well as the global ceiling.
-3. Restrict direct access to the Node port. Forward the configured public Host header and terminate TLS at the gateway.
-4. Set an API project budget, alerts and appropriate provider limits. The app's request counter is not a dollar budget.
-5. Disable request-body and authorization-header logging. Document that questions and the public evidence are sent to OpenAI. Do not ask users for confidential information.
-6. Test a provider success, refusal, timeout and quota exhaustion before enabling public traffic.
+The API uses `gpt-6-astra`, at most two Responses requests per answer, `store:false`, explicit low reasoning effort and a maximum of 2,200 output tokens per request. Requests are limited to 50,000 UTF-8 bytes, with duplicate evidence removed. There are no automatic paid retries or external model tools.
 
-Then set `HOST=0.0.0.0`, `PUBLIC_ORIGIN=https://your-host.example` and `AI_PUBLIC_GATEWAY_READY=1`. The readiness flag is an operator acknowledgement. It does not install or verify the gateway controls. Set `PORT` to the port expected by the host. Do not set wildcard CORS; the server requires a matching Origin header on analysis requests.
+Current published standard pricing is US$10 per million input tokens and US$50 per million output tokens. The output allowance alone can therefore cost up to US$0.22 per analysis, plus input tokens. Daily/monthly request limits do not constitute a dollar cap. [Model and pricing](https://developers.openai.com/api/docs/models/gpt-6-astra)
 
-The local implementation is ready for integration testing. Public AI launch still requires a hosting account, the gateway controls above, and a verified deployment. The current static Pages deployment is not a publicly hosted AI service.
+Use an OpenAI enforced project spend limit, not just an alert, after confirming the correct project scope. OpenAI documents a possible small overrun while usage propagates. The existing key has a 30-day expiry and needs rotation before its configured expiration. A longer-term production key should be project-scoped and stored only in the hosting secret store. [Spend limits](https://developers.openai.com/api/docs/guides/spend-limits)
 
-## Configuration reference
+## Activation sequence
 
-| Environment variable | Default | Meaning |
-| --- | --- | --- |
-| `OPENAI_API_KEY` | absent | Server-only credential. Absence disables analysis. |
-| `OPENAI_MODEL` | `gpt-6-astra` | Responses API model with strict structured-output support. |
-| `HOST` | `127.0.0.1` | Public interfaces require the explicit public-host settings above. |
-| `PORT` | `4175` | Server port. |
-| `PUBLIC_ORIGIN` | absent | Exact HTTPS origin for a hosted deployment, without a trailing slash or path. |
-| `AI_PUBLIC_GATEWAY_READY` | absent | Set to `1` only after configuring the gateway. |
-| `AI_CONCURRENCY` | `2` | Maximum simultaneous analyses in this process. |
-| `AI_PER_MINUTE` | `6` | Global analyses admitted in a rolling minute. |
-| `AI_DAILY_LIMIT` | `20` | Global analyses admitted per UTC day in this process. Failed attempts also count. |
-| `AI_TIMEOUT_MS` | `60000` | Combined timeout for both provider passes. |
+The owner approves the hosting cost, key destination and spend-limit scope. Then:
 
-The local counters reset on restart and are not shared across instances. Each analysis permits two provider requests, each capped at 2,200 output tokens. No automatic retries or background provider calls occur. Input questions are limited to 2,000 characters and request bodies to 8 KiB. These bounds control requests and tokens; they do not guarantee a fixed monetary cost.
+1. Reauthorize the Cloudflare account using only the required scopes. Existing Pages access is retained:
 
-## API reference
+   ```sh
+   npx wrangler login --scopes account:read user:read workers_scripts:write workers:write challenge-widgets.write pages:write offline_access
+   ```
 
-Send `POST /api/analysis` with `Content-Type: application/json` and the app's matching `Origin` header.
+   Complete the authorization page. Enable Workers Paid in the account if not already enabled.
 
-```json
-{
-  "question": "How would higher energy prices affect Alberta?",
-  "state": {
-    "region": "AB",
-    "scenario": "Higher",
-    "year": 2030,
-    "oilShock": 10,
-    "duration": "persistent"
-  }
-}
-```
+2. Create a managed Turnstile widget named `Canada in Motion`, limited to `the-prairie.github.io`. Save its public site key in `wrangler.jsonc` under `vars.TURNSTILE_SITE_KEY`. Keep `AI_ENABLED` set to `0` for the first deployment.
+3. Run `npm ci`, `npm test`, `npm run test:ai:edge`, then `npm run deploy:ai`. The account and Worker name are pinned in `wrangler.jsonc`.
+4. Put `OPENAI_API_KEY`, `TURNSTILE_SECRET_KEY` and a random, at least 32-character `VISITOR_HASH_KEY` in this Worker's encrypted secret store. Transfer the approved local OpenAI key through stdin/in-memory tooling; never put it in command arguments, a workflow variable, Git, a screenshot or chat. Do not rotate the visitor hash casually because that resets per-network accounting for the current day.
+5. Replenish OpenAI credit and configure the approved project spend limit. If Default project is shared, isolate the app before changing limits that would affect other applications.
+6. Set `AI_ENABLED` to `1`, deploy, and copy the actual HTTPS Worker origin returned by Cloudflare. Run `node scripts/connect-public-ai.mjs <actual-origin>`. This verifies the service's origin, configured status and matching Turnstile site key before writing the public configuration.
+7. Commit the public origin/site key and publish the GitHub Pages build. The build embeds the matching CSP. Do not use wildcard CORS or `unsafe-eval` to fix integration errors.
+8. In the public browser, complete Turnstile and ask a question. Verify a completed cited answer, correct data version, a second visitor request and the quota response. Verify the API key is absent from the public build. Record the actual Worker and Pages deployment revisions.
 
-State fields are optional within `state`. The model normalizes missing fields before scenario selection. Supported regions are Canada and all provinces and territories. Years run from 2023 through 2050. CER cases are `Current Measures`, `Higher`, `Lower` and `Canada Net-zero`. The separate national oil illustration permits changes from -20% through +20%; cases other than the published +10% preset are explicitly labelled approximations.
+No new domain, separate database service or GitHub credential is required. GitHub continues refreshing the datasets. Worker source updates are deployed from this authorized workspace; `.github/workflows/ai-checks.yml` verifies them in CI without production credentials.
 
-A successful response contains `state`, `summary`, `model`, and `analysis`. The analysis contains a `headline`, `blocks`, `limitations`, `sources`, and `evidence`. Each block contains plain `text`, `sourceIds`, and `evidenceIds`. Render text as text, never as HTML. Use the returned trusted source URLs for citations.
+## Operations
 
-Errors contain `error.code` and `error.message`. Invalid requests use 400, a refused analysis uses 422, quota exhaustion uses 429, unchecked model output uses 502, unavailable analysis uses 503, and a timeout uses 504. Provider response bodies, credentials and raw exceptions are not returned.
+To pause AI, set `AI_ENABLED` to `0` and redeploy. Maps, records, published scenarios and calculations remain available. To disconnect the frontend completely, restore `config/ai-public.json` to `{"apiOrigin":null}` and republish Pages.
 
-## Evidence and limitations
+Do not delete the Durable Object namespace or change the `public-analysis-v1` object identity during ordinary deployments, as doing so would reset accounting. Rollbacks use the previous Worker code with the same namespace and schema. The initial migration is additive.
 
-The first pass can select only the validated state. The second pass receives the calculation summary and a small curated set of primary-source debate facts. Stakeholder sources establish attributed positions, not independently measured economic outcomes. The context includes producer, consumer, labour, Indigenous, electricity-system and environmental perspectives. It is a dated, incomplete selection, not a live news feed.
+Cloudflare operational metrics can diagnose CPU/error rates. Request-body logging is disabled. OpenAI receives the visitor's question and selected public evidence with `store:false`; provider retention policies still apply. Turnstile processes browser verification signals and the network address.
 
-The server rejects unknown evidence IDs, unsupported citation IDs, numerical literals, malformed placeholders and mismatched source sets. It substitutes numeric placeholders with values from the deterministic result. This prevents the model from performing hidden arithmetic in the published answer. The mechanical check does not prove that every qualitative sentence or unit interpretation is correct. Inspect the citations and test representative questions before publication.
+## Local development
 
-Observed GDP is value added, not gross sales. CER cases change multiple assumptions together. The national oil illustration does not identify provincial GDP responses, does not alter the CER paths, and must not be added to them. Provincial GDP, jobs and household bill responses to arbitrary oil, gas and electricity price shocks remain unestimated.
+`npm run build && npm run start:ai` serves the existing Node development server on `127.0.0.1:4175`, using the approved ignored `.env.local`. It is for private testing only. Its per-process limits are not the public accounting mechanism. `npm run dev:ai:edge` runs the Worker locally; the shipped public Worker deliberately accepts only the public site's origin.
 
-The API uses `store: false`. This setting is not a claim of zero provider retention. Review the provider's applicable data policy before launch. The app does not persist question text, raw provider responses or response caches.
-
-Run the local contract and boundary tests without spending API credits.
-
-```sh
-node --test tests/energy-ai.test.mjs
-```
-
-The provider implementation follows the [Responses structured-output guide](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses). Production controls should also follow the [OpenAI production guidance](https://developers.openai.com/api/docs/guides/production-best-practices).
+The analyzer selects supported inputs, computes results deterministically, then explains the evidence with checked citations and numerical placeholders. It does not infer uncalibrated provincial GDP, jobs or household-bill responses. Qualitative model interpretation still needs review; validation does not prove every sentence true.

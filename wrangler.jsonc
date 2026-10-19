@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "canada-in-motion-ai",
+  "account_id": "f78623ddd332611244f13a0f5a5436e0",
+  "main": "server/cloudflare-worker.mjs",
+  "compatibility_date": "2026-10-18",
+  "workers_dev": true,
+  "preview_urls": false,
+  "send_metrics": false,
+  "observability": {"enabled": false},
+  "limits": {"cpu_ms": 100},
+  "vars": {"AI_ENABLED": "0", "TURNSTILE_SITE_KEY": ""},
+  "durable_objects": {"bindings": [{"name": "AI_QUOTA", "class_name": "AnalysisQuota"}]},
+  "migrations": [{"tag": "v1", "new_sqlite_classes": ["AnalysisQuota"]}]
+}

@@ -14,9 +14,10 @@ export async function createPublicServer(directory = path.join(ROOT,'dist')) {
   const manifest = JSON.parse(await safeRead(root,'build-manifest.json'));
   if(manifest.schemaVersion !== 1 || !Array.isArray(manifest.files)) throw new Error('Invalid build manifest');
   const allowed = new Map(manifest.files.map(item=>[item.path,item]));
+  const policy=manifest.contentSecurityPolicy||CSP;
   allowed.delete('_headers');
   const server = http.createServer({ requestTimeout:30000, headersTimeout:15000, keepAliveTimeout:5000 }, async (request,response)=>{
-    const headers = {'Content-Security-Policy':CSP,'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Frame-Options':'DENY','Permissions-Policy':'camera=(), microphone=(), geolocation=()','Cache-Control':'no-store'};
+    const headers = {'Content-Security-Policy':policy,'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Frame-Options':'DENY','Permissions-Policy':'camera=(), microphone=(), geolocation=()','Cache-Control':'no-store'};
     const fail = (status,message)=>{response.writeHead(status,{...headers,'Content-Type':'text/plain; charset=utf-8'});response.end(request.method==='HEAD'?'':message);};
     if(!['GET','HEAD'].includes(request.method)) {response.setHeader('Allow','GET, HEAD');fail(405,'Method not allowed');return;}
     let relative;

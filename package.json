@@ -15,6 +15,14 @@
     "refresh": "python3 pipeline/refresh.py",
     "readiness:beta": "node scripts/launch-readiness.mjs",
     "start:ai": "node server/server.mjs",
-    "refresh:economy": "python3 pipeline/refresh_economy.py"
+    "refresh:economy": "python3 pipeline/refresh_economy.py",
+    "build:ai": "wrangler deploy --dry-run --outdir .worker-build",
+    "deploy:ai": "wrangler deploy",
+    "dev:ai:edge": "wrangler dev --local --port 8787",
+    "test:ai:edge": "npm run build:ai && node --test tests/edge/*.test.mjs"
+  },
+  "devDependencies": {
+    "miniflare": "5.20261012.1-beta",
+    "wrangler": "4.151.1"
   }
 }

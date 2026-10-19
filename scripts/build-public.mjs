@@ -9,8 +9,19 @@ export const CONTEXT_FILES = ['historical-infrastructure.geojson','benchmark-tol
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const CSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+export function publicAIConfig(value) {
+  assert(value && Object.keys(value).length===1 && Object.hasOwn(value,'apiOrigin'), 'Invalid public AI configuration');
+  if(value.apiOrigin===null)return value;
+  const url=new URL(value.apiOrigin);
+  assert(url.protocol==='https:' && url.origin===value.apiOrigin && !url.username && !url.password, 'AI service must be an exact HTTPS origin');
+  return {apiOrigin:url.origin};
+}
+export function cspForAI(config) {
+  if(!config.apiOrigin)return CSP;
+  return CSP.replace("script-src 'self'", "script-src 'self' https://challenges.cloudflare.com").replace("connect-src 'self'",`connect-src 'self' ${config.apiOrigin} https://challenges.cloudflare.com`)+"; frame-src https://challenges.cloudflare.com";
+}
 export const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
-export const PUBLIC_FILES = ['energy-economy.js','energy-economy.css','economy-model.mjs','data/economy.json','data/energy-debate.json','index.html','app.js','record-atlas.js','record-atlas.css','atlas-model.mjs','map.js','model.mjs','data-store.mjs','insights.mjs','style.css','design.css', 'vendor/leaflet.js','vendor/leaflet.css','vendor/supercluster.js', 'vendor/fonts/ibm-plex-sans-400.ttf','vendor/fonts/ibm-plex-sans-500.ttf','vendor/fonts/ibm-plex-sans-600.ttf','vendor/fonts/ibm-plex-mono-400.ttf','vendor/fonts/ibm-plex-mono-500.ttf', 'data/network.json','data/tariffs.json','data/tariff-sources.json','data/countries.geojson','data/provinces.geojson','data/national-coverage.json', 'data/context/manifest.json', ...CONTEXT_FILES.map(name => 'data/context/'+name)];
+export const PUBLIC_FILES = ['ai-client.mjs','energy-economy.js','energy-economy.css','economy-model.mjs','data/economy.json','data/energy-debate.json','index.html','app.js','record-atlas.js','record-atlas.css','atlas-model.mjs','map.js','model.mjs','data-store.mjs','insights.mjs','style.css','design.css', 'vendor/leaflet.js','vendor/leaflet.css','vendor/supercluster.js', 'vendor/fonts/ibm-plex-sans-400.ttf','vendor/fonts/ibm-plex-sans-500.ttf','vendor/fonts/ibm-plex-sans-600.ttf','vendor/fonts/ibm-plex-mono-400.ttf','vendor/fonts/ibm-plex-mono-500.ttf', 'data/network.json','data/tariffs.json','data/tariff-sources.json','data/countries.geojson','data/provinces.geojson','data/national-coverage.json', 'data/context/manifest.json', ...CONTEXT_FILES.map(name => 'data/context/'+name)];
 export function safeRelative(value) {
   if (typeof value !== 'string' || !value || value.includes('\\') || value.includes('%') || value.includes('\0') || path.posix.isAbsolute(value) || value.split('/').some(x => !x || x === '.' || x === '..' || x.startsWith('.')) || !/^[A-Za-z0-9_./-]+$/.test(value)) throw new Error(`Unsafe release path: ${value}`);
   return value;
@@ -201,6 +212,9 @@ export async function validateContext(root) {
 export async function buildPublic(root = ROOT) {
   const { catalog, files, config } = await validateRelease(root);
   validateEconomy(await readJSON(root, 'data/economy.json'));
+  let aiConfig;
+  try{aiConfig=publicAIConfig(await readJSON(root,'config/ai-public.json'));}catch(error){if(error.code!=='ENOENT')throw error;aiConfig={apiOrigin:null};}
+  const contentSecurityPolicy=cspForAI(aiConfig);
   const stage = await fs.mkdtemp(path.join(root, '.public-build-'));
   try {
     const vendorExtras = [];
@@ -209,21 +223,21 @@ export async function buildPublic(root = ROOT) {
     }
     assert(vendorExtras.some(file => file.startsWith('vendor/fonts/')), 'Font licence notice missing');
     assert(vendorExtras.some(file => !file.startsWith('vendor/fonts/')), 'Vendor licence notices missing');
-    const output = new Map();
+    const output = new Map([['ai-config.json',Buffer.from(JSON.stringify(aiConfig))]]);
     for (const file of [...new Set([...PUBLIC_FILES, ...vendorExtras, ...files])].sort()) {
       let bytes = await safeRead(root, file);
       if (file === 'index.html') {
         let html = bytes.toString();
         assert(!/http-equiv=["']Content-Security-Policy/i.test(html), 'Source HTML already has CSP; review before build');
-        html = html.replace('<head>', `<head>\n    <meta http-equiv="Content-Security-Policy" content="${CSP.replace("; frame-ancestors 'none'", '')}">\n    <meta name="referrer" content="no-referrer">`);
+        html = html.replace('<head>', `<head>\n    <meta http-equiv="Content-Security-Policy" content="${contentSecurityPolicy.replace("; frame-ancestors 'none'", '')}">\n    <meta name="referrer" content="no-referrer">`);
         bytes = Buffer.from(html);
       }
       output.set(file, bytes);
     }
     output.set('health.json', Buffer.from(JSON.stringify({status:config.publicLaunchEnabled && config.releaseScope === 'public-beta' ? 'public-beta' : 'candidate',releaseId:catalog.releaseId,records:catalog.totalRecords,retrievedAt:catalog.retrievedAt,builtAt:new Date().toISOString(),nationalComplete:catalog.nationalComplete === true})));
     output.set('robots.txt', Buffer.from('User-agent: *\nAllow: /\n'));
-    output.set('_headers', Buffer.from(`/*\n  Content-Security-Policy: ${CSP}\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  X-Frame-Options: DENY\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n  Cache-Control: no-cache\n/data/releases/*\n  Cache-Control: public, max-age=31536000, immutable\n`));
-    const manifest = {schemaVersion:1,releaseId:catalog.releaseId,files:[]};
+    output.set('_headers', Buffer.from(`/*\n  Content-Security-Policy: ${contentSecurityPolicy}\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  X-Frame-Options: DENY\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n  Cache-Control: no-cache\n/data/releases/*\n  Cache-Control: public, max-age=31536000, immutable\n`));
+    const manifest = {schemaVersion:1,releaseId:catalog.releaseId,contentSecurityPolicy,files:[]};
     for (const [file, bytes] of output) {
       await fs.mkdir(path.dirname(path.join(stage,file)),{recursive:true});
       await fs.writeFile(path.join(stage,file),bytes);

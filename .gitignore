@@ -12,6 +12,9 @@ data/well-sources.json
 *.zip
 .env
 .env.*
+.dev.vars*
+.wrangler/
+.worker-build/
 data/source-monitor.json
 data/context/
 data/beta-readiness.json

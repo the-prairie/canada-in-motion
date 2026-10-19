@@ -1,5 +1,6 @@
 import {normalizeEconomyState, summarizeEconomy, validateEconomy} from './economy-model.mjs';
 import {project} from './atlas-model.mjs';
+import {loadAnalysisStatus, requestChallengeToken} from './ai-client.mjs';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const num = (value, digits=1) => Number.isFinite(value) ? new Intl.NumberFormat('en-CA',{maximumFractionDigits:digits}).format(value) : 'Unavailable';
@@ -43,7 +44,7 @@ export class EnergyEconomy {
     root.addEventListener('keydown',event=>{if(event.target.tagName.toLowerCase()==='path' && event.target.dataset.ecRegion && ['Enter',' '].includes(event.key)){event.preventDefault();this.change({region:event.target.dataset.ecRegion});}});
     void this.load();
     fetch('data/energy-debate.json').then(response=>response.ok?response.json():null).then(context=>{if(context){this.context=context;this.render();}}).catch(()=>{});
-    fetch('api/analysis/status').then(r=>r.ok?r.json():null).then(status=>{if(status){this.status=status;this.render();}}).catch(()=>{});
+    loadAnalysisStatus().then(status=>{this.status=status;this.render();}).catch(()=>{});
   }
   async load() {
     this.loading=true;this.error=null;this.render();
@@ -51,10 +52,10 @@ export class EnergyEconomy {
     catch {this.error='Economic data could not load. The well atlas and transport views remain available.';}
     this.loading=false;this.render();
   }
-  deactivate() {this.request?.abort();this.request=null;this.busy=false;}
+  deactivate() {this.request?.abort();this.request=null;this.busy=false;this.verifying=false;}
   update(state) {const next=normalizeEconomyState(state);if(JSON.stringify(next)!==JSON.stringify(this.state))this.deactivate();this.state=next;this.render();}
   change(patch) {
-    this.request?.abort();this.request=null;this.busy=false;this.aiError=null;
+    this.deactivate();this.aiError=null;
     this.state=normalizeEconomyState({...this.state,...patch});this.onChange(this.state);this.render();
   }
   click(event) {
@@ -74,7 +75,7 @@ export class EnergyEconomy {
     if(action==='retry')void this.load();
     if(action==='inventory')this.onInventory(this.state.region==='CA'?'all':this.state.region);
     if(action==='ask'){this.root.querySelector('#ec-ai-title')?.scrollIntoView({behavior:'auto',block:'start'});this.root.querySelector(this.status.available?'#energy-question':'#ec-ai-title')?.focus({preventScroll:true});}
-    if(action==='cancel'){this.request?.abort();this.request=null;this.busy=false;this.aiError=null;this.render();}
+    if(action==='cancel'){this.deactivate();this.aiError=null;this.render();}
     if(action==='ask-again')void this.ask();
     if(action==='download'){
       const payload={dataVersion:this.data.generatedAt,state:this.state,summary:summarizeEconomy(this.data,this.state),analysis:this.answer||null};
@@ -86,14 +87,22 @@ export class EnergyEconomy {
     if(!this.status.available||this.busy||!this.question.trim())return;
     this.request?.abort();const request=this.request=new AbortController();
     const {region,scenario,year,oilShock,duration}=this.state;const apiState={region,scenario,year,oilShock,duration};
-    const submittedQuestion=this.question;this.busy=true;this.aiError=null;this.render();
+    const submittedQuestion=this.question;this.busy=true;this.verifying=false;this.aiError=null;this.render();
     try {
-      const response=await fetch('api/analysis',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:submittedQuestion,state:apiState}),signal:request.signal});
+      const headers={'Content-Type':'application/json'};
+      if(this.status.turnstileSiteKey){
+        this.verifying=true;
+        headers['X-Turnstile-Token']=await requestChallengeToken(this.status.turnstileSiteKey,this.root.querySelector('#ec-verification'),request.signal);
+        this.verifying=false;
+        const progress=this.root.querySelector('#ec-ai-progress');if(progress)progress.textContent='Checking the available evidence.';
+      }
+      request.signal.throwIfAborted();
+      const response=await fetch(this.status.endpoint||'api/analysis',{method:'POST',credentials:'omit',headers,body:JSON.stringify({question:submittedQuestion,state:apiState}),signal:AbortSignal.any([request.signal,AbortSignal.timeout(80000)])});
       const result=await response.json();if(!response.ok)throw Error(result.error?.message||'Analysis is unavailable.');
       if(this.request!==request)return;
       this.state=normalizeEconomyState({...this.state,...result.state});this.onChange(this.state);this.answer={...result,question:submittedQuestion};
-    } catch(error) {if(this.request===request&&error.name!=='AbortError')this.aiError=error.message;}
-    finally {if(this.request===request){this.busy=false;this.render();}}
+    } catch(error) {if(this.request===request&&error.name!=='AbortError')this.aiError=error.name==='TimeoutError'?'The analysis took too long. Try again.':error.message;}
+    finally {if(this.request===request){this.busy=false;this.verifying=false;this.render();}}
   }
   sourceLink(id,label) {
     const source=this.data.sources.find(s=>s.id===id);
@@ -162,7 +171,7 @@ export class EnergyEconomy {
     return `<details class="ec-debate"><summary>Who benefits and who pays?</summary><p>Economic totals do not settle how income, costs and risks are shared. These sources address different parts of the debate.</p><p class="ec-caption">Research reviewed ${esc(this.context.reviewDate)}. Stakeholder statements describe the named organization’s position. This selection is not a complete account of every community or project.</p><div class="ec-debate-grid">${this.context.facts.map(fact=>`<article><h3>${esc(labels[fact.id]||fact.id)}</h3><p>${esc(fact.text)}</p><div class="ec-links">${fact.sourceIds.map(id=>sourceAnchor(this.context.sources.find(source=>source.id===id))).join('')}</div></article>`).join('')}</div></details>`;
   }
   analyst() {
-    return `<section class="ec-intelligence" aria-labelledby="ec-ai-title"><div class="ec-ai-heading"><div><p class="ec-kicker">ASK ABOUT THE EVIDENCE</p><h2 id="ec-ai-title" tabindex="-1">Follow the economic effects</h2></div><span class="ec-ai-status">${this.status.available?'Analysis connected':'Analysis not connected'}</span></div><form id="energy-question-form"><label for="energy-question">Your question</label><div class="ec-ask"><textarea id="energy-question" maxlength="1200" rows="2" placeholder="If oil prices fall, what changes for Alberta and Canada?" ${!this.status.available?'disabled':''}>${esc(this.question)}</textarea><button class="primary-button" type="submit" ${!this.status.available||this.busy?'disabled':''}>${this.busy?'Analysing…':'Analyse'}</button>${this.busy?'<button class="secondary-button" type="button" data-ec-action="cancel">Cancel</button>':''}</div></form><p class="ec-caption">${this.status.available?'Your question and selected public data are sent to OpenAI. Do not include personal information.':'Live AI is not connected here. The observed data, official scenarios and oil-price calculation work without it.'}</p><div role="status" aria-live="polite">${this.busy?`Checking the available evidence.${this.answer?' Your previous answer remains below.':''}`:''}</div>${this.aiError?`<div class="ec-analysis-error" role="alert"><p>${esc(this.aiError)}</p><button data-ec-action="ask-again">Try again</button></div>`:''}${this.renderAnswer()}</section>`;
+    return `<section class="ec-intelligence" aria-labelledby="ec-ai-title"><div class="ec-ai-heading"><div><p class="ec-kicker">ASK ABOUT THE EVIDENCE</p><h2 id="ec-ai-title" tabindex="-1">Follow the economic effects</h2></div><span class="ec-ai-status">${this.aiError?'Analysis unavailable':this.busy?'Working…':this.answer?'Answer ready':this.status.available?'Ready for a question':'Analysis offline'}</span></div><form id="energy-question-form"><label for="energy-question">Your question</label><div class="ec-ask"><textarea id="energy-question" maxlength="1200" rows="2" placeholder="If oil prices fall, what changes for Alberta and Canada?" ${!this.status.available?'disabled':''}>${esc(this.question)}</textarea><button class="primary-button" type="submit" ${!this.status.available||this.busy?'disabled':''}>${this.busy?'Analysing…':'Analyse'}</button>${this.busy?'<button class="secondary-button" type="button" data-ec-action="cancel">Cancel</button>':''}</div></form><p class="ec-caption">${this.status.available?'Your question and selected public data are sent to OpenAI. Do not include personal information.':'Live AI is not connected here. The observed data, official scenarios and oil-price calculation work without it.'}</p>${this.status.turnstileSiteKey?'<p class="ec-caption">Up to three questions per network each day. Cloudflare checks for automated requests. We store temporary usage counts, not your questions or answers.</p>':''}<div id="ec-ai-progress" role="status" aria-live="polite">${this.busy?`${this.status.turnstileSiteKey?'Complete the security check to send your question.':'Checking the available evidence.'}${this.answer?' Your previous answer remains below.':''}`:''}</div>${this.busy?'<div id="ec-verification"></div>':''}${this.aiError?`<div class="ec-analysis-error" role="alert"><p>${esc(this.aiError)}</p><button data-ec-action="ask-again">Try again</button></div>`:''}${this.renderAnswer()}</section>`;
   }
   renderAnswer() {
     if(!this.answer?.analysis)return '';
@@ -172,6 +181,7 @@ export class EnergyEconomy {
     return `<article class="ec-answer"><p class="ec-kicker">COMPLETED ANALYSIS</p><p class="ec-answer-question">${esc(this.answer.question||'')}</p><h3>${esc(analysis.headline)}</h3>${blocks.slice(0,2).map(renderBlock).join('')}${extra.length?`<details><summary>Read the supporting analysis</summary>${extra.map(renderBlock).join('')}</details>`:''}${limitations.length?`<details><summary>Assumptions and limits (${limitations.length})</summary><ul>${limitations.map(text=>`<li>${esc(text)}</li>`).join('')}</ul></details>`:''}<p class="ec-caption">This answer uses the question and inputs submitted with it. Changing the controls does not recalculate it.</p><button class="text-link" data-ec-action="download">Download answer, calculations and sources</button></article>`;
   }
   render() {
+    if(this.verifying&&this.busy)return;
     if(this.loading||!this.data){this.root.innerHTML=`<div class="ec-loading"><h1>${this.error?'Economic data unavailable':'Loading the energy account'}</h1><p role="status">${esc(this.error||'Reading provincial GDP and official energy scenarios.')}</p>${this.error?'<button data-ec-action="retry" class="primary-button">Retry</button>':''}</div>`;return;}
     const activeId=this.root.contains(document.activeElement)?document.activeElement.id:null;
     const start=activeId==='energy-question'?document.activeElement.selectionStart:null;

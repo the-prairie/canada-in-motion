@@ -1,0 +1,32 @@
+{
+  "verifiedAt": "2026-10-18",
+  "deployment": {
+    "publicWebsite": "https://the-prairie.github.io/canada-in-motion/",
+    "apiHost": "Cloudflare Workers",
+    "workerName": "canada-in-motion-ai",
+    "remoteApiDeployed": false,
+    "publicAiEnabled": false
+  },
+  "checks": {
+    "nodeTests": 64,
+    "workerdTests": 9,
+    "publicBuildPassed": true,
+    "publicFilesScannedForExistingKey": 436,
+    "secretFound": false,
+    "independentReview": "accepted after cancel/change retry repair"
+  },
+  "providerProbe": {
+    "modelMetadataStatus": 200,
+    "responsesStatus": 429,
+    "errorCode": "credit_balance_exhausted",
+    "errorType": "insufficient_quota",
+    "completedAnswer": false
+  },
+  "pending": [
+    "Cloudflare Workers and Turnstile authorization",
+    "Approval for paid hosting and remote secret storage",
+    "OpenAI credit and approved project spending limit",
+    "Deployed public browser acceptance test"
+  ],
+  "testScope": "Workerd tests use simulated upstream verification and model responses. They do not establish funded public inference access."
+}
