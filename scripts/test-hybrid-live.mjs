@@ -8,6 +8,7 @@ import {validateWorkspace} from '../workspace-contract.mjs';
 
 const root=new URL('../',import.meta.url);
 export const HYBRID_LIVE_CASES=[
+  {id:'provincial-forecast',question:'Compare the GDP forecasts for Alberta, Ontario and Québec in 2026 and 2027.',types:['gdp-forecast']},
   {id:'gdp',question:'Compare energy GDP in Alberta, Ontario and Québec. Include a map.',types:['province-map','province-comparison']},
   {id:'electricity',question:'Compare electricity generation in Alberta, Ontario and Québec in the Higher scenario in 2040.',types:['scenario-comparison'],year:2040,scenario:'Higher'},
   {id:'compound',question:'Compare 2022 energy GDP in Alberta and Québec, their electricity generation in the Higher scenario in 2040, and map their pipeline routes and facilities.',types:['province-map','province-comparison','scenario-comparison','infrastructure-map'],year:2040,scenario:'Higher'},
@@ -37,6 +38,7 @@ if(!process.argv.includes('--run')&&!process.argv.includes('--serve')){
     const network=JSON.parse(await readFile(new URL('data/network.json',root)));
     const flows=JSON.parse(await readFile(new URL('data/energy-flows.json',root)));
     const fiscal=JSON.parse(await readFile(new URL('data/provincial-impacts.json',root)));
+    const forecast=JSON.parse(await readFile(new URL('data/provincial-forecasts.json',root)));
     const reserveAttempt=async usd=>{
       if(ledger.reservedUsd+usd>0.9)throw Error('budget');
       ledger={...ledger,reservedUsd:ledger.reservedUsd+usd,attempts:ledger.attempts+1};
@@ -50,7 +52,7 @@ if(!process.argv.includes('--run')&&!process.argv.includes('--serve')){
     }}});
     const usage=[];
     const liveDecider=createJevDecider({apiKey,reserveAttempt});
-    const analyze=createEnergyAnalyzer({data,debate,network,flows,fiscal,workspaceEnabled:true,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider,decider:async input=>{const result=await liveDecider(input);usage.push({inputTokens:result.inputTokens,estimatedUsd:result.estimatedUsd});return result;},answerMode:'claims',model:FREE_MODEL});
+    const analyze=createEnergyAnalyzer({data,debate,network,flows,fiscal,forecast,workspaceEnabled:true,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider,decider:async input=>{const result=await liveDecider(input);usage.push({inputTokens:result.inputTokens,estimatedUsd:result.estimatedUsd});return result;},answerMode:'claims',model:FREE_MODEL});
     if(process.argv.includes('--serve')){
       const {createAnalysisServer}=await import('../server/server.mjs');
       const server=await createAnalysisServer({analyze,provider:'cloudflare',model:FREE_MODEL,workspaceEnabled:true,jevEnabled:true,perMinute:10,dailyLimit:12});
@@ -66,7 +68,7 @@ if(!process.argv.includes('--run')&&!process.argv.includes('--serve')){
         const state={region:'CA',year:2030,scenario:'Current Measures',oilShock:10,duration:'persistent'};
         const answer=await analyze({question:item.question,state});validateWorkspace(answer.workspace);
         const types=answer.workspace.panels.map(p=>p.type);
-        const passed=answer.answerMode==='source-backed-workspace'&&llmCalls-callsBefore===1&&item.types.every(type=>types.includes(type))&&(item.id==='missing-flow'?answer.workspace.plan.requestedMeasure==='measured-flow':answer.workspace.plan.requestedMeasure==='available')&&answer.workspace.decision.provider==='jev'&&(!item.year||(answer.workspace.plan.year===item.year&&answer.workspace.plan.scenario===item.scenario))&&JSON.stringify(answer.workspace.economySnapshot)===JSON.stringify(data);
+        const passed=answer.answerMode==='source-backed-workspace'&&llmCalls-callsBefore===1&&item.types.every(type=>types.includes(type))&&(item.id==='missing-flow'?answer.workspace.plan.requestedMeasure==='measured-flow':answer.workspace.plan.requestedMeasure==='available')&&answer.workspace.decision.provider==='jev'&&(!item.year||(answer.workspace.plan.year===item.year&&answer.workspace.plan.scenario===item.scenario))&&JSON.stringify(answer.workspace.economySnapshot)===JSON.stringify(data)&&(item.id!=='provincial-forecast'||answer.workspace.decision.coverage==='supported'&&JSON.stringify(answer.workspace.forecastSnapshot)===JSON.stringify(forecast)&&answer.workspace.panels.filter(panel=>panel.type==='gdp-forecast').length===2);
         results.push({id:item.id,passed,milliseconds:Date.now()-start,llmCalls:llmCalls-callsBefore,types,decision:answer.workspace.decision,plan:answer.workspace.plan});
         await writeFile(new URL(`hybrid-live-${item.id}.json`,cache),JSON.stringify({...answer,question:item.question},null,2)+'\n',{mode:0o600});
       }catch(error){results.push({id:item.id,passed:false,error:['unsupported_scenario','provider_unavailable','analysis_unavailable','invalid_model_output'].includes(error.code)?error.code:'test_failed',milliseconds:Date.now()-start});}

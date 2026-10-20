@@ -140,3 +140,26 @@ test('published snapshot loader bounds size, validates identity, checks freshnes
   assert.equal(await loadPublishedForecast(async()=>{calls++;throw Error('cached');},now+1),loaded);
   assert.equal(calls,1);
 });
+
+
+test('verified forecast coverage survives an incorrect advisory model label without losing its audit trail',async()=>{
+  let decisionInput;
+  const result=await fixture({decider:async input=>{decisionInput=input;return {answers:{presentation:{choice:'comparison'},coverage:{choice:'unsupported'}}};}}).analyze({question:`Compare Alberta and Ontario GDP forecasts in ${origin} and ${origin+1}.`,state});
+  assert.equal(result.workspace.decision.coverage,'supported');
+  assert.equal(result.workspace.decision.modelCoverage,'unsupported');
+  assert.equal(result.workspace.decision.coverageBasis,'verified-forecast-rows');
+  assert.deepEqual(decisionInput.state.panels.map(p=>p.forecastYear),[origin,origin+1]);
+  assert.ok(decisionInput.state.panels.every(p=>JSON.stringify(p.availableRegions)===JSON.stringify(['AB','ON'])&&!p.unavailableRegions.length));
+  assert.match(decisionInput.questions.coverage.instructions,/plan.year.*other tools/);
+  assert.doesNotThrow(()=>validateWorkspace(result.workspace));
+});
+
+
+test('forecast-only panels do not erase an advisory gap for a companion outcome',async()=>{
+  const f=fixture({decider:async()=>({answers:{presentation:{choice:'comparison'},coverage:{choice:'partial'}}})});
+  for(const question of [`Forecast Alberta GDP and jobs in ${origin}.`,`Compare Alberta GDP forecasts and unemployment forecasts for ${origin} and ${origin+1}.`]){
+    const result=await f.analyze({question,state});
+    assert.equal(result.workspace.decision.coverage,'partial');
+    assert.equal(result.workspace.decision.coverageBasis,undefined);
+  }
+});
