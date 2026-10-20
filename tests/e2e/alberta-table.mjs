@@ -24,7 +24,7 @@ const expectTotals=async()=>{
   assert.match(await aer.innerText(),new RegExp(format(data.latest.operating)+' operating'));
   assert.match(await aer.innerText(),new RegExp(String(data.latest.year)));
   assert.equal(await aer.locator('[data-ra-status]').count(),0,'province-wide totals cannot filter unmapped records');
-  assert.equal(await aer.getByRole('link',{name:'AER well licences',exact:true}).getAttribute('href'),data.source.url);
+  assert.equal(await aer.getByRole('link',{name:/^AER well licences/}).getAttribute('href'),data.source.url);
 };
 try{
   await page.goto(url({}));
@@ -60,6 +60,7 @@ try{
   assert.equal(await mapped('AB').locator('[data-ra-status="unknown"]').innerText(),unknownBefore);
 
   failTotals=true;
+  await page.goto('about:blank');
   await page.goto(url({}));
   await aer.getByRole('button',{name:'Retry totals',exact:true}).waitFor({timeout:120000});
   assert.match(await aer.innerText(),/could not load/);

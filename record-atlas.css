@@ -233,3 +233,13 @@
 .ra-provincial-summary th,.ra-provincial-summary td{padding:5px 0;text-align:left;font-weight:400}
 .ra-provincial-summary td{text-align:right;font-variant-numeric:tabular-nums}
 .ra-provincial-summary a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+
+#record-atlas .ra-table-wrap th small, #record-atlas .ra-table-wrap td small { display:block; margin-top:5px; font:11px/1.4 'IBM Plex Sans',sans-serif; color:var(--ra-muted); }
+#record-atlas .ra-aer-row { background:#e9eee5; }
+#record-atlas .ra-aer-row th { border-left:3px solid #27766e; }
+#record-atlas .ra-aer-row a { color:inherit; text-underline-offset:3px; }
+#record-atlas .ra-aer-active strong { font:500 16px/1.4 'IBM Plex Mono',monospace; color:#255e56; }
+#record-atlas .ra-not-applicable { color:var(--ra-muted); }
+#record-atlas .ra-not-applicable abbr { text-decoration:none; }
+#record-atlas .ra-aer-load { text-align:left; white-space:normal; font:13px/1.5 'IBM Plex Sans',sans-serif; }
+#record-atlas .ra-aer-load button { display:inline-block; text-decoration:underline; }
