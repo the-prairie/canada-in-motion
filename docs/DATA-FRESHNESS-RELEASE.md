@@ -26,4 +26,13 @@ Some older reference periods are still the publisher's newest data. The input-ou
 
 Model the Domain kept nominal contribution and real activity as independent datasets with explicit periods and units. Prove It Works required source reconciliation, independent counterexample testing and the actual browser flows. Scoped diff review and headless Playwright replaced unavailable Cursor-specific review and UI helpers.
 
-Public deployment verification is recorded below after publication.
+
+## Public verification, 20 October 2026
+
+[Deployment 39498030347](https://github.com/the-prairie/canada-in-motion/actions/runs/39498030347) published application commit `c6f2ff9`. Production CI passed all 349 JavaScript tests and 106 Python tests, downloaded the GDP source again, and produced 2022 nominal GDP plus 2025 activity for all 13 jurisdictions. The approved beta publication gate passed.
+
+The public application code version is `57888c51f97eb86faf85`, release `5ab71846785600f158fb`. The published nominal and real GDP records exactly match the reviewed observations. The NS/SK outlook registry is `7552446365cb90decef2`.
+
+Both new headless browser suites passed against [the public app](https://the-prairie.github.io/canada-in-motion/). They verified every jurisdiction, the dated map and table, narrow mobile layouts, real-growth question handling, real GDP disclosure and complete source-snapshot export. No runtime errors occurred. Provider endpoints were mocked for the question-driven test; no paid inference was used. The existing connected-investigation and economic-research suites also passed against the final local build.
+
+Worker version `f50ef8b6-4153-460d-9b1a-5dfbc8a01b3f` was deployed after the site update. Its public status returned HTTP 200 with the existing Cloudflare model, dynamic workspace and Jev integration enabled. The free hosting setup and US$1 Jev lifetime cap were preserved. Temporary preview servers created for this release were stopped after verification.
