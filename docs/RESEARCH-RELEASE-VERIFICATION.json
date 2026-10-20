@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-10-20T00:49:26.246072+00:00",
+  "verifiedAt": "2026-10-20T01:04:19.561Z",
   "scope": "Research-informed energy investigations, income multipliers, and historical oil/GDP evidence",
   "delivery": [
     "CheckList-style deterministic question interpretation and provider refusal cases",
@@ -40,7 +40,16 @@
     "incomeSourceCellsMatched": 12000,
     "modelHoldoutCasesReproduced": 1980,
     "modelAndBaselinePredictionsReproduced": 3960,
-    "unresolvedBlockingFindings": []
+    "unresolvedBlockingFindings": [],
+    "findingsResolved": [
+      "Fractional and malformed price parsing",
+      "Sparse matrix keyboard navigation",
+      "Mobile selected-origin fallback",
+      "Small positive values rounding to zero",
+      "Saved baseline and cross-view restoration",
+      "Historical episode and province selection persistence",
+      "Late service responses replacing research panels and dropping keyboard focus"
+    ]
   },
   "liveProviders": {
     "scope": "Live Cloudflare planning, live Jev decision, deterministic source-backed findings and client contract validation. Browser interaction and deployed Turnstile checks are separate.",
@@ -86,7 +95,50 @@
     "Trade price experiments hold quantities fixed and are not GDP forecasts.",
     "Existing national well coverage remains incomplete and the site remains a public beta."
   ],
-  "deployment": "Awaiting public deployment verification; see workflow history for the release result.",
+  "deployment": {
+    "status": "verified live",
+    "url": "https://the-prairie.github.io/canada-in-motion/",
+    "commit": "b321f25ac4be3721728a95f52bba5188db4045f7",
+    "workflow": "https://github.com/the-prairie/canada-in-motion/actions/runs/39350827702",
+    "workerVersion": "bc9aeaea-aed2-4986-bc73-b5e4e1739891",
+    "verifiedAt": "2026-10-20T01:04:19.561Z",
+    "health": {
+      "codeVersion": "e88b5b52b0d8b40c768f",
+      "status": "public-beta",
+      "releaseId": "6b0a0a480cb1f60fc37c",
+      "records": 317936,
+      "retrievedAt": "2026-10-20T01:01:17Z",
+      "builtAt": "2026-10-20T01:03:02.938Z",
+      "nationalComplete": false
+    },
+    "assetsMatched": [
+      "energy-economy.js",
+      "economy-model.mjs",
+      "vendor/energy-workspace.js",
+      "energy-workspace.css",
+      "income-path-model.mjs",
+      "dynamic-price-model.mjs"
+    ],
+    "snapshots": {
+      "income-paths": "237a9a1fdb3ad466a250",
+      "dynamic-price-history": "c1c4245c7d704ff792f1"
+    },
+    "aiStatus": {
+      "available": true,
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "provider": "cloudflare",
+      "turnstileSiteKey": "0x4AAAAAAFbE-EHrmceVEeJi",
+      "limits": {
+        "daily": 10,
+        "monthly": 100,
+        "visitorDaily": 3,
+        "minute": 6,
+        "concurrent": 2
+      },
+      "workspaceEnabled": true,
+      "jevEnabled": true
+    }
+  },
   "publicSubmissionCheck": {
     "status": "automated_security_check_timed_out",
     "providerRequestSent": false,
@@ -97,5 +149,79 @@
     "maximumOilModelNumericDifferencePctPoints": 2.0463630789890885e-12,
     "oilValidationSummary": "exact match",
     "note": "Fresh Linux/Python pipeline reproduces local results within floating-point precision."
+  },
+  "publicBrowserResults": {
+    "economic-research": {
+      "status": "passed",
+      "checks": [
+        "official multiplier GDP value",
+        "linear scaling",
+        "zero-demand reload",
+        "reference-year reload",
+        "induced toggle",
+        "missing industry",
+        "province selector sync",
+        "historical episode URL reload",
+        "horizon URL reload",
+        "forecast gate disclosure",
+        "mobile layout",
+        "no runtime errors"
+      ]
+    },
+    "investigations": {
+      "status": "passed",
+      "matrixCells": 156,
+      "checks": [
+        "direction",
+        "linked map",
+        "branch baseline",
+        "reference-year robustness",
+        "save and reload snapshot",
+        "mobile overflow",
+        "no runtime errors"
+      ]
+    },
+    "investigation-review": {
+      "status": "passed",
+      "providerCalls": 0,
+      "checks": [
+        "matrix cardinal navigation, filtering, exact small-value distinction and desktop fit",
+        "saved price controls, pinned baseline and shared URL restore together",
+        "corrupt saved record is isolated without a runtime error",
+        "trade-only baseline, native-to-AI restore and stale written-answer removal",
+        "physical-only period and source series survive AI-to-native restore",
+        "mobile seller/partner view, exact positive values, linked detail and changed-pair fallback"
+      ]
+    },
+    "research-late-status": {
+      "status": "passed",
+      "providerCalls": 0,
+      "results": [
+        {
+          "view": "income",
+          "checks": [
+            "DOM identity",
+            "focused control",
+            "open disclosure",
+            "edited inputs",
+            "calculation/episode identity",
+            "late AI status",
+            "late context data"
+          ]
+        },
+        {
+          "view": "history",
+          "checks": [
+            "DOM identity",
+            "focused control",
+            "open disclosure",
+            "edited inputs",
+            "calculation/episode identity",
+            "late AI status",
+            "late context data"
+          ]
+        }
+      ]
+    }
   }
 }
