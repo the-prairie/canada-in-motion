@@ -48,3 +48,13 @@ Initial snapshot versions: GDP `a36f1473cf546e21156b`; household `f40b574bd2c8c8
 ## Decisions
 
 Model the Domain kept benchmark transmission, retail arithmetic, GDP associations and independent forecasts in separate result channels. Prove It Works required reconstruction from official observations and checks of the built interface. Sequence Work into Verifiable Units put the model checks ahead of UI integration and public deployment.
+
+## Public verification, 20 October 2026
+
+[Deployment 39482050605](https://github.com/the-prairie/canada-in-motion/actions/runs/39482050605) published application commit `73aa01d`. Production CI passed 340 JavaScript tests and 101 Python tests, rebuilt both models from downloaded official sources, and passed the beta publication gate. The separate Worker suite passed 23 tests locally before deployment.
+
+The published application version is `102aa28158eb65c0c6dc`, with release `f2a4529e69bcfb915654`. The refreshed GDP snapshot is `4dcfd55c8fc0c34aa532`; the household snapshot is `e3ef47e343ea2a5f5967`. All parsed histories, selected models and scenario parameters agree with the independently reviewed snapshots within `1.6e-12`. Snapshot hashes differ after the fresh download and cross-platform recalculation; the accepted-screen counts remain eight GDP comparisons and ten household oil models.
+
+All three browser suites passed against [the public app](https://the-prairie.github.io/canada-in-motion/), including export/reimport, reactive values, keyboard controls, source-failure recovery, and mobile layouts. They reported no runtime errors. The AI handoff uses a mocked provider response in the browser suite; no paid inference was used.
+
+Worker deployment `e5eb3bd7-c4b1-48c4-9e82-9a94f56dcf3f` publishes the revised coverage guidance. Its live status returned HTTP 200 with analysis and the existing hybrid enabled. The provider configuration and US$1 Jev lifetime cap were preserved.

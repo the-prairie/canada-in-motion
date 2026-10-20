@@ -7,7 +7,7 @@
 - [x] Phase B: Design the workflow.
 - [x] Phase C: Run the loop.
 - [x] Phase D: Keep the audit trail.
-- [ ] Phase E: Verify and hand back.
+- [x] Phase E: Verify and hand back.
 
 ## Outcome and acceptance
 
@@ -43,4 +43,4 @@ No provider credentials, budgets or public AI spending caps will change. Browser
 
 ## Review outcome
 
-Both independent reviews accepted the implementation after corrections to annual bill wording, GDP chart units, failed-screen descriptions, missing CPI coverage and transient loading failures. Full numerical and browser evidence is recorded in `PRICE-IMPACTS-RELEASE.md` and the linked review receipts. Public deployment verification remains the final step.
+Both independent reviews accepted the implementation after corrections to annual bill wording, GDP chart units, failed-screen descriptions, missing CPI coverage and transient loading failures. Full numerical and browser evidence is recorded in `PRICE-IMPACTS-RELEASE.md` and the linked review receipts. Public deployment and all three browser suites passed on the live URL; the AI Worker status also returned available.
