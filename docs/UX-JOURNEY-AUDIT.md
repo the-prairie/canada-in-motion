@@ -102,3 +102,11 @@ The tightened candidate had no recorded page errors or horizontal document overf
 The release owner subsequently applied the remaining Futures polish: shared numeric precision for the headline and chart value, no duplicate Current Measures legend, and removal of the redundant chart-scale sentence. Written analysis and citations are also collapsed beside an interactive answer, with the result’s units, uncertainty and coverage still visible. Final build checks are recorded in the release receipt.
 
 The recheck script/output are `.data-cache/ux-review/recheck.mjs` and `recheck.json`; screenshots start `tightened-`. The separate validation agent's focused scripts are `tests/e2e/well-scope.mjs` and `tests/e2e/scenario-keyboard.mjs`. Their exact paths should be confirmed in the final release test list rather than inferring successful public deployment from local results.
+
+## Public release verification
+
+The release owner deployed the reviewed frontend in [workflow 39390412567](https://github.com/the-prairie/canada-in-motion/actions/runs/39390412567) and confirmed public code version `3e924a5f60f4be2a8503`. All nine headless browser suites listed in `docs/FORECAST-UX-RELEASE-VERIFICATION.json` passed against the public URL. This includes the repaired well scope and keyboard editing without module overrides, focused views, inline retry, forecast exports, saved investigations and late-response focus preservation.
+
+AI browser tests intercepted provider calls and exercised the real analyzer and UI. A separate live Cloudflare/Jev forecast call passed after exposing forecast-specific years and regional coverage to the decision model. This is not a claim that the production Turnstile challenge was completed by a browser test. The journey coverage limits above still apply.
+
+The next generative-UI iteration should support explicit edits to the current investigation: “add Québec,” “compare the downside,” or “explain that outlier.” Show the proposed parameter/panel changes, preserve the current selection and source snapshot, and make the edit undoable. Evaluate task completion, correction effort, evidence comprehension and latency against the direct controls before expanding the component vocabulary. This is a proposed next step, not shipped behavior in this release.

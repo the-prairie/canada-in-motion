@@ -59,3 +59,9 @@ The numerical review also identified a defensive validation gap: the initial Jav
 ## Literature informing the independent review
 
 [Hyndman and Athanasopoulos, *Forecasting: Principles and Practice*](https://otexts.com/fpp3/toolbox.html) supports temporal validation, explicit baselines and evaluation at the requested horizon. [Gibbs and Candès (2024)](https://jmlr.org/papers/v25/22-1218.html) and [Zaffran et al. (2022)](https://proceedings.mlr.press/v162/zaffran22a.html) address adaptive uncertainty under temporal dependence and distribution shift. These works do not validate this app's forecasts or establish a guaranteed coverage rate for its short provincial series.
+
+## Published snapshot verification
+
+The public release rebuilt the same inputs on GitHub's Linux runner. Its forecast version is `85ade6d95bf18ee72515`. Source histories and nonnumeric fields match the reviewed local snapshot; floating-point arithmetic differs by at most 5.12 × 10⁻¹³, changing the content fingerprint without changing displayed estimates.
+
+The independent fitter was rerun against the downloaded public JSON: all 2,380 checks and 2,340 numeric comparisons passed, with maximum error 1.38 × 10⁻¹⁴. The receipt is `docs/PUBLIC-FORECAST-INDEPENDENT-AUDIT.json`. To reproduce against a downloaded snapshot, use `python3 tests/review/provincial-forecast-audit.py --input /path/to/provincial-forecasts.json --output /path/to/audit.json`.

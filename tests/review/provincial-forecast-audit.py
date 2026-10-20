@@ -1,10 +1,14 @@
 """Independent numerical reproduction; no production modules imported.
 Fits 1/2-predictor ridge with explicit closed-form algebra, not pipeline solver.
 """
-import json,math,statistics,hashlib
+import json,math,statistics,hashlib,argparse
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
-FILE=ROOT/'data/provincial-forecasts.json';raw=FILE.read_bytes();D=json.loads(raw)
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--input',type=Path,default=ROOT/'data/provincial-forecasts.json')
+parser.add_argument('--output',type=Path,default=ROOT/'.data-cache/forecast-review/PRODUCTION-AUDIT.json')
+args=parser.parse_args()
+FILE=args.input;raw=FILE.read_bytes();D=json.loads(raw)
 P=['NL','PE','NS','NB','QC','ON','MB','SK','AB','BC'];C=['historical-mean','shrunk-autoregression','employment-bridge','pooled-employment-bridge'];mean=statistics.mean
 G={(r['region'],r['year']):r['value'] for r in D['history']['gdp'] if r['status']=='available'}
 E={(r['region'],r['month']):r['value'] for r in D['history']['employment'] if r['status']=='available'}
@@ -75,8 +79,8 @@ for r in P:
   audit_rows.append({'region':r,'horizon':h,'model':production['model'],'prediction':production['predictionPct'],'mae':mae,'baselineMae':bmae,'improvementPct':100*(1-mae/bmae),'intervalCoverage':coverage,'intervalN':len(interval),'lower':production['lowerPct'],'upper':production['upperPct']})
   all_records[r,h]=rec
 report={'inputVersion':D['dataVersion'],'inputSha256':hashlib.sha256(raw).hexdigest(),'independentImplementation':'No production imports. Explicit one/two-variable ridge algebra, separately reconstructed rows, chronological adaptive selection, and past resolved forecast residual quantiles.','numericComparisons':compared,'maximumAbsoluteDifference':maxdiff,'checks':checks,'failures':failures,'provinceResults':audit_rows,'scope':'GDP/employment values are taken from pinned source history; original vintages not reconstructed. Audit reproduces all 20 final forecasts and 220 published historical predictions, all candidates, final coefficients, selection and ranges.','releaseRecommendation':'Numerically reproducible with no temporal target leakage found. Display error bands as historical-error ranges with measured province-specific coverage; do not promise80%futurecoverage. Forecasts are predictive not causal price effects.'}
-(ROOT/'.data-cache/forecast-review').mkdir(parents=True,exist_ok=True)
-(ROOT/'.data-cache/forecast-review/PRODUCTION-AUDIT.json').write_text(json.dumps(report,indent=2)+'\n')
+args.output.parent.mkdir(parents=True,exist_ok=True)
+args.output.write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps({k:v for k,v in report.items() if k!='provinceResults'},indent=2))
 for x in audit_rows: print(x)
 if failures:raise SystemExit(1)

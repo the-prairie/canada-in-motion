@@ -1,10 +1,10 @@
 {
-  "verifiedAt": "2026-10-20T08:01:03.360081+00:00",
+  "verifiedAt": "2026-10-20T08:10:28.764206+00:00",
   "scope": "Focused data journeys, question-driven views and provincial GDP outlook",
-  "status": "local production artifact verified; public deployment pending",
+  "status": "published and verified",
   "forecastDataVersion": "156c3939d0a89df609ba",
   "checks": {
-    "nodePassed": 306,
+    "nodePassed": 308,
     "pythonPassed": 83,
     "workerEdgePassed": 23,
     "independentNumericalChecks": 2380,
@@ -26,7 +26,8 @@
   "independentReviews": [
     "docs/UX-JOURNEY-AUDIT.md",
     "docs/PROVINCIAL-FORECAST-VALIDATION.md",
-    "docs/PROVINCIAL-FORECAST-INDEPENDENT-AUDIT.json"
+    "docs/PROVINCIAL-FORECAST-INDEPENDENT-AUDIT.json",
+    "Narrow independent review of verified forecast coverage override: no blocking findings."
   ],
   "delivered": [
     "One focused result with named related views and optional All views",
@@ -44,5 +45,153 @@
     "GDP forecasts are predictive; they do not identify causal provincial effects of changing energy prices.",
     "Historical-error ranges have uneven coverage and are not guarantees.",
     "No screen-reader, Safari/Firefox, real-touch-device or full WCAG conformance audit was completed."
-  ]
+  ],
+  "publishedData": {
+    "checkedAt": "2026-10-20T08:08:05.698Z",
+    "status": "passed",
+    "health": {
+      "codeVersion": "3e924a5f60f4be2a8503",
+      "status": "public-beta",
+      "releaseId": "cc9c48793d48f747f10c",
+      "records": 317936,
+      "retrievedAt": "2026-10-20T08:04:51Z",
+      "builtAt": "2026-10-20T08:06:52.644Z",
+      "nationalComplete": false
+    },
+    "forecastDataVersion": "85ade6d95bf18ee72515",
+    "forecastAsOf": "2026-10-20",
+    "forecastOriginYear": 2026,
+    "forecastRows": 20,
+    "outlookRows": 20,
+    "sourceLoader": "same Worker loader fetched and validated live public snapshot in Node"
+  },
+  "deployment": {
+    "frontendCommit": "d4dad66b77110785bf81e89b90e1c2de06ef39a3",
+    "backendCommit": "6e80243",
+    "pagesWorkflow": "https://github.com/the-prairie/canada-in-motion/actions/runs/39390412567",
+    "pagesConclusion": "success",
+    "url": "https://the-prairie.github.io/canada-in-motion/",
+    "workerUrl": "https://canada-in-motion-ai.thelaurenzary.workers.dev",
+    "workerVersion": "4d0690c3-2772-4ce5-a010-6edee03d0d5c",
+    "workerChecks": [
+      "configured status",
+      "workspace and Jev enabled",
+      "allowed preflight",
+      "wrong origin rejected",
+      "missing visitor verification rejected"
+    ],
+    "jevPublicLifetimeCapUsd": 1,
+    "capReset": false
+  },
+  "publicBrowserChecks": [
+    {
+      "suite": "tests/e2e/investigations.mjs",
+      "status": "passed",
+      "logSha256": "2cb98643aa01fea3da542e82e7a16233230d7a0eef27bea64e7d8e60fe306eb9"
+    },
+    {
+      "suite": "tests/e2e/investigation-review.mjs",
+      "status": "passed",
+      "logSha256": "807ba753d53ef2b5dbdc55f2db1343f5baf0480c62cadb75ec3ffaf38e87b280"
+    },
+    {
+      "suite": "tests/e2e/economic-research.mjs",
+      "status": "passed",
+      "logSha256": "4d660abc372a0c5919c4d99fbf3cf1c7b77a19868548e335bd6a7bf2e1287651"
+    },
+    {
+      "suite": "tests/e2e/research-late-status.mjs",
+      "status": "passed",
+      "logSha256": "468d72088a6b17c720f7fc698f9423a0c15821399235de18f5106fe0382b3ec0"
+    },
+    {
+      "suite": "tests/e2e/provincial-forecast.mjs",
+      "status": "passed",
+      "logSha256": "42ff4bc32ef7e35b4a4179759169187832744cb6d7f71e88521a5590a183d3eb"
+    },
+    {
+      "suite": "tests/e2e/forecast-ai.mjs",
+      "status": "passed",
+      "logSha256": "3271039270cec9e76245b8eb083e933c91dd506b3ee7f50d6656d9c7c7d28257"
+    },
+    {
+      "suite": "tests/e2e/focused-views.mjs",
+      "status": "passed",
+      "logSha256": "952834471ce7b316cbdfafc1696b5cbfba157b4f7ac2439082883bb830e674db"
+    },
+    {
+      "suite": "tests/e2e/well-scope.mjs",
+      "status": "passed",
+      "logSha256": "5a16e189791d331201aec372e88ff465917276defffcc45b104946cf50cb01a3"
+    },
+    {
+      "suite": "tests/e2e/scenario-keyboard.mjs",
+      "status": "passed",
+      "logSha256": "f3fb6222a25cfd443b6b380cdb0aa4941c911bbd606a3aeeb2ad4510e2a1b855"
+    }
+  ],
+  "liveModelCheck": {
+    "status": "passed",
+    "scope": "Live Cloudflare planning, live Jev decision, deterministic source-backed findings and client contract validation. Browser interaction and deployed Turnstile checks are separate.",
+    "result": {
+      "id": "provincial-forecast",
+      "passed": true,
+      "milliseconds": 4018,
+      "llmCalls": 1,
+      "types": [
+        "gdp-forecast",
+        "gdp-forecast"
+      ],
+      "decision": {
+        "provider": "jev",
+        "model": "jev-1.14.0",
+        "status": "accepted",
+        "planStatus": "valid",
+        "presentation": "comparison",
+        "coverage": "supported",
+        "modelCoverage": "supported",
+        "coverageBasis": "verified-forecast-rows"
+      },
+      "plan": {
+        "regions": [
+          "AB",
+          "ON",
+          "QC"
+        ],
+        "topics": [
+          "gdp-forecast"
+        ],
+        "metricIds": [],
+        "includeMap": false,
+        "requestedMeasure": "available",
+        "energyTrade": {
+          "commodity": "oil",
+          "year": null,
+          "shockPct": 0,
+          "linkScope": "between"
+        },
+        "year": 2030,
+        "scenario": "Current Measures",
+        "oilShock": 10,
+        "duration": "persistent"
+      }
+    },
+    "usage": [
+      {
+        "inputTokens": 1244,
+        "estimatedUsd": 5.2248000000000005e-05
+      }
+    ],
+    "lifetimeTestingReservedUsd": 0.2983680000000002,
+    "productionTurnstileCompleted": false
+  },
+  "publishedNumericalAudit": {
+    "report": "docs/PUBLIC-FORECAST-INDEPENDENT-AUDIT.json",
+    "dataVersion": "85ade6d95bf18ee72515",
+    "checks": 2380,
+    "numericComparisons": 2340,
+    "maximumAbsoluteDifference": 1.7763568394002505e-15,
+    "failures": [],
+    "rebuildComparison": "Source histories, model choices and nonnumeric fields match the locally reviewed snapshot. Platform arithmetic changes numeric fields by at most5.12e-13, changing the fingerprint without changing displayed estimates."
+  }
 }
