@@ -52,6 +52,8 @@ jobs:
         run: python pipeline/refresh_bcer.py
       - name: Refresh openly licensed context when seven days old
         run: python pipeline/refresh_context.py
+      - name: Refresh official monthly oil, gas and electricity activity
+        run: python pipeline/refresh_monthly_energy.py
       - name: Refresh observed GDP and official energy scenarios
         run: python pipeline/refresh_economy.py
       - name: Refresh Alberta province-wide well status counts

@@ -1,3 +1,4 @@
+import {MonthlyEnergy} from './monthly-energy.jsx';
 import React,{useMemo,useRef,useState,useEffect,useId} from 'react';
 import {createRoot} from 'react-dom/client';
 import {summarizeEnergyStory,exportEnergyStory} from '../energy-story-model.mjs';
@@ -107,6 +108,7 @@ function Story({snapshots:liveSnapshots,initial,shapes,onState,onAsk,onNavigate}
       <div className="es-price"><label htmlFor="es-price">Price change<output htmlFor="es-price">{percent(selection.shockPct)}</output></label><input id="es-price" type="range" min="-20" max="20" step="1" value={selection.shockPct} onChange={e=>update({shockPct:Number(e.target.value)})}/><div><span>−20%</span><button onClick={()=>update({shockPct:0})}>Unchanged</button><span>+20%</span></div></div>
     </div>
     <details className="es-assumption-detail"><summary>What this price experiment changes</summary><p>This is a sensitivity experiment. The percentage applies uniformly to {commodities[selection.commodity].toLowerCase()} trade prices and to each available budget’s named price benchmark. Trade quantities stay fixed. The provincial GDP panel uses historical benchmark relationships. The household panel uses a sustained twelve-month benchmark change or a separately selected retail-price scenario. Neither predicts an individual bill.</p><label>Trade reference year<select aria-label="Investigation trade year" value={selection.tradeYear} onChange={e=>update({tradeYear:Number(e.target.value)})}>{snapshots.flows.trade.years.map(y=><option key={y}>{y}</option>)}</select></label><p>Trade uses {selection.tradeYear} values. Budget estimates keep their own fiscal years. The national oil illustration uses the Finance Canada baseline. These accounts overlap and must not be added.</p></details>
+    {snapshots===liveSnapshots&&<MonthlyEnergy region={selection.focus} compare={selection.compare} commodity={selection.commodity} context="story"/>}
     {notice&&<p className="es-notice" role="status">{notice}</p>}
     <nav className="es-chapters" aria-label="Investigation chapters">{chapters.map(([id,label],i)=><button key={id} aria-current={selection.chapter===id?'step':undefined} aria-pressed={selection.chapter===id} onClick={()=>update({chapter:id})}><span>{String(i+1).padStart(2,'0')}</span>{label}</button>)}</nav>
     <div className="es-current-answer" aria-live="polite" aria-atomic="true"><p>{summaryText}</p></div>

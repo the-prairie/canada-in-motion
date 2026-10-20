@@ -135,7 +135,9 @@ try{
   await host.locator('.es-notice').filter({hasText:'saved snapshot'}).waitFor();
   assert.equal((await shareState()).commodity,'gas');
   assert.match(await host.locator('.es-notice').innerText(),/saved snapshot/);
+  assert.equal(await host.locator('[data-monthly-ready]').count(),0,'Replayed investigations must not mix in live monthly observations');
   await host.locator('input[type=file]').setInputFiles({name:'invalid.json',mimeType:'application/json',buffer:Buffer.from('{"schemaVersion":1,"snapshots":{}}')});
+  await host.locator('.es-notice').filter({hasText:'could not be verified'}).waitFor();
   assert.match(await host.locator('.es-notice').innerText(),/could not be verified/);
   assert.equal((await shareState()).commodity,'gas');
   checks.push('pin restore, complete export replay, imported snapshot and malformed-file recovery');

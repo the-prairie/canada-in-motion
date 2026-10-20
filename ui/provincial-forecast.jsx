@@ -1,3 +1,4 @@
+import {MonthlyEnergy} from './monthly-energy.jsx';
 import React,{useState,useId} from 'react';
 import {createRoot} from 'react-dom/client';
 import {summarizeProvincialForecast,validateProvincialForecast} from '../provincial-forecast-model.mjs';
@@ -72,6 +73,7 @@ export function ForecastExplorer({data,initial={},onChange,benchmarks=null,embed
     <details className="pf-scope"><summary>What this estimates</summary><p>Real GDP growth across all industries, at basic prices. These forecasts do not isolate the effect of oil, gas or electricity prices. Ranges use past prediction errors, with an 80% calibration target. The observed coverage is shown for each province.</p></details>
     <label className="hw-measure pf-inspect">Inspect a province<select aria-label="Inspect provincial forecast" value={row.region} onChange={e=>inspect(e.target.value)}>{result.rows.map(r=><option value={r.region} key={r.region}>{r.name}</option>)}</select></label>
     <ForecastDetail data={data} row={row} benchmarks={benchmarks}/>
+    {!embedded&&<MonthlyEnergy region={row.region} context="forecast"/>}
     <details className="hw-sources"><summary>Inputs, model selection & limitations</summary><p>GDP observations through {result.information.gdpYear}; employment through {through}. Forecast snapshot: {result.asOf.slice(0,10)}. Models are fitted separately for the current and following year.</p><p>{typeof result.methodology.selection==='string'?result.methodology.selection:''}</p>{result.methodology.limitations.map((text,i)=><p key={i}>{text}</p>)}{result.sources.map(source=><p key={source.id}><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title}</a></p>)}{result.methodology.literature?.map((paper,i)=><p key={i}><a href={paper.url} target="_blank" rel="noopener noreferrer">{paper.title}</a></p>)}</details>
   </section>;
 }

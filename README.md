@@ -13,6 +13,7 @@ python pipeline/refresh.py
 python pipeline/refresh_context.py
 python pipeline/refresh_bcer.py
 python pipeline/refresh_economy.py
+python pipeline/refresh_monthly_energy.py
 npm test
 python -m unittest discover -s pipeline -p 'test_*.py'
 node scripts/beta-release-gate.mjs
@@ -55,6 +56,8 @@ The opening investigation connects an oil, gas or electricity price assumption w
 The provincial outlook chapter now compares benchmark-price changes using historically tested provincial GDP relationships. The People & costs chapter estimates oil-to-motor-fuel spending equivalents and offers explicit gas/electricity retail-price scenarios. Failed models remain exploratory, and monthly retail-price validation does not establish annual bill accuracy. Both snapshots refresh in the scheduled data workflow. See [models, independent review and release checks](docs/PRICE-IMPACTS-RELEASE.md).
 
 The Data views menu retains the detailed accounts and existing shared links. The Income account reports observed energy-sector GDP for all 13 jurisdictions using the latest common current-price year in the acquired Statistics Canada table, currently 2022. The ranked comparison, map and table share a province selection. GDP measures value added, not gross sales or a net benefit to residents.
+
+Monthly activity appears in Income, Energy Futures, Provincial outlook and Explore a question. The three Statistics Canada series currently cover July 2026, with province selection, year-over-year change, 24-month charts/tables and source-preserving downloads. Oil is crude oil production alone; gas uses the active 25-10-0086 table in GJ; electricity includes utilities and industrial producers. All 13 jurisdictions and Canada are represented, with confidential, missing and absent observations kept distinct. The daily workflow reacquires and validates each independently dated series. These observations do not silently change annual GDP or forecast inputs. See [independent verification](docs/MONTHLY-ENERGY-VERIFICATION.md) and [release checks](docs/MONTHLY-ENERGY-RELEASE.md).
 
 Energy Futures compares annual CER 2026 scenario series through 2050. International price assumptions and regional production/use appear in separate groups. Residential electricity indices compare each jurisdiction with its own same-year Current Measures case. They cannot compare absolute electricity bills between provinces. The oil-price experiment uses Finance Canada's national 2026 sensitivity; it does not estimate provincial GDP or jobs.
 

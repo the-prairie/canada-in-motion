@@ -180,3 +180,5 @@ export {mountDynamicPrices} from './dynamic-prices.jsx';
 
 export {mountProvincialForecast} from './provincial-forecast.jsx';
 export {mountEnergyStory} from './energy-story.jsx';
+
+export {mountMonthlyEnergy} from './monthly-energy.jsx';
