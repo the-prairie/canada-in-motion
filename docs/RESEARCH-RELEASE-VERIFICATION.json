@@ -25,7 +25,8 @@
     "headlessBrowserSuites": [
       "tests/e2e/investigations.mjs",
       "tests/e2e/investigation-review.mjs",
-      "tests/e2e/economic-research.mjs"
+      "tests/e2e/economic-research.mjs",
+      "tests/e2e/research-late-status.mjs"
     ],
     "publicBetaGate": "passed"
   },
@@ -85,5 +86,16 @@
     "Trade price experiments hold quantities fixed and are not GDP forecasts.",
     "Existing national well coverage remains incomplete and the site remains a public beta."
   ],
-  "deployment": "Awaiting public deployment verification; see workflow history for the release result."
+  "deployment": "Awaiting public deployment verification; see workflow history for the release result.",
+  "publicSubmissionCheck": {
+    "status": "automated_security_check_timed_out",
+    "providerRequestSent": false,
+    "note": "Turnstile prevented the headless browser from submitting. Provider execution is verified separately; no CAPTCHA bypass was attempted."
+  },
+  "postDeploymentDataCheck": {
+    "incomeObservationRows": "exact match to reviewed snapshot",
+    "maximumOilModelNumericDifferencePctPoints": 2.0463630789890885e-12,
+    "oilValidationSummary": "exact match",
+    "note": "Fresh Linux/Python pipeline reproduces local results within floating-point precision."
+  }
 }

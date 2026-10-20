@@ -194,20 +194,31 @@ export class EnergyEconomy {
     const tradeKey=JSON.stringify([this.state.tradeCommodity,this.state.tradeYear,this.state.priceShock,this.state.linkScope,this.state.tradeRegions,this.state.transferSet]);
     const previousTrade=this.state.section==='trade'&&this.tradeMountKey===tradeKey?this.root.querySelector('#ec-trade-workspace'):null;
     if(!previousTrade){this.tradeMount?.unmount();this.tradeMount=null;}
-    const activeId=this.root.contains(document.activeElement)?document.activeElement.id:null;
+    const previousResearch={};
+    for(const [kind,section,id] of [['income','supply','#ec-income-paths'],['history','oil','#ec-oil-history']]){
+      const host=this.state.section===section&&this[`${kind}MountKey`]===this.researchKey(kind)?this.root.querySelector(id):null;
+      if(host)previousResearch[kind]=host;else{this[`${kind}Mount`]?.unmount();this[`${kind}Mount`]=null;}
+    }
+    const activeElement=this.root.contains(document.activeElement)?document.activeElement:null;
+    const activeId=activeElement?.id;
     const start=activeId==='energy-question'?document.activeElement.selectionStart:null;
     const summary=summarizeEconomy(this.data,this.state);
     const isResearch=['trade','supply','oil'].includes(this.state.section);
     this.root.innerHTML=`<div class="ec-context"><label>Place<select id="ec-region" data-econ-field="region">${choices([['CA','Canada'],...this.data.regions.filter(r=>r.code!=='CA').map(r=>[r.code,nameOf(this.data,r.code)])],this.state.region)}</select></label><nav aria-label="Energy economy accounts">${[['income','Income'],['trade','Trade & prices'],['supply','Follow the dollar'],['futures','Energy futures'],['oil','Oil & the economy']].map(([id,label])=>`<button id="ec-section-${id}" data-ec-section="${id}" aria-current="${this.state.section===id?'page':'false'}">${label}</button>`).join('')}</nav><div class="ec-context-actions"><button data-ec-action="ask">${this.status.available?"Ask a question":"Live analysis status"}</button><button data-ec-action="download" aria-label="Download selected economic data and analysis">Download</button></div></div>
     ${isResearch?'':this.analyst()}${this.answer?.workspace&&!isResearch?'<details class="ec-authored-data"><summary>Browse the original data views</summary>':''}<div class="ec-workspace">${this.state.section==='trade'?'<div id="ec-trade-workspace"><p role="status">Loading energy trade and price effects…</p></div>':this.state.section==='futures'?this.futures(summary):this.state.section==='oil'?this.oil()+'<div id="ec-oil-history"><p role="status">Loading historical oil and GDP paths…</p></div>':this.state.section==='supply'?'<div id="ec-income-paths"><p role="status">Loading supply-chain effects…</p></div>':this.income(summary)}</div>${isResearch?`<details class="ec-trade-question" ${this.tradeQuestionOpen||this.busy?'open':''}><summary>Ask a question about this data</summary>${this.analyst()}</details>`:''}${this.debate()}${this.answer?.workspace&&!isResearch?'</details>':''}<details class="ec-methods"><summary>Data coverage and methods</summary><ul>${summary.limitations.map(text=>`<li>${esc(text)}</li>`).join('')}</ul><p>Retrieved ${esc(this.data.generatedAt?.slice(0,10))}. Economic series are separate from well inventories. Trade & prices includes modelled bilateral trade value, provincial physical energy balances and explicit price sensitivities. Causal provincial GDP and employment forecasts, bilateral physical shipments and household income distribution remain incomplete.</p><div class="ec-links">${this.data.sources.map(source=>this.sourceLink(source.id)).join('')}</div></details>`;
-    for(const [kind,id] of [['income','#ec-income-paths'],['history','#ec-oil-history']]){this[`${kind}Mount`]?.unmount();this[`${kind}Mount`]=null;const host=this.root.querySelector(id);if(host)void this.mountResearchView(host,kind);}
+    for(const [kind,id] of [['income','#ec-income-paths'],['history','#ec-oil-history']]){const host=this.root.querySelector(id);if(host&&previousResearch[kind])host.replaceWith(previousResearch[kind]);else if(host)void this.mountResearchView(host,kind);}
     const tradeHost=this.root.querySelector('#ec-trade-workspace');
     if(tradeHost&&previousTrade)tradeHost.replaceWith(previousTrade);else if(tradeHost)void this.mountTrade(tradeHost,tradeKey);
     const workspaceHost=this.root.querySelector('#ec-dynamic-workspace');
     if(workspaceHost&&previousHost){workspaceHost.replaceWith(previousHost);}else if(workspaceHost){void this.mountDynamicWorkspace(workspaceHost);}
-    if(activeId){const node=this.root.querySelector(`#${CSS.escape(activeId)}`);node?.focus({preventScroll:true});if(start!==null)node?.setSelectionRange?.(start,start);}
+    if(activeElement?.isConnected)activeElement.focus({preventScroll:true});
+    else if(activeId){const node=this.root.querySelector(`#${CSS.escape(activeId)}`);node?.focus({preventScroll:true});if(start!==null)node?.setSelectionRange?.(start,start);}
+  }
+  researchKey(kind) {
+    const s=this.state;return JSON.stringify(kind==='income'?[s.region,s.incomeIndustry,s.incomeYear,s.demandMillion,s.includeInduced]:[s.historyRegions,s.historyOilChange,s.historyHorizon,s.historyYear]);
   }
   async mountResearchView(host,kind) {
+    this[`${kind}MountKey`]=this.researchKey(kind);
     try {
       const module=await import('./vendor/energy-workspace.js');
       const file=kind==='income'?'income-paths':'dynamic-price-history';
@@ -215,7 +226,7 @@ export class EnergyEconomy {
       if(!host.isConnected)return;
       host.replaceChildren();
       this[`${kind}Mount`]=module[kind==='income'?'mountIncomePaths':'mountDynamicPrices'](host,{data,initial:this.state,onChange:selection=>{
-        this.state=normalizeEconomyState({...this.state,...(kind==='income'?{region:selection.region,incomeIndustry:selection.industry,incomeYear:selection.year,demandMillion:selection.demandMillion,includeInduced:selection.includeInduced}:{historyRegions:selection.regions,historyOilChange:selection.oilChangePct,historyHorizon:selection.horizonYears,historyYear:selection.selectedYear??null})});const place=this.root.querySelector('#ec-region');if(place)place.value=this.state.region;this.onChange(this.state);
+        this.state=normalizeEconomyState({...this.state,...(kind==='income'?{region:selection.region,incomeIndustry:selection.industry,incomeYear:selection.year,demandMillion:selection.demandMillion,includeInduced:selection.includeInduced}:{historyRegions:selection.regions,historyOilChange:selection.oilChangePct,historyHorizon:selection.horizonYears,historyYear:selection.selectedYear??null})});this[`${kind}MountKey`]=this.researchKey(kind);const place=this.root.querySelector('#ec-region');if(place)place.value=this.state.region;this.onChange(this.state);
       }});
     }catch{if(host.isConnected)host.innerHTML='<p role="alert">This dataset could not load. Reload to try again.</p>';}
   }
