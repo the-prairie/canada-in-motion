@@ -1,6 +1,6 @@
 import {summarizeEconomy,validateEconomy} from './economy-model.mjs';
 import {selectInfrastructure} from './infrastructure-model.mjs';
-import {buildTradePanels,normalizeTradeSelection} from './trade-workspace-model.mjs';
+import {buildTradePanels,normalizeTradeSelection,ENERGY_COMMODITIES} from './trade-workspace-model.mjs';
 import {validateEnergyFlows} from './energy-flow-model.mjs';
 import {validateProvincialImpacts} from './provincial-impact-model.mjs';
 import {validateProvincialForecast,summarizeProvincialForecast} from './provincial-forecast-model.mjs';
@@ -95,6 +95,19 @@ export function resolveWorkspace(workspace,selection,economy) {
     }
     if(tradeTypes.includes(panel.type)){const rebuilt=tradePanels.find(p=>p.type===panel.type);return rebuilt?{...rebuilt,id:panel.id,role:panel.role}:panel;}
     if(panel.type==='infrastructure-map'&&workspace.networkSnapshot)return {...panel,...selectInfrastructure(workspace.networkSnapshot,selection.regions),regions:selection.regions.length?selection.regions:['CA']};
+    if(panel.type==='oil-sensitivity'){
+      const oilShock=selection.oilShock===undefined?panel.shockPct:selection.oilShock;
+      const duration=selection.duration===undefined?panel.duration:selection.duration;
+      if(!Number.isFinite(oilShock)||Math.abs(oilShock)>20||!['persistent','temporary'].includes(duration))fail();
+      if(oilShock===panel.shockPct&&duration===panel.duration)return panel;
+      const sensitivity=summarizeEconomy(economy,{...selection,oilShock,duration,region:'CA'}).publishedOilSensitivity;
+      const rows=panel.rows.map(row=>{
+        const match=/^oil-(nominalGdpPct|realGdpPct|nominalGdpBillionCad|federalRevenueBillionCad|federalBalanceBillionCad)-([12])$/.exec(row.id);
+        if(!match)fail();
+        return {...row,value:sensitivity.years[Number(match[2])-1][match[1]]};
+      });
+      return {...panel,scope:'CA',shockPct:oilShock,duration,method:sensitivity.method,baseline:sensitivity.baseline,period:sensitivity.baseline,sourceIds:sensitivity.sourceIds,rows};
+    }
     if(panel.type==='province-map')return {...panel,rows:gdpRows};
     if(panel.type==='province-comparison')return {...panel,rows:gdpRows.filter(row=>regionCodes.includes(row.code))};
     if(panel.type==='scenario-comparison'){
@@ -109,4 +122,68 @@ export function resolveWorkspace(workspace,selection,economy) {
     return panel;
   });
   return {...workspace,panels};
+}
+
+const formatFinding=value=>new Intl.NumberFormat('en-CA',{maximumFractionDigits:Math.abs(value)>0&&Math.abs(value)<.01?4:2}).format(Object.is(value,-0)?0:value);
+const moneyFinding=value=>Number.isFinite(value)?`CA$${formatFinding(Math.abs(value)>=1000?value/1000:value)} ${Math.abs(value)>=1000?'billion':'million'}`:'unavailable';
+const signedFinding=value=>`${value>0?'+':''}${formatFinding(value)}`;
+const leadingRows=(rows,key)=>[...rows].sort((a,b)=>(Number.isFinite(b[key])?b[key]:-Infinity)-(Number.isFinite(a[key])?a[key]:-Infinity)).slice(0,3);
+const regionName=(workspace,code)=>workspace.tradeSnapshot?.regions.find(row=>row.code===code)?.name||workspace.economySnapshot?.regions.find(row=>row.code===code)?.name||code;
+
+function panelFinding(panel,workspace,selection) {
+  if(panel.type==='coverage-note')return panel.message;
+  if(panel.type==='province-comparison'||panel.type==='province-map'){
+    const rows=panel.type==='province-map'&&selection.regions?.length?panel.rows.filter(row=>selection.regions.includes(row.code)):panel.rows;
+    const leaders=leadingRows(rows,'value');
+    return `${leaders.map(row=>`${row.name} generated ${moneyFinding(row.value)} in energy-sector GDP${Number.isFinite(row.sharePct)?`, ${formatFinding(row.sharePct)}% of its economy`:''}`).join('; ')} in ${panel.period}.${rows.length>3?' These are the three largest values in this selection.':''} GDP records value added where production occurs; it does not identify who receives the income.`;
+  }
+  if(panel.type==='scenario-comparison'){
+    const rows=leadingRows(panel.rows,'selected');
+    const entries=rows.map(row=>row.selected===null?`${row.name} has no published value`:`${row.name} ${formatFinding(row.selected)}${panel.scenario!==panel.baselineScenario&&Number.isFinite(row.baseline)?` versus ${formatFinding(row.baseline)} under ${panel.baselineScenario}`:''}`);
+    return `${panel.title} in ${panel.period} under ${panel.scenario}, in ${panel.unit}. ${entries.join('; ')}.${panel.rows.length>3?' These are the three largest selected values.':''} CER changes several assumptions together. This comparison does not isolate a price effect.`;
+  }
+  if(panel.type==='oil-sensitivity'){
+    const outcomes=[1,2].map(year=>{
+      const gdp=panel.rows.find(row=>row.id===`oil-nominalGdpPct-${year}`);
+      const revenue=panel.rows.find(row=>row.id===`oil-federalRevenueBillionCad-${year}`);
+      if(!gdp||!revenue)return null;
+      return `year ${year} nominal GDP ${Number.isFinite(gdp.value)?`${signedFinding(gdp.value)}%`:'unavailable'} and federal revenue ${Number.isFinite(revenue.value)?`${signedFinding(revenue.value)} billion CAD`:'unavailable'}`;
+    }).filter(Boolean);
+    return `Canada-wide effects of a ${signedFinding(panel.shockPct)}% WTI change${panel.duration==='temporary'?', lasting two quarters':', sustained'} on the ${panel.baseline}. ${outcomes.join('; ')}. ${panel.method}. This model does not estimate effects for individual provinces.`;
+  }
+  if(panel.type==='energy-trade'){
+    const result=panel.summary,total=result.totals;
+    const largest=leadingRows(result.links.filter(row=>Number.isFinite(row.value)&&row.value>0),'value')[0];
+    const amount=total.value===null?`${moneyFinding(total.availableValue)} in published transactions, with ${total.missingRecords} unavailable ${total.missingRecords===1?'record':'records'}`:`${moneyFinding(total.value)} in transactions`;
+    const scope=result.linkScope==='between'?'between the selected provinces':'touching the selected provinces';
+    return `${ENERGY_COMMODITIES[result.commodity]} trade ${scope} totalled ${amount} in ${panel.period}.${largest?` The largest connection is ${regionName(workspace,largest.origin)} to ${regionName(workspace,largest.destination)}, ${moneyFinding(largest.value)}.`:''} These supplier-to-purchaser estimates use basic prices. They measure transactions, not GDP or physical routes.`;
+  }
+  if(panel.type==='energy-transfers'){
+    const result=panel.dataset;
+    const rows=result.observations.slice(0,3).map(row=>`${regionName(workspace,row.region)} ${row.netReceipts===null?'has no published net balance':row.netReceipts===0?'has balanced net transfers':`${formatFinding(Math.abs(row.netReceipts))} net ${row.netReceipts>0?'received':'delivered'}`}`);
+    return `${ENERGY_COMMODITIES[result.commodity]} transfers in ${result.period}, in ${result.unit}${result.publicationStatus==='preliminary'?', preliminary':''}. ${rows.join('; ')}.${result.observations.length>3?' The table includes the other selected jurisdictions.':''} The source does not identify the partner province.`;
+  }
+  if(panel.type==='provincial-impact'){
+    const result=panel.result;
+    const trade=result.trade.rows.slice(0,3).map(row=>`${regionName(workspace,row.region)} ${moneyFinding(row.netChange)}`);
+    const fiscal=result.fiscal.rows.filter(row=>row.available).slice(0,2).map(row=>`${regionName(workspace,row.region)} ${moneyFinding(row.revenueChangeLow)}${row.revenueChangeHigh!==row.revenueChangeLow?` to ${moneyFinding(row.revenueChangeHigh)}`:''} in ${row.fiscalYear}`);
+    return `A ${signedFinding(result.shockPct)}% ${ENERGY_COMMODITIES[result.commodity].toLowerCase()} price change, with ${result.year} quantities held fixed, changes interprovincial trade balances by ${trade.join('; ')}. This is trade repricing, not a GDP forecast.${fiscal.length?` Separate budget sensitivities give ${fiscal.join('; ')} on their own benchmark assumptions. Those amounts cannot be added to trade repricing.`:' No fiscal sensitivity is calibrated for this selection.'}`;
+  }
+  if(panel.type==='gdp-forecast'){
+    const available=panel.summary.rows.filter(row=>row.status==='available');
+    const missing=panel.summary.rows.filter(row=>row.status!=='available');
+    const entries=available.slice(0,3).map(row=>`${row.name} ${formatFinding(row.predictionPct)}%${row.lowerPct!==null?`, with a historical-error range of ${formatFinding(row.lowerPct)}% to ${formatFinding(row.upperPct)}%`:''}`);
+    return `${panel.year} real GDP growth outlook at basic prices. ${entries.length?entries.join('; '):'No forecast is available for this selection'}.${available.length>3?' The table contains the other selected provinces.':''}${missing.length?` No comparable forecast is available for ${missing.map(row=>row.name).join(', ')}.`:''} These predictions use observed indicators. Changing energy-price assumptions does not change this forecast.`;
+  }
+  if(panel.type==='infrastructure-map')return `${panel.routeIds.length} selected routes and ${panel.facilityIds.length} facility records match these provinces. Locations are approximate and source dates vary. These records do not measure shipments or establish current operating status.`;
+  return null;
+}
+
+export function summarizeWorkspaceFindings(workspace,selection={}) {
+  const focus=workspace.panels.find(panel=>panel.id===selection.panelId)||workspace.panels.find(panel=>panel.role==='answer'&&panel.type!=='coverage-note')||workspace.panels[0];
+  const visible=selection.viewMode==='all'?workspace.panels.filter(panel=>panel.type!=='province-map'||!workspace.panels.some(p=>p.type==='province-comparison')):[focus];
+  const coverage=workspace.panels.filter(panel=>panel.type==='coverage-note'&&!visible.includes(panel));
+  const panels=[...visible,...coverage];
+  const sources=new Set(workspace.sources.map(source=>source.id));
+  return panels.map(panel=>({panelId:panel.id,title:panel.title,text:panelFinding(panel,workspace,selection),sourceIds:panel.sourceIds.filter(id=>sources.has(id))})).filter(block=>block.text);
 }
