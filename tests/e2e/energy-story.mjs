@@ -192,6 +192,18 @@ try{
   assert.equal(await broken.locator('#es-price').inputValue(),'-10');
   await broken.close();
   checks.push('source-loading retry and explicit invalid shared-state recovery');
+  const responsive=await context.newPage();
+  await responsive.route('**/api/analysis/status',route=>route.fulfill({json:{available:false}}));
+  for(const section of ['income','explore']){
+    await responsive.goto(base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy:{section}})));
+    await responsive.locator(section==='income'?'.ec-ranking':'.es-sales').waitFor();
+    for(const width of [1440,1200,1101,1024,768,390,320]){
+      await responsive.setViewportSize({width,height:900});
+      assert.ok(await responsive.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${section} overflows at ${width}px`);
+    }
+  }
+  await responsive.close();
+  checks.push('existing and new navigation contains all controls from 320 to 1440 pixels');
   assert.deepEqual(errors,[]);
   console.log(JSON.stringify({status:'passed',base,checks,providerCalls:'mocked; no billed inference',runtimeErrors:errors},null,2));
 }finally{releaseStatus();releaseDebate();await browser.close();}

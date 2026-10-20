@@ -17,9 +17,9 @@ body[data-view='economy'] .workspace,body[data-view='economy'] .mobile-surface {
 #energy-economy details summary {cursor:pointer;font-size:13px;line-height:1.5;min-height:44px;padding:12px 0;}
 #energy-economy details p,#energy-economy details li {font-size:13px;line-height:1.65;}
 #energy-economy details ul {padding-left:20px;}
-.ec-context {display:flex;gap:24px;align-items:center;border-bottom:1px solid var(--line);padding:18px 0;}
+.ec-context {display:flex;flex-wrap:wrap;gap:24px;align-items:center;border-bottom:1px solid var(--line);padding:18px 0;}
 .ec-context>label {font-size:11px;color:var(--muted);min-width:185px;max-width:235px;display:flex;gap:8px;align-items:center;}
-.ec-context nav {display:flex;gap:4px;flex:1;}
+.ec-context nav {display:flex;flex-wrap:wrap;gap:4px;flex:1;min-width:0;}
 .ec-context nav button {background:none;border:0;min-height:44px;padding:10px 16px;font-size:14px;white-space:nowrap;border-radius:2px;color:var(--muted);}
 .ec-context nav button[aria-current='page'] {background:var(--ink);color:var(--paper);}
 .ec-context-actions {display:flex;gap:12px;}

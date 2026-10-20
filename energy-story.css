@@ -182,6 +182,10 @@
 @media(prefers-reduced-motion:no-preference) {
  .es-bar-row>i {transition:width .18s ease-out}
 }
+@media(max-width:760px) {
+ .ec-context:not(.ec-context-explore) nav {grid-template-columns:repeat(3,minmax(0,1fr))}
+ .ec-context:not(.ec-context-explore) nav button {white-space:normal;min-width:0}
+}
 
 .es-trade-balance {border-block:1px solid var(--line);margin:20px 0;padding:0 0 2px}
 .es-balance-grid {display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:12px 0}

@@ -53,8 +53,10 @@ Independent acceptance found and retested three defects. Zero-flow copy now foll
 
 ## Release checks
 
-Local candidate `11528aa38f98a3584f29` passed 329 JavaScript tests, 23 local Worker tests, the full connected-investigation browser flow, the provincial forecast browser flow, the forecast AI fixture flow and the Alberta well-table regression. Tests use headless Chromium. AI response fixtures verify interface integration without billed inference.
+Local candidate `520c8d7f4d887e46bcac` passed 329 JavaScript tests, 23 local Worker tests, the full connected-investigation browser flow, the provincial forecast browser flow, the forecast AI fixture flow and the Alberta well-table regression. Tests use headless Chromium. AI response fixtures verify interface integration without billed inference.
 
 The new browser harness is `tests/e2e/energy-story.mjs`. It checks source-backed values, local recomputation, keyboard interaction, URL restore, export replay, missing data, recovery, responsive containment, scoped forecast handoff and current OpenUI findings.
 
 Public deployment and verification are recorded in `ENERGY-INVESTIGATION-RELEASE.md` when complete.
+
+A final responsive sweep found navigation overflow at intermediate widths in the older detailed views. The first deployment was cancelled before publication. Wrapping and minimum-size rules now keep the controls within 320–1440 pixels. A fresh reviewer checked all seven economy sections, opened menus and keyboard navigation.
