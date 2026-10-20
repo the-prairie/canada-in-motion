@@ -39,6 +39,35 @@ function ForecastAudit({row}){
   </details>;
 }
 
+
+function EnergyForecastAudit({data,row}){
+  const evaluation=data.energyEvaluation;
+  if(!evaluation)return null;
+  if(evaluation.status!=='evaluated')return <details className="hw-method-inline pf-energy-audit"><summary>Monthly energy test</summary><p>{evaluation.reason}</p></details>;
+  const test=evaluation.horizons.find(h=>h.horizon===row.horizon);
+  const province=test.byProvince.find(p=>p.region===row.region);
+  const records=evaluation.records.filter(r=>r.region===row.region&&r.horizon===row.horizon&&evaluation.protocol.holdoutTargetYears.includes(r.targetYear));
+  const current=evaluation.records.find(r=>r.region===row.region&&r.horizon===row.horizon&&r.originYear===data.forecastOriginYear);
+  const inputs=evaluation.features.filter(f=>f.region===row.region&&f.originYear===data.forecastOriginYear);
+  const changed=Math.abs(current.experimentalPct-current.baselinePct)>1e-10;
+  return <details className="hw-method-inline pf-energy-audit"><summary>Monthly energy test · existing forecast retained</summary>
+    <p>{test.passed?'The monthly energy model passed the numerical checks, but requires a separate review before it can change the forecast.':test.changedCount===0?'Monthly oil, gas and electricity readings did not change any forecasts in the final test.':'Monthly oil, gas and electricity readings did not improve accuracy enough to change the forecast.'}</p>
+    <div className="hw-table-wrap" role="region" tabIndex={0} aria-label="Monthly energy forecast accuracy"><table><caption>Average absolute error · {evaluation.protocol.holdoutTargetYears[0]}–{evaluation.protocol.holdoutTargetYears.at(-1)} outcomes · percentage points</caption><thead><tr><th scope="col">Test</th><th scope="col">Existing model</th><th scope="col">With energy inputs</th></tr></thead><tbody>
+      <tr><th scope="row">All 10 provinces</th><td>{n(test.baseline.mae,3)}</td><td>{n(test.experiment.mae,3)}</td></tr>
+      <tr><th scope="row">{row.name}</th><td>{n(province.baseline.mae,3)}</td><td>{n(province.experiment.mae,3)}</td></tr>
+    </tbody></table></div>
+    <p>{n(Math.abs(test.maeGainPct),1)}% {test.maeGainPct>=0?'lower':'higher'} average error; the rule requires at least 5%, plus checks on large errors and performance across years and provinces. {test.changedCount} of {test.baseline.count} predictions changed. These span only three shared economic years.</p>
+    <details><summary>Inspect {row.name}’s results and inputs</summary>
+      <div className="hw-table-wrap" role="region" tabIndex={0} aria-label={`${row.name} energy model test years`}><table><caption>Annual real GDP growth · forecasts made {row.horizon===0?'during':'the year before'} the target year</caption><thead><tr><th scope="col">Year</th><th scope="col">Existing</th><th scope="col">With energy</th><th scope="col">Actual</th></tr></thead><tbody>{records.map(r=><tr key={r.targetYear}><th scope="row">{r.targetYear}</th><td>{pct(r.baselinePct)}</td><td>{pct(r.experimentalPct)}</td><td>{pct(r.actualPct)}</td></tr>)}</tbody></table></div>
+      <p>{row.year}: {changed?`the unadopted energy model would give ${pct(current.experimentalPct)}. The published estimate remains ${pct(current.baselinePct)}.`:'the energy model proposes no change.'}</p>
+      <div className="hw-table-wrap" role="region" tabIndex={0} aria-label={`${row.name} energy model inputs`}><table><caption>January–July {data.forecastOriginYear} production · change from the same months a year earlier</caption><thead><tr><th scope="col">Input</th><th scope="col">Change</th></tr></thead><tbody>{inputs.map(f=><tr key={f.metric}><th scope="row">{{oil:'Crude oil',gas:'Marketable natural gas',electricity:'Electricity generation'}[f.metric]}</th><td>{f.status==='available'?pct(f.growthPct):'Insufficient comparable data'}</td></tr>)}</tbody></table></div>
+      <p>Each historical forecast uses earlier GDP outcomes to fit and select its model. Energy inputs stop in July; employment stops in September. Missing energy readings are never treated as zero.</p>
+      <p>These tests use revised historical data and simulated release delays. They do not recreate the data available at the time, establish a causal price effect, or guarantee future accuracy. The 2016 electricity coverage break is excluded.</p>
+      {evaluation.sources.map(s=><p key={s.id}><a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a> · released {s.releaseTime.slice(0,10)}</p>)}
+    </details>
+  </details>;
+}
+
 function ForecastDetail({data,row,benchmarks}){
   const titleId=useId();
   if(row.status!=='available')return <section className="pf-detail" aria-live="polite"><h3>{row.name}</h3><p>The forecasting model needs a comparable monthly employment series. This source does not cover this jurisdiction; its GDP observations remain available.</p></section>;
@@ -52,6 +81,7 @@ function ForecastDetail({data,row,benchmarks}){
       {future.map(r=><tr className="pf-projection-row" key={r.year}><th scope="row">{r.year}</th><td>{r.horizon===0?'Estimate':'Forecast'}</td><td>{pct(r.predictionPct)}</td><td>{range(r)}</td></tr>)}
     </tbody></table></div>
     <ForecastAudit row={row}/>
+    <EnergyForecastAudit data={data} row={row}/>
     {official.length>0&&<details className="hw-method-inline"><summary>Published provincial outlooks</summary><p>These are separate forecasts with their own dates and assumptions. Provincial budgets generally use expenditure-based GDP at market prices; this model uses industry GDP at basic prices.</p>{official.map(r=><p key={`${r.region}-${r.year}`}><strong>{r.year}: {pct(r.growthPct)}</strong> · {r.publicationDate} · <a href={r.source.url} target="_blank" rel="noopener noreferrer">{r.source.title}</a></p>)}</details>}
   </section>;
 }

@@ -69,6 +69,19 @@ jobs:
         run: python pipeline/refresh_household_energy.py
       - name: Refresh GDP and employment inputs and rebuild provincial forecasts
         run: python pipeline/refresh_provincial_forecast.py
+      - name: Independently reproduce eligible energy forecast experiments
+        run: |
+          python - <<'PYTHON'
+          import json, subprocess, sys
+          with open('data/provincial-forecasts.json') as source:
+              evaluation = json.load(source).get('energyEvaluation', {})
+          if evaluation.get('status') == 'evaluated':
+              subprocess.run([sys.executable, 'tests/review/energy-forecast-independent-audit.py'], check=True)
+          elif evaluation.get('status') == 'outside-tested-cutoff':
+              print('Energy experiment outside its tested information cutoff; incumbent forecast retained.')
+          else:
+              raise ValueError('Energy forecast evaluation is missing or has an unknown status')
+          PYTHON
       - name: Verify published provincial budget sensitivities
         run: python pipeline/refresh_provincial_impacts.py
       - name: Require approved beta scope, rights, integrity and freshness

@@ -293,9 +293,12 @@ def main():
     parser.add_argument('--offline', action='store_true')
     parser.add_argument('--as-of', default=date.today().isoformat())
     parser.add_argument('--cache', type=Path, default=ROOT / '.data-cache' / 'provincial-forecast')
+    parser.add_argument('--energy-cache', type=Path, default=ROOT / '.data-cache' / 'monthly-energy')
     parser.add_argument('--output', type=Path, default=ROOT / 'data' / 'provincial-forecasts.json')
     args = parser.parse_args()
     data = build(load_sources(args.cache, offline=args.offline, as_of=args.as_of), args.as_of)
+    from provincial_energy_forecast import attach_energy_evaluation, load_energy_history
+    data = attach_energy_evaluation(data, load_energy_history(args.energy_cache, args.as_of))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     temporary = args.output.with_suffix('.tmp')
     temporary.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')) + '\n')

@@ -126,7 +126,7 @@ def observation(row, spec):
     return {'value': value, 'status': 'available', **result}
 
 
-def parse_metric(raw, metric_id):
+def parse_metric(raw, metric_id, retain_months=36):
     spec = SPECS[metric_id]
     indexed = {}
     periods = set()
@@ -153,7 +153,9 @@ def parse_metric(raw, metric_id):
     if not any(region != 'CA' and month == latest and row['status'] == 'available'
                for (region, month), row in indexed.items()):
         raise ValueError('Latest provincial coverage is unavailable')
-    months = month_window(latest)
+    first = min(periods)
+    count = ((int(latest[:4]) - int(first[:4])) * 12 + int(latest[5:]) - int(first[5:]) + 1) if retain_months is None else retain_months
+    months = month_window(latest, count)
     return {
         'id': metric_id, 'label': spec['label'], 'definition': spec['definition'],
         'sourceId': f"statcan-{spec['table']}",
