@@ -46,7 +46,7 @@ LIMITATIONS = [
     'The national GDP comparison is the sum of 13 provinces and territories at basic prices. It is not expenditure GDP at market prices.',
     'CER scenarios change several assumptions together. Their differences are not the causal effect of changing one price.',
     'Delivered residential price indices compare scenarios in the same year. The source price basis requires reconciliation, so dollar bills are not estimated.',
-    'No calibrated provincial GDP, employment, royalty or household-income response to arbitrary commodity prices is included.',
+    'This snapshot contains observed GDP and published scenarios. Conditional historical price responses are supplied separately; employment and household-income effects are not estimated.',
     'Oil sensitivity is a separate national Finance Canada illustration on its 2026 baseline. Do not add it to CER scenario changes or allocate it to provinces.',
     'Missing source combinations remain unavailable. They do not establish zero production or zero cost.',
 ]
@@ -90,6 +90,81 @@ def parse_gdp(raw):
                        'energyStatus':energy['STATUS'],'totalStatus':total['STATUS']})
     return {'year':year,'unit':'million current CAD at basic prices','sourceId':'statcan-36100711',
             'industry':'Energy sector [T016]','regions':result}
+
+
+GDP_AVAILABLE_STATUSES = {'', '0s', 'A', 'B', 'C', 'D', 'E', 'p', 'r', 't'}
+GDP_UNAVAILABLE_STATUSES = {'..', '...', 'F', 'x', '<LOD'}
+
+
+def validate_gdp_activity(activity):
+    if (activity['unit'] != 'million chained 2017 CAD at basic prices'
+            or activity['sourceId'] != 'statcan-36100711'
+            or activity['industry'] != 'Energy sector [T016]'
+            or not isinstance(activity['year'], int)
+            or activity['previousYear'] != activity['year'] - 1):
+        raise ValueError('Invalid GDP activity basis or years')
+    rows = activity['regions']
+    if len(rows) != 13 or {row['code'] for row in rows} != set(REGIONS):
+        raise ValueError('GDP activity must cover all 13 jurisdictions')
+    for row in rows:
+        for field in ['energy', 'total', 'previousEnergy', 'previousTotal']:
+            if not math.isfinite(row[field]) or row[field] < 0:
+                raise ValueError('Invalid GDP activity observation')
+        if row['total'] <= 0 or row['previousTotal'] <= 0:
+            raise ValueError('Invalid GDP activity total')
+        for current, previous, growth in [('energy', 'previousEnergy', 'energyGrowthPct'), ('total', 'previousTotal', 'totalGrowthPct')]:
+            expected = (row[current] / row[previous] - 1) * 100 if row[previous] else None
+            actual = row[growth]
+            if (expected is None and actual is not None) or (expected is not None and (actual is None or not math.isfinite(actual) or abs(actual - expected) > 1e-8)):
+                raise ValueError('Invalid GDP activity growth')
+        if any(row[field] not in GDP_AVAILABLE_STATUSES for field in ['energyStatus', 'totalStatus', 'previousEnergyStatus', 'previousTotalStatus']):
+            raise ValueError('Invalid GDP activity status')
+        if any(not re.fullmatch(r'v\d+', row[field]) for field in ['energyVector', 'totalVector']):
+            raise ValueError('Missing GDP activity vector')
+    return activity
+
+
+def parse_gdp_activity(raw):
+    records, seen = {}, set()
+    industries = {'All industries [T001]': 'total', 'Energy sector [T016]': 'energy'}
+    with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+        with archive.open('36100711.csv') as stream:
+            for row in csv.DictReader(io.TextIOWrapper(stream, encoding='utf-8-sig')):
+                industry = row['North American Industry Classification System (NAICS)']
+                code = CODES.get(row['GEO'])
+                if row['Prices'] != 'Chained (2017) dollars' or code not in REGIONS or industry not in industries:
+                    continue
+                if row['UOM'] != 'Dollars' or row['SCALAR_FACTOR'] != 'millions':
+                    raise ValueError('GDP activity unit or scale changed')
+                key = (int(row['REF_DATE']), code, industries[industry])
+                if key in seen:
+                    raise ValueError('Duplicate GDP activity observation')
+                seen.add(key)
+                if row['STATUS'] not in GDP_AVAILABLE_STATUSES | GDP_UNAVAILABLE_STATUSES:
+                    raise ValueError('Unknown GDP activity status')
+                if not row['VALUE'] or row['STATUS'] in GDP_UNAVAILABLE_STATUSES:
+                    continue
+                value = float(row['VALUE'])
+                if not math.isfinite(value) or value < 0:
+                    raise ValueError('Invalid GDP activity observation')
+                records[key] = row | {'value': value}
+    complete = {year for year, _, _ in records if all((year, code, kind) in records for code in REGIONS for kind in industries.values())}
+    common = [year for year in complete if year - 1 in complete]
+    if not common:
+        raise ValueError('No consecutive common chained-dollar years for all 13 jurisdictions')
+    year = max(common)
+    regions = []
+    for code, name in REGIONS.items():
+        energy, total, previous_energy, previous_total = (records[y, code, kind] for y, kind in [(year, 'energy'), (year, 'total'), (year - 1, 'energy'), (year - 1, 'total')])
+        regions.append({'code': code, 'name': name, 'energy': energy['value'], 'total': total['value'],
+                        'previousEnergy': previous_energy['value'], 'previousTotal': previous_total['value'],
+                        'energyGrowthPct': (energy['value'] / previous_energy['value'] - 1) * 100 if previous_energy['value'] else None,
+                        'totalGrowthPct': (total['value'] / previous_total['value'] - 1) * 100 if previous_total['value'] else None,
+                        'energyVector': energy['VECTOR'], 'totalVector': total['VECTOR'],
+                        'energyStatus': energy['STATUS'], 'totalStatus': total['STATUS'],
+                        'previousEnergyStatus': previous_energy['STATUS'], 'previousTotalStatus': previous_total['STATUS']})
+    return validate_gdp_activity({'year': year, 'previousYear': year - 1, 'unit': 'million chained 2017 CAD at basic prices',
+                                 'sourceId': 'statcan-36100711', 'industry': 'Energy sector [T016]', 'regions': regions})
 
 
 def observation_map(rows, predicate, aggregate=False):
@@ -172,6 +247,10 @@ def validate_economy(data):
     sources = {s['id'] for s in data['sources']}
     if len(sources) != len(data['sources']) or data['gdp']['sourceId'] not in sources:
         raise ValueError('Invalid source registry')
+    if 'gdpActivity' in data:
+        validate_gdp_activity(data['gdpActivity'])
+        if data['gdpActivity']['sourceId'] not in sources:
+            raise ValueError('Missing GDP activity source')
     for source in data['sources']:
         if not re.fullmatch('[0-9a-f]{64}',source['sha256']) or not source['url'].startswith('https://'):
             raise ValueError('Missing source provenance')
@@ -250,7 +329,8 @@ def build(input_dir=None):
                    **{duration:{key:row[offset:offset+2] for key,row in FINANCE_ROWS.items()} for duration,offset in [('persistent',0),('temporary',2)]}}
     return validate_economy({'schemaVersion':1,'generatedAt':checked,'years':YEARS,'scenarios':list(SCENARIOS.values()),
                              'regions':[{'code':'CA','name':'Canada'},*[{'code':code,'name':name} for code,name in REGIONS.items()]],
-                             'gdp':parse_gdp(raws['36100711-eng.zip']),'metrics':parse_metrics(raws),
+                             'gdp':parse_gdp(raws['36100711-eng.zip']),'gdpActivity':parse_gdp_activity(raws['36100711-eng.zip']),
+                             'metrics':parse_metrics(raws),
                              'oilSensitivity':sensitivity,'sources':sources,'limitations':LIMITATIONS})
 
 
@@ -278,7 +358,7 @@ def main():
     args = parser.parse_args()
     data = build(args.input_dir)
     atomic_write(data,args.output)
-    print(json.dumps({'output':str(args.output),'gdpYear':data['gdp']['year'],'jurisdictions':len(data['gdp']['regions']),
+    print(json.dumps({'output':str(args.output),'gdpYear':data['gdp']['year'],'gdpActivityYear':data['gdpActivity']['year'],'jurisdictions':len(data['gdp']['regions']),
                       'metrics':len(data['metrics']),'sources':len(data['sources'])}))
 
 

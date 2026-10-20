@@ -16,7 +16,7 @@ function queued(...answers){let i=0;return async()=>answers[i++];}
 const request={question:'What happens in Alberta?',state};
 test('two-pass analysis selects state, resolves exact numeric evidence and preserves limitations',async()=>{
   let calls=0;const run=analyzer(async input=>{calls++;assert.ok(input.signal);return calls===1?{state}:explanation;});
-  const result=await run(request);assert.equal(calls,2);assert.equal(result.analysis.blocks[0].text,'Observed energy value added is 100 CAD million.');assert.equal(result.analysis.sources[0].id,'gdp');assert.ok(result.analysis.limitations.some(x=>x.includes('Provincial GDP')));
+  const result=await run(request);assert.equal(calls,2);assert.equal(result.analysis.blocks[0].text,'Observed energy value added is 100 CAD million.');assert.equal(result.analysis.sources[0].id,'gdp');assert.ok(result.analysis.limitations.some(x=>/provincial GDP/i.test(x)));
 });
 test('bad input is rejected before the provider runs',async()=>{
   let calls=0;const run=analyzer(async()=>{calls++;});

@@ -20,6 +20,10 @@ export function buildClaimCatalog({evidence,summary,state,regionName}) {
   const year=number('Observed GDP year');
   const code=state.region;
   add('observed-contribution',`In ${year}, ${regionName}'s energy sector generated ${number(`selected ${code} GDP energy`)} million current CAD in value added, or ${number(`selected ${code} GDP sharePct`)}% of its GDP at basic prices. This measures where production occurs, not where owners live or how the income is distributed.${code==='CA'?' The Canada figure is the sum of provincial and territorial accounts.':''}`);
+  if(summary.activity?.selected && byLabel.has(`${summary.activity.selected.name} energyGrowthPct`)) {
+    const row=summary.activity.selected;
+    add('observed-activity',`From ${number('Previous real GDP year')} to ${number('Observed real GDP year')}, ${regionName}'s energy-sector real GDP changed by ${number(`${row.name} energyGrowthPct`)}%, while its whole economy changed by ${number(`${row.name} totalGrowthPct`)}%. These observed growth rates adjust for price changes and do not replace the older current-dollar contribution.`);
+  }
   if(code!=='CA'){
     const row=summary.gdp.ranking.find(item=>item.code===code);
     add('national-contribution',`${regionName} accounted for ${number(`${row.name||row.code} observed GDP nationalEnergySharePct`)}% of Canada's energy-sector value added in ${year}. This is a share of the energy sector, not of Canada's total GDP or federal revenue.`);

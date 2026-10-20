@@ -218,7 +218,7 @@ test('missing forecast evidence and unavailable historical years stay unavailabl
       assert.match(analysis.blocks[0].text,/GDP forecast data could not be loaded/);
       assert.ok(!workspace.panels.some(panel=>panel.type==='gdp-forecast'));
     }else{
-      assert.match(analysis.blocks[0].text,/GDP data cover 2022/);assert.match(analysis.blocks[1].text,/Observed energy-sector GDP in 2022/);
+      assert.match(analysis.blocks[0].text,/current-dollar GDP data cover 2022/);assert.match(analysis.blocks[1].text,/Observed energy-sector GDP in 2022/);
     }
   }
   const current=buildWorkspacePanels({...input,question:'Compare energy GDP across Canada for 2022.',investigation:{...investigation,regions:['CA']}});
@@ -282,4 +282,73 @@ test('multiple or unavailable scenario years fail before model calls or calculat
     });
   }
   assert.equal(calls,0);assert.equal(decisions,0);assert.equal(calculations,0);
+});
+
+
+test('observed 2025 real activity remains separate from 2022 dollar GDP in generated and reactive comparisons',()=>{
+  const workspace=buildWorkspacePanels({...input,question:'Compare Alberta and Quebec real energy GDP growth in 2025.'});
+  assert.equal(workspace.panels.some(p=>p.type==='coverage-note'),false);
+  const panel=workspace.panels.find(p=>p.type==='province-comparison');
+  assert.equal(panel.period,'2022');assert.equal(panel.activityYear,2025);
+  const row=panel.rows.find(r=>r.code==='AB');
+  assert.equal(row.value,163605.9);
+  assert.ok(Math.abs(row.activity.energyGrowthPct-(81627.5/78855.7-1)*100)<1e-10);
+  assert.match(buildWorkspaceAnalysis(workspace).blocks[0].text,/2024 to 2025/);
+  const unsupported=buildWorkspacePanels({...input,question:'Show Alberta nominal GDP in 2025.'});
+  assert.equal(unsupported.panels[0].type,'coverage-note');
+});
+
+
+test('real growth interval includes its observed prior year without permitting unavailable periods',()=>{
+  const supported=buildWorkspacePanels({...input,question:"How much did Alberta's real energy GDP grow from 2024 to 2025?"});
+  assert.equal(supported.panels.some(p=>p.type==='coverage-note'),false);
+  assert.match(buildWorkspaceAnalysis(supported).blocks[0].text,/81,627.5 million chained 2017 CAD/);
+  for(const question of ["How much did Alberta's real energy GDP grow from 2023 to 2025?","Show Alberta real GDP in 2024.","Show Alberta nominal GDP in 2025."]){
+    assert.equal(buildWorkspacePanels({...input,question}).panels[0].type,'coverage-note');
+  }
+});
+
+
+test('national real GDP requests cannot be answered by summing provincial chained levels',()=>{
+  const national={...input,investigation:{...investigation,regions:['CA']}};
+  const unavailable=buildWorkspacePanels({...national,question:"Show Canada's total real GDP in 2025."});
+  assert.match(unavailable.panels[0].message,/cannot be summed/);
+  assert.equal(unavailable.panels.find(p=>p.type==='province-comparison').role,'context');
+  const provincial=buildWorkspacePanels({...national,question:'Compare real energy GDP growth across Canadian provinces in 2025.'});
+  assert.equal(provincial.panels.some(p=>p.type==='coverage-note'),false);
+});
+
+
+test('an explicit real GDP basis cannot inherit the nominal observation year',()=>{
+  for(const question of ['Show Alberta real GDP in 2022.','Show Alberta real energy GDP growth in 2022.']){
+    assert.equal(buildWorkspacePanels({...input,question}).panels[0].type,'coverage-note');
+  }
+  const mixed=buildWorkspacePanels({...input,question:'Show Alberta energy GDP in 2022 dollars and real growth in 2025.'});
+  assert.equal(mixed.panels.some(p=>p.type==='coverage-note'),false);
+});
+
+
+test('the observed national activity guard preserves the published national oil sensitivity',()=>{
+  const workspace=buildWorkspacePanels({...input,question:"How would Canada's real GDP change when oil prices rise 10%?",investigation:{...investigation,regions:['CA'],topics:['oil-sensitivity']}});
+  assert.equal(workspace.panels.some(p=>p.type==='coverage-note'),false);
+  assert.ok(workspace.panels.some(p=>p.type==='oil-sensitivity'&&p.role==='answer'));
+});
+
+
+test('nominal growth cannot be inferred from a single nominal year or substituted with real growth',()=>{
+  for(const year of [2022,2025]){
+    assert.equal(buildWorkspacePanels({...input,question:`Show Alberta nominal GDP growth in ${year}.`}).panels[0].type,'coverage-note');
+  }
+  assert.equal(buildWorkspacePanels({...input,question:'Show Alberta nominal GDP in 2022.'}).panels.some(p=>p.type==='coverage-note'),false);
+});
+
+
+test('the planning model sees both observed GDP dates before selecting a view',async()=>{
+  const analyzer=createEnergyAnalyzer({...input,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,workspaceEnabled:true,
+    provider:async({input:prompt})=>{
+      assert.deepEqual(prompt.capabilities.observedGDP,{currentDollarYear:2022,realActivityYear:2025,realGrowthFromYear:2024,nationalRealAggregate:false});
+      return {state:prompt.state,investigation};
+    },decider:async()=>({answers:{presentation:{choice:"comparison"},coverage:{choice:"supported"}}})});
+  const result=await analyzer({question:'Compare Alberta and Quebec real energy GDP growth in 2025.',state:{region:'AB'}});
+  assert.equal(result.workspace.panels.find(p=>p.type==='province-comparison').activityYear,2025);
 });

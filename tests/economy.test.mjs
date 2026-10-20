@@ -142,3 +142,27 @@ test('connected investigation selections survive a shared URL without changing o
   assert.equal(normalizeEconomyState({section:'oil'}).section,'oil');
   assert.equal(normalizeEconomyState({story:{shockPct:99}}).story.shockPct,99);
 });
+
+
+test('current-dollar contribution and latest real activity keep independent periods and arithmetic',()=>{
+  const summary=summarizeEconomy(data,{region:'AB',year:2030,oilShock:20});
+  assert.equal(summary.gdp.year,2022);assert.equal(summary.gdp.selected.energy,163605.9);
+  assert.equal(summary.activity.year,2025);assert.equal(summary.activity.previousYear,2024);
+  assert.equal(summary.activity.selected.energy,81627.5);
+  assert.ok(Math.abs(summary.activity.selected.energyGrowthPct-(81627.5/78855.7-1)*100)<1e-10);
+  assert.equal(summarizeEconomy(data,{region:'CA'}).activity.selected,null);
+  assert.equal(summary.activity.regions.length,13);
+  const old=copy();delete old.gdpActivity;validateEconomy(old);
+  assert.equal(summarizeEconomy(old,{}).activity,null);
+  for(const mutation of [d=>d.gdpActivity.year++,d=>d.gdpActivity.regions[0].energyGrowthPct=999,d=>d.gdpActivity.regions.pop()]){
+    const invalid=copy();mutation(invalid);assert.throws(()=>validateEconomy(invalid),/real GDP/);
+  }
+});
+
+test('new visits resolve dataset years later while explicit historical selections survive normalization',()=>{
+  assert.equal(normalizeEconomyState().tradeYear,null);
+  assert.equal(normalizeEconomyState().incomeYear,null);
+  assert.equal(normalizeEconomyState({tradeYear:2023,incomeYear:2021}).tradeYear,2023);
+  assert.equal(normalizeEconomyState({tradeYear:2023,incomeYear:2021}).incomeYear,2021);
+  assert.deepEqual(normalizeEconomyState(normalizeEconomyState()),normalizeEconomyState());
+});

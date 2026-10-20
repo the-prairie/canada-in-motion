@@ -53,18 +53,18 @@
     },
     {
       "id": "sk-official-outlook-2026",
-      "title": "Saskatchewan 2026–27 Budget",
+      "title": "Saskatchewan 2026–27 first-quarter financial report",
       "publisher": "SK provincial government",
-      "publicationDate": "2026-03-18",
+      "publicationDate": "2026-08-27",
       "publicationDatePrecision": "day",
-      "url": "https://publications.saskatchewan.ca/api/v1/products/128317/formats/153853/download",
-      "sha256": "914d16562d2994a70bae1fc81a0f034492648eefd4c2191889002fcd7b3a9882",
-      "sourceBytes": 1570436,
-      "locator": "PDF page 32, printed page 30; Private-sector forecast at a glance",
-      "forecastType": "Private-sector average adopted in the provincial budget, survey February 9, 2026",
+      "url": "https://publications.saskatchewan.ca/api/v1/products/129712/formats/156618/download",
+      "sha256": "2f6f74246dde5c890f9a34913bda6faa44d4690c80271b8ed4a6fd5776c5368b",
+      "sourceBytes": 428442,
+      "locator": "PDF page 4, printed page 2; Table 2, Private-sector forecast at a glance, Real GDP row",
+      "forecastType": "Average private-sector forecast as of July 29, 2026, published in the provincial first-quarter report",
       "basis": "Real GDP; price basis not identified in the cited table",
       "reviewedDate": "2026-10-20",
-      "selection": "Dated official outlook; not an exhaustive search of all subsequent releases"
+      "selection": "August 2026 first-quarter report replaces the March 2026 budget outlook. Private-sector survey as of July 29, 2026."
     },
     {
       "id": "on-official-outlook-2026",
@@ -98,18 +98,18 @@
     },
     {
       "id": "ns-official-outlook-2026",
-      "title": "Nova Scotia Budget 2026–27",
+      "title": "Nova Scotia September 2026 forecast update",
       "publisher": "NS provincial government",
-      "publicationDate": "2026-02-23",
+      "publicationDate": "2026-09-24",
       "publicationDatePrecision": "day",
-      "url": "https://www.novascotia.ca/sites/default/files/documents/6-4173/ftb-bfi-046-en-budget-2026-2027.pdf",
-      "sha256": "2455439c0287efc291ab5bc280b3b19ecb85fd3b774e2e1ec7a486bdd364ac82",
-      "sourceBytes": 5746743,
-      "locator": "PDF page 51, printed page 48; Chart 6.3 and real GDP growth outlook",
+      "url": "https://notices.novascotia.ca/files/budget-forecast-notices/budget-forecast-update-september-2026.pdf",
+      "sha256": "02e858798d6d5b92f4e4f22196409646804925e89318fc9f2ae48104c50a2297",
+      "sourceBytes": 334085,
+      "locator": "PDF page 8, printed page 6; Current Economic Outlook Assumptions, September Forecast, Real GDP ($2017 chained)",
       "forecastType": "Nova Scotia Department of Finance and Treasury Board projection",
       "basis": "Expenditure-based GDP at market prices; chained 2017 dollars",
       "reviewedDate": "2026-10-20",
-      "selection": "Dated official outlook; not an exhaustive search of all subsequent releases"
+      "selection": "September 2026 update replaces the February 2026 budget outlook. Information through June 22, 2026, with household income updated July 22, 2026."
     },
     {
       "id": "nb-official-outlook-2026",
@@ -227,10 +227,10 @@
     {
       "region": "SK",
       "year": 2026,
-      "growthPct": 1.6,
+      "growthPct": 1.5,
       "status": "published-projection",
       "sourceId": "sk-official-outlook-2026",
-      "publicationDate": "2026-03-18",
+      "publicationDate": "2026-08-27",
       "basis": "Real GDP; price basis not identified in the cited table",
       "metric": "annual real GDP growth",
       "unit": "percent"
@@ -238,10 +238,10 @@
     {
       "region": "SK",
       "year": 2027,
-      "growthPct": 2.0,
+      "growthPct": 2.1,
       "status": "published-projection",
       "sourceId": "sk-official-outlook-2026",
-      "publicationDate": "2026-03-18",
+      "publicationDate": "2026-08-27",
       "basis": "Real GDP; price basis not identified in the cited table",
       "metric": "annual real GDP growth",
       "unit": "percent"
@@ -293,10 +293,10 @@
     {
       "region": "NS",
       "year": 2026,
-      "growthPct": 1.5,
+      "growthPct": 1.4,
       "status": "published-projection",
       "sourceId": "ns-official-outlook-2026",
-      "publicationDate": "2026-02-23",
+      "publicationDate": "2026-09-24",
       "basis": "Expenditure-based GDP at market prices; chained 2017 dollars",
       "metric": "annual real GDP growth",
       "unit": "percent"
@@ -304,10 +304,10 @@
     {
       "region": "NS",
       "year": 2027,
-      "growthPct": 1.5,
+      "growthPct": 1.3,
       "status": "published-projection",
       "sourceId": "ns-official-outlook-2026",
-      "publicationDate": "2026-02-23",
+      "publicationDate": "2026-09-24",
       "basis": "Expenditure-based GDP at market prices; chained 2017 dollars",
       "metric": "annual real GDP growth",
       "unit": "percent"
@@ -379,5 +379,5 @@
       "unit": "percent"
     }
   ],
-  "dataVersion": "cba4d7e2d059befe2998"
+  "dataVersion": "7552446365cb90decef2"
 }

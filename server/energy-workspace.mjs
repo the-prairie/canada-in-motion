@@ -13,7 +13,7 @@ const MEASURES=['available','measured-flow','provincial-price-impact','beneficia
 const enumArray=(values,maximum)=>({type:'array',minItems:1,maxItems:maximum,items:{type:'string',enum:values}});
 export const INVESTIGATION_SCHEMA={type:'object',properties:{regions:enumArray(REGIONS,14),topics:enumArray(TOPICS,3),metricIds:{...enumArray(WORKSPACE_METRICS,3),minItems:0},includeMap:{type:'boolean'},requestedMeasure:{type:'string',enum:MEASURES,description:'Use available for observed energy GDP, published CER generation or production comparisons, and infrastructure locations. Use measured-flow only when the user asks for quantities transported between places, not for quantities produced in each province.'}},required:['regions','topics','metricIds','includeMap','requestedMeasure'],additionalProperties:false};
 INVESTIGATION_SCHEMA.properties.energyTrade={type:'object',properties:{commodity:{type:'string',enum:['oil','gas','electricity']},year:{type:['integer','null']},shockPct:{type:'number',minimum:-20,maximum:20},linkScope:{type:'string',enum:['between','touching']}},required:['commodity','year','shockPct','linkScope'],additionalProperties:false};
-export const WORKSPACE_PLANNING_INSTRUCTIONS=' Also return investigation. Identify every requested province or territory, not only the state region. state.year applies only to published CER scenarios; observed GDP retains its own published period. Copy an explicitly requested supported scenario year exactly into state.year, independently of any GDP year in the question. Use CA for a national/all-provinces comparison, including when a province is emphasized. Respect exclusions by listing the remaining requested regions. Select up to three topics and up to three metricIds from the supplied capabilities. GDP contribution uses gdp and an empty metricIds array; published CER scenarios use scenario and only the requested metric IDs; pipeline/refinery/LNG locations use infrastructure; supported national oil-price changes use oil-sensitivity. Include a map when requested or geographic context helps. Set requestedMeasure to available for observed GDP contribution, production/generation within provinces, published CER scenarios, and infrastructure locations. Comparing electricity generation in Alberta and Quebec is available; it does not request electricity trade or measured-flow. Comparing energy GDP in Alberta, Ontario and Quebec is available; it does not request shipment volumes. Use measured-flow only for requested shipment, pipeline throughput or origin-destination quantities. Use provincial-price-impact for arbitrary provincial GDP/jobs/royalties/bill changes, beneficiary-distribution for who receives energy income, and other-unavailable for another unsupported measure. Compound questions retain any genuinely missing requested measure. Infrastructure geometry cannot answer measured-flow. Published CER scenario differences cannot answer isolated price impacts. Never invent a tool, metric, source, number, URL or view.';
+export const WORKSPACE_PLANNING_INSTRUCTIONS=' Also return investigation. Identify every requested province or territory, not only the state region. state.year applies only to published CER scenarios; observed GDP retains its own published period. Copy an explicitly requested supported scenario year exactly into state.year, independently of any GDP year in the question. Use CA for a national/all-provinces comparison, including when a province is emphasized. Respect exclusions by listing the remaining requested regions. Select up to three topics and up to three metricIds from the supplied capabilities. GDP contribution and observed real energy activity/growth use gdp and an empty metricIds array; the comparison carries separate current-dollar and real-activity dates; published CER scenarios use scenario and only the requested metric IDs; pipeline/refinery/LNG locations use infrastructure; supported national oil-price changes use oil-sensitivity. Include a map when requested or geographic context helps. Set requestedMeasure to available for observed GDP contribution, production/generation within provinces, published CER scenarios, and infrastructure locations. Comparing electricity generation in Alberta and Quebec is available; it does not request electricity trade or measured-flow. Comparing energy GDP in Alberta, Ontario and Quebec is available; it does not request shipment volumes. Use measured-flow only for requested shipment, pipeline throughput or origin-destination quantities. Use provincial-price-impact for arbitrary provincial GDP/jobs/royalties/bill changes, beneficiary-distribution for who receives energy income, and other-unavailable for another unsupported measure. Compound questions retain any genuinely missing requested measure. Infrastructure geometry cannot answer measured-flow. Published CER scenario differences cannot answer isolated price impacts. Never invent a tool, metric, source, number, URL or view.';
 export const TRADE_PLANNING_INSTRUCTIONS=' When energyTrade capabilities are supplied, use energy-flows for historical economic trade values or physical provincial totals, and provincial-impact for bounded price changes. Add energyTrade with commodity oil/gas/electricity, the requested historical trade year or null for latest, shockPct with the correct sign, and linkScope between for trade between named provinces or touching for all their partners. Trade years are independent of state.year (CER). Economic trade is a Statistics Canada supply/use estimate, not measured physical shipment routes. Physical datasets give only provincial totals/net balances; bilateral physical flow remains measured-flow. Fixed-quantity trade repricing and separately published provincial budget sensitivities are available, but no provincial GDP/jobs/profit/household bill forecast. For a request only about trade or these supported price channels, requestedMeasure is available; retain provincial-price-impact for unsupported GDP/jobs/bills. Do not add CER scenarios or national oil-sensitivity unless explicitly requested. A fiscal sensitivity has its own published baseline, not the selected historical trade year.';
 
 const exactKeys=(value,keys)=>value&&typeof value==='object'&&!Array.isArray(value)&&Object.keys(value).length===keys.length&&keys.every(key=>Object.hasOwn(value,key));
@@ -71,14 +71,27 @@ function missingMeasure(question) {
 function topicClauses(text) {
   return text.split(/[.;!?]|(?:,\s*(?:and\s+)?|\b(?:and|with)\s+)(?=(?:(?:their|its|the|observed|projected|forecast|forecasted|future|published|historical|energy)\s+)*(?:electricity|oil|gas|natural gas|generation|production|gdp|pib)\b)/);
 }
-function missingGDPClausePeriod(text,gdpYear) {
-  return topicClauses(text).some(clause=>/\b(gdp|pib|gross domestic product|value added)\b/.test(clause)&&(/\b(future|forecast\w*|projected|projection\w*)\b/.test(clause)||[...clause.matchAll(/\b((?:19|20|21)\d{2})\b/g)].some(match=>Number(match[1])!==gdpYear)));
+function missingGDPClausePeriod(text,gdpYear,activityYear) {
+  return topicClauses(text).some(clause=>{
+    if(!/\b(gdp|pib|gross domestic product|value added)\b/.test(clause))return false;
+    if(/\b(future|forecast\w*|projected|projection\w*)\b/.test(clause))return true;
+    const years=[...clause.matchAll(/\b((?:19|20|21)\d{2})\b/g)].map(match=>Number(match[1]));
+    const nominal=/\b(nominal|current.dollars?|dollars?)\b/.test(clause);
+    const growth=/\b(growth|grew|grow|change|changed)\b/.test(clause);
+    const explicitReal=/\b(real|activity|inflation.adjusted)\b/.test(clause);
+    if(nominal&&growth&&!explicitReal)return true;
+    const real=explicitReal||(growth&&!nominal);
+    const allowed=new Set([...(real?[activityYear]:[gdpYear]),...(nominal?[gdpYear]:[])]);
+    if(real&&growth&&years.includes(activityYear))allowed.add(activityYear-1);
+    return years.some(year=>!allowed.has(year));
+  });
 }
+
 export function requestedScenarioYears(question) {
   const clauses=topicClauses(question.toLowerCase()).filter(clause=>!/\b(gdp|pib|gross domestic product|value added)\b/.test(clause)&&(!isEnergyTradeClause(clause)||/\b(generation|production|scenario)\b/.test(clause))&&/\b(electricity|oil|gas|generation|production|demand|consumption|scenario|benchmark|wti|wcs|brent)\b/.test(clause));
   return unique(clauses.flatMap(clause=>[...clause.matchAll(/\b((?:19|20|21)\d{2})\b/g)].map(match=>Number(match[1]))));
 }
-function repairFlowClassification(question,plan,gdpYear) {
+function repairFlowClassification(question,plan,gdpYear,activityYear) {
   if(plan.requestedMeasure!=='measured-flow'||plan.topics.some(topic=>!['gdp','scenario'].includes(topic)))return plan.requestedMeasure;
   const text=question.normalize('NFD').replace(/\p{M}/gu,'').toLowerCase();
   if(/\b(flow\w*|throughput|ship\w*|pipeline\w*|routes?|corridors?|trade|transfer\w*|transport\w*|export\w*|import\w*|interties?|transmission|send\w*|sent|receive\w*|benefit\w*|recipient\w*|jobs?|royalties|bills?|revenue|profits?|pension\w*|emissions?|tolls?|tax\w*|debit|echange\w*|achemin\w*|emplois|factures|beneficiaires)\b/.test(text))return plan.requestedMeasure;
@@ -86,14 +99,14 @@ function repairFlowClassification(question,plan,gdpYear) {
   const quantity=/\b(generation|production|demand|consumption)\b/.test(text);
   if(!gdp&&!quantity)return plan.requestedMeasure;
   if(/\b(price|prices|prix|shock|effect|impact|affect|double|halve)\b/.test(text))return plan.requestedMeasure;
-  if(gdp&&missingGDPClausePeriod(text,gdpYear))return plan.requestedMeasure;
+  if(gdp&&missingGDPClausePeriod(text,gdpYear,activityYear))return plan.requestedMeasure;
   return 'available';
 }
-function unsupportedGDPPeriod(question,plan,gdpYear) {
+function unsupportedGDPPeriod(question,plan,gdpYear,activityYear) {
   const text=question.normalize('NFD').replace(/\p{M}/gu,'').toLowerCase();
   const nationalOil=plan.topics.includes('oil-sensitivity')&&plan.regions.includes('CA')&&/\boil\b/.test(text)&&/\bprice\b/.test(text)&&/\b(change|fall|rise|drop|increase|decrease|shock)\b/.test(text)&&!/\b(absolute|level|forecast|forecasted)\b/.test(text);
   if(nationalOil)return false;
-  return missingGDPClausePeriod(text,gdpYear);
+  return missingGDPClausePeriod(text,gdpYear,activityYear);
 }
 export function fallbackInvestigation(question,state) {
   const text=question.toLowerCase();
@@ -125,8 +138,8 @@ export function buildWorkspacePanels({data,network,flows,fiscal,forecast,summary
   if(!plan.regions.length){plan.regions=['CA'];plan.topics=['unavailable'];plan.requestedMeasure='other-unavailable';}
   if(/\b(map|mapped|mapping|carte|cartograph\w*)\b/i.test(question))plan.includeMap=true;
   const forecastRequest=inspectProvincialForecastQuestion(question,forecast);
-  const gdpPeriodGap=!forecastRequest&&unsupportedGDPPeriod(question,plan,data.gdp.year);
-  plan.requestedMeasure=gdpPeriodGap?'other-unavailable':missingMeasure(question)||repairFlowClassification(question,plan,data.gdp.year);
+  const gdpPeriodGap=!forecastRequest&&unsupportedGDPPeriod(question,plan,data.gdp.year,data.gdpActivity?.year);
+  plan.requestedMeasure=gdpPeriodGap?'other-unavailable':missingMeasure(question)||repairFlowClassification(question,plan,data.gdp.year,data.gdpActivity?.year);
   const tradeRequest=inspectEnergyTradeQuestion(question,flows,plan.energyTrade,plan.topics,fiscal);
   if(tradeRequest){
     if(tradeRequest.physicalBilateral)plan.requestedMeasure='measured-flow';
@@ -151,14 +164,17 @@ export function buildWorkspacePanels({data,network,flows,fiscal,forecast,summary
     if(!plan.topics.length)plan.topics=['gdp'];
   }
   if(plan.regions.length>1)plan.regions=plan.regions.filter(code=>code!=='CA');
+  const nationalActivityTotal=plan.topics.includes('gdp')&&!plan.topics.includes('oil-sensitivity')&&plan.regions.includes('CA')&&/\b(canada|canadian|national)\b/i.test(question)&&/\b(gdp|pib|gross domestic product)\b/i.test(question)&&/\b(real|growth|grew|grow|inflation.adjusted)\b/i.test(question)&&!/\b(provinces?|provincial|territories|territorial|jurisdictions?|across|by region)\b/i.test(question)&&!forecastRequest;
+  if(nationalActivityTotal)plan.requestedMeasure='other-unavailable';
   const regions=plan.regions.includes('CA')?data.gdp.regions.map(row=>row.code):plan.regions;
-  const allGDP=summary.gdp.ranking.map(row=>({code:row.code,name:row.name,value:row.energy,sharePct:row.sharePct,nationalSharePct:row.nationalEnergySharePct,energyVector:row.energyVector,totalVector:row.totalVector}));
+  const allGDP=summary.gdp.ranking.map(row=>({code:row.code,name:row.name,value:row.energy,sharePct:row.sharePct,nationalSharePct:row.nationalEnergySharePct,energyVector:row.energyVector,totalVector:row.totalVector,activity:data.gdpActivity?.regions.find(activity=>activity.code===row.code)||null}));
   const contextual=plan.requestedMeasure!=='available';
   const role=contextual?'context':'answer';
   const panels=[];
   const limitations=[];
   const registry=new Map([...data.sources,...(network?.sources||[]),...(flows?.sources||[]),...(fiscal?.sources||[]),...(forecast?.sources||[])].map(source=>[source.id,source]));
-  let coverage=gdpPeriodGap?{title:'GDP is unavailable for the requested period',message:`This app's GDP data cover ${data.gdp.year}. They do not provide GDP for other years or future forecasts. The dated GDP comparison provides context.`,sourceKind:'gdp'}:COVERAGE[plan.requestedMeasure];
+  let coverage=gdpPeriodGap?{title:'GDP is unavailable for the requested period',message:`This app's current-dollar GDP data cover ${data.gdp.year}.${data.gdpActivity?` Real energy activity and annual growth cover ${data.gdpActivity.year}.`:''} They do not provide the requested measure for that period. The dated GDP comparison provides context.`,sourceKind:'gdp'}:COVERAGE[plan.requestedMeasure];
+  if(nationalActivityTotal)coverage={title:'A national real GDP total is not supplied',message:'The observed activity table provides each province and territory separately. Chained-dollar levels cannot be summed to create a Canada total or national growth rate. The provincial comparison below supplies context.',sourceKind:'gdp'};
   if(tradeRequest?.physicalBilateral)coverage={title:'Bilateral physical volumes are not published here',message:'The physical sources give provincial totals or net regional transfers, without identifying the partner province. The trade map shows modelled supplier-to-purchaser dollar values. It cannot establish a physical route or bilateral shipment volume.',sourceKind:'trade'};
   else if(tradeRequest?.unsupportedOutcome)coverage={title:'The requested economic or emissions effect is not modelled',message:'Published trade values and physical balances are available. The price tool calculates fixed-quantity trade receipts and purchase costs, plus selected published provincial budget sensitivities. These separate channels do not predict provincial GDP, jobs, emissions, profit or household income and must not be added together. Explore a question includes conditional historical GDP comparisons and price-only household spending scenarios; these do not establish causal impacts or individual bills.',sourceKind:'trade'};
   if(forecastRequest&&!forecastRequest.supported)coverage={title:'This GDP forecast is not available',message:forecastRequest.reason,sourceKind:'forecast'};
@@ -183,7 +199,7 @@ export function buildWorkspacePanels({data,network,flows,fiscal,forecast,summary
   }
   const addGDP=()=>{
     if(panels.some(panel=>panel.type==='province-comparison'))return;
-    const common={role,sourceIds:[data.gdp.sourceId],period:String(data.gdp.year),year:data.gdp.year,unit:data.gdp.unit,metricId:'energy-gdp',note:'Observed energy-sector value added at basic prices. This measures contribution, not a price response or the distribution of income.'};
+    const common={role,activityYear:data.gdpActivity?.year??null,previousActivityYear:data.gdpActivity?.previousYear??null,sourceIds:[data.gdp.sourceId],period:String(data.gdp.year),year:data.gdp.year,unit:data.gdp.unit,metricId:'energy-gdp',note:'Observed energy-sector value added at basic prices. This measures contribution, not a price response or the distribution of income.'};
     panels.push({id:'gdp-comparison',type:'province-comparison',title:'Energy contribution by province',...common,rows:allGDP.filter(row=>regions.includes(row.code))});
     if(plan.includeMap)panels.push({id:'gdp-map',type:'province-map',title:'Where energy value is added',...common,regions:plan.regions,rows:allGDP});
   };
@@ -302,7 +318,7 @@ export function buildWorkspaceAnalysis(workspace) {
     }
     if(panel.type==='province-comparison'||panel.type==='province-map'){
       const selection=selectedRows(panel.rows,'value');
-      text=`Observed energy-sector GDP in ${panel.period} was ${selection.rows.map(row=>`${formatValue(row.value)} for ${row.name}`).join('; ')}. Values are in ${panel.unit}.${selection.tail} GDP measures value added where production occurs, not who receives the income.`;
+      text=`Observed energy-sector GDP in ${panel.period} was ${selection.rows.map(row=>`${formatValue(row.value)} for ${row.name}`).join('; ')}. Values are in ${panel.unit}.${selection.tail} GDP measures value added where production occurs, not who receives the income.${panel.activityYear&&panel.type==='province-comparison'?` Separately, real energy-sector growth from ${panel.previousActivityYear} to ${panel.activityYear} was ${selection.rows.map(row=>`${row.name} ${row.activity?.energyGrowthPct==null?'unavailable':formatValue(row.activity.energyGrowthPct)+'%'}${row.activity?` (real energy GDP ${formatValue(row.activity.energy)} million chained 2017 CAD in ${panel.activityYear})`:''}`).join('; ')}.`:''}`;
     }
     if(panel.type==='scenario-comparison'){
       const selection=selectedRows(panel.rows,'selected');

@@ -85,7 +85,7 @@ export function resolveWorkspace(workspace,selection,economy) {
   }
   const regionCodes=selection.regions.length?selection.regions:economy.regions.filter(row=>row.code!=='CA').map(row=>row.code);
   const total=economy.gdp.regions.reduce((sum,row)=>sum+row.energy,0);
-  const gdpRows=economy.gdp.regions.map(row=>({...row,value:row.energy,nationalSharePct:row.energy/total*100}));
+  const gdpRows=economy.gdp.regions.map(row=>({...row,value:row.energy,nationalSharePct:row.energy/total*100,activity:economy.gdpActivity?.regions.find(activity=>activity.code===row.code)||null}));
   const tradeTypes=['energy-trade','energy-transfers','provincial-impact'];
   const tradePanels=workspace.tradeSnapshot?buildTradePanels({flows:workspace.tradeSnapshot,fiscal:workspace.fiscalSnapshot,selection,regions:selection.regions,includeFlows:workspace.panels.some(p=>p.type==='energy-trade'),includePhysical:workspace.panels.some(p=>p.type==='energy-transfers'),includeImpacts:workspace.panels.some(p=>p.type==='provincial-impact')}).panels:[];
   const panels=workspace.panels.map(panel=>{
@@ -109,7 +109,7 @@ export function resolveWorkspace(workspace,selection,economy) {
       return {...panel,scope:'CA',shockPct:oilShock,duration,method:sensitivity.method,baseline:sensitivity.baseline,period:sensitivity.baseline,sourceIds:sensitivity.sourceIds,rows};
     }
     if(panel.type==='province-map')return {...panel,rows:gdpRows};
-    if(panel.type==='province-comparison')return {...panel,rows:gdpRows.filter(row=>regionCodes.includes(row.code))};
+    if(panel.type==='province-comparison')return {...panel,activityYear:economy.gdpActivity?.year??null,previousActivityYear:economy.gdpActivity?.previousYear??null,rows:gdpRows.filter(row=>regionCodes.includes(row.code))};
     if(panel.type==='scenario-comparison'){
       const metric=economy.metrics.find(row=>row.id===panel.metricId);if(!metric)fail();
       const codes=metric.kind==='benchmark'?['CA']:regionCodes;
@@ -135,7 +135,7 @@ function panelFinding(panel,workspace,selection) {
   if(panel.type==='province-comparison'||panel.type==='province-map'){
     const rows=panel.type==='province-map'&&selection.regions?.length?panel.rows.filter(row=>selection.regions.includes(row.code)):panel.rows;
     const leaders=leadingRows(rows,'value');
-    return `${leaders.map(row=>`${row.name} generated ${moneyFinding(row.value)} in energy-sector GDP${Number.isFinite(row.sharePct)?`, ${formatFinding(row.sharePct)}% of its economy`:''}`).join('; ')} in ${panel.period}.${rows.length>3?' These are the three largest values in this selection.':''} GDP records value added where production occurs; it does not identify who receives the income.`;
+    return `${leaders.map(row=>`${row.name} generated ${moneyFinding(row.value)} in energy-sector GDP${Number.isFinite(row.sharePct)?`, ${formatFinding(row.sharePct)}% of its economy`:''}`).join('; ')} in ${panel.period}.${rows.length>3?' These are the three largest values in this selection.':''} GDP records value added where production occurs; it does not identify who receives the income.${panel.activityYear&&panel.type==='province-comparison'?` Real energy-sector growth from ${panel.previousActivityYear} to ${panel.activityYear}: ${leaders.map(row=>`${row.name} ${Number.isFinite(row.activity?.energyGrowthPct)?signedFinding(row.activity.energyGrowthPct)+'%':'unavailable'}`).join('; ')}.`:''}`;
   }
   if(panel.type==='scenario-comparison'){
     const rows=leadingRows(panel.rows,'selected');

@@ -22,12 +22,12 @@ export function normalizeEconomyState(input = {}) {
     tradePanelId: typeof raw.tradePanelId==='string'&&/^[a-zA-Z0-9_-]{1,80}$/.test(raw.tradePanelId)?raw.tradePanelId:null,
     tradeViewMode: raw.tradeViewMode==='all'?'all':'focus',
     tradeCommodity: ['oil','gas','electricity'].includes(raw.tradeCommodity)?raw.tradeCommodity:'oil',
-    tradeYear: bounded(Math.round(number(raw.tradeYear,2024)),2000,2100),
+    tradeYear: raw.tradeYear == null ? null : bounded(Math.round(number(raw.tradeYear,2024)),2000,2100),
     priceShock: bounded(number(raw.priceShock,10),-20,20),
     linkScope: raw.linkScope==='between'?'between':'touching',
     tradeRegions: Array.isArray(raw.tradeRegions)?[...new Set(raw.tradeRegions.filter(code=>ECONOMY_REGIONS.includes(code)&&code!=='CA'))]:[],
     incomeIndustry: ['oil-gas','oil-sands','electricity','gas-distribution','refining','oil-pipelines','gas-pipelines','oil-gas-services','oil-gas-construction','electricity-construction'].includes(raw.incomeIndustry)?raw.incomeIndustry:'oil-gas',
-    incomeYear: bounded(Math.round(number(raw.incomeYear,2022)),2010,2100),
+    incomeYear: raw.incomeYear == null ? null : bounded(Math.round(number(raw.incomeYear,2022)),2010,2100),
     demandMillion: bounded(number(raw.demandMillion,100),0,10000),
     includeInduced: raw.includeInduced===true,
     historyRegions: Array.isArray(raw.historyRegions)&&raw.historyRegions.some(c=>ECONOMY_REGIONS.includes(c))?[...new Set(raw.historyRegions.filter(c=>ECONOMY_REGIONS.includes(c)))]:['AB','ON','QC'],
@@ -60,6 +60,18 @@ export function validateEconomy(data) {
     require(Number.isFinite(row.energy) && Number.isFinite(row.total) && row.energy >= 0 && row.total > 0 && row.energy <= row.total, 'GDP values');
     require(Number.isFinite(row.sharePct) && Math.abs(row.sharePct - row.energy / row.total * 100) < 1e-8, 'GDP share');
     require(row.energyVector && row.totalVector, 'GDP source vectors');
+  }
+  if (data.gdpActivity) {
+    const activity = data.gdpActivity;
+    require(Number.isInteger(activity.year) && activity.previousYear === activity.year - 1 && activity.unit === 'million chained 2017 CAD at basic prices' && sourceIds.has(activity.sourceId), 'real GDP basis');
+    require(Array.isArray(activity.regions) && activity.regions.length === 13 && ECONOMY_REGIONS.slice(1).every(code => activity.regions.filter(row => row.code === code).length === 1), 'real GDP coverage');
+    for (const row of activity.regions) {
+      require(['energy','total','previousEnergy','previousTotal'].every(key => Number.isFinite(row[key]) && row[key] >= 0) && row.total > 0 && row.previousTotal > 0, 'real GDP values');
+      for (const [level, previous, growth] of [['energy','previousEnergy','energyGrowthPct'],['total','previousTotal','totalGrowthPct']]) {
+        require(row[previous] === 0 ? row[growth] === null : Number.isFinite(row[growth]) && Math.abs(row[growth] - (row[level] / row[previous] - 1) * 100) < 1e-8, 'real GDP growth');
+      }
+      require(row.energyVector && row.totalVector, 'real GDP source vectors');
+    }
   }
   require(Array.isArray(data.metrics) && data.metrics.length === METRICS.length && METRICS.every(id => data.metrics.filter(m => m.id === id).length === 1), 'metric set');
   for (const metric of data.metrics) {
@@ -134,6 +146,7 @@ export function summarizeEconomy(data, input) {
   return {
     state,
     gdp: { year: data.gdp.year, unit: data.gdp.unit, selected, national, ranking, sourceId: data.gdp.sourceId },
+    activity: data.gdpActivity ? {...data.gdpActivity, selected: data.gdpActivity.regions.find(row => row.code === state.region) ?? null} : null,
     metrics,
     publishedOilSensitivity: {
       available, scope: 'CA', shockPct: state.oilShock, duration: state.duration,
@@ -141,7 +154,7 @@ export function summarizeEconomy(data, input) {
       baseline: calibration.baseline, temporaryDuration: calibration.temporaryDuration,
       years, sourceIds: [calibration.sourceId],
       limitations: [
-        ...(available ? [] : ['No provincial GDP response has been calibrated. Select Canada to see the published national illustration.']),
+        ...(available ? [] : ['This Finance Canada illustration is national. Select Canada to see it; provincial historical responses are a separate model in Explore a question.']),
         'First and second year after the shock on the 2026 Finance Canada baseline. These are not GDP forecasts for the selected CER scenario year.',
         'Published values are rounded. A displayed 0.0% can coexist with a nonzero dollar effect.',
         'The result depends on the cause and duration of the oil-price change. Approximate scaling is limited to changes between -20% and +20%.',

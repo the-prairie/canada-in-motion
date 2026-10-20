@@ -193,6 +193,8 @@ export function summarizeEnergyStory(snapshots, input = {}) {
       },
     gdpContext: {
       year: economySummary.gdp.year, unit: economySummary.gdp.unit,
+      activityYear: economySummary.activity?.year ?? null,
+      activity: economySummary.activity?.regions.find(row => row.code === selection.focus) ?? null,
       focus: economySummary.gdp.ranking.find(row => row.code === selection.focus),
       comparison: economySummary.gdp.ranking.find(row => row.code === selection.compare) ?? null,
       sourceIds: [economySummary.gdp.sourceId], changesWithPrice: false,
