@@ -1,0 +1,79 @@
+import assert from 'node:assert/strict';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
+const base=process.env.TEST_URL||'http://127.0.0.1:4188/';
+const response=await fetch(new URL('data/alberta-well-status.json',base));
+assert.equal(response.status,200);
+const data=await response.json(),format=n=>new Intl.NumberFormat('en-CA').format(n);
+const browser=await chromium.launch({headless:true,...(process.env.TEST_BROWSER_PATH?{executablePath:process.env.TEST_BROWSER_PATH}:{})});
+const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'});
+const errors=[];page.on('pageerror',error=>errors.push(error.message));
+let releaseTotals,failTotals=false;
+const totalsGate=new Promise(resolve=>releaseTotals=resolve);
+await page.route('**/data/alberta-well-status.json',async route=>{
+  await totalsGate;
+  await route.fulfill(failTotals?{status:503,body:'Unavailable'}:{json:data});
+});
+const url=patch=>base+'#v1='+encodeURIComponent(JSON.stringify({view:'atlas',province:'AB',closure:'unknown',exploration:{arrangement:'table',area:null},...patch}));
+const table=page.locator('.ra-table-wrap');
+const aer=table.locator('[data-ra-aer-row]');
+const mapped=code=>table.locator(`[data-ra-mapped-row="${code}"]`);
+const expectTotals=async()=>{
+  await aer.locator('[data-ra-aer-active]').waitFor();
+  assert.equal(await aer.locator('[data-ra-aer-active]').innerText(),format(data.latest.counts.active));
+  assert.match(await aer.innerText(),new RegExp(format(data.latest.counts.marginal)+' marginal'));
+  assert.match(await aer.innerText(),new RegExp(format(data.latest.operating)+' operating'));
+  assert.match(await aer.innerText(),new RegExp(String(data.latest.year)));
+  assert.equal(await aer.locator('[data-ra-status]').count(),0,'province-wide totals cannot filter unmapped records');
+  assert.equal(await aer.getByRole('link',{name:'AER well licences',exact:true}).getAttribute('href'),data.source.url);
+};
+try{
+  await page.goto(url({}));
+  await table.locator('[data-ra-segment-province="AB"][data-ra-status="unknown"]').waitFor({timeout:120000});
+  assert.equal(await aer.count(),1,'Alberta AER total row is missing');
+  assert.match(await aer.innerText(),/Loading/);
+  const selected=table.locator('[data-ra-segment-province="AB"][data-ra-status="unknown"]');
+  await selected.focus();
+  const selectedNode=await selected.elementHandle();
+  const scroll=await table.evaluate(el=>({left:el.scrollLeft,top:el.scrollTop}));
+  releaseTotals();
+  await expectTotals();
+  assert.equal(await selectedNode.evaluate(el=>el.isConnected&&el===document.activeElement),true,'late totals preserve focused record filter');
+  assert.deepEqual(await table.evaluate(el=>({left:el.scrollLeft,top:el.scrollTop})),scroll);
+  assert.equal(await mapped('AB').locator('[data-ra-status="active"]').innerText(),'Not mapped');
+  assert.equal(await mapped('AB').locator('[data-ra-status="active"]').isDisabled(),true);
+  const unknownBefore=await mapped('AB').locator('[data-ra-status="unknown"]').innerText();
+  const bcActive=await mapped('BC').locator('[data-ra-status="active"]').innerText();
+  assert.ok(Number(bcActive.replaceAll(',',''))>0,'selecting Alberta must not turn BC inventory counts into zero');
+  await mapped('AB').locator('[data-ra-status="abandoned"]').click();
+  await expectTotals();
+  assert.equal(await mapped('AB').locator('[data-ra-status="unknown"]').innerText(),unknownBefore);
+  assert.equal(await mapped('BC').locator('[data-ra-status="active"]').innerText(),bcActive);
+  await page.screenshot({path:'/tmp/cim-alberta-table-desktop.png'});
+
+  await page.goto(url({province:'all',closure:'all'}));
+  await table.locator('[data-ra-segment-province="AB"]').first().waitFor({timeout:120000});
+  await expectTotals();
+  await page.goto(url({query:'no-such-well-qxz-991'}));
+  await table.locator('[data-ra-segment-province="AB"]').first().waitFor({timeout:120000});
+  await expectTotals();
+  assert.equal(await mapped('AB').locator('[data-ra-matching]').innerText(),'0');
+  assert.equal(await mapped('AB').locator('[data-ra-status="unknown"]').innerText(),unknownBefore);
+
+  failTotals=true;
+  await page.goto(url({}));
+  await aer.getByRole('button',{name:'Retry totals',exact:true}).waitFor({timeout:120000});
+  assert.match(await aer.innerText(),/could not load/);
+  assert.equal(await aer.locator('[data-ra-aer-active]').count(),0);
+  failTotals=false;
+  await aer.getByRole('button',{name:'Retry totals',exact:true}).click();
+  await expectTotals();
+
+  await page.setViewportSize({width:390,height:844});
+  await aer.locator('[data-ra-aer-active]').scrollIntoViewIfNeeded();
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+  assert.ok(await table.evaluate(el=>el.scrollWidth>el.clientWidth),'mobile table remains horizontally scrollable');
+  assert.ok(await aer.locator('[data-ra-aer-active]').isVisible());
+  await page.screenshot({path:'/tmp/cim-alberta-table-mobile.png'});
+  assert.deepEqual(errors,[]);
+  console.log(JSON.stringify({status:'passed',checks:['AER totals appear in the Alberta table row','active and marginal categories stay separate','no invented map filtering','late response preserves focus and scroll','other province inventories stay visible','totals survive status, province and search filters','missing data retries without false zeros','mobile horizontal scrolling'],active:data.latest.counts.active,marginal:data.latest.counts.marginal,operating:data.latest.operating},null,2));
+}finally{releaseTotals();await browser.close();}
