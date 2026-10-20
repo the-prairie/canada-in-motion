@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
+const browser=await chromium.launch({headless:true,...(process.env.TEST_BROWSER_PATH?{executablePath:process.env.TEST_BROWSER_PATH}:{})});
+const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'});
+const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+const base=process.env.TEST_URL||'http://127.0.0.1:4188/';
+const url=base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy:{section:'trade',region:'CA',tradeCommodity:'electricity',tradeYear:2024}}));
+try{
+ await page.goto(url);await page.getByRole('table',{name:'Electricity · 2024 · million current CAD',exact:true}).waitFor();
+ assert.equal(await page.locator('.hw-matrix tbody tr').count(),13);
+ assert.equal(await page.locator('.hw-matrix tbody button').count(),156);
+ await page.getByRole('button',{name:'Alberta to British Columbia: 60.209 million CAD',exact:true}).click();
+ assert.match(await page.locator('.hw-link-detail').innerText(),/60.209/);
+ await page.getByRole('button',{name:'Show on map',exact:true}).click();assert.ok(await page.locator('.hw-trade-map').isVisible());
+ await page.getByRole('button',{name:'Show in matrix',exact:true}).click();
+ await page.getByRole('button',{name:'Pin this comparison',exact:true}).click();
+ await page.getByLabel('Energy price change',{exact:true}).fill('-10');
+ assert.match(await page.locator('.hw-branch-comparison').innerText(),/Current: Electricity · 2024 · -10%/);
+ await page.locator('.hw-robustness summary').click();assert.match(await page.locator('.hw-robustness').innerText(),/2022/);
+ await page.getByRole('button',{name:'Save investigation',exact:true}).click();await page.getByText('Saved on this device with its original data.',{exact:true}).waitFor();
+ await page.reload();await page.locator('.hw-saved summary').click();
+ assert.equal(await page.locator('.hw-saved li').count(),1);
+ await page.locator('.hw-saved li button').first().click();
+ await page.getByText('Restored with the original source snapshot.',{exact:true}).waitFor();
+ assert.equal(await page.getByLabel('Energy price change',{exact:true}).inputValue(),'-10');
+ await page.screenshot({path:'/tmp/cim-investigations-desktop.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'page must not overflow mobile viewport');
+ await page.screenshot({path:'/tmp/cim-investigations-mobile.png',fullPage:true});
+ assert.deepEqual(errors,[]);console.log(JSON.stringify({status:'passed',matrixCells:156,checks:['direction','linked map','branch baseline','reference-year robustness','save and reload snapshot','mobile overflow','no runtime errors']},null,2));
+}finally{await browser.close();}

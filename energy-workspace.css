@@ -13,3 +13,31 @@
 @media(max-width:760px){.hw-flow-links{gap:0 12px}.hw-balance-row{grid-template-columns:24px minmax(50px,1fr) 84px;gap:6px}.hw-trade-total strong{font-size:28px}.hw-trade-controls label{flex:1}.hw-impact-tabs button{flex:1}.hw-price-control>div button{min-height:44px}}
 
 .ec-question-info{font-size:12px;color:#5d6b63;margin:12px 0}.ec-question-info>summary{cursor:pointer;padding:5px 0;min-height:32px}.ec-trade-question{border-top:1px solid #cdd3c7;margin-top:24px;padding:16px 0}.ec-trade-question>summary{cursor:pointer;font-size:16px;font-weight:500;min-height:44px}.ec-trade-question .ec-intelligence{margin-top:10px}.ec-workspace:has(#ec-trade-workspace){padding-top:0}#ec-trade-workspace .hw-shell{border-top:0;margin-top:0}
+
+/* Linked trade exploration: one selection, exact values, no hover dependency. */
+.hw-matrix-scroll{overflow:auto;max-width:100%;border:1px solid #d5dcd5;border-radius:4px;scrollbar-gutter:stable}
+.hw-matrix{border-collapse:separate;border-spacing:2px;table-layout:fixed;min-width:690px;width:100%;font:11px 'IBM Plex Mono',monospace}
+.hw-matrix caption{padding:10px;text-align:left;font:12px 'IBM Plex Sans',sans-serif;color:#425953}
+.hw-matrix th{height:32px;color:#314c45;font-weight:500;width:47px;text-align:center;background:#f6f7f0}
+.hw-matrix th:first-child{position:sticky;left:0;z-index:1;width:55px}
+.hw-matrix td{padding:0;text-align:center;color:#6b766f}
+.hw-matrix td button{border:1px solid transparent;border-radius:2px;width:100%;min-height:34px;padding:3px 0;color:#173b32;font:inherit;cursor:pointer}
+.hw-matrix td button[aria-pressed=true]{border:2px solid #b44f2f;box-shadow:inset 0 0 0 1px #fff}
+.hw-matrix button:focus-visible{outline:3px solid #172f29;outline-offset:0}
+.hw-matrix-key{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0;color:#52645d;font-size:12px}
+.hw-link-detail{margin-top:14px;border-top:2px solid #356b60;padding-top:14px}
+.hw-link-detail>div:first-child{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.hw-link-detail h4{margin:0;flex:1}.hw-link-detail small{font-weight:400}
+.hw-link-detail button,.hw-branch-actions button,.hw-saved button{font:inherit;border:1px solid #bdcbc1;background:#fffdf7;color:#244c41;border-radius:4px;padding:9px 12px;cursor:pointer}
+.hw-robustness,.hw-branch-comparison{border-top:1px solid #cad5ca;padding:16px 0;margin-top:18px}.hw-robustness summary,.hw-branch-comparison summary{font-weight:500;cursor:pointer}
+.hw-current-question{padding:12px 0;margin:0;color:#2f5045;font-size:14px;line-height:1.8}
+.hw-branch-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0 0 16px}.hw-branch-actions span{color:#57665f;font-size:12px}
+.hw-save-notice{color:#2e5948;font-size:13px}.hw-saved{margin:0 0 16px;font-size:13px}.hw-saved summary{cursor:pointer}
+.hw-saved ul{list-style:none;padding:0}.hw-saved li{display:flex;align-items:center;gap:12px;border-bottom:1px solid #d5ddd4;padding:9px 0}.hw-saved li>button:first-child{flex:1;text-align:left}.hw-saved small{display:block;font-weight:400;color:#586b60;margin-top:4px}
+@media(max-width:600px){.hw-matrix{min-width:650px}.hw-matrix td button{min-height:40px}.hw-heading{display:block}.hw-actions{margin-top:12px;flex-wrap:wrap}.hw-current-question{font-size:13px}.hw-branch-actions span{flex-basis:100%}.hw-link-detail h4{flex-basis:100%}}
+.hw-income-controls{flex-wrap:wrap}.hw-income-controls input{font:inherit;min-height:40px;border:1px solid #a6b4a8;border-radius:3px;background:transparent;padding:7px 11px;width:150px;color:#213e39}.hw-income-controls select{max-width:350px}
+.hw-income-hero{max-width:820px;padding:30px 0}.hw-income-hero>strong{font-size:clamp(42px,6vw,70px);font-weight:500;line-height:1.4;letter-spacing:-.04em}.hw-income-stack{display:flex;height:30px;background:#e7e9df;overflow:hidden;margin:8px 0 16px;border-radius:2px}.hw-income-stack i:first-child,.hw-income-key span:first-child i{background:#356b60}.hw-income-stack i:last-child,.hw-income-key span:last-child i{background:#ba633e}.hw-income-key{display:flex;gap:28px;flex-wrap:wrap}.hw-income-key span{display:flex;align-items:center;gap:8px;font-size:13px}.hw-income-key i{width:10px;height:10px;display:inline-block}.hw-induced{display:flex;gap:10px;align-items:center;margin:15px 0}.hw-induced input{width:20px;height:20px}.hw-income-paths>.hw-caption{margin-top:14px}.hw-income-paths .hw-sources{margin-top:20px}
+@media(max-width:600px){.hw-income-controls{display:grid;grid-template-columns:1fr}.hw-income-controls select,.hw-income-controls input{max-width:100%;width:100%}.hw-income-key span{width:100%}}
+.hw-matrix-panel{grid-column:1/-1}.hw-partner-list{display:none}.hw-mobile-label{display:none}
+.hw-episodes{display:flex;gap:8px;overflow:auto;padding:16px 0}.hw-episodes button{display:flex;flex-direction:column;gap:4px;min-width:105px;text-align:left}.hw-episodes span{font-size:12px}.hw-history-chart{width:100%;max-width:900px;height:auto;display:block;margin:24px 0}.hw-history-chart text{font:12px 'IBM Plex Sans',sans-serif;fill:#38554b}.hw-oil-history .hw-sources{margin-top:20px}
+@media(max-width:600px){.hw-matrix-scroll,.hw-matrix-key,.hw-desktop-label{display:none}.hw-mobile-label{display:inline}.hw-partner-list{display:block}.hw-partner-list ul{padding:0;list-style:none}.hw-partner-list button{display:flex;justify-content:space-between;gap:12px;width:100%;text-align:left;border-width:0 0 1px;border-radius:0}.hw-partner-list select{width:100%;margin:10px 0}}

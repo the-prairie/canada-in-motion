@@ -58,6 +58,10 @@ jobs:
         run: python pipeline/refresh_alberta_status.py
       - name: Refresh interprovincial energy trade and physical balances
         run: python pipeline/refresh_energy_flows.py
+      - name: Refresh official industry income multipliers
+        run: python pipeline/refresh_income_paths.py
+      - name: Refresh oil history and reproduce conditional model checks
+        run: python pipeline/refresh_dynamic_price.py
       - name: Verify published provincial budget sensitivities
         run: python pipeline/refresh_provincial_impacts.py
       - name: Build verified beta candidate

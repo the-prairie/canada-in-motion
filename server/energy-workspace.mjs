@@ -31,10 +31,27 @@ function explicitRegions(question) {
 }
 function requestedRegions(question,proposed) {
   const text=question.normalize('NFD').replace(/\p{M}/gu,'').toLowerCase();
-  const exclusionClause=value=>value.split(/\b(?:especially|focusing|but include|and include|versus|compared to|to|show|compare|focus)\b/i)[0];
-  const exclusions=[...question.matchAll(/\b(?:except|excluding|exclude|without|but not|not including|other than|sauf|hors|sans)\s+([^.;!?]+)/gi)].flatMap(match=>explicitRegions(exclusionClause(match[1])));
+  // An exclusion is a list of regions immediately after the operator. Looking
+  // anywhere in the remaining sentence turns “not jobs in Alberta” into an
+  // exclusion of Alberta, or consumes a later comparison after a comma.
+  const excludedRegionList=value=>{
+    let remaining=value.normalize('NFD').replace(/\p{M}/gu,'').toLowerCase().replace(/[-–]/g,' ').trim();
+    const codes=[];
+    while(remaining){
+      remaining=remaining.replace(/^(?:(?:the|le|la|les|province of|province de)\s+|l['’])/,'');
+      const match=Object.entries(REGION_NAMES).flatMap(([code,names])=>[code.toLowerCase(),...names].map(name=>({code,name})))
+        .sort((a,b)=>b.name.length-a.name.length).find(({name})=>remaining.startsWith(name)&&!/[a-z]/.test(remaining[name.length]||''));
+      if(!match)break;
+      codes.push(match.code);remaining=remaining.slice(match.name.length);
+      const separator=remaining.match(/^\s*(?:,\s*(?:(?:and|or|et|ou)\s+)?|(?:and|or|et|ou)\s+)/);
+      if(!separator)break;
+      remaining=remaining.slice(separator[0].length);
+    }
+    return codes;
+  };
+  const exclusions=[...question.matchAll(/\b(?:except|excluding|exclude|without|but not|not including|other than|sauf|hors|sans)\s+([^.;!?]+)/gi)].flatMap(match=>excludedRegionList(match[1]));
   const bareNot=question.match(/\bnot\s+([^.;!?]+)/i);
-  if(bareNot&&!/^just\b/i.test(bareNot[1]))exclusions.push(...explicitRegions(exclusionClause(bareNot[1])));
+  if(bareNot&&!/^just\b/i.test(bareNot[1]))exclusions.push(...excludedRegionList(bareNot[1]));
   const excluded=new Set(exclusions);
   const all=/\b(all|every|each)\s+(?:(?:other|the|canadian)\s+)?(?:provinces?|territories|regions?)\b|\b(across canada|nationwide|nationally|national comparison|canada wide)\b|\b(toutes? les provinces|chaque province|partout au canada)\b/.test(text)||(proposed.includes('CA')&&/\b(especially|particularly|in particular|notably|attention to|focus on|surtout|notamment)\b/.test(text));
   if(all&&!excluded.size)return ['CA'];

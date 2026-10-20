@@ -7,10 +7,10 @@ const bounded = (value, low, high) => Math.min(high, Math.max(low, value));
 export function normalizeEconomyState(input = {}) {
   const raw = input && typeof input === 'object' ? input : {};
   return {
-    section: ['income', 'trade', 'futures', 'oil'].includes(raw.section) ? raw.section : 'income',
+    section: ['income', 'trade', 'supply', 'futures', 'oil'].includes(raw.section) ? raw.section : 'income',
     display: ['bars', 'map', 'table'].includes(raw.display) ? raw.display : 'bars',
     metric: raw.metric === 'retail' ? 'retail' : 'production',
-    region: ECONOMY_REGIONS.includes(raw.region) ? raw.region : 'CA',
+    region: raw.section==='supply'&&(!ECONOMY_REGIONS.includes(raw.region)||raw.region==='CA')?'AB':ECONOMY_REGIONS.includes(raw.region)?raw.region:'CA',
     scenario: ECONOMY_SCENARIOS.includes(raw.scenario) ? raw.scenario : 'Current Measures',
     year: bounded(Math.round(number(raw.year, 2030)), 2023, 2050),
     oilShock: bounded(number(raw.oilShock, 10), -20, 20),
@@ -20,6 +20,14 @@ export function normalizeEconomyState(input = {}) {
     priceShock: bounded(number(raw.priceShock,10),-20,20),
     linkScope: raw.linkScope==='between'?'between':'touching',
     tradeRegions: Array.isArray(raw.tradeRegions)?[...new Set(raw.tradeRegions.filter(code=>ECONOMY_REGIONS.includes(code)&&code!=='CA'))]:[],
+    incomeIndustry: ['oil-gas','oil-sands','electricity','gas-distribution','refining','oil-pipelines','gas-pipelines','oil-gas-services','oil-gas-construction','electricity-construction'].includes(raw.incomeIndustry)?raw.incomeIndustry:'oil-gas',
+    incomeYear: bounded(Math.round(number(raw.incomeYear,2022)),2010,2100),
+    demandMillion: bounded(number(raw.demandMillion,100),0,10000),
+    includeInduced: raw.includeInduced===true,
+    historyRegions: Array.isArray(raw.historyRegions)&&raw.historyRegions.some(c=>ECONOMY_REGIONS.includes(c))?[...new Set(raw.historyRegions.filter(c=>ECONOMY_REGIONS.includes(c)))]:['AB','ON','QC'],
+    historyOilChange: [-60,-40,-20,-10,0,10,20,40,60,100].includes(raw.historyOilChange)?raw.historyOilChange:10,
+    historyYear: Number.isInteger(raw.historyYear)&&raw.historyYear>=1980&&raw.historyYear<=2100?raw.historyYear:null,
+    historyHorizon: [0,1,2].includes(raw.historyHorizon)?raw.historyHorizon:2,
     transferSet: typeof raw.transferSet==='string'&&/^[a-z0-9-]{1,80}$/.test(raw.transferSet)?raw.transferSet:null,
   };
 }

@@ -1,0 +1,89 @@
+{
+  "verifiedAt": "2026-10-20T00:49:26.246072+00:00",
+  "scope": "Research-informed energy investigations, income multipliers, and historical oil/GDP evidence",
+  "delivery": [
+    "CheckList-style deterministic question interpretation and provider refusal cases",
+    "Complete directed provincial trade matrix linked to map and mobile partner list",
+    "Editable investigations, pinned comparisons and persistent source snapshots",
+    "Reference-year sensitivity of provincial trade balances",
+    "Official provincial and rest-of-Canada income multipliers",
+    "Historical provincial GDP paths and held-out conditional oil-model checks"
+  ],
+  "checks": {
+    "node": {
+      "passed": 290,
+      "failed": 0
+    },
+    "python": {
+      "passed": 66,
+      "failed": 0
+    },
+    "workerEdge": {
+      "passed": 21,
+      "failed": 0
+    },
+    "headlessBrowserSuites": [
+      "tests/e2e/investigations.mjs",
+      "tests/e2e/investigation-review.mjs",
+      "tests/e2e/economic-research.mjs"
+    ],
+    "publicBetaGate": "passed"
+  },
+  "independentReview": {
+    "reviewers": [
+      "behavioral_harness: investigation UI, persistence and background browser acceptance",
+      "income_paths: independent NumPy replication of oil-model holdouts",
+      "dynamic_price: source-cell audit of official income multipliers",
+      "release_review: release, provenance, freshness, numerical parsing and state consistency"
+    ],
+    "incomeSourceCellsMatched": 12000,
+    "modelHoldoutCasesReproduced": 1980,
+    "modelAndBaselinePredictionsReproduced": 3960,
+    "unresolvedBlockingFindings": []
+  },
+  "liveProviders": {
+    "scope": "Live Cloudflare planning, live Jev decision, deterministic source-backed findings and client contract validation. Browser interaction and deployed Turnstile checks are separate.",
+    "cases": [
+      {
+        "id": "trade",
+        "passed": true,
+        "llmCalls": 1,
+        "decision": {
+          "provider": "jev",
+          "model": "jev-1.14.0",
+          "status": "accepted",
+          "planStatus": "valid",
+          "presentation": "geographic",
+          "coverage": "supported"
+        }
+      },
+      {
+        "id": "provincial-price",
+        "passed": true,
+        "llmCalls": 1,
+        "decision": {
+          "provider": "jev",
+          "model": "jev-1.14.0",
+          "status": "accepted",
+          "planStatus": "valid",
+          "presentation": "comparison",
+          "coverage": "partial"
+        }
+      }
+    ],
+    "estimatedJevUsd": 9.8406e-05,
+    "lifetimeTestReservedUsd": 0.29299200000000014,
+    "publicJevLifetimeCapUsd": 1
+  },
+  "snapshots": {
+    "income-paths": "237a9a1fdb3ad466a250",
+    "dynamic-price-history": "baaf20c4203c2a099d42"
+  },
+  "limits": [
+    "Provincial causal price forecasts remain disabled: historical error checks do not validate a causal future price-to-GDP response.",
+    "Income multipliers identify within-province and rest-of-Canada effects; detailed bilateral supply-chain paths are not available in the summary table.",
+    "Trade price experiments hold quantities fixed and are not GDP forecasts.",
+    "Existing national well coverage remains incomplete and the site remains a public beta."
+  ],
+  "deployment": "Awaiting public deployment verification; see workflow history for the release result."
+}

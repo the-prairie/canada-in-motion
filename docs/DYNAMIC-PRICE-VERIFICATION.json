@@ -1,0 +1,29 @@
+{
+  "scope": "Latest-vintage conditional local-projection checks and observed oil/GDP paths",
+  "independentNumpyPredictions": 3960,
+  "maxAbsoluteDifferencePctPoints": 1.4210854715202004e-13,
+  "candidateModels": 126,
+  "errorScreenPassed": 12,
+  "dataVersion": "baaf20c4203c2a099d42",
+  "forecastsEnabled": false,
+  "unitTests": {
+    "node": 10,
+    "python": 7
+  },
+  "sourceHashes": {
+    "statcan-real-provincial-gdp-history": "438e0832790ba0c1ff4e6b159eef71902052bc77472c1895a96030e36f1f4fea",
+    "eia-annual-wti-history": "d93ef1ed585e32cad915dbb7d51207ee02718f69b732c3cbfa37b48a7fcef008",
+    "bh-2019-oil-supply-shocks": "00d392b04200cc2e337c16fdc13b8e25086fd92b7543f053b0e58ba5d1fcfa72",
+    "bh-2019-oil-demand-shocks": "ea5d57e935fa0423cc2910d6a8902798cc3f6f0efbbaa53926f26621eea26aa0",
+    "kaenzig-2021-oil-supply-news": "8aa80042f84071ea310b3c2f604b177aed57ee7575e6a18aed5b8ad52ec353de"
+  },
+  "independentReview": {
+    "reviewer": "independent income_paths agent",
+    "independentHoldoutCases": 1980,
+    "maxAbsoluteDifferencePctPoints": 1.4210854715202004e-13,
+    "findingsResolved": [
+      "Unknown GDP status now fails refresh.",
+      "Public snapshot retains annual structural shock inputs and raw GDP source flags."
+    ]
+  }
+}

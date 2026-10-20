@@ -1,0 +1,166 @@
+{
+  "purpose": "Observed annual oil-price episodes and provincial real GDP paths, with inspectable conditional local-projection validation.",
+  "dataVersion": "baaf20c4203c2a099d42",
+  "sources": [
+    {
+      "id": "statcan-real-provincial-gdp-history",
+      "title": "Provincial and territorial real GDP at market prices",
+      "publisher": "Statistics Canada",
+      "url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3610022201",
+      "downloadUrl": "https://www150.statcan.gc.ca/n1/tbl/csv/36100222-eng.zip",
+      "locator": "Table 36-10-0222-01; Gross domestic product at market prices; Chained (2017) dollars; millions",
+      "license": "Statistics Canada Open Licence",
+      "licenseUrl": "https://www.statcan.gc.ca/en/reference/licence",
+      "sha256": "438e0832790ba0c1ff4e6b159eef71902052bc77472c1895a96030e36f1f4fea"
+    },
+    {
+      "id": "eia-annual-wti-history",
+      "title": "Cushing, Oklahoma WTI spot price FOB: annual average",
+      "publisher": "US Energy Information Administration",
+      "url": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=RWTC&f=A",
+      "downloadUrl": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=RWTC&f=A",
+      "locator": "RWTC annual; dollars per barrel; full calendar years only",
+      "license": "US government public data",
+      "licenseUrl": "https://www.eia.gov/about/copyrights_reuse.php",
+      "sha256": "d93ef1ed585e32cad915dbb7d51207ee02718f69b732c3cbfa37b48a7fcef008"
+    },
+    {
+      "id": "bh-2019-oil-supply-shocks",
+      "title": "Structural oil supply shocks, updated author estimates",
+      "publisher": "Christiane Baumeister and James D. Hamilton",
+      "url": "https://sites.google.com/site/cjsbaumeister/research",
+      "downloadUrl": "https://drive.google.com/uc?export=download&id=1OsA8btgm2rmDucUFngiLkwv4uywTDmya",
+      "locator": "Monthly posterior median structural supply shock estimates, February 1975 onward",
+      "citation": "Baumeister and Hamilton (2019), American Economic Review 109(5), 1873–1910, doi:10.1257/aer.20151569",
+      "sha256": "00d392b04200cc2e337c16fdc13b8e25086fd92b7543f053b0e58ba5d1fcfa72"
+    },
+    {
+      "id": "bh-2019-oil-demand-shocks",
+      "title": "Structural oil demand shocks, updated author estimates",
+      "publisher": "Christiane Baumeister and James D. Hamilton",
+      "url": "https://sites.google.com/site/cjsbaumeister/research",
+      "downloadUrl": "https://drive.google.com/uc?export=download&id=1neFXLrIvGwggebQRwjmtrWK-dfQZ9NH8",
+      "locator": "Monthly posterior median economic activity, oil consumption demand and inventory demand shocks",
+      "citation": "Baumeister and Hamilton (2019), American Economic Review 109(5), 1873–1910, doi:10.1257/aer.20151569",
+      "sha256": "ea5d57e935fa0423cc2910d6a8902798cc3f6f0efbbaa53926f26621eea26aa0"
+    },
+    {
+      "id": "kaenzig-2021-oil-supply-news",
+      "title": "Oil supply news shocks: December 2025 vintage",
+      "publisher": "Diego R. Känzig",
+      "license": "Creative Commons Attribution 4.0 International",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "url": "https://github.com/dkaenzig/oilsupplynews",
+      "downloadUrl": "https://raw.githubusercontent.com/dkaenzig/oilsupplynews/master/oilSupplyNewsShocks_2025M12.xlsx",
+      "locator": "Monthly worksheet, Oil supply news shock column; annual sum of twelve months",
+      "citation": "Känzig (2021), American Economic Review 111(4), 1092–1125, doi:10.1257/aer.20190964",
+      "sha256": "8aa80042f84071ea310b3c2f604b177aed57ee7575e6a18aed5b8ad52ec353de"
+    }
+  ],
+  "referencePeriods": {
+    "GDP": "1981–2024, with Northwest Territories and Nunavut from1999",
+    "WTI": "1986–2025 full calendar-year averages",
+    "shocks": {
+      "bh-2019-oil-supply-shocks": {
+        "firstMonth": "1975-02",
+        "lastMonth": "2026-06",
+        "months": 617
+      },
+      "bh-2019-oil-demand-shocks": {
+        "firstMonth": "1975-02",
+        "lastMonth": "2026-06",
+        "months": 617
+      },
+      "kaenzig-2021-oil-supply-news": {
+        "firstMonth": "1975-01",
+        "lastMonth": "2025-12",
+        "months": 612
+      }
+    }
+  },
+  "calculation": {
+    "kind": "expanding-window-latest-vintage-conditional-holdout",
+    "outcome": "100 × (GDP(t+h) / GDP(t−1) − 1)",
+    "regressionOutcome": "100 × log(GDP(t+h) / GDP(t−1))",
+    "baseline": "Intercept and one lag of annual provincial real GDP log growth; refitted at each origin",
+    "comparisonSample": "Every candidate and its baseline use the same annual observations and held-out origins within each jurisdiction and horizon.",
+    "models": [
+      {
+        "id": "price",
+        "label": "WTI price change",
+        "features": "Baseline plus contemporaneous annual WTI log change"
+      },
+      {
+        "id": "structural",
+        "label": "Supply and demand shocks",
+        "features": "Baseline plus annual sums of all four Baumeister–Hamilton posterior median structural shocks"
+      },
+      {
+        "id": "news",
+        "label": "OPEC supply news",
+        "features": "Baseline plus annual sum of Känzig oil supply news shocks"
+      }
+    ],
+    "errorUnit": "percentage points of cumulative real GDP change",
+    "errorScreen": "At least 12 held-out years and 10% lower mean absolute error than the no-oil baseline",
+    "limitations": [
+      "Uses revised GDP and the latest available estimated shock vintages, not data available at historical release dates.",
+      "Oil prices and identified shocks in the held-out year are treated as observed inputs; these are conditional checks, not advance forecasts.",
+      "Annual aggregation does not identify the within-year timing of shocks. Shock-model identification and posterior uncertainty are not propagated.",
+      "No model coefficients are selected or tuned on the holdout scores. Error-screen thresholds are application release criteria, not claims from the cited papers."
+    ]
+  },
+  "publicForecastGate": {
+    "enabled": false,
+    "status": "research-only",
+    "reason": "Historical episodes are available. A validated conversion from an arbitrary oil-price change to a provincial GDP forecast is not.",
+    "requirements": [
+      "Identify the supply or demand intervention and validate its mapping to the chosen WTI price path.",
+      "Propagate shock-identification, parameter and future-outcome uncertainty.",
+      "Validate with historical data vintages and independent provincial review before enabling forecasts."
+    ]
+  },
+  "literature": [
+    {
+      "title": "Estimation and Inference of Impulse Responses by Local Projections",
+      "authors": "Òscar Jordà",
+      "year": 2005,
+      "url": "https://www.aeaweb.org/articles?id=10.1257/0002828053828518"
+    },
+    {
+      "title": "Not All Oil Price Shocks Are Alike",
+      "authors": "Lutz Kilian",
+      "year": 2009,
+      "url": "https://www.aeaweb.org/articles?id=10.1257/aer.99.3.1053"
+    },
+    {
+      "title": "Structural Interpretation of Vector Autoregressions with Incomplete Identification",
+      "authors": "Christiane Baumeister and James D. Hamilton",
+      "year": 2019,
+      "url": "https://www.aeaweb.org/articles?id=10.1257/aer.20151569"
+    },
+    {
+      "title": "The Macroeconomic Effects of Oil Supply News",
+      "authors": "Diego R. Känzig",
+      "year": 2021,
+      "url": "https://www.aeaweb.org/articles?id=10.1257/aer.20190964"
+    }
+  ],
+  "limitations": [
+    "The observed GDP changes include every economic influence during those years; they are not effects caused only by oil.",
+    "Nominal US-dollar WTI changes are compared with real Canadian-dollar GDP growth. No exchange-rate or inflation-adjusted oil-price equivalence is implied.",
+    "GDP is expenditure-based at market prices, distinct from the basic-price energy GDP in the income view.",
+    "Northwest Territories and Nunavut histories begin in 1999. Earlier combined-territory figures are not reassigned to either jurisdiction.",
+    "Nearest episodes are chosen only by the annual oil-price change, not economic similarity or the sign of subsequent GDP."
+  ],
+  "reproduction": {
+    "refresh": "python3 pipeline/refresh_dynamic_price.py",
+    "offline": "python3 pipeline/refresh_dynamic_price.py --offline",
+    "unitTests": [
+      "node --test tests/dynamic-price.test.mjs",
+      "python3 -m unittest discover -s pipeline -p test_dynamic_price.py"
+    ],
+    "design": "For each province and horizon0,1,2 regress cumulative GDP log change on lagged GDP growth and either oil log change, all four BH structural shocks, or Känzig supply-news shock. Fit ordinary least squares on common candidate years. At each heldout year from2006, only use training rows whose outcomeYear is earlier, with at least18training rows. Convert predicted log changes to cumulative percent before scoring. Never map selected arbitrary WTI percentages into these research estimates."
+  },
+  "interpretation": "A statistical error screen is not causal identification or public forecast approval. All126candidate projections remain research-only. Historical episode selection uses oil price distance alone; all observed GDP paths include other contemporaneous influences."
+}
