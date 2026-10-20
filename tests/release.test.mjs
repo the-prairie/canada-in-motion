@@ -24,6 +24,10 @@ async function fixture(t) {
   const coverage={provinces:config.requiredProvinces.map(code=>({code,topics:Object.fromEntries(config.requiredTopics.map(topic=>[topic,{status:'partial',sourceIds:['example'],evidenceUrl:'https://example.org/evidence',retrievedAt:DATE}]))}))};
   for(const file of PUBLIC_FILES) await write(file,file==='index.html'?'<html><head></head><body>Atlas</body></html>':file.endsWith('.json')?{}:'/* fixture */');
   for(const file of ['economy','energy-flows','provincial-impacts','alberta-well-status','income-paths','dynamic-price-history','provincial-forecasts','provincial-outlook-benchmarks'])await write(`data/${file}.json`,JSON.parse(await fs.readFile(new URL(`../data/${file}.json`,import.meta.url),'utf8')));
+  for(const file of ['provincial-price-response','household-energy-costs']){
+    const data=JSON.parse(await fs.readFile(new URL(`../data/${file}.json`,import.meta.url),'utf8'));
+    await write(`data/${file}.json`,{...data,retrievedAt:new Date().toISOString()});
+  }
   await write('vendor/LICENSE.txt','Third party notice');await write('vendor/fonts/OFL.txt','Font notice');
   await write('config/publication.json',config);await write('config/sources.json',[definition]);await write('data/catalog.json',catalog);await write('data/national-coverage.json',coverage);
   await write(catalog.basePath+source.indexFile,index);await write(catalog.basePath+source.detailFiles[0].file,details);
@@ -177,4 +181,16 @@ test('release versions entry points, static imports and lazy modules together', 
   assert.equal(versionApplicationAssets(fixture()),version);
   const changed=fixture();changed.set('model.mjs',Buffer.from('export const x=2;'));assert.notEqual(versionApplicationAssets(changed),version);
   const dataOnly=fixture();dataOnly.set('data/economy.json',Buffer.from('{"new":true}'));assert.equal(versionApplicationAssets(dataOnly),version);
+});
+
+test('publication rejects stale price evidence and altered household model paths',async t=>{
+  const f=await fixture(t);
+  const gdp=JSON.parse(await fs.readFile(path.join(f.root,'data/provincial-price-response.json'),'utf8'));
+  await f.write('data/provincial-price-response.json',{...gdp,retrievedAt:new Date(Date.now()-9*86400000).toISOString()});
+  await assert.rejects(buildPublic(f.root),/source verification is stale/);
+  await f.write('data/provincial-price-response.json',gdp);
+  const household=JSON.parse(await fs.readFile(path.join(f.root,'data/household-energy-costs.json'),'utf8'));
+  household.calibrations.find(row=>row.status==='supported').responseDraws.persistent[0][0]=null;
+  await f.write('data/household-energy-costs.json',household);
+  await assert.rejects(buildPublic(f.root),/household parameter draws/);
 });

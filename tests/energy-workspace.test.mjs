@@ -199,7 +199,8 @@ test('an electricity comparison cannot receive an unrelated legacy GDP or unsupp
 test('workspace findings keep missing evidence first and national and regional results separate',()=>{
   const workspace=buildWorkspacePanels({...input,question:'How would a lower oil price affect GDP in Alberta and Québec?',investigation:{...investigation,topics:['oil-sensitivity'],requestedMeasure:'provincial-price-impact'}});
   const analysis=buildWorkspaceAnalysis(workspace);
-  assert.match(analysis.blocks[0].text,/No calibrated model/);
+  assert.match(analysis.blocks[0].text,/does not calculate a causal provincial GDP effect/);
+  assert.match(analysis.blocks[0].text,/Explore a question provides separately tested historical GDP relationships/);
   const oil=analysis.blocks.find(block=>block.text.includes('oil-price change'));
   assert.match(oil.text,/-10% persistent/);assert.match(oil.text,/national changes/);assert.match(oil.text,/2026/);assert.match(oil.text,/year 1/);assert.match(oil.text,/year 2/);
   assert.ok(analysis.blocks.length<=6);assert.ok(analysis.blocks.every(block=>typeof block.text==='string'&&!block.text.includes('undefined')));

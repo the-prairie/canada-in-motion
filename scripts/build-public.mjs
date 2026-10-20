@@ -1,3 +1,4 @@
+import {validateProvincialPriceResponse,validateHouseholdEnergyCosts} from '../price-response-model.mjs';
 import {validateProvincialForecast, validateProvincialOutlooks} from '../provincial-forecast-model.mjs';
 import {validateIncomePaths} from '../income-path-model.mjs';
 import {validateDynamicPriceHistory} from '../dynamic-price-model.mjs';
@@ -27,7 +28,7 @@ export function cspForAI(config) {
   return CSP.replace("script-src 'self'", "script-src 'self' https://challenges.cloudflare.com").replace("connect-src 'self'",`connect-src 'self' ${config.apiOrigin} https://challenges.cloudflare.com`)+"; frame-src https://challenges.cloudflare.com";
 }
 export const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
-export const PUBLIC_FILES = ['data/provincial-forecasts.json','data/provincial-outlook-benchmarks.json','provincial-forecast-model.mjs','data/income-paths.json','income-path-model.mjs','data/dynamic-price-history.json','dynamic-price-model.mjs','ai-client.mjs','energy-economy.js','energy-economy.css','energy-workspace.css','energy-story.css','vendor/energy-workspace.js','economy-model.mjs','data/economy.json','data/energy-debate.json','data/energy-flows.json','data/provincial-impacts.json','data/alberta-well-status.json','alberta-status-model.mjs','energy-flow-model.mjs','provincial-impact-model.mjs','trade-workspace-model.mjs','index.html','app.js','record-atlas.js','record-atlas.css','atlas-model.mjs','map.js','model.mjs','data-store.mjs','insights.mjs','style.css','design.css', 'vendor/leaflet.js','vendor/leaflet.css','vendor/supercluster.js', 'vendor/fonts/ibm-plex-sans-400.ttf','vendor/fonts/ibm-plex-sans-500.ttf','vendor/fonts/ibm-plex-sans-600.ttf','vendor/fonts/ibm-plex-mono-400.ttf','vendor/fonts/ibm-plex-mono-500.ttf', 'data/network.json','data/tariffs.json','data/tariff-sources.json','data/countries.geojson','data/provinces.geojson','data/national-coverage.json', 'data/context/manifest.json', ...CONTEXT_FILES.map(name => 'data/context/'+name)];
+export const PUBLIC_FILES = ['data/provincial-price-response.json','data/household-energy-costs.json','price-response-model.mjs','data/provincial-forecasts.json','data/provincial-outlook-benchmarks.json','provincial-forecast-model.mjs','data/income-paths.json','income-path-model.mjs','data/dynamic-price-history.json','dynamic-price-model.mjs','ai-client.mjs','energy-economy.js','energy-economy.css','energy-workspace.css','energy-story.css','vendor/energy-workspace.js','economy-model.mjs','data/economy.json','data/energy-debate.json','data/energy-flows.json','data/provincial-impacts.json','data/alberta-well-status.json','alberta-status-model.mjs','energy-flow-model.mjs','provincial-impact-model.mjs','trade-workspace-model.mjs','index.html','app.js','record-atlas.js','record-atlas.css','atlas-model.mjs','map.js','model.mjs','data-store.mjs','insights.mjs','style.css','design.css', 'vendor/leaflet.js','vendor/leaflet.css','vendor/supercluster.js', 'vendor/fonts/ibm-plex-sans-400.ttf','vendor/fonts/ibm-plex-sans-500.ttf','vendor/fonts/ibm-plex-sans-600.ttf','vendor/fonts/ibm-plex-mono-400.ttf','vendor/fonts/ibm-plex-mono-500.ttf', 'data/network.json','data/tariffs.json','data/tariff-sources.json','data/countries.geojson','data/provinces.geojson','data/national-coverage.json', 'data/context/manifest.json', ...CONTEXT_FILES.map(name => 'data/context/'+name)];
 export function safeRelative(value) {
   if (typeof value !== 'string' || !value || value.includes('\\') || value.includes('%') || value.includes('\0') || path.posix.isAbsolute(value) || value.split('/').some(x => !x || x === '.' || x === '..' || x.startsWith('.')) || !/^[A-Za-z0-9_./-]+$/.test(value)) throw new Error(`Unsafe release path: ${value}`);
   return value;
@@ -237,6 +238,11 @@ export function versionApplicationAssets(output) {
 export async function buildPublic(root = ROOT) {
   const { catalog, files, config } = await validateRelease(root);
   validateEconomy(await readJSON(root, 'data/economy.json'));
+  for(const [file,validate] of [['provincial-price-response',validateProvincialPriceResponse],['household-energy-costs',validateHouseholdEnergyCosts]]){
+    const data=await readJSON(root,`data/${file}.json`);validate(data);
+    const age=Date.now()-Date.parse(data.retrievedAt);
+    assert(Number.isFinite(age)&&age>=-86400000&&age<=8*86400000,`${file} source verification is stale`);
+  }
   validateIncomePaths(await readJSON(root,'data/income-paths.json'));
   validateDynamicPriceHistory(await readJSON(root,'data/dynamic-price-history.json'));
   validateProvincialForecast(await readJSON(root,'data/provincial-forecasts.json'));

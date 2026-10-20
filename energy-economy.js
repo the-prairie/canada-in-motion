@@ -78,7 +78,7 @@ export class EnergyEconomy {
     }
     const action=target.dataset.ecAction;
     if(action==='retry')void this.load();
-    if(action==='retry-story'){const host=this.root.querySelector('#ec-energy-story');if(host){host.innerHTML='<p role="status">Loading the investigation…</p>';void this.mountStory(host);}}
+    if(action==='retry-story'){const host=this.root.querySelector('#ec-energy-story');if(host){this.storyMount?.unmount();this.storyMount=null;host.innerHTML='<p role="status">Loading the investigation…</p>';void this.mountStory(host);}}
     if(action==='retry-research'){const kind=target.dataset.researchKind,host=this.root.querySelector(({income:'#ec-income-paths',history:'#ec-oil-history',forecast:'#ec-provincial-forecast'})[kind]);if(host){host.innerHTML='<p role="status">Loading data…</p>';void this.mountResearchView(host,kind);}}
     if(action==='inventory')this.onInventory(this.state.region==='CA'?'all':this.state.region);
     if(action==='ask'){const disclosure=this.root.querySelector('.ec-trade-question');if(disclosure){this.tradeQuestionOpen=true;disclosure.open=true;}this.root.querySelector('#ec-ai-title')?.scrollIntoView({behavior:'auto',block:'start'});this.root.querySelector(this.status.available?'#energy-question':'#ec-ai-title')?.focus({preventScroll:true});}
@@ -232,15 +232,17 @@ export class EnergyEconomy {
   async mountStory(host) {
     this.storyMountKey=JSON.stringify(this.state.story);
     try {
-      const [{mountEnergyStory},flows,fiscal,forecast]=await Promise.all([
+      const [{mountEnergyStory},flows,fiscal,forecast,priceResponses,householdCosts]=await Promise.all([
         import('./vendor/energy-workspace.js'),
         this.flows||fetch('data/energy-flows.json').then(r=>{if(!r.ok)throw Error();return r.json();}),
         this.fiscal||fetch('data/provincial-impacts.json').then(r=>{if(!r.ok)throw Error();return r.json();}),
         this.forecast||fetch('data/provincial-forecasts.json').then(r=>r.ok?r.json():null).catch(()=>null),
+        fetch('data/provincial-price-response.json').then(r=>r.ok?r.json():null).catch(()=>null),
+        fetch('data/household-energy-costs.json').then(r=>r.ok?r.json():null).catch(()=>null),
       ]);
       if(!host.isConnected)return;
       this.flows=flows;this.fiscal=fiscal;this.forecast=forecast;host.replaceChildren();
-      this.storyMount=mountEnergyStory(host,{snapshots:{economy:this.data,flows,fiscal,forecast},initial:this.state.story,shapes:this.shapes,onState:story=>{
+      this.storyMount=mountEnergyStory(host,{snapshots:{economy:this.data,flows,fiscal,forecast,priceResponses,householdCosts},initial:this.state.story,shapes:this.shapes,onState:story=>{
         this.state=normalizeEconomyState({...this.state,story});this.storyMountKey=JSON.stringify(this.state.story);this.onChange(this.state);
       },onAsk:question=>{
         this.question=question;this.tradeQuestionOpen=true;this.render();this.root.querySelector('#energy-question')?.focus();

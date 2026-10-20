@@ -2,6 +2,7 @@ import { validateEconomy, summarizeEconomy } from './economy-model.mjs';
 import { FLOW_COMMODITIES, FLOW_REGIONS } from './energy-flow-model.mjs';
 import { summarizeProvincialImpacts } from './provincial-impact-model.mjs';
 import { summarizeProvincialForecast } from './provincial-forecast-model.mjs';
+import { summarizeProvincialPriceResponse, summarizeHouseholdEnergyCosts } from './price-response-model.mjs';
 
 export const ENERGY_STORY_CHAPTERS = Object.freeze(['overview', 'trade', 'public-finances', 'national', 'outlook', 'households']);
 const commodityNames = { oil: 'crude oil', gas: 'natural gas', electricity: 'electricity' };
@@ -28,6 +29,8 @@ export function normalizeEnergyStorySelection(snapshots, input = {}) {
     tradeYear: read('tradeYear', snapshots.flows.trade.latestYear),
     duration: read('duration', 'persistent'),
     chapter: read('chapter', 'overview'),
+    responseHorizon: read('responseHorizon', 0),
+    householdBasis: read('householdBasis', 'benchmark'),
   };
   require(FLOW_COMMODITIES.includes(selection.commodity), 'choose oil, gas or electricity');
   require(FLOW_REGIONS.includes(selection.focus), 'choose a province or territory');
@@ -36,6 +39,8 @@ export function normalizeEnergyStorySelection(snapshots, input = {}) {
   require(Number.isInteger(selection.tradeYear) && years.includes(selection.tradeYear), 'trade year is unavailable');
   require(['persistent', 'temporary'].includes(selection.duration), 'unknown national oil shock duration');
   require(ENERGY_STORY_CHAPTERS.includes(selection.chapter), 'unknown chapter');
+  require([0,1].includes(selection.responseHorizon), 'unknown GDP response period');
+  require(['benchmark','retail'].includes(selection.householdBasis), 'unknown household price basis');
   if (selection.compare === selection.focus) selection.compare = null;
   selection.shockPct = cleanZero(selection.shockPct);
   return selection;
@@ -77,7 +82,7 @@ function provenanceFor(snapshots, sourceIds) {
 }
 
 function storyNarrative(channels, selection, names) {
-  const { domestic, international, fiscal, national, gdpContext, outlook } = channels;
+  const { domestic, international, fiscal, national, gdpContext, outlook, priceResponse, households } = channels;
   const name = names.get(selection.focus);
   const commodity = commodityNames[selection.commodity];
   const change = selection.shockPct === 0 ? 'unchanged prices' : `${Math.abs(selection.shockPct)}% ${selection.shockPct < 0 ? 'lower' : 'higher'} prices`;
@@ -124,13 +129,23 @@ function storyNarrative(channels, selection, names) {
       add('independent-outlook-unavailable', `The economic-indicator model has insufficient coverage to forecast ${name}'s real GDP growth.`, 'outlook');
     }
   }
+  for(const row of priceResponse.rows){
+    add(`price-gdp-${row.region}`,row.status==='supported'
+      ? `The historical ${row.benchmark} model associates this price change with ${decimal(row.estimatePct)}% real GDP relative to its unchanged-price path in ${names.get(row.region)}. This conditional association is separate from the current GDP forecast and does not identify a causal shock.`
+      : `A supported ${commodity} price-to-GDP estimate for ${names.get(row.region)} is unavailable for this horizon.${row.status==='exploratory'?' The exploratory historical fit failed a stability or performance screen.':''}`,'priceResponse');
+  }
+  for(const row of households.rows){
+    add(`household-${row.region}`,Number.isFinite(row.annualChangeCad)
+      ? `${names.get(row.region)}'s average household ${row.categoryLabel.toLowerCase()} changes by ${decimal(row.annualChangeCad)} CAD over twelve months at fixed consumption. ${row.status==='retail-scenario'?'This applies the selected change directly to retail prices; it does not derive retail prices from commodity markets.':'This uses a sustained benchmark-price change and a conditional retail-price model.'} The reference averages all households, including those with zero spending in this category.`
+      : `A household ${commodity} cost estimate for ${names.get(row.region)} is unavailable on the selected price basis.`,'households');
+  }
   return narrative;
 }
 
 export function summarizeEnergyStory(snapshots, input = {}) {
   require(snapshots && typeof snapshots === 'object' && !Array.isArray(snapshots), 'source snapshots are required');
   const selection = normalizeEnergyStorySelection(snapshots, input);
-  const { economy, flows, fiscal, forecast } = snapshots;
+  const { economy, flows, fiscal, forecast, priceResponses, householdCosts } = snapshots;
   validateEconomy(economy);
   const impacts = summarizeProvincialImpacts(flows, fiscal, {
     commodity: selection.commodity, shockPct: selection.shockPct, year: selection.tradeYear,
@@ -183,12 +198,14 @@ export function summarizeEnergyStory(snapshots, input = {}) {
       sourceIds: [economySummary.gdp.sourceId], changesWithPrice: false,
     },
     outlook,
+    priceResponse: summarizeProvincialPriceResponse(priceResponses,{commodity:selection.commodity,shockPct:selection.shockPct,regions:selectedRegions,horizonYears:selection.responseHorizon}),
+    households: summarizeHouseholdEnergyCosts(householdCosts,{commodity:selection.commodity,shockPct:selection.shockPct,regions:selectedRegions,basis:selection.householdBasis}),
   };
   const gaps = [
-    { id: 'households', text: 'Household bills are not estimated.', reason: 'The experiment has no calibrated link from commodity prices to retail tariffs, taxes, household consumption or household income.' },
-    { id: 'provincial-gdp', text: 'Provincial GDP changes are not estimated.', reason: 'Trade repricing and budget sensitivities cannot establish provincial GDP, employment or investment effects.' },
+    { id: 'households', text: 'Individual household bills are not predicted.', reason: 'The household calculation uses an all-household spending reference. Actual tariffs, usage, household composition and future policy may differ.' },
+    { id: 'provincial-gdp', text: 'A causal provincial GDP effect is not identified.', reason: 'Historical price responses condition on observed prices. Supply, demand, exchange rates and policy responses can lead to different outcomes.' },
     { id: 'separate-channels', text: 'These channels cannot be added together.', reason: 'Trade values, fiscal sensitivities and national GDP use different periods and scopes and overlap economically.' },
-    { id: 'price-pass-through', text: 'Each price is assumed to change by the same percentage.', reason: 'The experiment does not estimate how WTI, local natural gas benchmarks or wholesale electricity pass through to other prices.' },
+    { id: 'price-pass-through', text: 'Each channel keeps its own price basis.', reason: 'Trade and budget sensitivities apply the chosen percentage to their named prices. Household commodity responses estimate retail pass-through; a retail-price scenario applies the percentage directly to consumer prices.' },
   ];
   const sourceIds = new Set(Object.values(channels).flatMap(channel => channel.sourceIds));
   return {
@@ -197,7 +214,7 @@ export function summarizeEnergyStory(snapshots, input = {}) {
       ? `${names.get(selection.focus)} with unchanged ${commodityNames[selection.commodity]} prices`
       : `${names.get(selection.focus)} with ${Math.abs(selection.shockPct)}% ${selection.shockPct < 0 ? 'lower' : 'higher'} ${commodityNames[selection.commodity]} prices`,
     channels, narrative: storyNarrative(channels, selection, names), gaps,
-    provenance: provenanceFor({ economy, flows, fiscal, ...(forecast ? { forecast } : {}) }, sourceIds),
+    provenance: provenanceFor({ economy, flows, fiscal, ...(forecast ? { forecast } : {}), ...(priceResponses?{priceResponses}:{}), ...(householdCosts?{householdCosts}:{}) }, sourceIds),
   };
 }
 

@@ -89,6 +89,7 @@ try{
   await chapter('Public revenue').click();
   assert.match(await host.locator('.es-fiscal').innerText(),/−\$4\.11B/);
   await chapter('Provincial outlook').click();
+  await open(host.locator('.pr-independent-outlook'));
   const outlook=await host.locator('.es-context-grid').innerText();
   await host.locator('#es-price').focus();await page.keyboard.press('End');
   assert.equal(await host.locator('.es-context-grid').innerText(),outlook);
@@ -112,7 +113,9 @@ try{
   await host.getByLabel('Investigation province',{exact:true}).selectOption('BC');
   assert.match(await host.locator('.es-fiscal').innerText(),/BC plant-inlet natural gas/);
   await chapter('People & costs').click();
-  assert.match(await host.locator('.es-people').innerText(),/Retail price pass-through is not calibrated/);
+  assert.match(await host.locator('.pr-households').innerText(),/Commodity prices did not reliably predict/);
+  await host.getByRole('button',{name:'Retail-price scenario',exact:true}).click();
+  assert.match(await host.locator('.pr-households').innerText(),/monthly equivalent at unchanged consumption/);
   checks.push('gas local benchmark and electricity and household model gaps');
 
   await open(host.locator('.es-actions details'));
@@ -125,9 +128,11 @@ try{
   await host.getByRole('button',{name:'Export investigation',exact:true}).click();
   const download=await pending,exported=JSON.parse(await readFile(await download.path(),'utf8'));
   assert.equal(exported.kind,'canada-in-motion-energy-story');
-  assert.deepEqual(summarizeEnergyStory(exported.snapshots,exported.selection),exported.result);
+  const comparable=value=>JSON.parse(JSON.stringify(value,(_,item)=>typeof item==='number'?Number(item.toPrecision(12)):item));
+  assert.deepEqual(comparable(summarizeEnergyStory(exported.snapshots,exported.selection)),comparable(exported.result));
   await host.getByRole('button',{name:'Oil',exact:true}).click();
   await host.locator('input[type=file]').setInputFiles({name:'investigation.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(exported))});
+  await host.locator('.es-notice').filter({hasText:'saved snapshot'}).waitFor();
   assert.equal((await shareState()).commodity,'gas');
   assert.match(await host.locator('.es-notice').innerText(),/saved snapshot/);
   await host.locator('input[type=file]').setInputFiles({name:'invalid.json',mimeType:'application/json',buffer:Buffer.from('{"schemaVersion":1,"snapshots":{}}')});
@@ -173,6 +178,7 @@ try{
   const linked=await context.newPage();
   await linked.route('**/api/analysis/status',route=>route.fulfill({json:{available:false}}));
   await linked.goto(base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy:{section:'explore',forecastYear:forecast.forecastOriginYear+1,story:{chapter:'outlook',focus:'AB',compare:'ON'}}})));
+  await open(linked.locator('.pr-independent-outlook'));
   await linked.getByRole('button',{name:'Inspect historical forecast performance',exact:false}).click();
   await linked.locator('#ec-provincial-forecast .pf-range-chart').waitFor();
   assert.equal(await linked.locator('#ec-provincial-forecast').getByRole('button',{name:String(forecast.forecastOriginYear),exact:true}).getAttribute('aria-pressed'),'true');

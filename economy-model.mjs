@@ -7,7 +7,7 @@ const bounded = (value, low, high) => Math.min(high, Math.max(low, value));
 export function normalizeEconomyState(input = {}) {
   const raw = input && typeof input === 'object' ? input : {};
   const storyInput=raw.story&&typeof raw.story==='object'?raw.story:{};
-  const story=Object.fromEntries(['commodity','focus','compare','shockPct','tradeYear','duration','chapter'].filter(key=>Object.hasOwn(storyInput,key)).map(key=>[key,['string','number','boolean'].includes(typeof storyInput[key])?storyInput[key]:null]));
+  const story=Object.fromEntries(['commodity','focus','compare','shockPct','tradeYear','duration','chapter','responseHorizon','householdBasis'].filter(key=>Object.hasOwn(storyInput,key)).map(key=>[key,['string','number','boolean'].includes(typeof storyInput[key])?storyInput[key]:null]));
   return {
     section: ['explore', 'income', 'trade', 'supply', 'futures', 'oil', 'outlook'].includes(raw.section) ? raw.section : 'explore',
     story,

@@ -14,7 +14,7 @@ const run = input => summarizeEnergyStory(snapshots, { ...base, ...input });
 test('absent selections use explicit defaults and duplicate comparison becomes no comparison', () => {
   assert.deepEqual(normalizeEnergyStorySelection(snapshots), {
     commodity: 'oil', focus: 'AB', compare: null, shockPct: -10,
-    tradeYear: snapshots.flows.trade.latestYear, duration: 'persistent', chapter: 'overview',
+    tradeYear: snapshots.flows.trade.latestYear, duration: 'persistent', chapter: 'overview', responseHorizon: 0, householdBasis: 'benchmark',
   });
   assert.equal(normalizeEnergyStorySelection(snapshots, { focus: 'ON', compare: 'ON' }).compare, null);
   for (const chapter of ENERGY_STORY_CHAPTERS) {
