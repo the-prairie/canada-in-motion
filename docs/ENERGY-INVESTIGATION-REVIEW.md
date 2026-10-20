@@ -28,3 +28,11 @@ The local origin's direct status request produces the expected production CORS r
 Scoped comment/prose review found no new narration comments requiring deletion. Application files touched by reviewer: none. Deleted comments: zero. MUST KILL flags: none. Clear source periods and scope qualifications were retained because they materially change interpretation.
 
 This is functional and semantic acceptance of this release candidate, not a human comprehension study or an objective ranking of design quality.
+
+## Responsive release review
+
+A fresh reviewer accepted candidate `520c8d7f4d887e46bcac` after the intermediate-width navigation repair. Headless Chromium covered Explore, Income, Provincial outlook, Trade & prices, Follow the dollar, Energy futures and Oil & the economy at 320, 390, 768, 1024, 1101, 1200 and 1440 pixels.
+
+All 49 view and width combinations contained their navigation controls without document overflow, clipped labels or offscreen controls. Opening Data views, entering the menu by keyboard, selecting Income and returning to Explore worked at every width. Focus remained on the selected navigation control. No JavaScript runtime errors were observed.
+
+Desktop, tablet and phone screenshots were inspected. The older data navigation remains tall at 768 pixels but readable and usable. No must-fix findings remain in this bounded review. Evidence includes 77 observations and screenshots in `.data-cache/story-review/responsive/`. No application files changed and no inference calls were made during review.

@@ -2,7 +2,13 @@
 
 ## Release status
 
-Local candidate `520c8d7f4d887e46bcac` is verified. Public deployment is pending.
+Published and verified on 20 October 2026. [Open the connected investigation](https://the-prairie.github.io/canada-in-motion/#v1=%7B%22view%22%3A%22economy%22%2C%22economy%22%3A%7B%22section%22%3A%22explore%22%7D%7D).
+
+- Application version `520c8d7f4d887e46bcac`.
+- Deployed commit `efdc8bf3a26ca27acfc6e8e5e6c45f2b8a3590ae`.
+- Data release `47a621b5db5778a53a7d`, containing 317,936 well records.
+- [Successful deployment](https://github.com/the-prairie/canada-in-motion/actions/runs/39401003790).
+- Public `health.json` returned HTTP 200 and the expected application version. The release remains a public beta with incomplete national coverage.
 
 The first deployment was cancelled before publication after a final check found navigation overflow at intermediate widths. The repair and expanded responsive check passed locally.
 
@@ -23,15 +29,18 @@ The connected controls do not make inference requests. Broader questions continu
 
 ## Verification
 
-- 329 JavaScript tests passed.
+- 329 JavaScript tests and 83 Python tests passed in deployment CI.
 - 23 local Worker tests passed.
-- The connected-investigation browser suite passed at the deployed-artifact preview origin.
+- The connected-investigation browser suite passed at both the deployed-artifact preview origin and the public GitHub Pages origin. It reported no JavaScript runtime errors.
 - Existing provincial forecast, forecast AI fixture and Alberta well-table browser suites passed.
 - The expanded layout test passed at widths of 320, 390, 768, 1024, 1101, 1200 and 1440 pixels for the original Income view and the new investigation.
 - The [independent review](ENERGY-INVESTIGATION-REVIEW.md) identified three defects, each repaired and independently retested.
+- A fresh reviewer accepted the responsive repair across all seven Economy views and seven viewport widths.
 - The production AI status endpoint returned HTTP 200 with Cloudflare, OpenUI workspaces and Jev enabled. This is a configuration check, not a new provider-inference test.
 
 AI browser tests use explicit provider fixtures. They exercise the real planner-output contract, calculations, renderer and local controls without billing inference. No provider budget or deployment secret changed.
+
+The public browser run verified current source values, price changes, keyboard map selection, partner comparisons, source periods, forecast independence, undo, URL recovery, pinning, export/import replay, malformed-file recovery, source-loading retry and the contextual OpenUI handoff. Its receipt is `.data-cache/story-design/public-e2e.log`; deployment logs are in `.data-cache/story-design/public-deploy.log`.
 
 Run the committed browser suite against a built artifact or the public site:
 

@@ -7,7 +7,7 @@
 - [x] Phase B: Design the workflow.
 - [x] Phase C: Run the loop.
 - [x] Phase D: Keep the audit trail.
-- [ ] Phase E: Verify and hand back.
+- [x] Phase E: Verify and hand back.
 
 ## Outcome
 
@@ -57,6 +57,6 @@ Local candidate `520c8d7f4d887e46bcac` passed 329 JavaScript tests, 23 local Wor
 
 The new browser harness is `tests/e2e/energy-story.mjs`. It checks source-backed values, local recomputation, keyboard interaction, URL restore, export replay, missing data, recovery, responsive containment, scoped forecast handoff and current OpenUI findings.
 
-Public deployment and verification are recorded in `ENERGY-INVESTIGATION-RELEASE.md` when complete.
+Public deployment and verification are recorded in `ENERGY-INVESTIGATION-RELEASE.md`. Deployment run `39401003790` succeeded. The public application reports version `520c8d7f4d887e46bcac`, and the full connected-investigation browser suite passed against the live site without runtime errors.
 
 A final responsive sweep found navigation overflow at intermediate widths in the older detailed views. The first deployment was cancelled before publication. Wrapping and minimum-size rules now keep the controls within 320–1440 pixels. A fresh reviewer checked all seven economy sections, opened menus and keyboard navigation.
