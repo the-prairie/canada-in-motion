@@ -78,7 +78,15 @@ async function main() {
     const network=workspaceEnabled?JSON.parse(await fs.readFile(new URL('../data/network.json',import.meta.url),'utf8')):undefined;
     const flows=workspaceEnabled?JSON.parse(await fs.readFile(path.join(ROOT,'data/energy-flows.json'),'utf8')):undefined;
     const fiscal=workspaceEnabled?JSON.parse(await fs.readFile(path.join(ROOT,'data/provincial-impacts.json'),'utf8')):undefined;
-    analyze=createEnergyAnalyzer({data,network,flows,fiscal,workspaceEnabled,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,debate,model,provider:createOpenAIProvider({apiKey:process.env.OPENAI_API_KEY,model}),timeoutMs:limit('AI_TIMEOUT_MS',60000)});
+    let forecast;
+    if(workspaceEnabled){
+      try{
+        const {validateProvincialForecast}=await import('../provincial-forecast-model.mjs');
+        forecast=JSON.parse(await fs.readFile(path.join(ROOT,'data/provincial-forecasts.json'),'utf8'));
+        validateProvincialForecast(forecast);
+      }catch{forecast=undefined;}
+    }
+    analyze=createEnergyAnalyzer({data,network,flows,fiscal,forecast,workspaceEnabled,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,debate,model,provider:createOpenAIProvider({apiKey:process.env.OPENAI_API_KEY,model}),timeoutMs:limit('AI_TIMEOUT_MS',60000)});
   }
   const server=await createAnalysisServer({analyze,model,workspaceEnabled,publicOrigin,maxConcurrent:limit('AI_CONCURRENCY',2),perMinute:limit('AI_PER_MINUTE',6),dailyLimit:limit('AI_DAILY_LIMIT',20)});
   server.listen(port,host,()=>console.log(`Canada in Motion: http://${host}:${port}/. AI ${analyze?'configured':'disabled'}.`));

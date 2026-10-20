@@ -20,7 +20,8 @@
     "deploy:ai": "wrangler deploy",
     "dev:ai:edge": "wrangler dev --local --port 8787",
     "test:ai:edge": "npm run build:ai && node --test tests/edge/*.test.mjs",
-    "build:workspace": "node scripts/build-workspace.mjs"
+    "build:workspace": "node scripts/build-workspace.mjs",
+    "refresh:forecasts": "python3 pipeline/refresh_provincial_forecast.py"
   },
   "devDependencies": {
     "esbuild": "0.28.2",

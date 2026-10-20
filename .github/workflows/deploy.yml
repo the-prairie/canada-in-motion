@@ -61,6 +61,8 @@ jobs:
         run: python pipeline/refresh_income_paths.py
       - name: Refresh oil history and reproduce conditional model checks
         run: python pipeline/refresh_dynamic_price.py
+      - name: Refresh GDP and employment inputs and rebuild provincial forecasts
+        run: python pipeline/refresh_provincial_forecast.py
       - name: Verify published provincial budget sensitivities
         run: python pipeline/refresh_provincial_impacts.py
       - name: Require approved beta scope, rights, integrity and freshness

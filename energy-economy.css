@@ -157,5 +157,11 @@ body[data-view='economy'] .workspace,body[data-view='economy'] .mobile-surface {
 .ec-debate { border-block:1px solid var(--line); padding:4px 0; }
 .ec-debate-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px 36px; padding:16px 0; }
 .ec-debate-grid article { border-top:1px solid var(--line); padding-top:18px; }
+.ec-focused-metric{display:block;max-width:900px}
+.ec-focused-metric .ec-metric{padding-top:8px}
+.ec-focused-metric .ec-trend{max-height:245px}
+.ec-indicator-select{display:flex;align-items:center;gap:12px;max-width:420px;font-size:13px;margin:16px 0}
+.ec-indicator-select select{flex:1}
+@media(max-width:760px){.ec-focused-metric .ec-metric h3{min-height:0!important}.ec-focused-metric .ec-metric-change,.ec-focused-metric .ec-metric-value small{min-height:0!important}.ec-focused-metric .ec-trend{min-height:130px}.ec-indicator-select{gap:8px}}
 .ec-debate-grid .ec-links { font-size:12px; }
 @media(max-width:760px){.ec-debate-grid{grid-template-columns:1fr;gap:16px;}}

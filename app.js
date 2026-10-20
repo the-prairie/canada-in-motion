@@ -14,6 +14,8 @@ import { wellStatusSummary, comparisonWidths, revealPanel } from "./insights.mjs
 import { AtlasMap } from "./map.js";
 import { EnergyEconomy } from "./energy-economy.js";
 import { RecordAtlas } from "./record-atlas.js";
+import { STATUSES, statusAvailability, inventoryScope, summarize as summarizeWellInventory } from "./atlas-model.mjs";
+import { validateAlbertaWellStatus } from "./alberta-status-model.mjs";
 import { fetchJSON, loadWells, loadDetail, snapshotFreshness } from "./data-store.mjs";
 const $ = (id) => document.getElementById(id);
 const esc = (s) =>
@@ -84,6 +86,7 @@ try {
 } catch {}
 let bcPromise = null, historicalPromise = null, dialogRevision = 0;
 let wellsReady = false, wellsLoading = false, wellLoadError = null, detailLoadingId = null, detailError = null;
+let wellInventory = null, albertaTotalsPromise = null, albertaTotalsError = false;
 async function boot() {
   const [
     network,
@@ -231,6 +234,7 @@ async function ensureWellData() {
   wellLoadError = null;
   try {
     data.wells.wells = await loadWells(data.catalog);
+    wellInventory = summarizeWellInventory(data.wells.wells);
     atlas.setRecords(data.wells.wells);
     wellsReady = true;
     if (state.well) {
@@ -239,6 +243,36 @@ async function ensureWellData() {
     }
   } catch (error) { wellLoadError = error.message; wellsReady = false; }
   finally { wellsLoading = false; render(); if (wellsReady && ["wells", "lab"].includes(state.view)) atlas.focus(); }
+}
+function wellRecordScope() {
+  const selected = STATUSES.findIndex(item => item.id === state.closure);
+  const availability = statusAvailability(data.catalog, state.province, wellInventory || summarizeWellInventory([]));
+  return {
+    ...inventoryScope(data.catalog, state.province),
+    status: selected >= 0 ? STATUSES[selected].label : "",
+    outsideScope: selected >= 0 && !availability[selected],
+  };
+}
+async function ensureAlbertaTotals() {
+  if (data.albertaWellStatus || albertaTotalsPromise) return albertaTotalsPromise;
+  albertaTotalsError = false;
+  albertaTotalsPromise = fetchJSON("data/alberta-well-status.json")
+    .then(value => { data.albertaWellStatus = validateAlbertaWellStatus(value); })
+    .catch(() => { albertaTotalsError = true; })
+    .finally(() => {
+      albertaTotalsPromise = null;
+      if (state.view === "wells" && state.province === "AB" && !state.well) render();
+    });
+  return albertaTotalsPromise;
+}
+function albertaCountEvidence() {
+  if (state.province !== "AB") return "";
+  const totals = data.albertaWellStatus;
+  if (!totals) return albertaTotalsError
+    ? '<p>Alberta’s provincial totals could not load. <button class="text-link" data-action="retry-alberta-totals">Retry totals</button></p>'
+    : '<p role="status">Loading AER’s provincial totals…</p>';
+  const row = totals.latest;
+  return `<p class="well-provincial-counts"><strong>${fmt(row.counts.active)} active</strong> and <strong>${fmt(row.counts.marginal)} marginal</strong> well licences in AER’s ${row.year} snapshot (${fmt(row.operating)} operating licences in total).</p><p class="small">Province-wide totals; your search and map filters do not apply.</p>`;
 }
 async function ensureSelectedDetail(record) {
   if (detailLoadingId === record.id) return;
@@ -295,7 +329,7 @@ function render() {
     clearTimeout(resultTimer);
     if (!energyEconomy) energyEconomy = new EnergyEconomy($("energy-economy"), {provinces:provinceGeometry,onChange: value => {state.economy = value;persist("push");},onInventory: province => {state.province = province;state.cohort="all";state.query="";state.orphan="all";state.closure="all";state.eventYear="all";state.eventType="all";state.exploration.area=null;chooseView("atlas");}});
     $("coverage-line").textContent = "Economic sources & methods";
-    $("snapshot-label").textContent = "GDP · 2022 observation / Energy futures · 2026 edition";
+    $("snapshot-label").textContent = "Observation dates and forecasts are labelled in each view";
     energyEconomy.update(state.economy);
     return;
   }
@@ -366,6 +400,7 @@ function render() {
     state.view === "wells" ||
     (state.view === "lab" && state.labTab === "cleanup");
   const inventoryGap = state.province !== "all" && !data.catalog.sources.some(source => source.province === state.province);
+  const recordScope = state.view === "wells" ? wellRecordScope() : {outsideScope:false};
   document.body.dataset.view = state.view;
   $("map-eyebrow").textContent = wellMode
     ? "WELL RECORDS"
@@ -373,7 +408,7 @@ function render() {
   $("map-title").textContent = wellMode
     ? state.well
       ? data.wells.wells.find((w) => w.id === state.well)?.name
-      : inventoryGap ? "Inventory not loaded" : `${fmt(filtered.length)} loaded well ${filtered.length === 1 ? "record" : "records"}`
+      : inventoryGap ? "Inventory not loaded" : recordScope.outsideScope ? `${recordScope.status} wells not mapped` : `${fmt(filtered.length)} loaded well ${filtered.length === 1 ? "record" : "records"}`
     : `${getRoute().origin} → ${getRoute().destination}`;
   $("map-subtitle").textContent = wellMode
     ? "Source coordinates · incomplete national coverage"
@@ -409,7 +444,7 @@ function render() {
     state.view === "lab" && state.labTab === "cleanup"
       ? "Saskatchewan records used in the budget scenario. Locations from the source."
       : state.view === "wells"
-        ? "Clusters count source records, not unique sites."
+        ? recordScope.outsideScope ? recordScope.detail : "Clusters count source records, not unique sites."
         : "Schematic routes. Facility markers show approximate locations.";
   if (state.layers.historical && data.historicalInfrastructure) $("map-source-label").textContent += ` Historical CanVec overlay: pipelines through ${data.historicalInfrastructure.metadata.observationRanges.pipeline.latest.slice(0,4)}, refineries through ${data.historicalInfrastructure.metadata.observationRanges.refinery.latest.slice(0,4)}; current operation unknown.`;
   $("coverage-line").textContent =
@@ -424,7 +459,7 @@ function render() {
     state.view === "journey"
       ? journeyDock()
       : wellMode
-        ? `<div class="dock-summary"><div><strong>${inventoryGap ? "Not loaded" : fmt(filtered.length)}</strong><small>${state.labTab === "cleanup" && state.view === "lab" ? "SK records eligible for this budget scenario" : "loaded records matching filters"}</small></div><button data-action="show-records">View records</button></div>`
+        ? `<div class="dock-summary"><div><strong>${inventoryGap ? "Not loaded" : recordScope.outsideScope ? "Not mapped" : fmt(filtered.length)}</strong><small>${state.labTab === "cleanup" && state.view === "lab" ? "SK records eligible for this budget scenario" : recordScope.outsideScope ? `${esc(recordScope.status)} wells outside source coverage` : "loaded records matching filters"}</small></div><button data-action="show-records">${recordScope.outsideScope ? "View coverage" : "View records"}</button></div>`
         : `<div class="dock-summary"><div><strong>${state.scenario.closed ? "Corridor unavailable" : getQuote(true).status === "partial" ? money(getQuote(true).knownSubtotal) : "Estimate unavailable"}</strong><small>Scenario subtotal · includes your assumptions</small></div><button data-action="show-details">Edit scenario</button></div>`;
   openSections.forEach((id) => {
     if ($(id)) $(id).open = true;
@@ -592,7 +627,10 @@ function wellsPanel() {
     state.eventType !== "all";
   const scope = state.province === "all" ? "Records from the sources listed in Coverage" : (data.catalog.sources.filter(s => s.province === state.province).map(s => s.title).join("; ") || "No well inventory is available in the app for this jurisdiction");
   const controls = wellFilters();
-  return `<div class="panel-head well-list-heading"><h1>Find a well</h1><div class="result-count" role="status"><span>${inventoryGap ? "Inventory not loaded" : `<strong>${fmt(filtered.length)}</strong> matching ${filtered.length === 1 ? "record" : "records"}`}</span><button class="text-link" data-action="clear-well-filters">Reset</button></div></div><div class="panel-section well-search-controls">${state.cohort === "cleanup" ? '<div class="callout">Closure-budget records. Reset to browse all inventories.</div>' : ""}${state.exploration.area ? '<div class="callout">Within the selected map area. <button class="text-link" data-action="clear-atlas-area">Clear area</button></div>' : ""}${controls}<details id="well-filter-options" class="disclosure"><summary>Status & event filters${advanced ? ` · ${esc([state.orphan !== "all" ? "orphan " + state.orphan : "", state.closure !== "all" ? state.closure : "", state.eventYear !== "all" ? state.eventYear : "", state.eventType !== "all" ? state.eventType : ""].filter(Boolean).join(" / "))}` : ""}</summary>${wellAdvancedFilters()}${eventChart()}</details><details id="well-source-scope" class="disclosure"><summary>Source coverage & status counts</summary><p class="coverage-note">${inventoryGap ? esc(provinceCoverage?.topics["well-inventory"].note || scope) : esc(scope) + ". Counts cover these sources only."} <button class="text-link" data-action="coverage">Coverage</button></p>${wellInsights(inventoryGap)}</details><button class="text-link" data-action="well-csv" ${inventoryGap ? "disabled" : ""}>Download matching records</button></div><div class="well-results" aria-label="Matching well records">${
+  const recordScope = wellRecordScope();
+  if (state.province === "AB" && recordScope.outsideScope && !data.albertaWellStatus && !albertaTotalsPromise && !albertaTotalsError) void ensureAlbertaTotals();
+  const outsideScopeMessage = `<div class="empty well-scope-gap"><h3>${esc(recordScope.status)} wells are not mapped for ${esc(provinceCoverage?.name || state.province)}</h3><p>${esc(recordScope.detail)}</p>${albertaCountEvidence()}<div class="action-row"><button class="secondary-button" data-action="clear-closure-filter">Clear status filter</button><button class="text-link" data-action="province-well-totals">${state.province === "AB" ? "View Alberta totals" : "View province inventory"}</button></div></div>`;
+  return `<div class="panel-head well-list-heading"><h1>Find a well</h1><div class="result-count" role="status"><span>${inventoryGap ? "Inventory not loaded" : recordScope.outsideScope ? `${esc(recordScope.status)} wells not mapped` : `<strong>${fmt(filtered.length)}</strong> matching ${filtered.length === 1 ? "record" : "records"}`}</span><button class="text-link" data-action="clear-well-filters">Reset</button></div></div><div class="panel-section well-search-controls">${state.cohort === "cleanup" ? '<div class="callout">Closure-budget records. Reset to browse all inventories.</div>' : ""}${state.exploration.area ? '<div class="callout">Within the selected map area. <button class="text-link" data-action="clear-atlas-area">Clear area</button></div>' : ""}${controls}<details id="well-filter-options" class="disclosure"><summary>Status & event filters${advanced ? ` · ${esc([state.orphan !== "all" ? "orphan " + state.orphan : "", state.closure !== "all" ? state.closure : "", state.eventYear !== "all" ? state.eventYear : "", state.eventType !== "all" ? state.eventType : ""].filter(Boolean).join(" / "))}` : ""}</summary>${wellAdvancedFilters()}${eventChart()}</details><details id="well-source-scope" class="disclosure"><summary>Source coverage & status counts</summary><p class="coverage-note">${inventoryGap ? esc(provinceCoverage?.topics["well-inventory"].note || scope) : esc(scope) + ". Counts cover these sources only."} <button class="text-link" data-action="coverage">Coverage</button></p>${wellInsights(inventoryGap)}</details><button class="text-link" data-action="well-csv" ${inventoryGap || recordScope.outsideScope || !filtered.length ? "disabled" : ""}>Download matching records</button></div><div class="well-results" aria-label="Matching well records">${
     filtered.length
       ? filtered
           .slice(0, resultLimit)
@@ -601,7 +639,7 @@ function wellsPanel() {
               `<button class="well-card" data-well="${esc(w.id)}"><strong>${esc(w.name)}</strong>${pill(w.province, "gray")} ${w.observationsThrough ? pill("Historical", "amber") : ""} ${pill(statusNames[w.closureStatus] || w.closureStatus, "gray")} ${w.orphanStatus === "designated" ? pill("Orphan designation recorded", "amber") : ""}<small>${esc(w.locationLabel || w.license)}<br>${esc(w.operator || "Company not supplied")}</small></button>`,
           )
           .join("")
-      : inventoryGap ? '<div class="empty"><h3>No inventory loaded</h3><p>The app has no well records for this jurisdiction yet. Its well count is unknown.</p><button class="secondary-button" data-action="coverage">View coverage details</button></div>' : '<div class="empty"><h3>No matching records</h3><p>Try another well name or ID, or clear the filters. Results cover the sources listed above.</p><button class="secondary-button" data-action="clear-well-filters">Clear all filters</button></div>'
+      : inventoryGap ? '<div class="empty"><h3>No inventory loaded</h3><p>The app has no well records for this jurisdiction yet. Its well count is unknown.</p><button class="secondary-button" data-action="coverage">View coverage details</button></div>' : recordScope.outsideScope ? outsideScopeMessage : '<div class="empty"><h3>No matching records</h3><p>Try another well name or ID, or clear the filters. Results cover the sources listed above.</p><button class="secondary-button" data-action="clear-well-filters">Clear all filters</button></div>'
   }${filtered.length > resultLimit ? '<button class="secondary-button wide" data-action="more-wells">Show 30 more records</button>' : ""}</div>`;
 }
 
@@ -1052,7 +1090,9 @@ document.addEventListener("change", (e) => {
           ? NaN
           : Number(t.value);
     if (validNumericInputs()) state = normalizeState(state);
-    render();
+    // Keep the focused controls mounted while change/blur advances keyboard focus.
+    updateLiveResults();
+    atlas.update(state, filtered);
     persist();
   }
 });
@@ -1190,6 +1230,13 @@ document.addEventListener("click", async (e) => {
     render();
   }
   if (a === "clear-atlas-area") { state.exploration.area = null; render(); persist(); }
+  if (a === "clear-closure-filter") {
+    state.closure = "all"; state.well = null;
+    render(); persist(); $("well-search")?.focus({preventScroll:true});
+    return;
+  }
+  if (a === "province-well-totals") { chooseView("atlas"); return; }
+  if (a === "retry-alberta-totals") { void ensureAlbertaTotals(); return; }
   if (a === "clear-well-filters") {
     Object.assign(state, {
       exploration: {...state.exploration, area:null},

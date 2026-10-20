@@ -7,14 +7,17 @@ const bounded = (value, low, high) => Math.min(high, Math.max(low, value));
 export function normalizeEconomyState(input = {}) {
   const raw = input && typeof input === 'object' ? input : {};
   return {
-    section: ['income', 'trade', 'supply', 'futures', 'oil'].includes(raw.section) ? raw.section : 'income',
+    section: ['income', 'trade', 'supply', 'futures', 'oil', 'outlook'].includes(raw.section) ? raw.section : 'income',
     display: ['bars', 'map', 'table'].includes(raw.display) ? raw.display : 'bars',
+    futureIndicator: ['wti','henry-hub','oil-production','gas-production','electricity-generation','end-use-demand'].includes(raw.futureIndicator)?raw.futureIndicator:'electricity-generation',
     metric: raw.metric === 'retail' ? 'retail' : 'production',
     region: raw.section==='supply'&&(!ECONOMY_REGIONS.includes(raw.region)||raw.region==='CA')?'AB':ECONOMY_REGIONS.includes(raw.region)?raw.region:'CA',
     scenario: ECONOMY_SCENARIOS.includes(raw.scenario) ? raw.scenario : 'Current Measures',
     year: bounded(Math.round(number(raw.year, 2030)), 2023, 2050),
     oilShock: bounded(number(raw.oilShock, 10), -20, 20),
     duration: raw.duration === 'temporary' ? 'temporary' : 'persistent',
+    tradePanelId: typeof raw.tradePanelId==='string'&&/^[a-zA-Z0-9_-]{1,80}$/.test(raw.tradePanelId)?raw.tradePanelId:null,
+    tradeViewMode: raw.tradeViewMode==='all'?'all':'focus',
     tradeCommodity: ['oil','gas','electricity'].includes(raw.tradeCommodity)?raw.tradeCommodity:'oil',
     tradeYear: bounded(Math.round(number(raw.tradeYear,2024)),2000,2100),
     priceShock: bounded(number(raw.priceShock,10),-20,20),
@@ -28,6 +31,9 @@ export function normalizeEconomyState(input = {}) {
     historyOilChange: [-60,-40,-20,-10,0,10,20,40,60,100].includes(raw.historyOilChange)?raw.historyOilChange:10,
     historyYear: Number.isInteger(raw.historyYear)&&raw.historyYear>=1980&&raw.historyYear<=2100?raw.historyYear:null,
     historyHorizon: [0,1,2].includes(raw.historyHorizon)?raw.historyHorizon:2,
+    forecastYear: Number.isInteger(raw.forecastYear)&&raw.forecastYear>=2000&&raw.forecastYear<=2100?raw.forecastYear:null,
+    forecastRegions: Array.isArray(raw.forecastRegions)?[...new Set(raw.forecastRegions.filter(code=>ECONOMY_REGIONS.includes(code)&&code!=='CA'))]:[],
+    forecastFocus: ECONOMY_REGIONS.includes(raw.forecastFocus)&&raw.forecastFocus!=='CA'?raw.forecastFocus:'AB',
     transferSet: typeof raw.transferSet==='string'&&/^[a-z0-9-]{1,80}$/.test(raw.transferSet)?raw.transferSet:null,
   };
 }

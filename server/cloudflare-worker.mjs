@@ -3,6 +3,7 @@ import {normalizeEconomyState, summarizeEconomy, validateEconomy} from '../econo
 import {createJevDecider,JevError,JEV_ATTEMPT_RESERVE_USD} from './jev-decisions.mjs';
 import {validateEnergyFlows} from '../energy-flow-model.mjs';
 import {validateProvincialImpacts} from '../provincial-impact-model.mjs';
+import {validateProvincialForecast} from '../provincial-forecast-model.mjs';
 
 const SITE_ORIGIN = 'https://the-prairie.github.io';
 const DATA_ROOT = SITE_ORIGIN + '/canada-in-motion/data/';
@@ -64,6 +65,20 @@ async function visitorID(ip, secret, now) {
 let evidenceCache;
 let networkCache;
 let tradeCache;
+let forecastCache;
+export async function loadPublishedForecast(fetchImpl=fetch,now=Date.now()) {
+  if(forecastCache?.expires>now)return forecastCache.data;
+  try{
+    const response=await fetchImpl(DATA_ROOT+'provincial-forecasts.json',{signal:AbortSignal.timeout(8000),redirect:'manual',headers:{Accept:'application/json'}});
+    if(!response.ok)return null;
+    const data=await boundedJSON(response,4*1048576,8000);
+    validateProvincialForecast(data);
+    const age=now-Date.parse(data.asOf);
+    if(!Number.isFinite(age)||age>8*DAY||age < -DAY)return null;
+    forecastCache={data,expires:now+300000};
+    return data;
+  }catch{return null;}
+}
 export async function loadPublishedTradeEvidence(fetchImpl=fetch,now=Date.now()) {
   if(tradeCache?.expires>now)return tradeCache;
   const read=async(file,validate)=>{
@@ -187,9 +202,9 @@ export class AnalysisQuota {
       const selected=providerConfig(env);
       const workspace=workspaceConfig(env);
       const provider=selected.provider==='cloudflare'?createCloudflareProvider({ai:env.AI}):createOpenAIProvider({apiKey:env.OPENAI_API_KEY});
-      const [network,trade]=workspace.workspaceEnabled?await Promise.all([loadPublishedNetwork(),loadPublishedTradeEvidence()]):[undefined,{}];
+      const [network,trade,forecast]=workspace.workspaceEnabled?await Promise.all([loadPublishedNetwork(),loadPublishedTradeEvidence(),loadPublishedForecast()]):[undefined,{},undefined];
       const decider=workspace.jevEnabled?createJevDecider({apiKey:env.TYPESAFE_API_KEY,reserveAttempt:amount=>this.reserveJev(amount)}):undefined;
-      const analyze=createEnergyAnalyzer({data,debate,network,flows:trade.flows,fiscal:trade.fiscal,decider,workspaceEnabled:workspace.workspaceEnabled,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider,model:selected.model,timeoutMs:60000,answerMode:selected.provider==='cloudflare'?'claims':'prose'});
+      const analyze=createEnergyAnalyzer({data,debate,network,flows:trade.flows,fiscal:trade.fiscal,forecast,decider,workspaceEnabled:workspace.workspaceEnabled,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider,model:selected.model,timeoutMs:60000,answerMode:selected.provider==='cloudflare'?'claims':'prose'});
       const result=await analyze(input);
       return json({...result,provider:selected.provider,dataVersion:data.generatedAt});
     } catch(error) {

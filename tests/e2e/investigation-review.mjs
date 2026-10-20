@@ -29,6 +29,8 @@ const base=process.env.TEST_URL||'http://127.0.0.1:4188/';
 const url=base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy:{section:'trade',region:'CA',tradeCommodity:'electricity',tradeYear:2024}}));
 const native=page.locator('#ec-trade-workspace');
 const dynamic=page.locator('#ec-dynamic-workspace');
+const actions=async host=>{const menu=host.locator('.hw-action-menu');if(!await menu.evaluate(e=>e.open))await menu.locator('summary').click();};
+const allViews=async host=>{await actions(host);const button=host.getByRole('button',{name:'All views',exact:true});if(await button.getAttribute('aria-pressed')!=='true')await button.click();else await host.locator('.hw-action-menu summary').click();};
 const openLibrary=async host=>{if(!await host.locator('.hw-saved').evaluate(e=>e.open))await host.locator('.hw-saved summary').click();};
 const ask=async question=>{if(!await page.locator('.ec-trade-question').evaluate(e=>e.open))await page.locator('.ec-trade-question > summary').click();await page.getByLabel('Your question',{exact:true}).fill(question);await page.getByRole('button',{name:'Analyse',exact:true}).click();await dynamic.locator('.hw-shell').waitFor();};
 try {
@@ -48,9 +50,9 @@ try {
   assert.equal(await native.locator('.hw-matrix button[tabindex="0"]').count(),1,'filtering must retain a keyboard entry point');
   checks.push('matrix cardinal navigation, filtering, exact small-value distinction and desktop fit');
 
-  await native.getByRole('button',{name:'Pin this comparison',exact:true}).click();
+  await allViews(native);await actions(native);await native.getByRole('button',{name:'Pin this comparison',exact:true}).click();
   await native.getByLabel('Energy price change',{exact:true}).fill('-10');
-  await native.getByRole('button',{name:'Save investigation',exact:true}).click();
+  await actions(native);await native.getByRole('button',{name:'Save investigation',exact:true}).click();
   await native.getByText('Saved on this device with its original data.',{exact:true}).waitFor();
   await native.getByLabel('Energy price change',{exact:true}).fill('10');
   await openLibrary(native);await native.locator('.hw-saved li button').first().click();
@@ -70,7 +72,7 @@ try {
   await pairEntry.focus();const beforePair=await page.evaluate(()=>document.activeElement.getAttribute('aria-label'));
   await page.keyboard.press('ArrowRight');
   assert.notEqual(await page.evaluate(()=>document.activeElement.getAttribute('aria-label')),beforePair,'the reverse flow must remain keyboard reachable when two filtered cells share neither row nor column');
-  await dynamic.getByRole('button',{name:'Pin this comparison',exact:true}).click();
+  await actions(dynamic);await dynamic.getByRole('button',{name:'Pin this comparison',exact:true}).click();
   await dynamic.getByLabel('Trade year',{exact:true}).selectOption('2023');
   assert.ok(await dynamic.locator('.hw-branch-comparison').isVisible(),'trade-only answers must support branch comparison');
   assert.doesNotMatch(await dynamic.locator('.hw-current-question').innerText(),/price change/);
@@ -87,7 +89,7 @@ try {
   assert.doesNotMatch(await dynamic.locator('.hw-current-question').innerText(),/2024|price change/);
   assert.equal(await dynamic.getByLabel('Trade year',{exact:true}).count(),0);
   assert.equal(await dynamic.getByRole('button',{name:'Pin this comparison',exact:true}).count(),0);
-  await dynamic.getByRole('button',{name:'Save investigation',exact:true}).click();
+  await actions(dynamic);await dynamic.getByRole('button',{name:'Save investigation',exact:true}).click();
   await dynamic.getByText('Saved on this device with its original data.',{exact:true}).waitFor();
   await page.reload();await native.locator('.hw-shell').waitFor();await openLibrary(native);
   await native.getByRole('button',{name:/^Review physical-only July observations\./}).click();

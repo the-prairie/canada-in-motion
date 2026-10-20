@@ -1,0 +1,48 @@
+{
+  "verifiedAt": "2026-10-20T08:01:03.360081+00:00",
+  "scope": "Focused data journeys, question-driven views and provincial GDP outlook",
+  "status": "local production artifact verified; public deployment pending",
+  "forecastDataVersion": "156c3939d0a89df609ba",
+  "checks": {
+    "nodePassed": 306,
+    "pythonPassed": 83,
+    "workerEdgePassed": 23,
+    "independentNumericalChecks": 2380,
+    "independentNumericalComparisons": 2340,
+    "headlessBrowserSuites": [
+      "tests/e2e/investigations.mjs",
+      "tests/e2e/investigation-review.mjs",
+      "tests/e2e/economic-research.mjs",
+      "tests/e2e/research-late-status.mjs",
+      "tests/e2e/provincial-forecast.mjs",
+      "tests/e2e/forecast-ai.mjs",
+      "tests/e2e/focused-views.mjs",
+      "tests/e2e/well-scope.mjs",
+      "tests/e2e/scenario-keyboard.mjs"
+    ],
+    "publicBetaGate": "passed",
+    "browserMode": "headless Chromium; desktop and 390px mobile"
+  },
+  "independentReviews": [
+    "docs/UX-JOURNEY-AUDIT.md",
+    "docs/PROVINCIAL-FORECAST-VALIDATION.md",
+    "docs/PROVINCIAL-FORECAST-INDEPENDENT-AUDIT.json"
+  ],
+  "delivered": [
+    "One focused result with named related views and optional All views",
+    "Collapsed question entry and supporting prose in ordinary reading journeys",
+    "Editable, undoable and saved source-pinned generative views",
+    "One selected Energy Futures indicator with persistent URL state",
+    "Inline dataset retry and mobile action-menu dismissal",
+    "Alberta active and marginal licence totals separate from unmapped status",
+    "Stable keyboard editing of cleanup-budget assumptions",
+    "Current-year and next-year real GDP growth for all ten provinces, with historical checks and explicit missing territories"
+  ],
+  "limitations": [
+    "Browser AI tests use intercepted provider endpoints and the real analyzer; they do not certify a live provider response or a completed production Turnstile challenge.",
+    "Historical forecast assessment uses latest-vintage data with simulated release timing, not original historical vintages.",
+    "GDP forecasts are predictive; they do not identify causal provincial effects of changing energy prices.",
+    "Historical-error ranges have uneven coverage and are not guarantees.",
+    "No screen-reader, Safari/Firefox, real-touch-device or full WCAG conformance audit was completed."
+  ]
+}

@@ -207,12 +207,18 @@ test('workspace findings keep missing evidence first and national and regional r
   assert.match(national.blocks[0].text,/all 13 selected provinces and territories/);assert.ok(national.blocks[0].text.length<700);
 });
 
-test('explicit GDP forecasts and unavailable years show dated context even if the planner calls them available',()=>{
+test('missing forecast evidence and unavailable historical years stay unavailable even if the planner approves',()=>{
   for(const question of ['Forecast energy GDP across Canada in 2040.','Compare GDP in Alberta and Ontario in 2030.','Show Alberta GDP for 2024.','Show Alberta GDP for 1990.','Show Alberta GDP for 1999.','Show Alberta GDP for 2100.']){
     const workspace=buildWorkspacePanels({...input,question,investigation:{...investigation,regions:['CA'],requestedMeasure:'available'}});
     assert.equal(workspace.plan.requestedMeasure,'other-unavailable');assert.equal(workspace.panels[0].type,'coverage-note');
     assert.ok(workspace.panels.filter(panel=>panel.type!=='coverage-note').every(panel=>panel.role==='context'));
-    const analysis=buildWorkspaceAnalysis(workspace);assert.match(analysis.blocks[0].text,/GDP data cover 2022/);assert.match(analysis.blocks[1].text,/Observed energy-sector GDP in 2022/);
+    const analysis=buildWorkspaceAnalysis(workspace);
+    if(question.startsWith('Forecast')){
+      assert.match(analysis.blocks[0].text,/GDP forecast data could not be loaded/);
+      assert.ok(!workspace.panels.some(panel=>panel.type==='gdp-forecast'));
+    }else{
+      assert.match(analysis.blocks[0].text,/GDP data cover 2022/);assert.match(analysis.blocks[1].text,/Observed energy-sector GDP in 2022/);
+    }
   }
   const current=buildWorkspacePanels({...input,question:'Compare energy GDP across Canada for 2022.',investigation:{...investigation,regions:['CA']}});
   assert.equal(current.plan.requestedMeasure,'available');

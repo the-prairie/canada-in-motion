@@ -5,6 +5,7 @@ const context=await browser.newContext({viewport:{width:1440,height:1000},reduce
 const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
 const base=process.env.TEST_URL||'http://127.0.0.1:4188/';
 const url=base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy:{section:'trade',region:'CA',tradeCommodity:'electricity',tradeYear:2024}}));
+const actions=async()=>{const menu=page.locator('.hw-action-menu');if(!await menu.evaluate(e=>e.open))await menu.locator('summary').click();};
 try{
  await page.goto(url);await page.getByRole('table',{name:'Electricity · 2024 · million current CAD',exact:true}).waitFor();
  assert.equal(await page.locator('.hw-matrix tbody tr').count(),13);
@@ -13,11 +14,12 @@ try{
  assert.match(await page.locator('.hw-link-detail').innerText(),/60.209/);
  await page.getByRole('button',{name:'Show on map',exact:true}).click();assert.ok(await page.locator('.hw-trade-map').isVisible());
  await page.getByRole('button',{name:'Show in matrix',exact:true}).click();
- await page.getByRole('button',{name:'Pin this comparison',exact:true}).click();
+ await actions();await page.getByRole('button',{name:'All views',exact:true}).click();
+ await actions();await page.getByRole('button',{name:'Pin this comparison',exact:true}).click();
  await page.getByLabel('Energy price change',{exact:true}).fill('-10');
  assert.match(await page.locator('.hw-branch-comparison').innerText(),/Current: Electricity · 2024 · -10%/);
  await page.locator('.hw-robustness summary').click();assert.match(await page.locator('.hw-robustness').innerText(),/2022/);
- await page.getByRole('button',{name:'Save investigation',exact:true}).click();await page.getByText('Saved on this device with its original data.',{exact:true}).waitFor();
+ await actions();await page.getByRole('button',{name:'Save investigation',exact:true}).click();await page.getByText('Saved on this device with its original data.',{exact:true}).waitFor();
  await page.reload();await page.locator('.hw-saved summary').click();
  assert.equal(await page.locator('.hw-saved li').count(),1);
  await page.locator('.hw-saved li button').first().click();

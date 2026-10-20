@@ -2,11 +2,13 @@ import {JEV_MODEL} from './jev-decisions.mjs';
 import {selectInfrastructure} from '../infrastructure-model.mjs';
 import {buildTradePanels} from '../trade-workspace-model.mjs';
 import {inspectEnergyTradeQuestion,isEnergyTradeClause} from './energy-trade-request.mjs';
+import {summarizeProvincialForecast} from '../provincial-forecast-model.mjs';
+import {inspectProvincialForecastQuestion} from './provincial-forecast-request.mjs';
 
 export const WORKSPACE_SCHEMA_VERSION=1;
 const REGIONS=['CA','AB','BC','SK','MB','ON','QC','NB','NS','PE','NL','YT','NT','NU'];
 export const WORKSPACE_METRICS=['wti','wcs','brent','cls','henry-hub','nit','oil-production','gas-production','electricity-generation','end-use-demand','electricity-price','gas-price'];
-const TOPICS=['gdp','scenario','infrastructure','oil-sensitivity','energy-flows','provincial-impact','unavailable'];
+const TOPICS=['gdp','gdp-forecast','scenario','infrastructure','oil-sensitivity','energy-flows','provincial-impact','unavailable'];
 const MEASURES=['available','measured-flow','provincial-price-impact','beneficiary-distribution','other-unavailable'];
 const enumArray=(values,maximum)=>({type:'array',minItems:1,maxItems:maximum,items:{type:'string',enum:values}});
 export const INVESTIGATION_SCHEMA={type:'object',properties:{regions:enumArray(REGIONS,14),topics:enumArray(TOPICS,3),metricIds:{...enumArray(WORKSPACE_METRICS,3),minItems:0},includeMap:{type:'boolean'},requestedMeasure:{type:'string',enum:MEASURES,description:'Use available for observed energy GDP, published CER generation or production comparisons, and infrastructure locations. Use measured-flow only when the user asks for quantities transported between places, not for quantities produced in each province.'}},required:['regions','topics','metricIds','includeMap','requestedMeasure'],additionalProperties:false};
@@ -117,12 +119,13 @@ const COVERAGE={
   'other-unavailable':{title:'The requested measure is not available',message:'The available datasets do not establish this requested result. Any accompanying view provides context only.',sourceKind:'economy'},
 };
 const oilFields={nominalGdpPct:['Nominal GDP','% change'],realGdpPct:['Real GDP','% change'],nominalGdpBillionCad:['Nominal GDP','billion CAD'],federalRevenueBillionCad:['Federal revenue','billion CAD'],federalBalanceBillionCad:['Federal budget balance','billion CAD']};
-export function buildWorkspacePanels({data,network,flows,fiscal,summary,summarize,state,investigation,question}) {
+export function buildWorkspacePanels({data,network,flows,fiscal,forecast,summary,summarize,state,investigation,question}) {
   const plan=validateInvestigation(investigation);
   plan.regions=requestedRegions(question,plan.regions);
   if(!plan.regions.length){plan.regions=['CA'];plan.topics=['unavailable'];plan.requestedMeasure='other-unavailable';}
   if(/\b(map|mapped|mapping|carte|cartograph\w*)\b/i.test(question))plan.includeMap=true;
-  const gdpPeriodGap=unsupportedGDPPeriod(question,plan,data.gdp.year);
+  const forecastRequest=inspectProvincialForecastQuestion(question,forecast);
+  const gdpPeriodGap=!forecastRequest&&unsupportedGDPPeriod(question,plan,data.gdp.year);
   plan.requestedMeasure=gdpPeriodGap?'other-unavailable':missingMeasure(question)||repairFlowClassification(question,plan,data.gdp.year);
   const tradeRequest=inspectEnergyTradeQuestion(question,flows,plan.energyTrade,plan.topics,fiscal);
   if(tradeRequest){
@@ -132,6 +135,21 @@ export function buildWorkspacePanels({data,network,flows,fiscal,summary,summariz
     const requestedTopics=[...(tradeRequest.includeFlows?['energy-flows']:[]),...(tradeRequest.includeImpacts?['provincial-impact']:[])];
     plan.topics=unique([...requestedTopics,...plan.topics.filter(topic=>topic!=='unavailable'&&!(tradeRequest.includeImpacts&&topic==='oil-sensitivity'&&!/\b(national|canada|federal)\b/i.test(question)))]).slice(0,3);
   }
+  if(forecastRequest){
+    if(!explicitRegions(question).length&&/\b(canada|canadian|national)\b/i.test(question))plan.regions=['CA'];
+    // Forecast recognition is server-owned. A planner cannot relabel observed
+    // energy-sector GDP or a CER production path as a whole-economy forecast.
+    const observedRequested=/\b(observed|historical|past|current contribution)\b/i.test(question);
+    const scenarioRequested=/\b(production|generation|cer|energy futures)\b/i.test(question);
+    plan.topics=unique([...(forecastRequest.supported?['gdp-forecast']:[]),...plan.topics.filter(topic=>
+      topic!=='gdp-forecast'&&topic!=='unavailable'&&(topic!=='gdp'||observedRequested)&&(topic!=='scenario'||scenarioRequested))]).slice(0,3);
+    if(!plan.topics.length)plan.topics=['unavailable'];
+    plan.requestedMeasure=forecastRequest.supported&&!tradeRequest?.unsupportedOutcome&&!tradeRequest?.physicalBilateral?'available':'other-unavailable';
+    if(forecastRequest.nationalAggregateRequested)plan.requestedMeasure='other-unavailable';
+  }else{
+    plan.topics=plan.topics.filter(topic=>topic!=='gdp-forecast');
+    if(!plan.topics.length)plan.topics=['gdp'];
+  }
   if(plan.regions.length>1)plan.regions=plan.regions.filter(code=>code!=='CA');
   const regions=plan.regions.includes('CA')?data.gdp.regions.map(row=>row.code):plan.regions;
   const allGDP=summary.gdp.ranking.map(row=>({code:row.code,name:row.name,value:row.energy,sharePct:row.sharePct,nationalSharePct:row.nationalEnergySharePct,energyVector:row.energyVector,totalVector:row.totalVector}));
@@ -139,12 +157,14 @@ export function buildWorkspacePanels({data,network,flows,fiscal,summary,summariz
   const role=contextual?'context':'answer';
   const panels=[];
   const limitations=[];
-  const registry=new Map([...data.sources,...(network?.sources||[]),...(flows?.sources||[]),...(fiscal?.sources||[])].map(source=>[source.id,source]));
+  const registry=new Map([...data.sources,...(network?.sources||[]),...(flows?.sources||[]),...(fiscal?.sources||[]),...(forecast?.sources||[])].map(source=>[source.id,source]));
   let coverage=gdpPeriodGap?{title:'GDP is unavailable for the requested period',message:`This app's GDP data cover ${data.gdp.year}. They do not provide GDP for other years or future forecasts. The dated GDP comparison provides context.`,sourceKind:'gdp'}:COVERAGE[plan.requestedMeasure];
   if(tradeRequest?.physicalBilateral)coverage={title:'Bilateral physical volumes are not published here',message:'The physical sources give provincial totals or net regional transfers, without identifying the partner province. The trade map shows modelled supplier-to-purchaser dollar values. It cannot establish a physical route or bilateral shipment volume.',sourceKind:'trade'};
   else if(tradeRequest?.unsupportedOutcome)coverage={title:'The requested economic or emissions effect is not modelled',message:'Published trade values and physical balances are available. The price tool calculates fixed-quantity trade receipts and purchase costs, plus selected published provincial budget sensitivities. These separate channels do not predict provincial GDP, jobs, emissions, profit or household income and must not be added together.',sourceKind:'trade'};
+  if(forecastRequest&&!forecastRequest.supported)coverage={title:'This GDP forecast is not available',message:forecastRequest.reason,sourceKind:'forecast'};
+  else if(forecastRequest?.nationalAggregateRequested)coverage={title:'A national GDP forecast is not supplied',message:'The available outlook predicts growth separately for each province. It does not supply a forecast for Canada as a whole. The provincial outlooks provide context; their growth rates cannot be added, and chained-dollar provincial GDP levels must not be summed to create a national forecast.',sourceKind:'forecast'};
   if(coverage){
-    const sourceIds=coverage.sourceKind==='trade'?(flows?.sources||[]).map(source=>source.id):coverage.sourceKind==='network'?(network?.sources||[]).filter(source=>source.id!=='natural-earth').map(source=>source.id):coverage.sourceKind==='gdp'?[data.gdp.sourceId]:unique([data.gdp.sourceId,data.oilSensitivity.sourceId]);
+    const sourceIds=coverage.sourceKind==='forecast'?(forecast?.sources||[]).map(source=>source.id):coverage.sourceKind==='trade'?(flows?.sources||[]).map(source=>source.id):coverage.sourceKind==='network'?(network?.sources||[]).filter(source=>source.id!=='natural-earth').map(source=>source.id):coverage.sourceKind==='gdp'?[data.gdp.sourceId]:unique([data.gdp.sourceId,data.oilSensitivity.sourceId]);
     panels.push({id:'coverage',type:'coverage-note',title:coverage.title,role:'answer',sourceIds,message:coverage.message});
     limitations.push(coverage.message);
   }
@@ -169,6 +189,17 @@ export function buildWorkspacePanels({data,network,flows,fiscal,summary,summariz
   };
   for(const topic of plan.topics){
     if(topic==='gdp')addGDP();
+    if(topic==='gdp-forecast'&&forecastRequest?.supported){
+      for(const year of forecastRequest.years){
+        const result=summarizeProvincialForecast(forecast,{regions:plan.regions,year});
+        const missing=result.rows.filter(row=>row.status!=='available');
+        panels.push({id:`gdp-forecast-${year}`,type:'gdp-forecast',title:'Provincial GDP outlook',role,
+          sourceIds:result.sources.map(source=>source.id),period:String(year),unit:'annual real GDP growth (%)',
+          year,regions:[...plan.regions],summary:result,
+          note:'Predictive whole-economy GDP growth from observed indicators. Historical validation uses revised data with publication lags; it does not estimate causal energy-price effects.'});
+        if(missing.length)limitations.push(`No GDP forecast is available for ${missing.map(row=>row.name).join(', ')} because comparable monthly labour indicators are missing.`);
+      }
+    }
     if(topic==='scenario'){
       const metrics=plan.metricIds.length?plan.metricIds:['electricity-generation'];
       for(const metricId of metrics){
@@ -206,31 +237,32 @@ export function buildWorkspacePanels({data,network,flows,fiscal,summary,summariz
   for(const panel of panels.filter(panel=>!selected.includes(panel)))limitations.push(`${panel.title} is omitted from this result to keep the requested comparisons together. Its source data remain available.`);
   const sourceIds=new Set([...selected.flatMap(panel=>panel.sourceIds),...(tradeSelection?[...(flows?.sources||[]),...(fiscal?.sources||[])].map(source=>source.id):[])]);
   const sources=[...registry.values()].filter(source=>sourceIds.has(source.id));
-  return {schemaVersion:WORKSPACE_SCHEMA_VERSION,dataVersion:data.generatedAt,economySnapshot:structuredClone(data),sourceHashes:Object.fromEntries(sources.filter(source=>source.sha256).map(source=>[source.id,source.sha256])),plan:{...plan,year:state.year,scenario:state.scenario,oilShock:state.oilShock,duration:state.duration,...tradeSelection},panels:selected,sources,limitations:unique(limitations),...(tradeSelection?{tradeSnapshot:structuredClone(flows),...(fiscal?{fiscalSnapshot:structuredClone(fiscal)}:{})}:{}),...(network&&selected.some(panel=>panel.type==='infrastructure-map')?{networkSnapshot:{routes:network.routes,facilities:network.facilities,sources:network.sources}}:{})};
+  return {schemaVersion:WORKSPACE_SCHEMA_VERSION,dataVersion:data.generatedAt,economySnapshot:structuredClone(data),sourceHashes:Object.fromEntries(sources.filter(source=>source.sha256).map(source=>[source.id,source.sha256])),plan:{...plan,year:state.year,scenario:state.scenario,oilShock:state.oilShock,duration:state.duration,...tradeSelection},panels:selected,sources,limitations:unique(limitations),...(selected.some(panel=>panel.type==='gdp-forecast')?{forecastSnapshot:structuredClone(forecast)}:{}),...(tradeSelection?{tradeSnapshot:structuredClone(flows),...(fiscal?{fiscalSnapshot:structuredClone(fiscal)}:{})}:{}),...(network&&selected.some(panel=>panel.type==='infrastructure-map')?{networkSnapshot:{routes:network.routes,facilities:network.facilities,sources:network.sources}}:{})};
 }
 
-export async function createEnergyWorkspace({data,network,flows,fiscal,summary,summarize,state,investigation,question,decider,signal}) {
+export async function createEnergyWorkspace({data,network,flows,fiscal,forecast,summary,summarize,state,investigation,question,decider,signal}) {
   let selected,planStatus='valid';
   try{selected=validateInvestigation(investigation);}catch{selected=fallbackInvestigation(question,state);planStatus='rules-fallback';}
-  const workspace=buildWorkspacePanels({data,network,flows,fiscal,summary,summarize,state,investigation:selected,question});
+  const workspace=buildWorkspacePanels({data,network,flows,fiscal,forecast,summary,summarize,state,investigation:selected,question});
   workspace.decision={provider:'rules',model:null,status:decider?'unavailable':'disabled',planStatus};
   if(!decider)return workspace;
   const questions={
-    presentation:{type:'choice',instructions:'Choose the most useful first view for this question, using only supplied panels. Choose geographic for location questions, comparison for magnitude comparisons, scenario for published future paths, and evidence when a requested measure is missing. Maps with no volumes cannot answer measured-flow questions.',criteria:{geographic:'A supplied geographic map is the most relevant first view.',comparison:'A supplied provincial GDP comparison is the most relevant first view.',scenario:'A supplied scenario comparison or national oil sensitivity is the most relevant first view.',evidence:'The coverage note must lead because the requested result is not established.'}},
-    coverage:{type:'choice',instructions:'Judge whether the supplied panel data answer the requested measure. Geometry is not measured flow. GDP contribution does not identify recipients. National oil sensitivity cannot be allocated to provinces. CER scenario comparisons are not isolated price effects.',criteria:{supported:'The supplied data answer the requested measure and scope.',partial:'The supplied data provide context or part of the answer, with missing requested evidence.',unsupported:'None of the supplied data establish the requested result.'}},
+    presentation:{type:'choice',instructions:'Choose the most useful first view for this question, using only supplied panels. Choose geographic for location questions, comparison for magnitude comparisons, scenario for GDP outlooks or published future paths, and evidence when a requested measure is missing. Maps with no volumes cannot answer measured-flow questions.',criteria:{geographic:'A supplied geographic map is the most relevant first view.',comparison:'A supplied provincial GDP comparison or outlook is the most relevant first view.',scenario:'A supplied GDP outlook, scenario comparison or national oil sensitivity is the most relevant first view.',evidence:'The coverage note must lead because the requested result is not established.'}},
+    coverage:{type:'choice',instructions:'Judge whether the supplied panel data answer the requested measure. Geometry is not measured flow. GDP contribution does not identify recipients. National oil sensitivity cannot be allocated to provinces. CER scenario comparisons are not isolated price effects. A GDP outlook predicts whole-economy growth from observed indicators; it is neither an observation nor an energy-price intervention. Missing territory forecasts cannot count as available.',criteria:{supported:'The supplied data answer the requested measure and scope.',partial:'The supplied data provide context or part of the answer, with missing requested evidence.',unsupported:'None of the supplied data establish the requested result.'}},
   };
   try{
     const decisionSignal=signal?AbortSignal.any([signal,AbortSignal.timeout(3000)]):AbortSignal.timeout(3000);
-    const compactPanels=workspace.panels.map(panel=>({id:panel.id,type:panel.type,title:panel.title,role:panel.role,period:panel.period,unit:panel.unit,sourceIds:panel.sourceIds,...(panel.message?{message:panel.message}:{}),...(panel.note?{note:panel.note}:{})}));
+    const compactPanels=workspace.panels.map(panel=>({id:panel.id,type:panel.type,title:panel.title,role:panel.role,period:panel.period,unit:panel.unit,sourceIds:panel.sourceIds,...(panel.message?{message:panel.message}:{}),...(panel.note?{note:panel.note}:{}),...(panel.type==='gdp-forecast'?{unavailableRegions:panel.summary.rows.filter(row=>row.status!=='available').map(row=>row.region)}:{})}));
     const result=await decider({state:{question,plan:workspace.plan,panels:compactPanels},questions,signal:decisionSignal});
     const presentation=result.answers.presentation.choice;
     const coverage=result.answers.coverage.choice;
-    const order={geographic:['province-map','infrastructure-map','energy-trade'],comparison:['province-comparison','energy-trade','energy-transfers'],scenario:['scenario-comparison','oil-sensitivity','provincial-impact'],evidence:['coverage-note']}[presentation];
+    const order={geographic:['province-map','infrastructure-map','energy-trade'],comparison:['province-comparison','gdp-forecast','energy-trade','energy-transfers'],scenario:['gdp-forecast','scenario-comparison','oil-sensitivity','provincial-impact'],evidence:['coverage-note']}[presentation];
     workspace.panels=workspace.panels.map((panel,index)=>({panel,index})).sort((a,b)=>{
       const rank=item=>item.panel.type==='coverage-note'?0:order.includes(item.panel.type)?1:2;
       return rank(a)-rank(b)||a.index-b.index;
     }).map(item=>item.panel);
-    workspace.decision={provider:'jev',model:JEV_MODEL,status:'accepted',planStatus,presentation,coverage:workspace.plan.requestedMeasure==='available'?coverage:'partial'};
+    const missingForecast=workspace.panels.some(panel=>panel.type==='gdp-forecast'&&panel.summary.rows.some(row=>row.status!=='available'));
+    workspace.decision={provider:'jev',model:JEV_MODEL,status:'accepted',planStatus,presentation,coverage:workspace.plan.requestedMeasure==='available'&&!missingForecast?coverage:'partial'};
   }catch(error){
     if(signal?.aborted)throw error;
     workspace.decision.status=error?.code==='budget_exhausted'?'budget-exhausted':'unavailable';
@@ -251,6 +283,12 @@ export function buildWorkspaceAnalysis(workspace) {
   const blocks=panels.map(panel=>{
     let text;
     if(panel.type==='coverage-note')text=panel.message;
+    if(panel.type==='gdp-forecast'){
+      const available=panel.summary.rows.filter(row=>row.status==='available');
+      const selected=available.slice(0,4);
+      const missing=panel.summary.rows.filter(row=>row.status!=='available');
+      text=`The ${panel.year} outlook predicts annual real GDP growth at basic prices: ${selected.length?selected.map(row=>`${row.name} ${formatValue(row.predictionPct)}%${row.lowerPct===null?'':` (historical-error range ${formatValue(row.lowerPct)}% to ${formatValue(row.upperPct)}%)`}`).join('; '):'no supported forecast for the selected jurisdictions'}. ${available.length>4?'The table includes all selected provinces. ':''}${missing.length?`Comparable monthly indicators are unavailable for ${missing.map(row=>row.name).join(', ')}. `:''}These are predictions from observed indicators, not measured outcomes or effects of changing energy prices. Historical errors and range coverage are shown for each province; revised source data prevent a fully real-time validation.`;
+    }
     if(panel.type==='province-comparison'||panel.type==='province-map'){
       const selection=selectedRows(panel.rows,'value');
       text=`Observed energy-sector GDP in ${panel.period} was ${selection.rows.map(row=>`${formatValue(row.value)} for ${row.name}`).join('; ')}. Values are in ${panel.unit}.${selection.tail} GDP measures value added where production occurs, not who receives the income.`;
