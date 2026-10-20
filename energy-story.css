@@ -1,0 +1,189 @@
+.ec-context-explore {padding:10px 0;min-height:65px}
+.ec-context-explore nav {align-items:center}
+.ec-data-menu {position:relative}
+#energy-economy .ec-data-menu>summary {padding:12px 18px;font-size:14px}
+.ec-data-menu>div {position:absolute;left:0;top:100%;z-index:15;width:230px;display:grid;background:var(--paper);border:1px solid var(--line);box-shadow:0 8px 24px #24312a14;padding:8px}
+.ec-data-menu>div button {text-align:left}
+.es-shell {--es-green:#286b5d;--es-soft:#e4ebe3;--es-rust:#a24c32;max-width:1200px;margin:auto}
+.es-shell button,.es-shell input,.es-shell select {font:inherit}
+.es-shell button {border:0;background:none;color:inherit;cursor:pointer;min-height:44px;padding:8px 12px}
+.es-shell button:disabled {opacity:.4;cursor:default}
+.es-shell input:focus-visible,.es-shell svg [role=button]:focus-visible {outline:2px solid var(--es-green);outline-offset:4px}
+.es-heading {display:flex;gap:24px;justify-content:space-between;align-items:flex-start;padding:20px 0 32px}
+#energy-economy .es-eyebrow {font:11px/1.5 'IBM Plex Mono',monospace;letter-spacing:1px;text-transform:uppercase;color:#5b665e;margin:0 0 12px}
+#energy-economy .es-heading h1 {font-size:clamp(30px,4.2vw,56px);max-width:800px;letter-spacing:-1.8px;line-height:1.12;margin:0;font-weight:500}
+.es-actions {display:flex;gap:8px;align-items:center;flex-shrink:0}
+.es-actions>button {font-size:13px}
+.es-actions details {position:relative}
+#energy-economy .es-actions summary {padding:11px 14px;border:1px solid #a4aca1;font-size:13px}
+.es-actions details>div {position:absolute;right:0;top:100%;min-width:220px;background:var(--paper);border:1px solid var(--line);z-index:12;display:grid;box-shadow:0 8px 24px #24312a14;padding:6px}
+.es-actions details button {text-align:left;font-size:13px}
+.es-actions button:hover,.es-actions details button:focus-visible {background:var(--es-soft)}
+.es-assumptions {display:grid;grid-template-columns:auto 1fr 1fr minmax(220px,1.2fr);gap:24px;align-items:center;padding:24px 0;border-top:1px solid #aab3a7;border-bottom:1px solid var(--line)}
+.es-commodity {display:flex;flex-direction:column;border-left:2px solid var(--line);min-width:120px}
+.es-commodity button {text-align:left;padding:6px 16px;min-height:32px;font-size:14px;border-left:2px solid transparent;margin-left:-2px;color:#657065}
+.es-commodity button[aria-pressed=true] {color:var(--es-green);font-weight:600;border-color:var(--es-green);background:#dfe8df6b}
+.es-assumptions>label,.es-assumption-detail label,.es-duration {font-size:12px;color:#586259;display:grid;gap:7px}
+#energy-economy .es-shell select {background:transparent;border:0;border-bottom:1px solid #9fa99c;border-radius:0;font-size:16px;padding-left:0;cursor:pointer}
+.es-price {min-width:0;padding-left:12px}
+.es-price>label {display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#586259}
+.es-price output {font:500 30px/1.1 'IBM Plex Sans',sans-serif;color:var(--es-green);font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.es-price input {display:block;width:100%;height:28px;margin:9px 0 0;accent-color:var(--es-green);cursor:pointer}
+.es-price>div {display:flex;align-items:center;justify-content:space-between;font:11px 'IBM Plex Mono',monospace;color:#657065}
+.es-price>div button {min-height:28px;font:12px 'IBM Plex Sans',sans-serif;padding:3px 8px;text-decoration:underline;text-underline-offset:3px}
+#energy-economy .es-assumption-detail {margin:2px 0 24px}
+#energy-economy .es-assumption-detail summary {font-size:12px;color:#586259}
+.es-assumption-detail[open] {background:#ebeee5;padding:0 18px 12px}
+.es-assumption-detail p {max-width:850px}
+.es-assumption-detail label {max-width:220px}
+.es-chapters {display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border-bottom:1px solid #a7b1a4;gap:8px}
+.es-chapters button {text-align:left;border-bottom:3px solid transparent;margin-bottom:-1px;padding:8px 8px 14px;color:#637061;font-size:14px;white-space:nowrap}
+.es-chapters button span {display:block;font:10px 'IBM Plex Mono',monospace;letter-spacing:1px;margin-bottom:7px;color:#768271}
+.es-chapters button[aria-pressed=true] {border-color:var(--es-green);color:var(--es-green);font-weight:600}
+.es-chapters button[aria-pressed=true] span {color:var(--es-green)}
+.es-chapters button:hover {background:#e8ece350}
+.es-current-answer {padding:28px 0 26px;max-width:960px}
+#energy-economy .es-current-answer p {font-size:clamp(20px,2.2vw,29px);line-height:1.38;letter-spacing:-.45px;margin:0;color:#213d33}
+.es-section-heading {display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:1px solid var(--line);padding:24px 0 20px}
+#energy-economy .es-section-heading h2 {font-size:20px;letter-spacing:-.35px;margin:0}
+#energy-economy .es-section-heading p {font:11px/1.55 'IBM Plex Mono',monospace;color:#657065;margin:6px 0 0}
+.es-sales {display:grid;grid-template-columns:1fr 1fr;gap:48px;padding:8px 0 12px}
+.es-value-change>div:first-child {margin-bottom:22px}
+#energy-economy .es-value-change h3 {font-size:17px;margin:0 0 4px}
+.es-value-change>div>span {font-size:11px;color:#657065}
+.es-bar-row {display:grid;grid-template-columns:65px minmax(20px,1fr) 82px;gap:12px;align-items:center;min-height:35px}
+.es-bar-row>span {font-size:12px!important}
+.es-bar-row>i {display:block;width:var(--bar-width);min-width:0;height:18px;background:#c1c9bb}
+.es-bar-after>i {background:var(--es-green)}
+.es-bar-row strong {font:12px 'IBM Plex Mono',monospace;text-align:right;font-weight:400}
+#energy-economy .es-delta {display:flex;align-items:baseline;gap:14px;border-top:1px solid #d0d6ca;margin-top:20px;padding-top:15px}
+.es-delta strong {font-size:34px;font-weight:500;letter-spacing:-1.2px;font-variant-numeric:tabular-nums;color:var(--es-green)}
+.es-delta span {font-size:12px;color:#5e695f}
+#energy-economy .es-caption {font-size:12px;line-height:1.55;color:#677063;max-width:850px}
+.es-purchases {display:grid;grid-template-columns:minmax(220px,1fr) 1.5fr;gap:48px;margin:30px 0;padding:26px 0;border-block:1px solid var(--line)}
+.es-metric {display:flex;flex-direction:column;gap:8px}
+.es-metric>span {font-size:13px;color:#546252}
+.es-metric>strong {font-size:36px;line-height:1.15;font-weight:500;letter-spacing:-1.3px;font-variant-numeric:tabular-nums;color:var(--es-green)}
+.es-metric>small {font-size:12px;color:#677063;max-width:280px;line-height:1.5}
+#energy-economy .es-purchases h3 {font-size:20px;margin-bottom:5px}
+.es-purchases button,.es-text-button,.es-comparison-note button,.es-people button {text-decoration:underline;text-underline-offset:4px;padding-left:0}
+.es-comparison {border-block:1px solid var(--line);padding:24px 0;margin-bottom:24px}
+.es-comparison>div {display:grid;grid-template-columns:1fr 1fr;gap:40px;margin:18px 0 8px}
+.es-next-steps {display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.es-next-steps button {display:grid;grid-template-columns:1fr auto;text-align:left;padding:20px 0;border-top:2px solid #9bac98}
+.es-next-steps button>span:first-child {font-size:11px;color:#657065;grid-column:1}
+.es-next-steps strong {grid-column:1;font-size:16px;font-weight:500;line-height:1.4;margin-top:10px;max-width:390px}
+.es-next-steps button>span:last-child {grid-column:2;grid-row:1 / span 2;align-self:center;font-size:24px;padding-left:20px}
+.es-next-steps button:hover {color:var(--es-green)}
+.es-view-switch {display:flex;border:1px solid #9fad99}
+.es-view-switch button {min-height:34px;font-size:12px;padding:6px 14px}
+.es-view-switch [aria-pressed=true] {background:var(--es-green);color:white}
+.es-trade-layout {display:grid;grid-template-columns:minmax(0,1.9fr) minmax(220px,1fr);gap:36px}
+.es-map-wrap {min-width:0}
+.es-map-wrap svg {width:100%;height:430px;display:block;background:#eef0e8}
+.es-map-province {fill:#dce1d5;stroke:#f8f8ee;stroke-width:.9}
+.es-map-focus {fill:#7d9e83;stroke:#386b51;stroke-width:1.6}
+.es-map-compare {fill:#ddaf91;stroke:#94573f;stroke-width:1.6}
+.es-map-wrap svg [role=button] {cursor:pointer}
+.es-map-wrap svg [role=button]:hover {fill:#b2c4ac}
+.es-map-key {display:flex;gap:16px;align-items:center;justify-content:space-between;font-size:12px}
+.es-map-key i {display:inline-block;width:9px;height:9px;margin-right:7px;background:#7d9e83}
+.es-map-key button {font-size:12px}
+.es-partners>p {color:#687464}
+.es-partners>button {width:100%;display:grid;grid-template-columns:1fr auto;text-align:left;gap:5px 8px;border-top:1px solid var(--line);padding:14px 8px}
+.es-partners>button>span {font-size:14px}
+.es-partners>button>strong {font:13px 'IBM Plex Mono',monospace}
+.es-partners>button>small {grid-column:1 / span 2;color:#687464;font-size:11px}
+.es-partners>button[aria-pressed=true] {background:#e5ebe1;border-left:3px solid var(--es-green)}
+.es-international {display:grid;gap:7px;padding:20px 8px;border-top:2px solid #9ead98;margin-top:15px}
+.es-international>strong {font-size:26px;font-weight:500;letter-spacing:-.8px}
+.es-international>small {font-size:12px;color:#687464}
+.es-table {overflow-x:auto}
+.es-table table {width:100%;border-collapse:collapse;font-size:13px}
+.es-table caption {text-align:left;font-size:12px;padding:0 0 16px;color:#687464}
+.es-table th,.es-table td {border-bottom:1px solid var(--line);padding:13px 10px;text-align:left;white-space:nowrap}
+.es-table th {font-weight:500}
+.es-table td:nth-child(3),.es-table td:nth-child(4) {font-family:'IBM Plex Mono',monospace;text-align:right}
+.es-fiscal,.es-national,.es-context-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:36px;padding:4px 0 22px}
+.es-fiscal article,.es-national article,.es-context-grid article {padding:24px;background:#e7ece1;border-top:2px solid #859f85}
+.es-fiscal-value,.es-national article>strong,.es-context-grid article>strong {font-size:44px;font-weight:500;letter-spacing:-1.6px;color:var(--es-green);display:block;margin:18px 0 10px}
+.es-national article>strong {font-size:58px}
+.es-national small {font-size:12px;line-height:1.5;color:#657065;display:block}
+.es-duration {max-width:230px;margin:0 0 10px}
+#energy-economy .es-scope {font-size:13px;border-left:2px solid #a59b7e;padding:4px 0 4px 16px;color:#5f685c;max-width:800px}
+.es-gap {padding:24px;background:#ecece1;max-width:800px}
+.es-gap button {border:1px solid #a6ae9e;margin-top:8px}
+.es-people {display:grid;grid-template-columns:1fr 1fr;gap:30px 40px;padding-top:10px}
+.es-people article {display:flex;gap:16px;border-top:1px solid var(--line);padding-top:22px}
+.es-people article>span {font:12px 'IBM Plex Mono',monospace;color:#6b7867}
+.es-people strong {font-size:12px;font-weight:500}
+.es-evidence {border-block:1px solid var(--line);margin-top:32px}
+.es-evidence[open] {padding-bottom:16px}
+.es-evidence small {display:block;color:#687464}
+.es-followup {margin:34px 0 12px;padding:24px 0 0}
+#energy-economy .es-followup h2 {font-size:20px}
+.es-followup-buttons {display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+.es-followup-buttons button {border:1px solid #a8b3a1;padding:11px 16px;font-size:13px;text-align:left}
+.es-followup-buttons button:hover {background:#e5ebe1}
+.es-ask {max-width:800px}
+.es-ask label {font-size:12px;display:block;margin:10px 0}
+.es-ask form>div {display:flex;gap:12px}
+.es-ask input {min-width:0;flex:1;padding:12px;background:transparent;border:1px solid #9fad99}
+.es-ask button {background:var(--es-green);color:white}
+.es-notice,.es-pinned {padding:12px 16px;background:#e5ebe1;font-size:13px}
+.es-pinned {display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.es-pinned>span {margin-right:auto}
+.es-pinned button {font-size:12px;text-decoration:underline}
+.hw-findings {border-block:1px solid var(--line);padding:20px 0;margin:10px 0 26px}
+#energy-economy .hw-finding-primary {font-size:20px;line-height:1.5;max-width:950px}
+.hw-finding-evidence ul {margin-bottom:0}
+@media(max-width:1100px) {
+ .es-heading {display:block}.es-actions {justify-content:flex-end;margin-top:16px}
+ .es-assumptions {gap:20px;grid-template-columns:100px 1fr 1fr 1.2fr}
+ .es-commodity {min-width:0}.es-commodity button {padding-inline:10px}
+ .es-chapters {gap:0}.es-chapters button {font-size:12px}
+ .es-sales {gap:28px}.es-delta {flex-direction:column;gap:0!important}
+ .es-trade-layout {grid-template-columns:minmax(0,1.5fr) 1fr;gap:24px}
+}
+@media(max-width:700px) {
+ .ec-context-explore {min-height:54px}.ec-context-explore nav {display:flex;flex-wrap:nowrap;order:0;flex-basis:auto}
+ .ec-context-explore nav>button {padding:8px 12px}.ec-context-explore .ec-context-actions:empty {display:none}
+ .ec-data-menu>div {left:auto;right:0}
+ .es-heading {padding:6px 0 22px}#energy-economy .es-heading h1 {font-size:34px;line-height:1.13;letter-spacing:-1.2px;margin:0}
+ #energy-economy .es-eyebrow {font-size:9px;letter-spacing:.7px}.es-actions {margin-top:12px}
+ .es-assumptions {grid-template-columns:1fr 1fr;gap:18px;padding:18px 0}
+ .es-commodity {grid-column:1 / -1;flex-direction:row;border:0;border-bottom:1px solid var(--line)}
+ .es-commodity button {border:0;border-bottom:2px solid transparent;flex:1;margin:0 0 -1px;min-height:40px;text-align:center}
+ #energy-economy .es-shell select {font-size:14px}
+ .es-price {grid-column:1 / -1;padding:5px 0 0}.es-price output {font-size:28px}
+ .es-chapters {grid-template-columns:repeat(3,minmax(0,1fr));border:0;gap:5px 0}
+ .es-chapters button {min-height:50px;font-size:11px;white-space:normal;border-bottom:1px solid #b8c2b0;padding:8px 5px}
+ .es-chapters button span {font-size:9px;margin-bottom:4px}
+ .es-chapters button[aria-pressed=true] {border-bottom:3px solid var(--es-green)}
+ #energy-economy .es-assumption-detail {margin-bottom:15px}
+ .es-current-answer {padding:24px 0}#energy-economy .es-current-answer p {font-size:22px}
+ .es-section-heading {display:block;padding:20px 0 14px}#energy-economy .es-section-heading h2 {font-size:18px}
+ .es-sales {grid-template-columns:1fr;gap:26px}.es-value-change>div:first-child {margin-bottom:12px}
+ #energy-economy .es-delta {flex-direction:row;gap:12px!important;margin-top:12px}.es-delta strong {font-size:30px}.es-delta span {font-size:11px;max-width:120px}
+ .es-purchases {grid-template-columns:1fr;gap:22px;margin:20px 0}.es-purchases h3 {font-size:18px!important}
+ .es-metric>strong {font-size:32px}.es-comparison>div {gap:18px}
+ .es-next-steps {grid-template-columns:1fr;gap:8px}.es-next-steps button {padding:15px 0}
+ .es-trade-layout {grid-template-columns:1fr;gap:20px}.es-map-wrap svg {height:290px}
+ .es-view-switch {width:max-content;margin:12px 0 0}
+ .es-map-key {align-items:flex-start}.es-map-key>span {padding-top:12px}
+ .es-fiscal,.es-national,.es-context-grid {gap:16px}
+ .es-fiscal article,.es-national article,.es-context-grid article {padding:20px}
+ .es-people {grid-template-columns:1fr;gap:18px}
+ .es-followup {margin-top:22px}.es-followup-buttons {display:grid;grid-template-columns:1fr}
+ .es-ask form>div {flex-direction:column}.es-ask input {width:100%}
+ .es-pinned {gap:0 12px}.es-pinned>span {flex-basis:100%}
+ #energy-economy .hw-finding-primary {font-size:17px}
+}
+@media(prefers-reduced-motion:no-preference) {
+ .es-bar-row>i {transition:width .18s ease-out}
+}
+
+.es-trade-balance {border-block:1px solid var(--line);margin:20px 0;padding:0 0 2px}
+.es-balance-grid {display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:12px 0}
+.es-trade-balance p {max-width:780px}
+.es-gdp-context {max-width:750px;margin-bottom:24px!important}

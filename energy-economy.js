@@ -59,7 +59,7 @@ export class EnergyEconomy {
   change(patch) {
     this.deactivate();this.aiError=null;
     if(Object.hasOwn(patch,'section'))this.answerVisible=false;
-    if(Object.hasOwn(patch,'region'))patch={...patch,tradeRegions:patch.region==='CA'?[]:[patch.region],forecastRegions:patch.region==='CA'?[]:[patch.region]};
+    if(Object.hasOwn(patch,'region'))patch={tradeRegions:patch.region==='CA'?[]:[patch.region],forecastRegions:patch.region==='CA'?[]:[patch.region],...patch};
     this.state=normalizeEconomyState({...this.state,...patch});this.onChange(this.state);this.render();
   }
   click(event) {
@@ -78,6 +78,7 @@ export class EnergyEconomy {
     }
     const action=target.dataset.ecAction;
     if(action==='retry')void this.load();
+    if(action==='retry-story'){const host=this.root.querySelector('#ec-energy-story');if(host){host.innerHTML='<p role="status">Loading the investigation…</p>';void this.mountStory(host);}}
     if(action==='retry-research'){const kind=target.dataset.researchKind,host=this.root.querySelector(({income:'#ec-income-paths',history:'#ec-oil-history',forecast:'#ec-provincial-forecast'})[kind]);if(host){host.innerHTML='<p role="status">Loading data…</p>';void this.mountResearchView(host,kind);}}
     if(action==='inventory')this.onInventory(this.state.region==='CA'?'all':this.state.region);
     if(action==='ask'){const disclosure=this.root.querySelector('.ec-trade-question');if(disclosure){this.tradeQuestionOpen=true;disclosure.open=true;}this.root.querySelector('#ec-ai-title')?.scrollIntoView({behavior:'auto',block:'start'});this.root.querySelector(this.status.available?'#energy-question':'#ec-ai-title')?.focus({preventScroll:true});}
@@ -86,6 +87,7 @@ export class EnergyEconomy {
     if(action==='show-answer'){this.answerVisible=true;this.render();}
     if(action==='browse-data'){this.answerVisible=false;this.render();}
     if(action==='download'){
+      if(this.state.section==='explore'&&target.closest('.ec-context-actions')){this.root.querySelector('[data-story-export]')?.click();return;}
       if(['supply','oil','outlook'].includes(this.state.section)&&target.closest('.ec-context-actions')){this.root.querySelector('[data-research-export]')?.click();return;}
       if(this.state.section==='trade'&&target.closest('.ec-context-actions')){this.root.querySelector('#ec-trade-workspace [data-workspace-export]')?.click();return;}
       const payload={dataVersion:this.data.generatedAt,state:this.state,summary:summarizeEconomy(this.data,this.state),analysis:this.answer||null};
@@ -189,7 +191,7 @@ export class EnergyEconomy {
     const analysis=this.answer.analysis;const sources=[...(analysis.sources||[]),...(this.answer.summary?.sources||[])];
     const renderBlock=block=>`<div class="ec-answer-block"><p>${esc(block.text)}</p><div class="ec-links">${[...new Set(block.sourceIds||[])].map(id=>sourceAnchor(sources.find(source=>source.id===id))).join('')}</div></div>`;
     const blocks=analysis.blocks||[];const extra=blocks.slice(2);const limitations=analysis.limitations||[];
-    return `${this.answer.workspace?'<details class="ec-answer"><summary>Written analysis & citations</summary>':'<article class="ec-answer">'}<p class="ec-kicker">COMPLETED ANALYSIS</p><p class="ec-answer-question">${esc(this.answer.question||'')}</p><h3>${esc(analysis.headline)}</h3>${blocks.slice(0,2).map(renderBlock).join('')}${extra.length?`<details><summary>Read the supporting analysis</summary>${extra.map(renderBlock).join('')}</details>`:''}${limitations.length?`<details><summary>Assumptions and limits (${limitations.length})</summary><ul>${limitations.map(text=>`<li>${esc(text)}</li>`).join('')}</ul></details>`:''}<p class="ec-caption">${this.answer.answerMode==='source-backed-findings'?'AI selected these published findings; figures and citations come from the app’s data. ':''}These written findings use the original question and inputs. The interactive charts update separately when you change their controls.</p><button class="text-link" data-ec-action="download">Download answer, calculations and sources</button>${this.answer.workspace?'</details>':'</article>'}`;
+    return `${this.answer.workspace?'<details class="ec-answer"><summary>Written analysis & citations</summary>':'<article class="ec-answer">'}<p class="ec-kicker">COMPLETED ANALYSIS</p><p class="ec-answer-question">${esc(this.answer.question||'')}</p><h3>${esc(analysis.headline)}</h3>${blocks.slice(0,2).map(renderBlock).join('')}${extra.length?`<details><summary>Read the supporting analysis</summary>${extra.map(renderBlock).join('')}</details>`:''}${limitations.length?`<details><summary>Assumptions and limits (${limitations.length})</summary><ul>${limitations.map(text=>`<li>${esc(text)}</li>`).join('')}</ul></details>`:''}<p class="ec-caption">${this.answer.answerMode==='source-backed-findings'?'AI selected these published findings; figures and citations come from the app’s data. ':''}These findings describe the original submitted question. Current-selection explanations appear beside the interactive results above.</p><button class="text-link" data-ec-action="download">Download answer, calculations and sources</button>${this.answer.workspace?'</details>':'</article>'}`;
   }
   render() {
     if(this.verifying&&this.busy)return;
@@ -199,6 +201,9 @@ export class EnergyEconomy {
     const tradeKey=JSON.stringify([this.state.tradeCommodity,this.state.tradeYear,this.state.priceShock,this.state.linkScope,this.state.tradeRegions,this.state.transferSet,this.state.tradePanelId,this.state.tradeViewMode]);
     const previousTrade=this.state.section==='trade'&&this.tradeMountKey===tradeKey?this.root.querySelector('#ec-trade-workspace'):null;
     if(!previousTrade){this.tradeMount?.unmount();this.tradeMount=null;}
+    const storyKey=JSON.stringify(this.state.story);
+    const previousStory=this.state.section==='explore'&&this.storyMountKey===storyKey?this.root.querySelector('#ec-energy-story'):null;
+    if(!previousStory){this.storyMount?.unmount();this.storyMount=null;}
     const previousResearch={};
     for(const [kind,section,id] of [['income','supply','#ec-income-paths'],['history','oil','#ec-oil-history'],['forecast','outlook','#ec-provincial-forecast']]){
       const host=this.state.section===section&&this[`${kind}MountKey`]===this.researchKey(kind)?this.root.querySelector(id):null;
@@ -209,15 +214,38 @@ export class EnergyEconomy {
     const start=activeId==='energy-question'?document.activeElement.selectionStart:null;
     const summary=summarizeEconomy(this.data,this.state);
     const isResearch=!this.answer?.workspace||this.answerVisible===false;
-    this.root.innerHTML=`<div class="ec-context"><label>Place<select id="ec-region" data-econ-field="region">${choices([['CA','Canada'],...this.data.regions.filter(r=>r.code!=='CA').map(r=>[r.code,nameOf(this.data,r.code)])],this.state.region)}</select></label><nav aria-label="Energy economy accounts">${[['income','Income'],['outlook','Provincial outlook'],['trade','Trade & prices'],['supply','Follow the dollar'],['futures','Energy futures'],['oil','Oil & the economy']].map(([id,label])=>`<button id="ec-section-${id}" data-ec-section="${id}" aria-current="${this.state.section===id?'page':'false'}">${label}</button>`).join('')}</nav><div class="ec-context-actions">${this.answer?.workspace?`<button data-ec-action="${isResearch?'show-answer':'browse-data'}">${isResearch?'Previous answer':'Return to data'}</button>`:''}<button data-ec-action="ask">${this.status.available?"Ask a question":"Live analysis status"}</button><button data-ec-action="download" aria-label="Download selected economic data and analysis">Download</button></div></div>
-    ${isResearch?'':this.analyst()}${this.answer?.workspace&&!isResearch?'<details class="ec-authored-data"><summary>Browse the original data views</summary>':''}<div class="ec-workspace">${this.state.section==='outlook'?'<div id="ec-provincial-forecast"><p role="status">Loading provincial GDP forecasts…</p></div>':this.state.section==='trade'?'<div id="ec-trade-workspace"><p role="status">Loading energy trade and price effects…</p></div>':this.state.section==='futures'?this.futures(summary):this.state.section==='oil'?this.oil()+'<div id="ec-oil-history"><p role="status">Loading historical oil and GDP paths…</p></div>':this.state.section==='supply'?'<div id="ec-income-paths"><p role="status">Loading supply-chain effects…</p></div>':this.income(summary)}</div>${isResearch?this.analyst():''}${this.debate()}${this.answer?.workspace&&!isResearch?'</details>':''}<details class="ec-methods"><summary>Data coverage and methods</summary><ul>${summary.limitations.map(text=>`<li>${esc(text)}</li>`).join('')}</ul><p>Retrieved ${esc(this.data.generatedAt?.slice(0,10))}. Economic series are separate from well inventories. Trade & prices includes modelled bilateral trade value, provincial physical energy balances and explicit price sensitivities. Provincial outlooks estimate whole-economy growth from observed indicators. They do not isolate energy-price effects. Bilateral physical shipments and household income distribution remain incomplete.</p><div class="ec-links">${this.data.sources.map(source=>this.sourceLink(source.id)).join('')}</div></details>`;
+    const sections=[['income','Income'],['outlook','Provincial outlook'],['trade','Trade & prices'],['supply','Follow the dollar'],['futures','Energy futures'],['oil','Oil & the economy']];
+    const sectionButtons=sections.map(([id,label])=>`<button id="ec-section-${id}" data-ec-section="${id}" aria-current="${this.state.section===id?'page':'false'}">${label}</button>`).join('');
+    const exploring=this.state.section==='explore';
+    this.root.innerHTML=`<div class="ec-context ${exploring?'ec-context-explore':''}">${exploring?'':`<label>Place<select id="ec-region" data-econ-field="region">${choices([['CA','Canada'],...this.data.regions.filter(r=>r.code!=='CA').map(r=>[r.code,nameOf(this.data,r.code)])],this.state.region)}</select></label>`}<nav aria-label="Energy economy accounts"><button id="ec-section-explore" data-ec-section="explore" aria-current="${exploring?'page':'false'}">Explore a question</button>${exploring?`<details class="ec-data-menu"><summary>Data views</summary><div>${sectionButtons}</div></details>`:sectionButtons}</nav><div class="ec-context-actions">${this.answer?.workspace?`<button data-ec-action="${isResearch?'show-answer':'browse-data'}">${isResearch?'Previous answer':'Return to data'}</button>`:''}${exploring?'':`<button data-ec-action="ask">${this.status.available?'Ask a question':'Live analysis status'}</button><button data-ec-action="download" aria-label="Download selected economic data and analysis">Download</button>`}</div></div>
+    ${isResearch?'':this.analyst()}${this.answer?.workspace&&!isResearch?'<details class="ec-authored-data"><summary>Browse the original data views</summary>':''}<div class="ec-workspace">${exploring?'<div id="ec-energy-story"><p role="status">Loading the connected investigation…</p></div>':this.state.section==='outlook'?'<div id="ec-provincial-forecast"><p role="status">Loading provincial GDP forecasts…</p></div>':this.state.section==='trade'?'<div id="ec-trade-workspace"><p role="status">Loading energy trade and price effects…</p></div>':this.state.section==='futures'?this.futures(summary):this.state.section==='oil'?this.oil()+'<div id="ec-oil-history"><p role="status">Loading historical oil and GDP paths…</p></div>':this.state.section==='supply'?'<div id="ec-income-paths"><p role="status">Loading supply-chain effects…</p></div>':this.income(summary)}</div>${isResearch?this.analyst():''}${this.debate()}${this.answer?.workspace&&!isResearch?'</details>':''}<details class="ec-methods"><summary>Data coverage and methods</summary><ul>${summary.limitations.map(text=>`<li>${esc(text)}</li>`).join('')}</ul><p>Retrieved ${esc(this.data.generatedAt?.slice(0,10))}. Economic series are separate from well inventories. Trade & prices includes modelled bilateral trade value, provincial physical energy balances and explicit price sensitivities. Provincial outlooks estimate whole-economy growth from observed indicators. They do not isolate energy-price effects. Bilateral physical shipments and household income distribution remain incomplete.</p><div class="ec-links">${this.data.sources.map(source=>this.sourceLink(source.id)).join('')}</div></details>`;
     for(const [kind,id] of [['income','#ec-income-paths'],['history','#ec-oil-history'],['forecast','#ec-provincial-forecast']]){const host=this.root.querySelector(id);if(host&&previousResearch[kind])host.replaceWith(previousResearch[kind]);else if(host)void this.mountResearchView(host,kind);}
+    const storyHost=this.root.querySelector('#ec-energy-story');
+    if(storyHost&&previousStory)storyHost.replaceWith(previousStory);else if(storyHost)void this.mountStory(storyHost);
     const tradeHost=this.root.querySelector('#ec-trade-workspace');
     if(tradeHost&&previousTrade)tradeHost.replaceWith(previousTrade);else if(tradeHost)void this.mountTrade(tradeHost,tradeKey);
     const workspaceHost=this.root.querySelector('#ec-dynamic-workspace');
     if(workspaceHost&&previousHost){workspaceHost.replaceWith(previousHost);}else if(workspaceHost){void this.mountDynamicWorkspace(workspaceHost);}
     if(activeElement?.isConnected)activeElement.focus({preventScroll:true});
     else if(activeId){const node=this.root.querySelector(`#${CSS.escape(activeId)}`);node?.focus({preventScroll:true});if(start!==null)node?.setSelectionRange?.(start,start);}
+  }
+  async mountStory(host) {
+    this.storyMountKey=JSON.stringify(this.state.story);
+    try {
+      const [{mountEnergyStory},flows,fiscal,forecast]=await Promise.all([
+        import('./vendor/energy-workspace.js'),
+        this.flows||fetch('data/energy-flows.json').then(r=>{if(!r.ok)throw Error();return r.json();}),
+        this.fiscal||fetch('data/provincial-impacts.json').then(r=>{if(!r.ok)throw Error();return r.json();}),
+        this.forecast||fetch('data/provincial-forecasts.json').then(r=>r.ok?r.json():null).catch(()=>null),
+      ]);
+      if(!host.isConnected)return;
+      this.flows=flows;this.fiscal=fiscal;this.forecast=forecast;host.replaceChildren();
+      this.storyMount=mountEnergyStory(host,{snapshots:{economy:this.data,flows,fiscal,forecast},initial:this.state.story,shapes:this.shapes,onState:story=>{
+        this.state=normalizeEconomyState({...this.state,story});this.storyMountKey=JSON.stringify(this.state.story);this.onChange(this.state);
+      },onAsk:question=>{
+        this.question=question;this.tradeQuestionOpen=true;this.render();this.root.querySelector('#energy-question')?.focus();
+      },onNavigate:(section,selection)=>{this.change({section,region:selection.compare?'CA':selection.focus,forecastYear:selection.year,forecastFocus:selection.focus,forecastRegions:[selection.focus,...(selection.compare?[selection.compare]:[])]});}});
+    }catch{if(host.isConnected)host.innerHTML='<p role="alert">The source data for this investigation could not load.</p><button data-ec-action="retry-story">Retry investigation</button>';}
   }
   researchKey(kind) {
     const s=this.state;return JSON.stringify(kind==='forecast'?[s.region,s.forecastRegions,s.forecastYear,s.forecastFocus]:kind==='income'?[s.region,s.incomeIndustry,s.incomeYear,s.demandMillion,s.includeInduced]:[s.historyRegions,s.historyOilChange,s.historyHorizon,s.historyYear]);

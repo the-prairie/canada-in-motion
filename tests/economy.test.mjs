@@ -99,7 +99,7 @@ test('shared analysis preserves presentation and separates observed accounts fro
   const summary = summarizeEconomy(data, state.economy);
   assert.equal(summary.gdp.year, 2022);
   assert.equal(summary.metrics.find(m => m.id === 'electricity-price').year, 2050);
-  assert.equal(normalizeEconomyState({ section: 'invented', display: '3d', metric: 'GDP forecast' }).section, 'income');
+  assert.equal(normalizeEconomyState({ section: 'invented', display: '3d', metric: 'GDP forecast' }).section, 'explore');
   assert.equal(normalizeEconomyState({ display: '3d' }).display, 'bars');
   assert.match(summarizeEconomy(data, {}).metrics.find(m => m.id === 'electricity-price').unavailableReason, /not for Canada/);
 });
@@ -130,4 +130,15 @@ test('historical boundaries distinguish observed prices from projected electrici
   assert.equal(mixed.metrics.find(m=>m.id==='oil-production').status,'observed');
   assert.equal(mixed.metrics.find(m=>m.id==='electricity-generation').status,'projected');
   assert.equal(mixed.metrics.find(m=>m.id==='electricity-price').status,'projected');
+});
+
+
+test('connected investigation selections survive a shared URL without changing old view links', async () => {
+  const {encodeState,decodeState,normalizeState}=await import('../model.mjs');
+  const story={commodity:'gas',focus:'BC',compare:'AB',shockPct:-13,tradeYear:2023,duration:'temporary',chapter:'public-finances'};
+  const state=normalizeState({view:'economy',economy:{section:'explore',story}});
+  assert.deepEqual(decodeState(encodeState(state)).economy.story,story);
+  assert.equal(normalizeEconomyState().section,'explore');
+  assert.equal(normalizeEconomyState({section:'oil'}).section,'oil');
+  assert.equal(normalizeEconomyState({story:{shockPct:99}}).story.shockPct,99);
 });

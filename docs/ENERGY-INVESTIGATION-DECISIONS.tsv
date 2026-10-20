@@ -1,0 +1,6 @@
+ts	phase	decision	why	evidence	result
+2026-10-20T08:52:19+00:00	frame	Build one connected price investigation using existing verified calculations.	A user needs an explanation that remains consistent as assumptions change.	docs/ENERGY-INVESTIGATION-PLAN.md	open
+2026-10-20T09:19:34+00:00	design	Use focused explanatory chapters and a shared selection.	Keep one result readable while retaining related accounts.	.data-cache/story-design/recommendation.md	implemented
+2026-10-20T09:19:34+00:00	model	Keep trade, budgets, national GDP and independent provincial forecasts separate.	Different scopes and source periods cannot be added or interpreted as a causal provincial GDP model.	energy-story-model.mjs; tests/energy-story.test.mjs	15 model tests passed
+2026-10-20T09:19:34+00:00	review	Repair zero-flow prose, forecast handoff and missing-calibration labels.	Independent browser review found three misleading edge cases.	.data-cache/story-review/acceptance.md	independently retested and accepted
+2026-10-20T09:19:34+00:00	verify	Preserve old links and verify the new journey against actual browser output.	Default navigation and shared models affect existing users.	tests/e2e/energy-story.mjs; .data-cache/story-design/e2e.log	329 JS tests; 23 edge tests; four headless browser suites passed
