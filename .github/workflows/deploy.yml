@@ -55,8 +55,8 @@ jobs:
         run: python pipeline/refresh_monthly_energy.py
       - name: Refresh observed GDP and official energy scenarios
         run: python pipeline/refresh_economy.py
-      - name: Refresh Alberta province-wide well status counts
-        run: python pipeline/refresh_alberta_status.py
+      - name: Refresh Alberta well counts unless the verified snapshot is less than a day old
+        run: python pipeline/refresh_alberta_status.py --max-age-hours 24
       - name: Refresh interprovincial energy trade and physical balances
         run: python pipeline/refresh_energy_flows.py
       - name: Refresh official industry income multipliers

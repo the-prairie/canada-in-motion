@@ -37,4 +37,6 @@ Model the Domain kept energy experiments separate from published forecasts. Expl
 
 ## Public acceptance
 
-Pending deployment verification.
+The first deployment stopped when the unrelated AER well-status CSV returned HTTP 403 to GitHub. The existing verified snapshot was less than 24 hours old. The deployment workflow can now reuse that intact daily snapshot without rewriting its bytes or retrieval date. Scheduled source refreshes still require an online download. Future-dated, stale or hash-mismatched snapshots cannot qualify. An independent review approved the policy, and tests cover the 24-hour boundary and unchanged-file behavior.
+
+Final deployment verification pending.

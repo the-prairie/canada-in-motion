@@ -1,7 +1,14 @@
+import contextlib
+import json
+import tempfile
+from pathlib import Path
+from unittest.mock import patch
+import copy
+from datetime import datetime, timedelta, timezone
 import csv
 import io
 import unittest
-from refresh_alberta_status import build, parse_counts, offline_retrieved_at, CATEGORIES
+from refresh_alberta_status import build, parse_counts, offline_retrieved_at, reusable_snapshot, main, CATEGORIES
 
 
 def fixture(year=2026):
@@ -15,6 +22,39 @@ def fixture(year=2026):
 
 
 class AlbertaStatusTests(unittest.TestCase):
+    def test_deploy_can_reuse_an_intact_daily_snapshot_without_changing_its_date(self):
+        previous = build(fixture(), '2026-10-19T23:58:11Z')
+        original = copy.deepcopy(previous)
+        now = datetime(2026, 10, 20, 22, 20, tzinfo=timezone.utc)
+        self.assertTrue(reusable_snapshot(previous, now))
+        self.assertEqual(previous, original)
+        self.assertTrue(reusable_snapshot(previous, datetime(2026, 10, 20, 23, 58, 11, tzinfo=timezone.utc)))
+        self.assertFalse(reusable_snapshot(previous, datetime(2026, 10, 20, 23, 58, 12, tzinfo=timezone.utc)))
+        self.assertFalse(reusable_snapshot(previous, now, max_age_hours=48))
+        self.assertFalse(reusable_snapshot(previous, now, max_age_hours=0))
+        self.assertFalse(reusable_snapshot(previous, datetime(2026, 10, 21, tzinfo=timezone.utc)))
+        self.assertFalse(reusable_snapshot(previous, datetime(2026, 10, 19, tzinfo=timezone.utc)))
+        changed = copy.deepcopy(previous)
+        changed['latest']['counts']['active'] += 1
+        self.assertFalse(reusable_snapshot(changed, now))
+        changed = copy.deepcopy(previous)
+        changed['retrievedAt'] = 'invalid'
+        self.assertFalse(reusable_snapshot(changed, now))
+        self.assertFalse(reusable_snapshot({}, now))
+
+    def test_reuse_returns_before_download_and_preserves_original_file_bytes(self):
+        stamp = (datetime.now(timezone.utc) - timedelta(hours=23)).isoformat()
+        data = build(fixture(), stamp)
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / 'status.json'
+            output.write_text(json.dumps(data, indent=3) + '\n')
+            original = output.read_bytes()
+            with patch('sys.argv', ['refresh', '--output', str(output), '--max-age-hours', '24']), patch('refresh_alberta_status.subprocess.run', side_effect=AssertionError('No download expected')), contextlib.redirect_stdout(io.StringIO()) as log:
+                main()
+            self.assertEqual(output.read_bytes(), original)
+            self.assertIn('reused-verified-snapshot', log.getvalue())
+            self.assertIn(stamp, log.getvalue())
+
     def test_operating_includes_marginal_and_preserves_unknown_month(self):
         data = build(fixture(), '2026-10-19T00:00:00Z')
         self.assertEqual(data['latest']['operating'], 20)

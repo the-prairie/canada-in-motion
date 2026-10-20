@@ -136,12 +136,34 @@ def offline_retrieved_at(raw, metadata=None, previous=None):
     raise ValueError('Offline cache has no verified retrieval date for these bytes; run an online refresh')
 
 
+def reusable_snapshot(previous, now, max_age_hours=24):
+    if max_age_hours != 24:
+        return False
+    try:
+        retrieved = datetime.fromisoformat(previous['retrievedAt'].replace('Z', '+00:00'))
+        if retrieved.tzinfo is None or not 0 <= (now - retrieved).total_seconds() <= max_age_hours * 3600:
+            return False
+        stable = {key: value for key, value in previous.items() if key not in ['retrievedAt', 'dataVersion']}
+        digest = hashlib.sha256(json.dumps(stable, sort_keys=True, separators=(',', ':')).encode()).hexdigest()[:20]
+        return digest == previous['dataVersion']
+    except (AttributeError, KeyError, TypeError, ValueError):
+        return False
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--cache', type=Path, default=ROOT / '.data-cache/alberta-status/WellStatusChart.csv')
     parser.add_argument('--output', type=Path, default=ROOT / 'data/alberta-well-status.json')
     parser.add_argument('--offline', action='store_true')
+    parser.add_argument('--max-age-hours', type=int, choices=[0, 24], default=0,
+                        help='Reuse an intact snapshot within 24 hours, preserving its original retrieval date')
     args = parser.parse_args()
+    if not args.offline and args.max_age_hours and args.output.exists():
+        previous = json.loads(args.output.read_text())
+        if reusable_snapshot(previous, datetime.now(timezone.utc), args.max_age_hours):
+            print(json.dumps({'status': 'reused-verified-snapshot', 'retrievedAt': previous['retrievedAt'],
+                              'dataVersion': previous['dataVersion']}))
+            return
     args.cache.parent.mkdir(parents=True, exist_ok=True)
     metadata_path = args.cache.with_suffix(args.cache.suffix + '.metadata.json')
     if args.offline:
