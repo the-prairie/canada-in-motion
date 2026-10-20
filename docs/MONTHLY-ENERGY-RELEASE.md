@@ -26,7 +26,18 @@ The saved-investigation test now waits for asynchronous file parsing before asse
 
 ## Public acceptance
 
-Deployment and public-site checks pending at this commit. The follow-up receipt will record the GitHub run, deployed content identity and public browser results.
+Published successfully on 2026-10-20 at 21:49 UTC by [GitHub Actions run 39502355964](https://github.com/the-prairie/canada-in-motion/actions/runs/39502355964), application commit `9fed8fb547439541ee12326dd6e12a267bf051e8`.
+
+- Public app: https://the-prairie.github.io/canada-in-motion/
+- Application code version: `c2bddddfe4c82cad6117`
+- Public release: `dc383f400d057ada3414`
+- Monthly source snapshot: `bc33daac7ade7de311b2`
+- The deployment independently reacquired the three sources at 21:44 UTC. All monthly observations and metric definitions match the locally reviewed snapshot. The published data file's SHA-256 matches the public build manifest.
+- The full eight-group monthly headless acceptance flow passed against the public URL, including every jurisdiction, scenario isolation, question comparisons, downloads, mobile layouts, and failed-fetch recovery. No browser runtime errors.
+- The existing six-group annual-GDP freshness flow also passed against the public URL. It still shows 2022 current-dollar GDP alongside 2025 real growth.
+- AI service health returned HTTP 200 and available. The Worker and its spending settings did not change. Browser checks stubbed only AI availability; monthly data and application code came from the actual public site.
+
+No remaining blocker for this monthly-activity release. It does not resolve confidential or unpublished provincial source values, add monthly readings to the forecast's trained inputs, or change the app's incomplete public-beta coverage.
 
 ## Design choices
 
