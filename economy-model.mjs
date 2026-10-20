@@ -7,7 +7,7 @@ const bounded = (value, low, high) => Math.min(high, Math.max(low, value));
 export function normalizeEconomyState(input = {}) {
   const raw = input && typeof input === 'object' ? input : {};
   return {
-    section: ['income', 'futures', 'oil'].includes(raw.section) ? raw.section : 'income',
+    section: ['income', 'trade', 'futures', 'oil'].includes(raw.section) ? raw.section : 'income',
     display: ['bars', 'map', 'table'].includes(raw.display) ? raw.display : 'bars',
     metric: raw.metric === 'retail' ? 'retail' : 'production',
     region: ECONOMY_REGIONS.includes(raw.region) ? raw.region : 'CA',
@@ -15,6 +15,12 @@ export function normalizeEconomyState(input = {}) {
     year: bounded(Math.round(number(raw.year, 2030)), 2023, 2050),
     oilShock: bounded(number(raw.oilShock, 10), -20, 20),
     duration: raw.duration === 'temporary' ? 'temporary' : 'persistent',
+    tradeCommodity: ['oil','gas','electricity'].includes(raw.tradeCommodity)?raw.tradeCommodity:'oil',
+    tradeYear: bounded(Math.round(number(raw.tradeYear,2024)),2000,2100),
+    priceShock: bounded(number(raw.priceShock,10),-20,20),
+    linkScope: raw.linkScope==='between'?'between':'touching',
+    tradeRegions: Array.isArray(raw.tradeRegions)?[...new Set(raw.tradeRegions.filter(code=>ECONOMY_REGIONS.includes(code)&&code!=='CA'))]:[],
+    transferSet: typeof raw.transferSet==='string'&&/^[a-z0-9-]{1,80}$/.test(raw.transferSet)?raw.transferSet:null,
   };
 }
 

@@ -1,3 +1,6 @@
+import {validateAlbertaWellStatus} from '../alberta-status-model.mjs';
+import {validateEnergyFlows} from '../energy-flow-model.mjs';
+import {validateProvincialImpacts} from '../provincial-impact-model.mjs';
 import { validateEconomy } from '../economy-model.mjs';
 import { BC_FILES, validateBC } from './bc-validation.mjs';
 import { promises as fs } from 'node:fs';
@@ -21,7 +24,7 @@ export function cspForAI(config) {
   return CSP.replace("script-src 'self'", "script-src 'self' https://challenges.cloudflare.com").replace("connect-src 'self'",`connect-src 'self' ${config.apiOrigin} https://challenges.cloudflare.com`)+"; frame-src https://challenges.cloudflare.com";
 }
 export const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
-export const PUBLIC_FILES = ['ai-client.mjs','energy-economy.js','energy-economy.css','energy-workspace.css','vendor/energy-workspace.js','economy-model.mjs','data/economy.json','data/energy-debate.json','index.html','app.js','record-atlas.js','record-atlas.css','atlas-model.mjs','map.js','model.mjs','data-store.mjs','insights.mjs','style.css','design.css', 'vendor/leaflet.js','vendor/leaflet.css','vendor/supercluster.js', 'vendor/fonts/ibm-plex-sans-400.ttf','vendor/fonts/ibm-plex-sans-500.ttf','vendor/fonts/ibm-plex-sans-600.ttf','vendor/fonts/ibm-plex-mono-400.ttf','vendor/fonts/ibm-plex-mono-500.ttf', 'data/network.json','data/tariffs.json','data/tariff-sources.json','data/countries.geojson','data/provinces.geojson','data/national-coverage.json', 'data/context/manifest.json', ...CONTEXT_FILES.map(name => 'data/context/'+name)];
+export const PUBLIC_FILES = ['ai-client.mjs','energy-economy.js','energy-economy.css','energy-workspace.css','vendor/energy-workspace.js','economy-model.mjs','data/economy.json','data/energy-debate.json','data/energy-flows.json','data/provincial-impacts.json','data/alberta-well-status.json','alberta-status-model.mjs','energy-flow-model.mjs','provincial-impact-model.mjs','trade-workspace-model.mjs','index.html','app.js','record-atlas.js','record-atlas.css','atlas-model.mjs','map.js','model.mjs','data-store.mjs','insights.mjs','style.css','design.css', 'vendor/leaflet.js','vendor/leaflet.css','vendor/supercluster.js', 'vendor/fonts/ibm-plex-sans-400.ttf','vendor/fonts/ibm-plex-sans-500.ttf','vendor/fonts/ibm-plex-sans-600.ttf','vendor/fonts/ibm-plex-mono-400.ttf','vendor/fonts/ibm-plex-mono-500.ttf', 'data/network.json','data/tariffs.json','data/tariff-sources.json','data/countries.geojson','data/provinces.geojson','data/national-coverage.json', 'data/context/manifest.json', ...CONTEXT_FILES.map(name => 'data/context/'+name)];
 export function safeRelative(value) {
   if (typeof value !== 'string' || !value || value.includes('\\') || value.includes('%') || value.includes('\0') || path.posix.isAbsolute(value) || value.split('/').some(x => !x || x === '.' || x === '..' || x.startsWith('.')) || !/^[A-Za-z0-9_./-]+$/.test(value)) throw new Error(`Unsafe release path: ${value}`);
   return value;
@@ -231,6 +234,9 @@ export function versionApplicationAssets(output) {
 export async function buildPublic(root = ROOT) {
   const { catalog, files, config } = await validateRelease(root);
   validateEconomy(await readJSON(root, 'data/economy.json'));
+  validateAlbertaWellStatus(await readJSON(root,'data/alberta-well-status.json'));
+  validateEnergyFlows(await readJSON(root,'data/energy-flows.json'));
+  validateProvincialImpacts(await readJSON(root,'data/provincial-impacts.json'));
   let aiConfig;
   try{aiConfig=publicAIConfig(await readJSON(root,'config/ai-public.json'));}catch(error){if(error.code!=='ENOENT')throw error;aiConfig={apiOrigin:null};}
   const contentSecurityPolicy=cspForAI(aiConfig);

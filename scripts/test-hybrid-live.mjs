@@ -11,8 +11,13 @@ export const HYBRID_LIVE_CASES=[
   {id:'gdp',question:'Compare energy GDP in Alberta, Ontario and Québec. Include a map.',types:['province-map','province-comparison']},
   {id:'electricity',question:'Compare electricity generation in Alberta, Ontario and Québec in the Higher scenario in 2040.',types:['scenario-comparison'],year:2040,scenario:'Higher'},
   {id:'compound',question:'Compare 2022 energy GDP in Alberta and Québec, their electricity generation in the Higher scenario in 2040, and map their pipeline routes and facilities.',types:['province-map','province-comparison','scenario-comparison','infrastructure-map'],year:2040,scenario:'Higher'},
+  {id:'trade',question:'Show the value of oil traded between Alberta and British Columbia in 2024.',types:['energy-trade']},
+  {id:'provincial-price',question:'If natural gas prices fall 10%, compare interprovincial trade exposure and published budget sensitivities in Alberta and British Columbia.',types:['provincial-impact']},
   {id:'missing-flow',question:'Map the energy routes between Alberta and British Columbia. Can we measure how much flows between them?',types:['infrastructure-map','coverage-note']},
 ];
+const selectedCases=process.argv.find(arg=>arg.startsWith('--cases='))?.slice(8).split(',');
+const cases=selectedCases?HYBRID_LIVE_CASES.filter(row=>selectedCases.includes(row.id)):HYBRID_LIVE_CASES;
+if(selectedCases&&(!cases.length||cases.length!==selectedCases.length))throw new Error('Unknown hybrid test case');
 if(!process.argv.includes('--run')&&!process.argv.includes('--serve')){
   console.log(JSON.stringify({mode:'dry-run',cases:HYBRID_LIVE_CASES.length,maximumJevReserveUsd:HYBRID_LIVE_CASES.length*JEV_ATTEMPT_RESERVE_USD,authorization:'Shares the existing lifetime US$1 Jev testing budget. No live calls without --run.'}));
 }else{
@@ -30,6 +35,8 @@ if(!process.argv.includes('--run')&&!process.argv.includes('--serve')){
     const data=JSON.parse(await readFile(new URL('data/economy.json',root)));validateEconomy(data);
     const debate=JSON.parse(await readFile(new URL('data/energy-debate.json',root)));
     const network=JSON.parse(await readFile(new URL('data/network.json',root)));
+    const flows=JSON.parse(await readFile(new URL('data/energy-flows.json',root)));
+    const fiscal=JSON.parse(await readFile(new URL('data/provincial-impacts.json',root)));
     const reserveAttempt=async usd=>{
       if(ledger.reservedUsd+usd>0.9)throw Error('budget');
       ledger={...ledger,reservedUsd:ledger.reservedUsd+usd,attempts:ledger.attempts+1};
@@ -43,7 +50,7 @@ if(!process.argv.includes('--run')&&!process.argv.includes('--serve')){
     }}});
     const usage=[];
     const liveDecider=createJevDecider({apiKey,reserveAttempt});
-    const analyze=createEnergyAnalyzer({data,debate,network,workspaceEnabled:true,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider,decider:async input=>{const result=await liveDecider(input);usage.push({inputTokens:result.inputTokens,estimatedUsd:result.estimatedUsd});return result;},answerMode:'claims',model:FREE_MODEL});
+    const analyze=createEnergyAnalyzer({data,debate,network,flows,fiscal,workspaceEnabled:true,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider,decider:async input=>{const result=await liveDecider(input);usage.push({inputTokens:result.inputTokens,estimatedUsd:result.estimatedUsd});return result;},answerMode:'claims',model:FREE_MODEL});
     if(process.argv.includes('--serve')){
       const {createAnalysisServer}=await import('../server/server.mjs');
       const server=await createAnalysisServer({analyze,provider:'cloudflare',model:FREE_MODEL,workspaceEnabled:true,jevEnabled:true,perMinute:10,dailyLimit:12});
@@ -53,7 +60,7 @@ if(!process.argv.includes('--run')&&!process.argv.includes('--serve')){
       console.log(JSON.stringify({liveBrowserJevCalls:usage.length,estimatedJevUsd:usage.reduce((sum,row)=>sum+row.estimatedUsd,0),lifetimeJevReservedUsd:ledger.reservedUsd}));
     }else{
     const results=[];
-    for(const item of HYBRID_LIVE_CASES){
+    for(const item of cases){
       const start=Date.now();const callsBefore=llmCalls;
       try{
         const state={region:'CA',year:2030,scenario:'Current Measures',oilShock:10,duration:'persistent'};

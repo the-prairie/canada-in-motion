@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "region": "AB",
+  "unit": "well licences",
+  "measure": "province-wide-lifecycle-counts",
+  "retrievedAt": "2026-10-19T23:58:11Z",
+  "latestYear": 2026,
+  "latest": {
+    "year": 2026,
+    "snapshotDate": null,
+    "datePrecision": "year",
+    "periodLabel": "2026 monthly snapshot (month not supplied)",
+    "counts": {
+      "reclamationExempt": 36801,
+      "reclamationCertified": 113570,
+      "decommissioned": 96380,
+      "inactive": 77354,
+      "marginal": 96350,
+      "active": 56998,
+      "new": 1681
+    },
+    "operating": 153348,
+    "total": 479134
+  },
+  "observations": [
+    {
+      "year": 2022,
+      "snapshotDate": "2022-12-31",
+      "datePrecision": "day",
+      "periodLabel": "2022 year-end",
+      "counts": {
+        "reclamationExempt": 36791,
+        "reclamationCertified": 96418,
+        "decommissioned": 90460,
+        "inactive": 82837,
+        "marginal": 103689,
+        "active": 52316,
+        "new": 1416
+      },
+      "operating": 156005,
+      "total": 463927
+    },
+    {
+      "year": 2023,
+      "snapshotDate": "2023-12-31",
+      "datePrecision": "day",
+      "periodLabel": "2023 year-end",
+      "counts": {
+        "reclamationExempt": 36859,
+        "reclamationCertified": 102091,
+        "decommissioned": 91846,
+        "inactive": 78790,
+        "marginal": 103673,
+        "active": 53146,
+        "new": 1283
+      },
+      "operating": 156819,
+      "total": 467688
+    },
+    {
+      "year": 2024,
+      "snapshotDate": "2024-12-31",
+      "datePrecision": "day",
+      "periodLabel": "2024 year-end",
+      "counts": {
+        "reclamationExempt": 36859,
+        "reclamationCertified": 105556,
+        "decommissioned": 94640,
+        "inactive": 78230,
+        "marginal": 101864,
+        "active": 53098,
+        "new": 1421
+      },
+      "operating": 154962,
+      "total": 471668
+    },
+    {
+      "year": 2025,
+      "snapshotDate": "2025-12-31",
+      "datePrecision": "day",
+      "periodLabel": "2025 year-end",
+      "counts": {
+        "reclamationExempt": 36844,
+        "reclamationCertified": 110944,
+        "decommissioned": 94928,
+        "inactive": 77932,
+        "marginal": 100034,
+        "active": 53522,
+        "new": 1369
+      },
+      "operating": 153556,
+      "total": 475573
+    },
+    {
+      "year": 2026,
+      "snapshotDate": null,
+      "datePrecision": "year",
+      "periodLabel": "2026 monthly snapshot (month not supplied)",
+      "counts": {
+        "reclamationExempt": 36801,
+        "reclamationCertified": 113570,
+        "decommissioned": 96380,
+        "inactive": 77354,
+        "marginal": 96350,
+        "active": 56998,
+        "new": 1681
+      },
+      "operating": 153348,
+      "total": 479134
+    }
+  ],
+  "definitions": {
+    "active": "A well currently in operation. The chart reports marginal wells as a separate category.",
+    "marginal": "An active well with average production below 10 barrels of oil equivalent per day.",
+    "operating": "Active plus marginal well licences. Marginal wells are active wells in AER’s definition.",
+    "inactive": "A well that has not produced oil or gas, injected fluids, or disposed of waste for 6 or 12 months, depending on type and risk.",
+    "new": "A drilled well that has not produced.",
+    "decommissioned": "A well permanently sealed and taken out of service; also called abandoned.",
+    "reclamationCertified": "A well whose site has received a reclamation certificate after return to equivalent land capacity.",
+    "reclamationExempt": "A well decommissioned before reclamation requirements came into effect (1963 in some areas, otherwise 1978)."
+  },
+  "source": {
+    "id": "aer-well-status",
+    "publisher": "Alberta Energy Regulator",
+    "title": "Well Status — number of licensed wells in each stage of the life cycle",
+    "url": "https://www.aer.ca/data-and-performance-reports/information-hub/well-status",
+    "downloadUrl": "https://www2.aer.ca/t/Production/views/WellStatus_17368672408070/WellStatusChart.csv?:showVizHome=no",
+    "sha256": "d042f7805b468261488bb471942fa7ca2436e547c586eacffd2c3a5f292cde1b",
+    "licence": "AER attributed noncommercial reproduction",
+    "licenceUrl": "https://www.aer.ca/copyright-and-disclaimer"
+  },
+  "limitations": [
+    "Counts cover well licences, including orphaned wells. They are not counts of mapped records or individual production strings.",
+    "AER defines marginal wells as active wells. Operating is the sum of the separately displayed Active and Marginal categories.",
+    "Past years are December 31 snapshots. The current-year CSV supplies only the year; its month is unknown. Retrieval date is not observation date.",
+    "These provincial totals cannot be filtered by a map area, operator, text search or mapped-record status."
+  ],
+  "attribution": "Source: Alberta Energy Regulator. Calculations and presentation by Canada in Motion; not an official AER product.",
+  "dataVersion": "2bd81cb5e6045d109960"
+}

@@ -56,3 +56,33 @@ export function summarize(wells) {
   }
   return {total:wells.length,counts,rows};
 }
+
+// Availability describes the source's classification, not whether a filter found rows.
+export function statusAvailability(catalog, province, inventory) {
+  const sources=(catalog?.sources || []).filter(source=>province==='all'||source.province===province);
+  const counts=province==='all'?inventory.counts:inventory.rows.find(row=>row.code===province)?.counts || [0,0,0,0];
+  return STATUSES.map((status,index)=>counts[index]>0 || sources.some(source=>{
+    if(status.id==='unknown')return true;
+    if(source.id==='sk-orphan-wells')return status.id==='abandoned';
+    return Object.values(source.closureMapping || {}).includes(status.id);
+  }));
+}
+
+export function inventoryScope(catalog, province) {
+  const sources=(catalog?.sources || []).filter(source=>province==='all'||source.province===province);
+  if(province==='all')return {label:'Combined source inventories',detail:'Coverage and observation dates vary by province.'};
+  if(!sources.length)return {label:'No inventory loaded',detail:'This app does not currently include a source for this jurisdiction.'};
+  if(sources.every(source=>source.id==='aer-abandoned-wells'))return {label:'Mapped abandoned-well records',detail:'AER’s province-wide active and marginal totals are shown separately. The mapped Alberta records come from the abandoned-well layer.'};
+  if(sources.every(source=>source.id==='sk-orphan-wells'))return {label:'Orphan-well inventory',detail:'Active and suspended statuses are not reported in this Saskatchewan source.'};
+  if(sources.every(source=>source.observationsThrough))return {label:'Historical well records',detail:'Recorded statuses may have changed since these inventories were published.'};
+  if(sources.some(source=>source.observationsThrough))return {label:'Current and historical inventories',detail:'Some recorded statuses come from historical inventories.'};
+  return {label:'Published well inventory',detail:'Counts describe the loaded source records.'};
+}
+
+export function matchingJurisdictions(query='') {
+  const plain=value=>value.normalize('NFD').replace(/\p{M}/gu,'').toLowerCase().trim();
+  const term=plain(query);
+  const exact=JURISDICTIONS.find(([code])=>plain(code)===term);
+  if(exact)return [exact];
+  return [['all','All provinces & territories'],...JURISDICTIONS].filter(([code,name])=>plain(`${code} ${name}`).includes(term));
+}

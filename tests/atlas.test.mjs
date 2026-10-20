@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {project,unproject,normalizeArea,inArea,summarize} from '../atlas-model.mjs';
+import {project,unproject,normalizeArea,inArea,summarize,statusAvailability,inventoryScope,matchingJurisdictions} from '../atlas-model.mjs';
+import {filterWells,normalizeState} from '../model.mjs';
 
 test('Canada Albers roundtrips western, Arctic and offshore source coordinates', () => {
   for (const coordinate of [[-123.1,49.2],[-96,58],[-45.26,47.1],[-84,82],[-141,60],[-60,44]]) {
@@ -33,4 +34,30 @@ test('comparison denominators and unknown counts use the supplied matching inven
   assert.deepEqual(result.rows.find(row=>row.code==='AB').counts,[1,0,0,1]);
   assert.equal(result.rows.find(row=>row.code==='QC').total,1);
   assert.equal(result.rows.find(row=>row.code==='PE').total,0);
+});
+
+test('active Alberta and Saskatchewan are outside source scope rather than measured zero', () => {
+  const catalog={sources:[{id:'aer-abandoned-wells',province:'AB',closureMapping:{Abandoned:'abandoned',Suspension:'suspended'}},{id:'sk-orphan-wells',province:'SK'}]};
+  const inventory=summarize([{province:'AB',closureStatus:'abandoned',sourceId:'aer-abandoned-wells'},{province:'SK',closureStatus:'unknown',sourceId:'sk-orphan-wells'}]);
+  assert.deepEqual(statusAvailability(catalog,'AB',inventory),[true,true,false,true]);
+  assert.deepEqual(statusAvailability(catalog,'SK',inventory),[true,false,false,true]);
+  assert.match(inventoryScope(catalog,'AB').detail,/province-wide active and marginal totals are shown separately/);
+  assert.match(inventoryScope(catalog,'SK').label,/Orphan/);
+  assert.deepEqual(statusAvailability(catalog,'PE',inventory),[false,false,false,false]);
+});
+
+test('status facets retain other statuses while preserving province and text filters', () => {
+  const wells=[{id:'one',name:'Match',province:'BC',closureStatus:'abandoned'},{id:'two',name:'Match',province:'BC',closureStatus:'active'},{id:'three',name:'Other',province:'BC',closureStatus:'active'},{id:'four',name:'Match',province:'AB',closureStatus:'active'}];
+  const state=normalizeState({province:'BC',closure:'abandoned',query:'Match'});
+  assert.deepEqual(summarize(filterWells(wells,state)).counts,[1,0,0,0]);
+  assert.deepEqual(summarize(filterWells(wells,{...state,closure:'all'})).counts,[1,0,1,0]);
+  const catalog={sources:[{province:'BC',closureMapping:{ACT:'active',ABAN:'abandoned'}}]};
+  assert.equal(statusAvailability(catalog,'BC',summarize([]))[2],true);
+});
+
+test('province picker search handles accents and codes without changing jurisdiction identities', () => {
+  assert.deepEqual(matchingJurisdictions('quebec'),[['QC','Québec']]);
+  assert.deepEqual(matchingJurisdictions('AB'),[['AB','Alberta']]);
+  assert.equal(matchingJurisdictions('').length,14);
+  assert.deepEqual(matchingJurisdictions('unlisted'),[]);
 });

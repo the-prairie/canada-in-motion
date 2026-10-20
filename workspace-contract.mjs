@@ -1,10 +1,14 @@
 import {summarizeEconomy,validateEconomy} from './economy-model.mjs';
 import {selectInfrastructure} from './infrastructure-model.mjs';
+import {buildTradePanels,normalizeTradeSelection} from './trade-workspace-model.mjs';
+import {validateEnergyFlows} from './energy-flow-model.mjs';
+import {validateProvincialImpacts} from './provincial-impact-model.mjs';
 
 export const PANEL_COMPONENTS = Object.freeze({
   'province-map':'ProvinceMap', 'province-comparison':'ProvinceComparison',
   'scenario-comparison':'ScenarioComparison', 'infrastructure-map':'InfrastructureMap',
   'oil-sensitivity':'OilSensitivity', 'coverage-note':'CoverageNote',
+  'energy-trade':'EnergyTrade','energy-transfers':'EnergyTransfers','provincial-impact':'ProvincialImpact',
 });
 export const REGION_CODES = ['CA','NL','PE','NS','NB','QC','ON','MB','SK','AB','BC','YT','NT','NU'];
 const finiteOrNull = value => value === null || Number.isFinite(value);
@@ -13,6 +17,8 @@ const fail = () => {throw new Error('This workspace could not be verified. The w
 export function validateWorkspace(value) {
   if(!value || value.schemaVersion!==1 || !Array.isArray(value.panels) || !value.panels.length || value.panels.length>6 || !Array.isArray(value.sources) || value.sources.length>30 || !Array.isArray(value.plan?.regions) || !value.plan.regions.length || value.plan.regions.some(code=>!REGION_CODES.includes(code)))fail();
   if(value.economySnapshot){try{validateEconomy(value.economySnapshot);if(value.economySnapshot.generatedAt!==value.dataVersion)fail();}catch{fail();}}
+  if(value.tradeSnapshot){try{validateEnergyFlows(value.tradeSnapshot);}catch{fail();}}
+  if(value.fiscalSnapshot){try{validateProvincialImpacts(value.fiscalSnapshot);}catch{fail();}}
   const sources=new Set();
   for(const source of value.sources){
     if(typeof source.id!=='string'||typeof source.title!=='string'||source.title.length>500||typeof source.url!=='string')fail();
@@ -24,6 +30,13 @@ export function validateWorkspace(value) {
   for(const panel of value.panels){
     if(!Object.hasOwn(PANEL_COMPONENTS,panel.type)||typeof panel.id!=='string'||!/^[a-zA-Z0-9_-]{1,80}$/.test(panel.id)||ids.has(panel.id)||typeof panel.title!=='string'||panel.title.length>250||!['answer','context'].includes(panel.role)||!Array.isArray(panel.sourceIds)||panel.sourceIds.some(id=>!sources.has(id)))fail();
     ids.add(panel.id);
+    if(['energy-trade','energy-transfers','provincial-impact'].includes(panel.type)){
+      if(!value.tradeSnapshot||!panel.sourceIds.length)fail();
+      if(panel.type==='energy-trade'&&(!Array.isArray(panel.summary?.links)||panel.summary.links.length>300))fail();
+      if(panel.type==='energy-transfers'&&(!Array.isArray(panel.dataset?.observations)||panel.dataset.observations.length>13))fail();
+      if(panel.type==='provincial-impact'&&(!value.fiscalSnapshot||!Array.isArray(panel.result?.trade?.rows)||panel.result.trade.rows.length>13))fail();
+      const finiteTree=(v)=>{if(typeof v==='number'&&!Number.isFinite(v))fail();if(v&&typeof v==='object')Object.values(v).forEach(finiteTree);};finiteTree(panel);
+    }
     if(panel.type==='coverage-note'){if(typeof panel.message!=='string'||panel.message.length>2500)fail();continue;}
     if(!['infrastructure-map','oil-sensitivity'].includes(panel.type)&&(!panel.sourceIds.length||typeof panel.unit!=='string'))fail();
     if(['province-map','province-comparison','scenario-comparison','oil-sensitivity'].includes(panel.type)){
@@ -45,7 +58,7 @@ export function compileWorkspace(value) {
 }
 
 export function initialSelection(workspace) {
-  return {regions:workspace.plan.regions.includes('CA')?[]:[...workspace.plan.regions],year:workspace.plan.year,scenario:workspace.plan.scenario,oilShock:workspace.plan.oilShock,duration:workspace.plan.duration};
+  return {regions:workspace.plan.regions.includes('CA')?[]:[...workspace.plan.regions],year:workspace.plan.year,scenario:workspace.plan.scenario,oilShock:workspace.plan.oilShock,duration:workspace.plan.duration,...(workspace.tradeSnapshot?normalizeTradeSelection(workspace.tradeSnapshot,workspace.plan):{})};
 }
 
 export function resolveWorkspace(workspace,selection,economy) {
@@ -56,7 +69,10 @@ export function resolveWorkspace(workspace,selection,economy) {
   const regionCodes=selection.regions.length?selection.regions:economy.regions.filter(row=>row.code!=='CA').map(row=>row.code);
   const total=economy.gdp.regions.reduce((sum,row)=>sum+row.energy,0);
   const gdpRows=economy.gdp.regions.map(row=>({...row,value:row.energy,nationalSharePct:row.energy/total*100}));
+  const tradeTypes=['energy-trade','energy-transfers','provincial-impact'];
+  const tradePanels=workspace.tradeSnapshot?buildTradePanels({flows:workspace.tradeSnapshot,fiscal:workspace.fiscalSnapshot,selection,regions:selection.regions,includeFlows:workspace.panels.some(p=>p.type==='energy-trade'),includePhysical:workspace.panels.some(p=>p.type==='energy-transfers'),includeImpacts:workspace.panels.some(p=>p.type==='provincial-impact')}).panels:[];
   const panels=workspace.panels.map(panel=>{
+    if(tradeTypes.includes(panel.type)){const rebuilt=tradePanels.find(p=>p.type===panel.type);return rebuilt?{...rebuilt,id:panel.id,role:panel.role}:panel;}
     if(panel.type==='infrastructure-map'&&workspace.networkSnapshot)return {...panel,...selectInfrastructure(workspace.networkSnapshot,selection.regions),regions:selection.regions.length?selection.regions:['CA']};
     if(panel.type==='province-map')return {...panel,rows:gdpRows};
     if(panel.type==='province-comparison')return {...panel,rows:gdpRows.filter(row=>regionCodes.includes(row.code))};

@@ -1,6 +1,8 @@
 import {AnalysisError, createEnergyAnalyzer, createOpenAIProvider, createCloudflareProvider, DEFAULT_MODEL, FREE_MODEL, validateAnalysisRequest} from './energy-analysis.mjs';
 import {normalizeEconomyState, summarizeEconomy, validateEconomy} from '../economy-model.mjs';
 import {createJevDecider,JevError,JEV_ATTEMPT_RESERVE_USD} from './jev-decisions.mjs';
+import {validateEnergyFlows} from '../energy-flow-model.mjs';
+import {validateProvincialImpacts} from '../provincial-impact-model.mjs';
 
 const SITE_ORIGIN = 'https://the-prairie.github.io';
 const DATA_ROOT = SITE_ORIGIN + '/canada-in-motion/data/';
@@ -61,6 +63,24 @@ async function visitorID(ip, secret, now) {
 
 let evidenceCache;
 let networkCache;
+let tradeCache;
+export async function loadPublishedTradeEvidence(fetchImpl=fetch,now=Date.now()) {
+  if(tradeCache?.expires>now)return tradeCache;
+  const read=async(file,validate)=>{
+    try{
+      const response=await fetchImpl(DATA_ROOT+file,{signal:AbortSignal.timeout(8000),redirect:'manual',headers:{Accept:'application/json'}});
+      if(!response.ok)return null;
+      const value=await boundedJSON(response,4*1048576,8000);
+      validate(value);
+      const age=now-Date.parse(value.retrievedAt||value.generatedAt);
+      if(!Number.isFinite(age)||age>8*DAY||age < -DAY)return null;
+      return value;
+    }catch{return null;}
+  };
+  const [flows,fiscal]=await Promise.all([read('energy-flows.json',validateEnergyFlows),read('provincial-impacts.json',validateProvincialImpacts)]);
+  tradeCache={flows,fiscal,expires:now+300000};
+  return tradeCache;
+}
 export async function loadPublishedNetwork(fetchImpl=fetch,now=Date.now()) {
   if(networkCache?.expires>now)return networkCache.data;
   try{
@@ -167,9 +187,9 @@ export class AnalysisQuota {
       const selected=providerConfig(env);
       const workspace=workspaceConfig(env);
       const provider=selected.provider==='cloudflare'?createCloudflareProvider({ai:env.AI}):createOpenAIProvider({apiKey:env.OPENAI_API_KEY});
-      const network=workspace.workspaceEnabled?await loadPublishedNetwork():undefined;
+      const [network,trade]=workspace.workspaceEnabled?await Promise.all([loadPublishedNetwork(),loadPublishedTradeEvidence()]):[undefined,{}];
       const decider=workspace.jevEnabled?createJevDecider({apiKey:env.TYPESAFE_API_KEY,reserveAttempt:amount=>this.reserveJev(amount)}):undefined;
-      const analyze=createEnergyAnalyzer({data,debate,network,decider,workspaceEnabled:workspace.workspaceEnabled,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider,model:selected.model,timeoutMs:60000,answerMode:selected.provider==='cloudflare'?'claims':'prose'});
+      const analyze=createEnergyAnalyzer({data,debate,network,flows:trade.flows,fiscal:trade.fiscal,decider,workspaceEnabled:workspace.workspaceEnabled,normalizeState:normalizeEconomyState,summarize:summarizeEconomy,provider,model:selected.model,timeoutMs:60000,answerMode:selected.provider==='cloudflare'?'claims':'prose'});
       const result=await analyze(input);
       return json({...result,provider:selected.provider,dataVersion:data.generatedAt});
     } catch(error) {

@@ -1,0 +1,22 @@
+{
+  "scope": "Alberta operating well licence counts and atlas usability fixes",
+  "source": "https://www.aer.ca/data-and-performance-reports/information-hub/well-status",
+  "reviewDate": "2026-10-19",
+  "active": 56998,
+  "marginal": 96350,
+  "operating": 153348,
+  "allLifecycleLicences": 479134,
+  "observationYear": 2026,
+  "snapshotMonth": null,
+  "definitions": "Marginal wells are active wells averaging less than 10 BOE/day. Operating sums AER’s separate Active and Marginal categories. These province-wide licence totals are separate from mapped source records.",
+  "sourceVerification": "Independent reviewer downloaded the official CSV, matched its hash and checked the embedded workbook and definitions.",
+  "tests": [
+    "2 JS schema/count/missing-date tests",
+    "5 Python parser, schema drift, counts and offline-provenance tests",
+    "Hidden desktop and 390px mobile actual browser tests",
+    "Searchable province picker, keyboard navigation, Escape and outside click",
+    "Unsupported mapped statuses show unavailable, never zero"
+  ],
+  "refresh": "Scheduled and deployment workflows verify and ingest the public CSV. Offline replay preserves the verified acquisition date.",
+  "recordLevelStatus": "ST37 is available but contains multiple production strings per licence. Legal licence status is not operational status; unreviewed production-string aggregation is not used as an active-well map."
+}

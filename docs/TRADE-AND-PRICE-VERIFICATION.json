@@ -1,0 +1,124 @@
+{
+  "scope": "Interprovincial energy trade, physical provincial balances and bounded price sensitivities",
+  "reviewDate": "2026-10-19",
+  "data": {
+    "tradeVersion": "eaa874e962ee1870e336",
+    "fiscalVersion": "a8b38429a8a6db24fabc",
+    "tradeYears": [
+      2022,
+      2023,
+      2024
+    ],
+    "tradeRecords": 1638,
+    "tradeUnit": "million current CAD at basic prices",
+    "physicalSeries": [
+      {
+        "id": "electricity-annual",
+        "commodity": "electricity",
+        "period": "2025",
+        "frequency": "annual",
+        "unit": "MWh",
+        "publicationStatus": "preliminary"
+      },
+      {
+        "id": "electricity-monthly",
+        "commodity": "electricity",
+        "period": "2026-07",
+        "frequency": "monthly",
+        "unit": "MWh",
+        "publicationStatus": "See source status flags"
+      },
+      {
+        "id": "oil-net-annual",
+        "commodity": "oil",
+        "period": "2024",
+        "frequency": "annual",
+        "unit": "TJ",
+        "publicationStatus": null
+      },
+      {
+        "id": "gas-net-annual",
+        "commodity": "gas",
+        "period": "2024",
+        "frequency": "annual",
+        "unit": "TJ",
+        "publicationStatus": null
+      }
+    ]
+  },
+  "model": {
+    "trade": "Uniform commodity repricing at fixed quantities: change in receipts = exports × shock; change in purchase costs = imports × shock. Every selected province uses all domestic counterparties. Domestic net balances cancel as an accounting identity, not as a GDP result.",
+    "fiscal": "The same percentage changes each published provincial benchmark from its own dated baseline. Alberta oil and gas, British Columbia gas, and Saskatchewan oil use separate budget sensitivities. BC includes production and royalty-credit responses. The fiscal and trade channels overlap and must not be added.",
+    "bounds": "One commodity and one percentage change, between -20% and +20%, per AI analysis. Native controls recalculate without inference.",
+    "missing": "Suppressed or unavailable values remain null. Missing fiscal calibrations are not zero. Physical totals do not identify bilateral shipments."
+  },
+  "refresh": {
+    "trade": "Official Statistics Canada ZIP downloads on scheduled refresh and deployment; dimension, completeness, missingness, reconciliation and source hashes verified before atomic output.",
+    "fiscal": "Verify the exact publisher files on every refresh. Changed hashes stop publication for review of the coefficients."
+  },
+  "architecture": {
+    "planner": "The language model selects topics and regions. Explicit supported periods, commodities and price signs are reconciled against the request. Unsupported measures retain a coverage note.",
+    "presentation": "Jev receives bounded panel metadata; OpenUI renders registered components. Model output does not supply numerical estimates or executable UI code.",
+    "reproducibility": "Browser exports contain resolved panels, selection, pinned source datasets and source registry."
+  },
+  "browserChecks": [
+    "Hidden desktop and 390px mobile; no horizontal overflow",
+    "AB/BC electricity 2024: 60.209M AB→BC, 420.803M BC→AB, 481.012M total",
+    "Gas -10% AB/BC live question; source-backed trade and budget panels",
+    "Budget estimates: AB -45M; BC -218M to -130.8M CAD",
+    "Native and AI exports preserve selected commodity, regions, shock and source snapshots",
+    "Saved native controls survive URL reload",
+    "No browser console errors"
+  ],
+  "remaining": [
+    "Bilateral measured physical shipment accounts",
+    "Causal provincial GDP and employment responses",
+    "Household bill and income distribution responses",
+    "Fiscal calibration for provinces without published supported coefficients"
+  ],
+  "sources": [
+    {
+      "id": "statcan-36100709",
+      "title": "Provincial and territorial trade flows, by detailed product classification, current and constant dollars",
+      "url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3610070901"
+    },
+    {
+      "id": "statcan-25100021",
+      "title": "Electric power, electric utilities and industry, annual supply and disposition",
+      "url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=2510002101"
+    },
+    {
+      "id": "statcan-25100016",
+      "title": "Electric power generation, monthly receipts, deliveries and availability",
+      "url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=2510001601"
+    },
+    {
+      "id": "statcan-25100029",
+      "title": "Supply and demand of primary and secondary energy in terajoules, annual",
+      "url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=2510002901"
+    },
+    {
+      "id": "ab-budget-2026-price-sensitivity",
+      "title": "Alberta Budget 2026: revenue tables",
+      "url": "https://open.alberta.ca/dataset/8055ff9a-6109-45ac-b4dc-b90084c0d28d/resource/d662ba40-28ff-48cd-96ea-0dfaebe48474/download/budget-2026-fiscal-plan-revenue-tables-2026-29.xlsx"
+    },
+    {
+      "id": "bc-budget-2026-price-sensitivity",
+      "title": "British Columbia Budget and Fiscal Plan 2026/27–2028/29",
+      "url": "https://www.bcbudget.gov.bc.ca/2026/pdf/2026_Budget_and_Fiscal_Plan.pdf"
+    },
+    {
+      "id": "sk-budget-2026-price-sensitivity",
+      "title": "Saskatchewan 2026–27 Budget",
+      "url": "https://pubsaskdev.blob.core.windows.net/pubsask-prod/153853/2026-27-Budget-Document.pdf"
+    }
+  ],
+  "checks": {
+    "nodeTests": 165,
+    "pythonTests": 54,
+    "workerEdgeTests": 21,
+    "liveProviderCases": 6,
+    "liveProviderPassed": 6,
+    "independentReview": "Accepted after arithmetic, scope, question-routing and refresh-timestamp repairs."
+  }
+}

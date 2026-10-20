@@ -4,6 +4,8 @@ import {Renderer,createLibrary,defineComponent} from '@openuidev/react-lang';
 import {z} from 'zod/v4';
 import {compileWorkspace,initialSelection,resolveWorkspace,validateWorkspace} from '../workspace-contract.mjs';
 import {project} from '../atlas-model.mjs';
+import {createTradeViews} from './trade-views.jsx';
+import {createTradeWorkspace,ENERGY_COMMODITIES} from '../trade-workspace-model.mjs';
 
 const Context=createContext(null);
 const number=(value,digits=1)=>Number.isFinite(value)?new Intl.NumberFormat('en-CA',{maximumFractionDigits:digits}).format(value):'No data';
@@ -21,7 +23,7 @@ function Sources({panel}){
   })}</details>;
 }
 function Panel({panel,children,tools,subtitle}){
-  return <section className={`hw-panel hw-${panel.type}`} aria-labelledby={`hw-title-${panel.id}`}><header><div><p className="hw-eyebrow">{panel.role==='context'?'Supporting context':panel.type==='scenario-comparison'?'Published scenario':panel.type==='oil-sensitivity'?'National model':'Observed data'} · {panel.period}</p><h3 id={`hw-title-${panel.id}`}>{panel.title}</h3>{subtitle&&<p className="hw-caption">{subtitle}</p>}</div>{tools}</header>{children}<Sources panel={panel}/></section>;
+  return <section className={`hw-panel hw-${panel.type}`} aria-labelledby={`hw-title-${panel.id}`}><header><div><p className="hw-eyebrow">{panel.role==='context'?'Supporting context':panel.type==='scenario-comparison'?'Published scenario':panel.type==='oil-sensitivity'?'National model':panel.type==='energy-trade'?'Modelled trade':panel.type==='provincial-impact'?'Price experiment':'Observed data'} · {panel.period}</p><h3 id={`hw-title-${panel.id}`}>{panel.title}</h3>{subtitle&&<p className="hw-caption">{subtitle}</p>}</div>{tools}</header>{children}<Sources panel={panel}/></section>;
 }
 function Table({caption,headers,rows}){
   return <div className="hw-table-wrap" tabIndex={0} role="region" aria-label={caption}><table><caption>{caption}</caption><thead><tr>{headers.map(label=><th key={label} scope="col">{label}</th>)}</tr></thead><tbody>{rows.map((row,index)=><tr key={index}>{row.map((value,i)=>i===0?<th key={i} scope="row">{value}</th>:<td key={i}>{value}</td>)}</tr>)}</tbody></table></div>;
@@ -36,7 +38,7 @@ function ProvinceComparisonView({id}){
   return <Panel panel={panel} subtitle="Energy-sector value added. Current Canadian dollars at basic prices." tools={<ViewSwitch table={table} setTable={setTable} label="GDP comparison display"/>}>
     <label className="hw-measure">Compare by<select aria-label="Compare by" value={measure} onChange={e=>setMeasure(e.target.value)}><option value="value">Energy GDP</option><option value="sharePct">Share of each economy</option><option value="nationalSharePct">Share of Canadian energy GDP</option></select></label>
     {table?<Table caption={`Energy-sector GDP · ${panel.period}`} headers={['Province / territory','Energy GDP','Share of local GDP','Share of Canadian energy GDP']} rows={rows.map(r=>[name(r.code)||r.name,dollars(r.value),percentage(r.sharePct),percentage(r.nationalSharePct)])}/>:<ol className="hw-bars">{rows.map(r=><li key={r.code}><button onClick={()=>toggle(r.code)} aria-pressed={selection.regions.includes(r.code)} aria-label={`${name(r.code)||r.name}, ${format(r[measure])}; toggle comparison`}><span className="hw-bar-label">{name(r.code)||r.name}</span><span className="hw-bar-track" aria-hidden="true"><span style={{width:`${(r[measure]||0)/max*100}%`}}/></span><strong>{format(r[measure])}</strong></button></li>)}</ol>}
-    <p className="hw-caption">GDP measures where value is added. It does not show where shareholders, workers or governments receive that income.</p>
+
   </Panel>;
 }
 function ProvinceMapView({id}){
@@ -48,7 +50,7 @@ function ProvinceMapView({id}){
       const row=panel.rows.find(r=>r.code===shape.code);const selected=selection.regions.includes(shape.code);
       return <path key={shape.code} d={shape.rings.map(path).join(' ')} fill={Number.isFinite(row?.sharePct)?`hsl(170 28% ${92-Math.min(row.sharePct,40)*1.55}%)`:'#e7e7df'} stroke={selected?'#b84e2a':'#fbfaf5'} strokeWidth={selected?2.5:1} vectorEffect="non-scaling-stroke" className={selected?'selected':''} tabIndex={0} role="button" aria-pressed={selected} aria-label={`${name(shape.code)||shape.name}: ${percentage(row?.sharePct)} of GDP. Toggle comparison.`} onClick={()=>toggle(shape.code)} onKeyDown={e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();toggle(shape.code);}}}><title>{shape.name} · {percentage(row?.sharePct)}</title></path>;
     })}</svg><div className="hw-map-key"><span>0%</span><i/><span>40% of local GDP</span><span className="hw-selected-key">Selected</span></div></>}
-    <p className="hw-caption">Select provinces here or in the comparison controls above. Smaller jurisdictions are also available by name.</p>
+
   </Panel>;
 }
 function ScenarioComparisonView({id}){
@@ -86,7 +88,8 @@ function OilSensitivityView({id}){
 function CoverageNoteView({id}){
   const {panel}=usePanel(id);return <aside className="hw-coverage" role="note"><p className="hw-eyebrow">Evidence gap</p><h3>{panel.title}</h3><p>{panel.message}</p>{panel.sourceIds.length>0&&<Sources panel={panel}/>}</aside>;
 }
-const components=Object.entries({ProvinceMap:ProvinceMapView,ProvinceComparison:ProvinceComparisonView,ScenarioComparison:ScenarioComparisonView,InfrastructureMap:InfrastructureMapView,OilSensitivity:OilSensitivityView,CoverageNote:CoverageNoteView}).map(([name,View])=>defineComponent({name,description:`A verified ${name} panel resolved from source data.`,props:z.object({id:z.string()}),component:({props})=><View id={props.id}/>}));
+const tradeViews=createTradeViews({usePanel,Panel,Table,ViewSwitch});
+const components=Object.entries({...tradeViews,ProvinceMap:ProvinceMapView,ProvinceComparison:ProvinceComparisonView,ScenarioComparison:ScenarioComparisonView,InfrastructureMap:InfrastructureMapView,OilSensitivity:OilSensitivityView,CoverageNote:CoverageNoteView}).map(([name,View])=>defineComponent({name,description:`A verified ${name} panel resolved from source data.`,props:z.object({id:z.string()}),component:({props})=><View id={props.id}/>}));
 const EnergyWorkspace=defineComponent({name:'EnergyWorkspace',description:'Linked energy evidence panels.',props:z.object({panels:z.array(z.union(components.map(component=>component.ref)))}),component:({props,renderNode})=><div className="hw-grid">{renderNode(props.panels)}</div>});
 export const energyLibrary=createLibrary({root:'EnergyWorkspace',components:[EnergyWorkspace,...components]});
 
@@ -102,16 +105,19 @@ function Workspace({workspace,economy,network,shapes,question,saved,onState,onRe
   const response=useMemo(()=>compileWorkspace(workspace),[workspace]);
   const update=patch=>{setHistory(old=>[...old.slice(-19),selection]);const next={...selection,...patch};setSelection(next);onState?.(next);};
   const toggle=code=>{if(!compatible)return;update({regions:selection.regions.includes(code)?selection.regions.filter(r=>r!==code):[...selection.regions,code]});};
+  const headingId=workspace.authored?'hw-trade-heading':'hw-heading';
   const hasScenario=workspace.panels.some(p=>p.type==='scenario-comparison');
-  const hasRegions=workspace.panels.some(p=>p.type.startsWith('province-')||p.type==='scenario-comparison'||p.type==='infrastructure-map');
+  const hasTrade=workspace.panels.some(p=>['energy-trade','energy-transfers','provincial-impact'].includes(p.type));
+  const hasRegions=hasTrade||workspace.panels.some(p=>p.type.startsWith('province-')||p.type==='scenario-comparison'||p.type==='infrastructure-map');
   const download=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify({schemaVersion:1,workspace:resolved,selection,sourceDataVersion:economy.generatedAt},null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='energy-workspace.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-  return <Context.Provider value={{workspace,resolved,economy,network,shapes,selection,toggle}}><div className="hw-shell">
-    <div className="hw-heading"><div><p className="hw-eyebrow">Interactive answer</p><h2 tabIndex={-1} id="hw-heading">{question}</h2></div><div className="hw-actions"><button onClick={()=>{const previous=history.at(-1);if(previous){setSelection(previous);onState?.(previous);setHistory(history.slice(0,-1));}}} disabled={!history.length}>Undo</button><button onClick={()=>update(original)} disabled={!compatible}>Reset</button><button onClick={download}>Export data</button></div></div>
+  return <Context.Provider value={{workspace,resolved,economy,network,shapes,selection,toggle,update}}><div className="hw-shell" role="region" aria-labelledby={headingId}>
+    <div className="hw-heading"><div><p className="hw-eyebrow">{workspace.authored?'Trade & prices':'Interactive answer'}</p><h2 tabIndex={-1} id={headingId}>{question}</h2></div><div className="hw-actions"><button onClick={()=>{const previous=history.at(-1);if(previous){setSelection(previous);onState?.(previous);setHistory(history.slice(0,-1));}}} disabled={!history.length}>Undo</button><button onClick={()=>update(original)} disabled={!compatible}>Reset</button><button data-workspace-export onClick={download}>Export data</button></div></div>
     {!compatible&&<p className="hw-coverage">This answer uses an earlier data snapshot. Its values are preserved; ask again to use the latest data and enable the comparison controls.</p>}
-    {hasRegions&&<details className="hw-selection" open><summary>Compare {selection.regions.length?selection.regions.map(code=>name(code)||economy.regions.find(r=>r.code===code)?.name||code).join(', '):'all provinces and territories'}</summary><div className="hw-regions"><button disabled={!compatible} aria-pressed={!selection.regions.length} onClick={()=>update({regions:[]})}>All</button>{economy.regions.filter(r=>r.code!=='CA').map(r=><button key={r.code} title={name(r.code)||r.name} aria-label={name(r.code)||r.name} aria-pressed={selection.regions.includes(r.code)} disabled={!compatible} onClick={()=>toggle(r.code)}>{r.code}</button>)}</div><p className="hw-caption">Choose any combination. Selections update the comparisons immediately.</p></details>}
+    {hasRegions&&<details className="hw-selection" open><summary>Compare {selection.regions.length?selection.regions.map(code=>name(code)||economy.regions.find(r=>r.code===code)?.name||code).join(', '):'all provinces and territories'}</summary><div className="hw-regions"><button disabled={!compatible} aria-pressed={!selection.regions.length} onClick={()=>update({regions:[]})}>All</button>{economy.regions.filter(r=>r.code!=='CA').map(r=><button key={r.code} title={name(r.code)||r.name} aria-label={name(r.code)||r.name} aria-pressed={selection.regions.includes(r.code)} disabled={!compatible} onClick={()=>toggle(r.code)}>{r.code}</button>)}</div></details>}
+    {hasTrade&&<div className="hw-scenario-controls hw-trade-controls"><label>Energy<select aria-label="Energy commodity" value={selection.tradeCommodity} onChange={e=>update({tradeCommodity:e.target.value,transferSet:null})}>{Object.entries(ENERGY_COMMODITIES).map(([id,label])=><option key={id} value={id}>{label}</option>)}</select></label><label>Trade year<select aria-label="Trade year" value={selection.tradeYear} onChange={e=>update({tradeYear:Number(e.target.value)})}>{workspace.tradeSnapshot.trade.years.map(y=><option key={y}>{y}</option>)}</select></label></div>}
     {hasScenario&&<div className="hw-scenario-controls"><label>Published scenario<select aria-label="Published scenario" disabled={!compatible} value={selection.scenario} onChange={e=>update({scenario:e.target.value})}>{economy.scenarios.map(s=><option key={s}>{s}</option>)}</select></label><label>Year<select aria-label="Scenario year" disabled={!compatible} value={selection.year} onChange={e=>update({year:Number(e.target.value)})}>{economy.years.map(y=><option key={y}>{y}</option>)}</select></label><p>Updates use the published series. No additional model call.</p></div>}
     {renderError?<p role="alert" className="hw-coverage">The interactive layout could not be verified. The written findings remain below.</p>:<Renderer response={response} library={energyLibrary} isStreaming={false} publishObservability={false} onError={errors=>{if(errors.some(error=>error.severity!=='warning'))setRenderError(true);}}/>}
-    <details className="hw-method"><summary>How this workspace was assembled</summary><p>The language model selected the topics and regions. {workspace.decision?.provider==='jev'?'Jev suggested the display order and assessed whether the evidence addressed the question.':'The app used its standard view rules; Jev was not used for this answer.'} Code checked the available measures and retrieved every displayed value from the cited data. Jev’s decision affects display order; coverage labels follow the app’s data checks. OpenUI arranges the registered maps and comparisons.</p><p>Data snapshot: {workspace.dataVersion?.slice(0,10)}. {workspace.decision?.status==='budget-exhausted'?'The Jev allowance has been reached.':''}</p>{workspace.limitations?.length>0&&<ul>{workspace.limitations.map((text,i)=><li key={i}>{text}</li>)}</ul>}</details>
+    <details className="hw-method"><summary>{workspace.authored?'Methods & coverage':'How this workspace was assembled'}</summary>{workspace.authored?<p>Published trade estimates, measured physical transfers and price calculations use separate sources and periods. Every view includes its definition and source. Controls recalculate locally without an AI request.</p>:<p>The language model selected the topics and regions. {workspace.decision?.provider==='jev'?'Jev suggested the display order and assessed whether the evidence addressed the question.':'The app used its standard view rules; Jev was not used for this answer.'} Code checked the available measures and retrieved every displayed value from the cited data. Jev’s decision affects display order; coverage labels follow the app’s data checks. OpenUI arranges the registered maps and comparisons.</p>}<p>Data snapshot: {workspace.dataVersion?.slice(0,10)}. {workspace.decision?.status==='budget-exhausted'?'The Jev allowance has been reached.':''}</p>{workspace.limitations?.length>0&&<ul>{workspace.limitations.map((text,i)=><li key={i}>{text}</li>)}</ul>}</details>
   </div></Context.Provider>;
 }
 export function mountWorkspace(element,options){
@@ -119,4 +125,9 @@ export function mountWorkspace(element,options){
   const pinned={...options,economy:options.workspace.economySnapshot||options.economy};
   const root=createRoot(element);root.render(<WorkspaceBoundary><Workspace {...pinned}/></WorkspaceBoundary>);
   return {unmount:()=>root.unmount()};
+}
+
+export function mountTradeExplorer(element,{economy,flows,fiscal,selection,regions,shapes,onState}) {
+  const workspace=createTradeWorkspace({economy,flows,fiscal,selection,regions});
+  return mountWorkspace(element,{workspace,economy,shapes,question:'Energy between provinces',onState});
 }

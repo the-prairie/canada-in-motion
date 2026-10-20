@@ -53,6 +53,12 @@ jobs:
         run: python pipeline/refresh_context.py
       - name: Refresh observed GDP and official energy scenarios
         run: python pipeline/refresh_economy.py
+      - name: Refresh Alberta province-wide well status counts
+        run: python pipeline/refresh_alberta_status.py
+      - name: Refresh interprovincial energy trade and physical balances
+        run: python pipeline/refresh_energy_flows.py
+      - name: Verify published provincial budget sensitivities
+        run: python pipeline/refresh_provincial_impacts.py
       - name: Require approved beta scope, rights, integrity and freshness
         run: node scripts/beta-release-gate.mjs
       - run: npm run build

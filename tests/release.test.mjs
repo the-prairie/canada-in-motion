@@ -23,7 +23,7 @@ async function fixture(t) {
   const catalog={schemaVersion:2,releaseId:'a'.repeat(20),basePath:`data/releases/${'a'.repeat(20)}/`,purpose:'noncommercial',retrievedAt:DATE,nationalComplete:false,totalRecords:1,sources:[source]};
   const coverage={provinces:config.requiredProvinces.map(code=>({code,topics:Object.fromEntries(config.requiredTopics.map(topic=>[topic,{status:'partial',sourceIds:['example'],evidenceUrl:'https://example.org/evidence',retrievedAt:DATE}]))}))};
   for(const file of PUBLIC_FILES) await write(file,file==='index.html'?'<html><head></head><body>Atlas</body></html>':file.endsWith('.json')?{}:'/* fixture */');
-  await write('data/economy.json', JSON.parse(await fs.readFile(new URL('../data/economy.json',import.meta.url),'utf8')));
+  for(const file of ['economy','energy-flows','provincial-impacts','alberta-well-status'])await write(`data/${file}.json`,JSON.parse(await fs.readFile(new URL(`../data/${file}.json`,import.meta.url),'utf8')));
   await write('vendor/LICENSE.txt','Third party notice');await write('vendor/fonts/OFL.txt','Font notice');
   await write('config/publication.json',config);await write('config/sources.json',[definition]);await write('data/catalog.json',catalog);await write('data/national-coverage.json',coverage);
   await write(catalog.basePath+source.indexFile,index);await write(catalog.basePath+source.detailFiles[0].file,details);
