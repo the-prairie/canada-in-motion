@@ -159,7 +159,10 @@ def main():
                         help='Reuse an intact snapshot within 24 hours, preserving its original retrieval date')
     args = parser.parse_args()
     if not args.offline and args.max_age_hours and args.output.exists():
-        previous = json.loads(args.output.read_text())
+        try:
+            previous = json.loads(args.output.read_text())
+        except (OSError, json.JSONDecodeError):
+            previous = {}
         if reusable_snapshot(previous, datetime.now(timezone.utc), args.max_age_hours):
             print(json.dumps({'status': 'reused-verified-snapshot', 'retrievedAt': previous['retrievedAt'],
                               'dataVersion': previous['dataVersion']}))

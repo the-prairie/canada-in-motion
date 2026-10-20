@@ -1,6 +1,7 @@
 import contextlib
 import json
 import tempfile
+import subprocess
 from pathlib import Path
 from unittest.mock import patch
 import copy
@@ -54,6 +55,16 @@ class AlbertaStatusTests(unittest.TestCase):
             self.assertEqual(output.read_bytes(), original)
             self.assertIn('reused-verified-snapshot', log.getvalue())
             self.assertIn(stamp, log.getvalue())
+
+    def test_malformed_reuse_file_attempts_strict_online_refresh(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output, cache = Path(directory) / 'status.json', Path(directory) / 'source.csv'
+            output.write_text('{broken')
+            with patch('sys.argv', ['refresh', '--output', str(output), '--cache', str(cache), '--max-age-hours', '24']), patch('refresh_alberta_status.subprocess.run', side_effect=subprocess.CalledProcessError(22, 'curl')) as download:
+                with self.assertRaises(subprocess.CalledProcessError):
+                    main()
+            download.assert_called_once()
+            self.assertEqual(output.read_text(), '{broken')
 
     def test_operating_includes_marginal_and_preserves_unknown_month(self):
         data = build(fixture(), '2026-10-19T00:00:00Z')
