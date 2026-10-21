@@ -333,7 +333,7 @@ function render() {
     energyEconomy.update(state.economy);
     return;
   }
-  $("snapshot-label").textContent = `${snapshotFreshness(data.catalog.retrievedAt) === "stale" ? "Refresh overdue" : "Retrieved"} · ${localDate(data.catalog.retrievedAt)}`;
+  $("snapshot-label").textContent = state.view === "journey" ? "" : `${snapshotFreshness(data.catalog.retrievedAt) === "stale" ? "Refresh overdue" : "Retrieved"} · ${localDate(data.catalog.retrievedAt)}`;
   if (exploring) {
     clearTimeout(resultTimer);
     if (!wellsReady) {
@@ -346,14 +346,14 @@ function render() {
       wells: data.wells.wells, provinces: provinceGeometry, catalog: data.catalog,
       onChange: patch => { state = normalizeState({...state, ...patch, well:null}); render(); persist("push"); },
       onRecords: () => chooseView("wells"), onExport: exportWellRecords,
-      onWell: chooseWell, onSource: showEvidence,
+      onWell: inspectAtlasWell, onSource: showEvidence,
     });
     recordAtlas.setVisible(true);
     recordAtlas.update(state, filtered);
     return;
   }
-  if (state.layers.bcPermits && !data.bcInfrastructure) void ensureBCData().catch(() => {});
-  if (state.layers.historical && !data.historicalInfrastructure) void ensureHistoricalData().catch(() => {});
+  if (state.view!=="journey" && state.layers.bcPermits && !data.bcInfrastructure) void ensureBCData().catch(() => {});
+  if (state.view!=="journey" && state.layers.historical && !data.historicalInfrastructure) void ensureHistoricalData().catch(() => {});
   const selectedRecord = wellsReady && state.view === "wells" && state.well ? data.wells.wells.find(w => w.id === state.well) : null;
   if (selectedRecord && !selectedRecord._detailLoaded) {
     const error = detailError?.id === selectedRecord.id ? detailError.message : null;
@@ -361,7 +361,7 @@ function render() {
     if (!error) void ensureSelectedDetail(selectedRecord);
     return;
   }
-  const needsWells = state.view === "wells" || (state.view === "lab" && state.labTab === "cleanup") || state.layers.wells;
+  const needsWells = state.view === "wells" || (state.view === "lab" && state.labTab === "cleanup") || (state.view!=="journey" && state.layers.wells);
   if (needsWells && !wellsReady) {
     document.querySelectorAll("[data-view]").forEach(b => {b.classList.toggle("selected",b.dataset.view===state.view);b.setAttribute("aria-current",b.dataset.view===state.view?"page":"false");});
     $("panel").innerHTML = `<div class="panel-head"><h1>${wellLoadError ? "Inventory unavailable" : "Loading well inventories"}</h1><p>${wellLoadError ? esc(wellLoadError) : "Loading well records. Details will load when you select a well."}</p>${wellLoadError ? '<button data-action="retry-wells" class="primary-button">Retry inventory</button>' : '<p role="status">Loading…</p>'}</div>`;
@@ -374,7 +374,7 @@ function render() {
   const active = document.activeElement,
     activeId = active?.id,
     activeControl = active?.matches("button")
-      ? ["view", "lab", "action", "nextWell", "statusFilter", "route"]
+      ? ["view", "lab", "action", "nextWell", "statusFilter", "route", "step"]
           .map((key) =>
             active.dataset[key] ? [key, active.dataset[key]] : null,
           )
@@ -445,9 +445,9 @@ function render() {
       ? "Saskatchewan records used in the budget scenario. Locations from the source."
       : state.view === "wells"
         ? recordScope.outsideScope ? recordScope.detail : "Clusters count source records, not unique sites."
-        : "Schematic routes. Facility markers show approximate locations.";
-  if (state.layers.historical && data.historicalInfrastructure) $("map-source-label").textContent += ` Historical CanVec overlay: pipelines through ${data.historicalInfrastructure.metadata.observationRanges.pipeline.latest.slice(0,4)}, refineries through ${data.historicalInfrastructure.metadata.observationRanges.refinery.latest.slice(0,4)}; current operation unknown.`;
-  $("coverage-line").textContent =
+        : state.view === "journey" ? "Schematic route · not a pipeline alignment." : "Schematic routes. Facility markers show approximate locations.";
+  if (state.view!=="journey" && state.layers.historical && data.historicalInfrastructure) $("map-source-label").textContent += ` Historical CanVec overlay: pipelines through ${data.historicalInfrastructure.metadata.observationRanges.pipeline.latest.slice(0,4)}, refineries through ${data.historicalInfrastructure.metadata.observationRanges.refinery.latest.slice(0,4)}; current operation unknown.`;
+  $("coverage-line").textContent = state.view === "journey" ? "Data coverage" :
     `${fmt(data.catalog.totalRecords)} records · ${new Set(data.catalog.sources.map(s => s.province)).size} jurisdictions · coverage gaps`;
   $("panel").innerHTML =
     state.view === "journey"
@@ -491,17 +491,9 @@ function render() {
 }
 function journeyDock() {
   const r = getRoute();
-  return `<div class="journey-stages">${[
-    ["Locate origin", r.origin.split(",")[0]],
-    ["Fit corridor", r.name.split(" · ")[0]],
-    ["Locate destination", r.destination.split(",")[0]],
-  ]
-    .map(
-      ([label, name], i) =>
-        `${i ? '<span class="stage-divider"></span>' : ""}<button class="stage ${state.step === i ? "active" : ""}" data-step="${i}" aria-pressed="${state.step === i}"><span class="stage-index">${i + 1}</span><span><small>${label}</small><strong>${esc(name)}</strong></span></button>`,
-    )
-    .join("")}</div>`;
+  return `<nav class="journey-stages" aria-label="Shipment stages">${[['Shipment',r.origin.split(',')[0]],['Carrier charge',r.name.split(' · ')[0]],['Destination',r.destination.split(',')[0]]].map(([label,name],i)=>`<button class="stage ${state.step===i?'active':''}" data-step="${i}" aria-pressed="${state.step===i}"><span class="stage-index">${i+1}</span><span><small>${label}</small><strong>${esc(name)}</strong></span></button>`).join('')}</nav>`;
 }
+
 function routeSelect() {
   return field(
     "Corridor and destination",
@@ -518,15 +510,7 @@ function receipt() {
     q = getQuote();
   if (!rate)
     return `<section class="panel-section" id="receipt-region"><h3>Transport estimate unavailable</h3><p class="small">No service-specific rate is loaded for this corridor.</p><div class="receipt-row"><span>Carrier charge</span><strong>Not sourced</strong></div><div class="receipt-row"><span>Government charges</span><strong>Not established</strong></div><button class="text-link" data-action="rate-coverage">View rate coverage</button></section>`;
-  return `<section class="panel-section" id="receipt-region"><div class="receipt-topline"><h3>Carrier subtotal</h3>${pill("Published schedule")}</div>${q.status === "partial" ? `<div class="receipt-total" data-testid="receipt-total">${money(q.carrier)}<small>CAD</small></div><p class="receipt-label">Base transport only · ${precise(rate.rate)} CAD / m³</p>` : `<div class="callout amber" role="status">${esc(q.reason)} ${["unverified-date", "out-of-period"].includes(q.status) ? `<button class="text-link" data-action="rate-date">Use ${rate.effectiveFrom}</button>` : ""}</div>`}<div class="receipt-row"><span>Government charges</span><strong>Not established</strong></div><p class="micro">No tariff solely for crossing a provincial border. Other applicable charges are not included.</p><div class="price-caption"><span>Schedule · ${rate.effectiveFrom}</span><button class="text-link" data-action="receipt-evidence">Calculation & source</button></div><details id="receipt-conditions" class="disclosure"><summary>Carrier breakdown & conditions</summary><p class="micro">${esc(rate.commodity)} · ${esc(rate.service)}<br>Payable to ${esc(rate.operator)}</p>${rate.components
-    .filter((c) => c.additive)
-    .map(
-      (c) =>
-        `<div class="receipt-row"><span>${esc(c.name)}<small>${precise(c.rate)} CAD / m³</small></span><strong>${q.status === "partial" ? money(q.m3 * c.rate) : "Not calculated"}</strong></div>`,
-    )
-    .join(
-      "",
-    )}<p class="micro">Rate applicability is verified for ${rate.effectiveFrom} only. The pipeline reclamation surcharge is included in the variable toll. It is not an orphan-well cleanup payment.</p>${rate.destination.includes("Westridge") ? '<p class="micro">Marine and port charges are not included.</p>' : ""}<button class="secondary-button" data-action="export-receipt">Download receipt</button></details></section>`;
+  return `<section class="panel-section" id="receipt-region"><div class="receipt-topline"><h3>Carrier subtotal</h3>${pill("Published schedule")}</div>${q.status === "partial" ? `<div class="receipt-total" data-testid="receipt-total">${money(q.carrier)}<small>CAD</small></div><p class="receipt-label">Base transport only · ${precise(rate.rate)} CAD / m³</p>` : `<div class="callout amber" role="status">${esc(q.reason)} ${["unverified-date", "out-of-period"].includes(q.status) ? `<button class="text-link" data-action="rate-date">Use ${rate.effectiveFrom}</button>` : ""}</div>`}<div class="receipt-row"><span>Government charges</span><strong>Not established</strong></div><p class="micro">No tariff solely for crossing a provincial border. Other applicable charges are not included.</p><div class="price-caption"><span>Schedule · ${rate.effectiveFrom}</span></div></section>`;
 }
 
 function destinationComparison() {
@@ -534,8 +518,9 @@ function destinationComparison() {
   return data.tariffs.rates.map((rate, i) => `<button class="route-option ${rate.routeId === state.route ? "selected" : ""}" data-route="${rate.routeId}" aria-pressed="${rate.routeId === state.route}"><span><strong>${esc(rate.destination.split(",")[0])}</strong><span class="rate-strip"><i style="width:${widths[i]}%"></i></span></span><span class="route-cost">${precise(rate.rate)} <small>CAD / m³</small></span></button>`).join("");
 }
 function journeyPanel() {
-  const route = getRoute();
-  return `<div class="panel-head"><span class="eyebrow">01 / TRANSPORT</span><h1>Transport costs</h1><p>Compare published pipeline tolls and estimate carrier charges.</p></div><div class="panel-section shipment-form"><div class="route-identity"><span>${esc(route.origin.split(",")[0])}</span><span aria-hidden="true">↗</span><strong>${esc(route.destination.split(",")[0])}</strong></div>${routeSelect()}${getRate() ? `<details class="disclosure" id="shipment-inputs"><summary>Shipment assumptions <span class="assumption-preview">${fmt(state.volume)} ${state.unit === "m3" ? "m³" : "bbl"} · ${esc(state.date)}</span></summary>${shipmentFields()}</details>` : ""}</div>${receipt()}${getRate() ? `<section class="panel-section destination-section"><span class="eyebrow">SAME SERVICE · SAME SCHEDULE</span><h3>Compare destinations</h3><p class="micro">Published schedule: May 1, 2026 · Edmonton origin · light crude · CAD per m³. Select a destination to see its route.</p>${destinationComparison()}<button class="primary-button wide" data-workspace="lab" data-tab="transport">Test a cost scenario <span aria-hidden="true">↗</span></button></section>` : ""}<div class="panel-section benchmark-entry"><span class="eyebrow">CER BENCHMARK TOLLS</span><h3>Other pipeline systems</h3><p class="micro">Browse published tolls for 25 pipeline systems. Dates, units and services vary.</p><button class="secondary-button wide" data-action="benchmark-tolls">Browse benchmark tolls <span aria-hidden="true">↗</span></button></div>`;
+  const route=getRoute(),rate=getRate();
+  const stage=state.step===0?`<section class="panel-section shipment-form"><h2>Your shipment</h2>${rate?shipmentFields():'<p>No service-specific rate is loaded for this corridor.</p>'}<button class="primary-button wide" data-step="1">See carrier charge →</button></section>`:state.step===1?`${receipt()}<section class="panel-section"><button class="text-link" data-step="0">Edit shipment · ${fmt(state.volume)} ${state.unit==='m3'?'m³':'bbl'}</button><button class="primary-button wide" data-step="2">Compare destinations →</button></section>`:`<section class="panel-section destination-section"><h2>${esc(route.destination.split(',')[0])}</h2>${rate?`<p>${esc(rate.commodity)} · ${esc(rate.service)} · ${rate.effectiveFrom}</p>${destinationComparison()}<button class="primary-button wide" data-workspace="lab" data-tab="transport">Test a cost scenario →</button>`:'<p>No comparable destination rates are loaded for this corridor.</p><button class="text-link" data-action="rate-coverage">Rate coverage</button>'}</section>`;
+  return `<div class="panel-head"><h1>Transport costs</h1>${routeSelect()}</div><div class="transport-stage" aria-live="polite">${stage}</div><div class="panel-section transport-actions"><button class="text-link" data-action="benchmark-tolls">Other pipeline tolls</button><button class="text-link" data-action="receipt-evidence">Sources & calculation</button></div>`;
 }
 
 function wellFilters() {
@@ -693,7 +678,20 @@ function chooseStep(n) {
   state.step = n;
   render();
   atlas.step(n);
+  document.querySelector(`#map-dock [data-step="${n}"]`)?.focus({preventScroll:true});
   persist();
+}
+async function inspectAtlasWell(id) {
+  const record=data.wells.wells.find(item=>item.id===id);if(!record)return;
+  const source=data.catalog.sources.find(item=>item.id===record.sourceId);
+  openDialog('<p role="status">Loading the source record…</p>',record.name||'Well record');
+  const revision=dialogRevision;
+  try{
+    if(!record._detailLoaded)Object.assign(record,await loadDetail(data.catalog,record),{_detailLoaded:true});
+    if(revision!==dialogRevision||!$('evidence-dialog').open)return;
+    const events=eventTimeline(record);
+    $('evidence-body').innerHTML=`<p>${esc(record.province)} · ${esc(source?.identifierLabel||'Licence')} ${esc(record.license)}</p><dl class="atlas-record-facts"><div><dt>Closure</dt><dd>${esc(statusNames[record.closureStatus]||record.closureStatus)}</dd></div><div><dt>Orphan designation</dt><dd>${esc(statusNames[record.orphanStatus]||'Unknown')}</dd></div><div><dt>Company in source</dt><dd>${esc(record.operator||'Not supplied')}</dd></div><div><dt>Reclamation</dt><dd>${esc(record.reclamationStatus||'Not supplied')}</dd></div></dl>${source?.observationsThrough?`<p>${esc(historicalNote(source))}</p>`:''}${events.length?`<h3>Recorded history</h3><ol class="timeline">${events.map(event=>`<li><time>${esc(event.date)}</time><strong>${esc(event.label)}</strong></li>`).join('')}</ol>`:'<p>No dated events supplied.</p>'}<a href="${esc(record.sourceUrl)}" target="_blank" rel="noopener">Open source record</a><p class="micro">${esc(source?.title||'')} · Retrieved ${esc(localDate(source?.retrievedAt||data.wells.retrievedAt))}. Current ownership and liability may differ.</p>`;
+  }catch{if(revision===dialogRevision)$('evidence-body').innerHTML='<p role="alert">The record could not load. Close this panel and select the record to retry.</p>';}
 }
 function chooseWell(id) {
   history.pushState(null, "", location.href);
@@ -807,7 +805,7 @@ function showReceiptEvidence() {
   const rate = getRate(),
     q = getQuote();
   openDialog(
-    `<div class="source-entry"><span class="eyebrow">CALCULATION</span><h3>${esc(getRoute().origin)} to ${esc(getRoute().destination)}</h3>${rate ? `<p>${esc(rate.commodity)}. ${esc(rate.service)}. Source page ${rate.page}.</p><p><strong>${fmt(state.volume)} ${state.unit === "m3" ? "m³" : "barrels"} × ${precise(rate.rate)} CAD/m³</strong>${state.unit === "bbl" ? " after converting barrels to cubic metres" : ""}.</p><p>One oil barrel is 0.158987294928 cubic metres. Currency is rounded for display after calculation.</p><p>${q.status === "partial" ? `Published base transport subtotal: ${money(q.carrier)} CAD.` : esc(q.reason)}</p><p><a href="${esc(rate.sourceUrl)}#page=${rate.page}" target="_blank" rel="noopener">Open tariff schedule</a></p>${rate.conditions.map((c) => `<p>${esc(c)}</p>`).join("")}<p>The published rate includes fixed and variable charges. The variable charge includes pipeline reclamation. The schedule does not identify an orphan-well cleanup contribution.</p>` : "<p>No published rate is loaded for this route.</p>"}</div><div class="source-entry"><h3>Government charges</h3><p>No tariff applies simply because goods cross an internal provincial border. Other taxes, permits, port fees and transaction-specific charges need their own applicability check.</p><p><a href="https://www.canada.ca/en/intergovernmental-affairs/services/internal-trade/federal-investments-internal-trade.html" target="_blank" rel="noopener">Government of Canada internal trade explanation</a></p><p>Rail, road and marine freight rates are not available in this app.</p></div>`,
+    `<div class="source-entry"><h3>${esc(getRoute().origin)} to ${esc(getRoute().destination)}</h3>${rate ? `<p>${esc(rate.commodity)}. ${esc(rate.service)}. Source page ${rate.page}.</p><p><strong>${fmt(state.volume)} ${state.unit === "m3" ? "m³" : "barrels"} × ${precise(rate.rate)} CAD/m³</strong>${state.unit === "bbl" ? " after converting barrels to cubic metres" : ""}.</p><p>One oil barrel is 0.158987294928 cubic metres. Currency is rounded for display after calculation.</p><p>${q.status === "partial" ? `Published base transport subtotal: ${money(q.carrier)} CAD.` : esc(q.reason)}</p><p><a href="${esc(rate.sourceUrl)}#page=${rate.page}" target="_blank" rel="noopener">Open tariff schedule</a></p>${rate.components.filter(c=>c.additive).map(c=>`<div class="receipt-row"><span>${esc(c.name)} · ${precise(c.rate)} CAD/m³</span><strong>${q.status==="partial"?money(q.m3*c.rate):"Not calculated"}</strong></div>`).join("")}${rate.conditions.map((c) => `<p>${esc(c)}</p>`).join("")}<button class="secondary-button" data-action="export-receipt">Download receipt</button><p>The published rate includes fixed and variable charges. The variable charge includes pipeline reclamation. The schedule does not identify an orphan-well cleanup contribution.</p>` : "<p>No published rate is loaded for this route.</p>"}</div><div class="source-entry"><h3>Government charges</h3><p>No tariff applies simply because goods cross an internal provincial border. Other taxes, permits, port fees and transaction-specific charges need their own applicability check.</p><p><a href="https://www.canada.ca/en/intergovernmental-affairs/services/internal-trade/federal-investments-internal-trade.html" target="_blank" rel="noopener">Government of Canada internal trade explanation</a></p><p>Rail, road and marine freight rates are not available in this app.</p></div><div class="source-entry"><h3>Route map</h3><p>${esc(getRoute().geometryNote)}</p><a href="${esc(getRoute().sourceUrl)}" target="_blank" rel="noopener">CAPP infrastructure map</a></div>`,
   );
 }
 function showFacility(f) {

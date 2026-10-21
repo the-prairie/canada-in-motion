@@ -31,6 +31,7 @@ for(const interruption of ['cancel','change'])test(`a new question completes imm
   globalThis.fetch=async(url,options)=>{paidCalls++;assert.equal(options.headers['X-Turnstile-Token'],'verified-retry');return Response.json({state:normalizeEconomyState(),analysis:{headline:'Completed',blocks:[]}});};
   const root={
     contains:()=>false,
+    querySelectorAll:()=>[],
     querySelector:selector=>selector==='#ec-verification'?container:null,
     set innerHTML(value){if(container)container.isConnected=false;html=value;container=value.includes('id="ec-verification"')?{isConnected:true}:null;},
     get innerHTML(){return html;},

@@ -332,3 +332,45 @@ body[data-view='wells'] .map-dock { width:auto; max-width:340px; right:auto; }
 body[data-view='wells'] .dock-summary { gap:14px; }
 body[data-view='wells'] .dock-summary strong { color:var(--ink); font-size:18px; }
 body[data-view='wells'] .dock-summary small { font-size:10px; }
+
+.ec-dialog-close{float:right;min-height:44px}
+.ec-composer.context-dialog{padding:0;border:1px solid var(--line)}
+.ec-composer .ec-ask{display:grid;grid-template-columns:1fr auto}
+.ec-composer textarea{min-width:0;width:100%}
+body[data-view='journey'] .map-eyebrow,body[data-view='journey'] #map-eyebrow{display:none}
+body[data-view='journey'] .map-toolbar,body[data-view='journey'] .map-legend{display:none}
+body[data-view='journey'] .map-dock{position:static;order:-1;margin:0;background:var(--paper);border-bottom:1px solid var(--line)}
+body[data-view='journey'] .map-canvas{display:flex;flex-direction:column}
+body[data-view='journey'] #map{position:relative;flex:1;min-height:0}
+body[data-view='journey'] .journey-stages{box-shadow:none;border:0;background:transparent}
+body[data-view='journey'] .stage{flex:1;min-width:0;border-bottom:3px solid transparent}
+body[data-view='journey'] .stage.active{border-bottom-color:var(--green);background:var(--soft)}
+body[data-view='journey'] .stage strong{white-space:normal}
+.endpoint-current{box-shadow:0 0 0 6px #147c7833;outline:2px solid #147c78}
+.transport-stage .primary-button{margin-top:16px}
+.transport-stage h2{font-size:22px;letter-spacing:-.5px;margin:0 0 16px}
+.transport-actions{display:flex;flex-wrap:wrap;gap:12px 24px}
+.atlas-record-facts>div{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:12px 0;border-bottom:1px solid var(--line)}
+.atlas-record-facts dd{margin:0}
+@media(max-width:760px){
+ body[data-view='journey'] .mobile-surface{display:none}
+ body[data-view='journey'] .workspace{display:flex;flex-direction:column;overflow:auto}
+ body[data-view='journey'] .map-space{display:flex;order:0;height:335px;min-height:335px;flex:none}
+ body[data-view='journey'] .detail-panel{display:block;order:1;height:auto;overflow:visible;flex:none}
+ body[data-view='journey'] .map-topbar{display:none}
+ body[data-view='journey'] .map-source{padding:5px 16px;font-size:10px;min-height:30px}
+ body[data-view='journey'] .map-source button{display:none}
+ body[data-view='journey'] .stage small{font-size:12px}
+ body[data-view='journey'] .stage strong{font-size:10px}
+ body[data-view='journey'] .stage{min-height:55px}
+ body[data-view='journey'] .panel-head{padding:16px 20px 8px}
+ body[data-view='journey'] .panel-head h1{font-size:22px;margin-bottom:12px}
+ body[data-view='journey'] .map-canvas{min-height:0}
+ .ec-composer .ec-ask{grid-template-columns:1fr}
+}
+body[data-view='journey'] .map-dock{max-width:none;width:100%;box-shadow:none;border:0;transform:none;left:auto;right:auto}
+body[data-view='journey'] .journey-stages{max-width:none;width:100%}
+body[data-view='journey'] .map-dock{display:block}
+@media(max-height:500px) and (min-width:761px){body[data-view='journey'] .workspace{min-height:480px}body[data-view='journey'] #app{height:auto;min-height:100dvh}body[data-view='journey']{overflow:auto}}
+body[data-view='journey'] .map-topbar .map-method{display:none}
+body[data-view='journey'] .map-source button{display:none}

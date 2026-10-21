@@ -10,7 +10,8 @@ const errors=[],checks=[];page.on('pageerror',e=>errors.push(e.message));
 const base=process.env.TEST_URL||'http://127.0.0.1:4199/';
 const data=await fetch(new URL('data/monthly-energy.json',base)).then(r=>r.json());
 const out=new URL('../../.data-cache/monthly-acceptance/',import.meta.url).pathname;await mkdir(out,{recursive:true});
-const go=async economy=>{await page.goto(base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy})));await page.locator('[data-monthly-ready]').waitFor();};
+const openMonthlyEvidence=async()=>{await page.getByRole('button',{name:'Evidence',exact:true}).click();await page.getByRole('button',{name:'Monthly activity',exact:true}).click();await page.locator('[data-monthly-ready]').waitFor();};
+const go=async economy=>{await page.goto(base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy})));if(economy.section==='outlook'){await page.locator('.pf-history-chart').waitFor();await openMonthlyEvidence();}else await page.locator('[data-monthly-ready]').waitFor();};
 const number=(n,d=2)=>new Intl.NumberFormat('en-CA',{maximumFractionDigits:d}).format(n);
 const format=(v,u)=>{const scale=v>=1e6?1e6:v>=1e3?1e3:1;return `${number(v/scale)} ${scale===1e6?'million ':scale===1e3?'thousand ':''}${u}`;};
 try{
@@ -46,9 +47,12 @@ try{
  const before=await page.locator('.monthly-grid').innerText();await page.locator('#ec-scenario').selectOption('Higher');await page.locator('[data-monthly-ready]').waitFor();assert.equal(await page.locator('.monthly-grid').innerText(),before);
  checks.push('Changing the annual scenario and projection year leaves monthly actuals unchanged');
  await go({section:'outlook',region:'CA',forecastRegions:[],forecastYear:2026});
- await page.getByLabel('Inspect provincial forecast',{exact:true}).selectOption('BC');
+ await page.keyboard.press('Escape');
+ await page.locator('.pf-place-buttons').getByRole('button',{name:'British Columbia',exact:true}).click();
+ await openMonthlyEvidence();
  await page.locator('[data-monthly-focus="BC"]').waitFor();assert.match(await page.locator('.monthly-basis').innerText(),/original inputs/);
- await page.getByRole('button',{name:'2027',exact:true}).click();assert.equal(await page.locator('[data-monthly-ready]').getAttribute('data-monthly-focus'),'BC');
+ await page.keyboard.press('Escape');
+ await page.getByRole('button',{name:'2027',exact:true}).click();await openMonthlyEvidence();assert.equal(await page.locator('[data-monthly-ready]').getAttribute('data-monthly-focus'),'BC');
  checks.push('Forecast inspector synchronizes province without silently changing model inputs');
  await go({section:'explore',story:{commodity:'electricity',focus:'AB',compare:'BC',shockPct:-10,chapter:'overview'}});
  assert.equal(await page.locator('[data-monthly-metric]').count(),1);assert.equal(await page.locator('.monthly-reading').count(),2);

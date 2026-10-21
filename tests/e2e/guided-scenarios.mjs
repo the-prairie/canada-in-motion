@@ -57,7 +57,7 @@ try{
   checks.push('gas/electricity unavailable models, explicit independent retail assumption, commodity changes preserve stage');
   const input=page.getByLabel('Commodity price change percent',{exact:true});await input.focus();await input.press('ControlOrMeta+A');await input.pressSequentially('-10');await input.press('Enter');assert.equal(await input.inputValue(),'-10');
   for(const width of [390,320]){await page.setViewportSize({width,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`overflow at ${width}`);await stage('The exchange').click();await page.locator('.gs-guide').screenshot({path:`/tmp/cim-guided-${width}.png`});await page.locator('.gs-footer').getByRole('button',{name:'Provincial economy →',exact:true}).click();await page.waitForFunction(()=>{const r=document.querySelector('.gs-stage>h4')?.getBoundingClientRect();return r&&r.top>=-1&&r.bottom<=innerHeight;});await page.locator('.gs-footer').getByRole('button',{name:'Household spending →',exact:true}).click();await page.waitForFunction(()=>{const r=document.querySelector('.gs-stage>h4')?.getBoundingClientRect();return r&&r.top>=-1&&r.bottom<=innerHeight;});}
-  const saved=page.locator('.hw-saved');await saved.locator('summary').click();
+  await page.locator('.hw-action-menu summary').click();await page.getByRole('button',{name:/^Open saved/}).click();const saved=page.locator('.hw-saved-list');
   await page.route('**/data/provincial-price-response.json',r=>r.abort());
   await page.route('**/data/household-energy-costs.json',r=>r.abort());
   await saved.getByRole('button',{name:/^Energy between provinces/}).click();

@@ -52,23 +52,29 @@ export class RecordAtlas {
         <footer class="ra-stage-footer"><details class="ra-guide"><summary>About this view</summary><p class="ra-record-key-detail"></p><p class="ra-map-help" id="ra-map-help">Drag to pan. Select an area to inspect its records.</p><p class="ra-comparison-note" hidden></p><span class="ra-projection">Canada Albers · equal area<br><a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener">Boundaries · Natural Earth</a></span></details></footer>
       </div>
       <aside class="ra-inspector" aria-label="Matching well records">
-        <div class="ra-selection-heading"><p class="ra-eyebrow">Well records</p><h2 class="ra-place">Canada</h2><p class="ra-coverage-label"></p><div class="ra-total" aria-live="polite" aria-atomic="true">0</div><p class="ra-match-label">matching records</p></div>
+        <div class="ra-selection-heading"><h2 class="ra-place">Canada</h2><p class="ra-coverage-label"></p><div class="ra-total" aria-live="polite" aria-atomic="true">0</div><p class="ra-match-label">matching records</p></div>
         <div class="ra-region-picker"><button type="button" class="ra-province-toggle" data-ra-command="province-picker" aria-haspopup="dialog" aria-expanded="false" aria-controls="ra-province-dialog"><span class="ra-picker-value">All provinces & territories</span><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="m5 8 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button><div id="ra-province-dialog" class="ra-province-dialog" role="dialog" aria-label="Choose a province or territory" hidden><div class="ra-picker-search"><input type="search" class="ra-province-search" aria-label="Find province or territory" placeholder="Find a province or territory" autocomplete="off"><button type="button" data-ra-command="close-picker" aria-label="Close province picker">×</button></div><div class="ra-province-options" role="group" aria-label="Provinces and territories"></div><p class="ra-picker-empty" hidden>No matching province or territory.</p></div></div>
         <div class="ra-filter-summary"></div><button class="ra-clear-filters" type="button" data-ra-command="clear-filters" hidden>Clear all filters</button><button class="ra-clear-area" type="button" data-ra-command="clear-area" hidden>Clear selected area</button>
         <div class="ra-status-heading"><h3>Recorded closure status</h3><button type="button" data-ra-command="all-status" hidden>Show all</button></div><div class="ra-statuses" role="group" aria-label="Filter by recorded closure status">${STATUSES.map(status=>`<button type="button" data-ra-status="${status.id}" aria-pressed="false" style="--ra-status:${status.colour}"><span class="ra-swatch"></span><span>${status.label}</span><strong>0</strong><span class="ra-status-track"><i></i></span></button>`).join('')}</div>
         <div class="ra-actions"><button type="button" data-ra-command="records">View matching records <span aria-hidden="true">↗</span></button><button type="button" data-ra-command="export">Download CSV <span aria-hidden="true">↓</span></button></div>
-        <details class="ra-sources"><summary>About these records <span class="ra-source-count"></span></summary><p class="ra-scope"></p><div class="ra-source-list"></div></details>
-        <details class="ra-preview"><summary>First matching records</summary><div class="ra-preview-list"></div></details>
+        <button class="ra-evidence-button" type="button" data-ra-command="evidence">Sources</button><dialog class="ra-evidence" aria-labelledby="ra-evidence-title"><header><h2 id="ra-evidence-title">Sources and coverage</h2><button type="button" data-ra-command="close-evidence">Close</button></header><p class="ra-scope"></p><div class="ra-source-list"></div><div class="ra-evidence-guide"></div></dialog>
+        <section class="ra-preview"><h3>Matching records</h3><div class="ra-preview-list"></div></section>
       </aside>
     </section>`;
     this.stage=this.host.querySelector('.ra-stage');
     const inspector=this.host.querySelector('.ra-inspector');
     const provincePicker=this.host.querySelector('.ra-region-picker');
-    inspector.prepend(provincePicker);
+    const context=document.createElement('header');context.className='ra-place-context';
+    this.host.querySelector('.ra-workspace').prepend(context);
+    context.append(provincePicker,this.host.querySelector('.ra-selection-heading'));
+    const guide=this.host.querySelector('.ra-guide');
+    this.host.querySelector('.ra-evidence-guide').append(...Array.from(guide.children).filter(child=>child.tagName!=='SUMMARY'));
+    this.host.querySelector('.ra-stage-footer').remove();
+    context.append(this.host.querySelector('.ra-evidence-button'));
     const provinceSummary=document.createElement('section');
     provinceSummary.className='ra-provincial-summary';provinceSummary.hidden=true;
     provinceSummary.setAttribute('aria-label','Alberta province-wide well totals');
-    provincePicker.after(provinceSummary);
+    context.append(provinceSummary);
     if(typeof this.host.querySelector('.ra-province-dialog').showPopover==='function')this.host.querySelector('.ra-province-dialog').setAttribute('popover','manual');
     this.stage.after(this.host.querySelector('.ra-renderer-note'));
     this.base=this.host.querySelector('.ra-boundaries');
@@ -141,7 +147,7 @@ export class RecordAtlas {
     if(button.dataset.raArrangement){this.exploration({arrangement:button.dataset.raArrangement});return;}
     if(button.dataset.raStatus){this.change(button.dataset.raSegmentProvince ? {province:button.dataset.raSegmentProvince,closure:button.dataset.raStatus} : {closure:this.state.closure===button.dataset.raStatus?'all':button.dataset.raStatus});return;}
     if(button.dataset.raProvince){this.change({province:this.state.province===button.dataset.raProvince?'all':button.dataset.raProvince});return;}
-    if(button.dataset.raWell){this.options.onWell(button.dataset.raWell);return;}
+    if(button.dataset.raWell){this.inspectRecord(button.dataset.raWell);return;}
     if(button.dataset.raSource){this.options.onSource(button.dataset.raSource);return;}
     switch(button.dataset.raCommand){
       case 'retry-alberta-totals': void this.loadAlbertaTotals();break;
@@ -150,16 +156,19 @@ export class RecordAtlas {
       case 'pan': case 'select': this.mode=button.dataset.raCommand;this.syncMode();break;
       case 'in':this.zoom(1.5);break;
       case 'out':this.zoom(1/1.5);break;
-      case 'fit':this.camera={zoom:1,pan:[0,0]};this.draw();break;
+      case 'fit':this.autoProvince=false;this.camera={zoom:1,pan:[0,0]};this.draw();break;
       case 'clear-filters':this.change({province:'all',closure:'all',orphan:'all',query:'',eventYear:'all',eventType:'all',cohort:'all',exploration:{...this.state.exploration,area:null}});break;
       case 'clear-area':this.draft=null;this.exploration({area:null});break;
       case 'all-status':this.change({closure:'all'});break;
       case 'records':this.options.onRecords();break;
+      case 'evidence':this.host.querySelector('.ra-evidence').showModal();break;
+      case 'close-evidence':this.host.querySelector('.ra-evidence').close();this.host.querySelector('[data-ra-command=evidence]').focus();break;
       case 'export':this.options.onExport();break;
     }
   }
   update(state, filtered) {
     const oldArrangement=this.state?.exploration?.arrangement;
+    const oldProvince=this.lastProvince;
     this.state=state;
     this.filtered=filtered;
     this.summary=summarize(filtered);
@@ -169,6 +178,7 @@ export class RecordAtlas {
     this.updateInspector();
     this.updateChart();
     this.resize();
+    if(state.province!==oldProvince){this.lastProvince=state.province;this.fitProvince(state.province);}
     const arrangement=state.exploration?.arrangement || 'geography';
     this.host.dataset.arrangement=arrangement;
     this.host.querySelectorAll('[data-ra-arrangement]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.raArrangement===arrangement)));
@@ -206,11 +216,13 @@ export class RecordAtlas {
     if(tableRow)tableRow.innerHTML=this.albertaTableCells();
     const host=this.host.querySelector('.ra-provincial-summary');
     if(!host)return;host.hidden=this.state?.province!=='AB';
+    const existing=this.host.querySelector('.ra-alberta-evidence');if(existing)existing.hidden=host.hidden;
     if(host.hidden)return;
     if(!this.albertaTotals){host.innerHTML=this.albertaTotalsLoading?'<p role="status">Loading AER’s provincial totals…</p>':'<p>Alberta’s provincial totals could not load.</p><button type="button" data-ra-command="retry-alberta-totals">Retry totals</button>';return;}
     const data=this.albertaTotals,row=data.latest;
-    const open=host.querySelector('details')?.open||false;
-    host.innerHTML=`<p class="ra-eyebrow">AER · province-wide · ${row.year}</p><strong class="ra-operating-total">${format(row.operating)}</strong><h3>Operating well licences</h3><div class="ra-operating-split"><span>Active <strong>${format(row.counts.active)}</strong></span><span>Marginal <strong>${format(row.counts.marginal)}</strong></span></div><p class="ra-operating-definition">Includes marginal wells averaging less than 10 BOE/day.</p><p class="ra-operating-definition">${row.year} snapshot; month not supplied. Map filters apply to the records below.</p><details ${open?'open':''}><summary>Definitions, history & source</summary><p>${escape(row.periodLabel)}. These totals cover Alberta and do not change with the map filters.</p><dl>${ALBERTA_LIFECYCLE.map(([id,label])=>`<div><dt>${label}</dt><dd>${format(row.counts[id])}</dd></div>`).join('')}<div><dt>All well licences</dt><dd>${format(row.total)}</dd></div></dl><p>${escape(data.definitions.marginal)} The Active and Marginal categories are separate in AER’s chart.</p><table><caption>Operating licences over time</caption><thead><tr><th scope="col">Snapshot</th><th scope="col">Active + marginal</th></tr></thead><tbody>${data.observations.map(item=>`<tr><th scope="row">${item.year}${item.datePrecision==='day'?' year-end':' monthly*'}</th><td>${format(item.operating)}</td></tr>`).join('')}</tbody></table><p>* AER’s current-year export does not identify the month. Retrieved ${escape(data.retrievedAt.slice(0,10))}.</p><p>${escape(data.attribution)}</p><a href="${escape(data.source.url)}" target="_blank" rel="noopener">AER well status ↗</a></details>`;
+    host.innerHTML=`<div><strong class="ra-operating-total">${format(row.operating)}</strong><span>operating licences · Alberta · ${row.year}</span></div><p>Active ${format(row.counts.active)} + marginal ${format(row.counts.marginal)}. Province-wide total; these are not mapped points.</p>`;
+    this.albertaEvidence=`<h3>Alberta well licences · ${row.year}</h3><p>${escape(row.periodLabel)}. Map filters do not change these provincial totals.</p><dl>${ALBERTA_LIFECYCLE.map(([id,label])=>`<div><dt>${label}</dt><dd>${format(row.counts[id])}</dd></div>`).join('')}</dl><p>${escape(data.definitions.marginal)}</p><p>The publisher does not identify the month for the current-year snapshot. Retrieved ${escape(data.retrievedAt.slice(0,10))}.</p><table><caption>Operating licences over time</caption><thead><tr><th>Year</th><th>Active + marginal</th></tr></thead><tbody>${data.observations.map(item=>`<tr><th>${item.year}</th><td>${format(item.operating)}</td></tr>`).join('')}</tbody></table><p>${escape(data.attribution)}</p><a href="${escape(data.source.url)}" target="_blank" rel="noopener">AER well status</a>`;
+    let evidence=this.host.querySelector('.ra-alberta-evidence');if(!evidence){evidence=document.createElement('section');evidence.className='ra-alberta-evidence';this.host.querySelector('.ra-evidence').append(evidence);}evidence.innerHTML=this.albertaEvidence;
   }
   updateInspector() {
     const {state,summary}=this;
@@ -249,7 +261,7 @@ export class RecordAtlas {
     const sources=this.catalog.sources.filter(source=>sourceIds.has(source.id) || (!summary.total && (state.province==='all'||source.province===state.province)));
     const historical=sources.some(source=>source.observationsThrough);
     this.host.querySelector('.ra-scope').textContent=scope.detail+' Status options count all records that match your other filters. These are source-record counts, not a census of wells.'+(historical?' Some observations are historical.':'');
-    this.host.querySelector('.ra-source-count').textContent=String(sources.length);
+
     this.host.querySelector('.ra-source-list').innerHTML=sources.map(source=>{
       let date=source.sourceObservationDate || source.sourceDateText;
       if(!date&&source.upstreamModifiedAt){const parsed=new Date(source.upstreamModifiedAt);if(Number.isFinite(parsed.getTime()))date=parsed.toISOString().slice(0,10);}
@@ -339,7 +351,18 @@ export class RecordAtlas {
     const [x1,y1,x2,y2]=this.bounds;
     this.fit=Math.min((this.width-48)/(x2-x1),(this.height-90)/(y2-y1));
     this.offset=[this.width/2-(x1+x2)/2*this.fit,this.height/2+(y1+y2)/2*this.fit+12];
-    this.chartPositions();this.draw();
+    this.chartPositions();if(this.autoProvince&&this.state?.province!=='all')this.fitProvince(this.state.province);else this.draw();
+  }
+  inspectRecord(id) {this.selectedId=id;this.draw();this.options.onWell(id);}
+  fitProvince(code) {
+    this.autoProvince=true;
+    const shape=this.shapes.find(item=>item.code===code);
+    if(!shape||!this.fit){this.camera={zoom:1,pan:[0,0]};this.draw();return;}
+    const points=shape.paths.flat(),xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
+    const x1=Math.min(...xs),x2=Math.max(...xs),y1=Math.min(...ys),y2=Math.max(...ys);
+    const zoom=Math.min(12,Math.max(1,Math.min((this.width-90)/(x2-x1),(this.height-130)/(y2-y1))/this.fit));
+    const scale=this.fit*zoom;
+    this.camera={zoom,pan:[this.width/2-(x1+x2)/2*scale-this.offset[0],this.height/2+(y1+y2)/2*scale-this.offset[1]+20]};this.draw();
   }
   screen([x,y]) { const scale=this.fit*this.camera.zoom;return [x*scale+this.offset[0]+this.camera.pan[0],-y*scale+this.offset[1]+this.camera.pan[1]]; }
   world([x,y]) { const scale=this.fit*this.camera.zoom;return [(x-this.offset[0]-this.camera.pan[0])/scale,-(y-this.offset[1]-this.camera.pan[1])/scale]; }
@@ -361,7 +384,10 @@ export class RecordAtlas {
       for(const well of this.filtered||[]){const index=this.ids.get(well.id),p=this.screen(this.projected[index]);ctx.fillStyle=STATUSES[statusIndex(well)].colour;ctx.fillRect(p[0],p[1],1.7,1.7);}
       ctx.globalAlpha=1;
     }
-    if(this.isMap())this.drawArea();
+    if(this.isMap()){
+      this.drawArea();
+      if(this.selectedId&&this.matched.has(this.selectedId)){const point=this.screen(this.projected[this.ids.get(this.selectedId)]);ctx.beginPath();ctx.arc(...point,9,0,Math.PI*2);ctx.strokeStyle='#173b36';ctx.lineWidth=2;ctx.stroke();}
+    }
   }
   drawMap() {
     const {ctx,width}=this;
@@ -400,6 +426,7 @@ export class RecordAtlas {
   zoom(factor, point=[this.width/2,this.height/2]) {
     if(!this.isMap())return;
     const before=this.world(point);
+    this.autoProvince=false;
     this.camera.zoom=Math.max(.75,Math.min(24,this.camera.zoom*factor));
     const after=this.screen(before);this.camera.pan[0]+=point[0]-after[0];this.camera.pan[1]+=point[1]-after[1];this.draw();
   }
@@ -407,6 +434,7 @@ export class RecordAtlas {
   pointerDown(event) {
     if(!this.isMap()||event.target.closest('button')||event.button!==0)return;
     this.stage.focus({preventScroll:true});this.stage.setPointerCapture(event.pointerId);
+    this.autoProvince=false;
     this.drag={start:this.pointer(event),pan:[...this.camera.pan],moved:false};
   }
   pointerMove(event) {
@@ -426,7 +454,7 @@ export class RecordAtlas {
     else if(!moved&&this.mode==='pan'){
       const point=this.pointer(event);let closest=null,distance=10;
       for(const well of this.filtered){const p=this.screen(this.projected[this.ids.get(well.id)]),d=Math.hypot(point[0]-p[0],point[1]-p[1]);if(d<distance){distance=d;closest=well;}}
-      if(closest)this.options.onWell(closest.id);
+      if(closest)this.inspectRecord(closest.id);
     }
   }
   key(event) {
@@ -447,7 +475,7 @@ export class RecordAtlas {
       if(event.shiftKey){next[2]+=dx*step;next[3]+=dy*step;if(next[2]<=next[0]||next[3]<=next[1])return;}
       else{next[0]+=dx*step;next[2]+=dx*step;next[1]+=dy*step;next[3]+=dy*step;}
       this.exploration({area:normalizeArea(next)});
-    }else{this.camera.pan[0]-=dx*35;this.camera.pan[1]+=dy*35;this.draw();}
+    }else{this.autoProvince=false;this.camera.pan[0]-=dx*35;this.camera.pan[1]+=dy*35;this.draw();}
   }
   destroy() {
     cancelAnimationFrame(this.animation);this.abort.abort();this.resizeObserver.disconnect();this.intersectionObserver.disconnect();

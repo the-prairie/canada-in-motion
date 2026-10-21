@@ -1,0 +1,16 @@
+.context-dialog{width:min(760px,calc(100vw - 32px));max-height:calc(100dvh - 48px);padding:0;border:1px solid #b7bdad;color:#242b26;background:#f8f8f0;overflow:auto}
+.context-dialog::backdrop{background:rgb(24 34 29 / .46)}
+.context-dialog-content{padding:24px}
+.context-dialog-content>header{display:flex;justify-content:space-between;gap:24px;align-items:start;border-bottom:1px solid #ccd1c3;padding-bottom:16px;margin-bottom:24px}
+.context-dialog h2{font-size:24px;margin:0}
+.context-dialog h3{font-size:18px;margin:24px 0 10px}
+.context-dialog p,.context-dialog li{line-height:1.6}
+.context-dialog button{min-height:44px}
+.context-dialog a{text-underline-offset:3px}
+.context-dialog .hw-evidence-source{padding-block:14px;border-bottom:1px solid #d7dacf}
+.context-dialog .hw-evidence-source small{display:block;color:#59655c;margin-top:6px}
+.context-dialog .hw-saved-list{list-style:none;padding:0}
+.context-dialog .hw-saved-list li{display:flex;gap:12px;border-bottom:1px solid #d7dacf;padding:12px 0}
+.context-dialog .hw-saved-list li>button:first-child{flex:1;text-align:left}
+.context-dialog .hw-saved-list small{display:block}
+@media(max-width:600px){.context-dialog-content{padding:18px}.context-dialog{max-height:calc(100dvh - 24px)}.context-dialog h2{font-size:21px}}

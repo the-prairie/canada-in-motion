@@ -186,3 +186,13 @@ body[data-view='economy'] .workspace,body[data-view='economy'] .mobile-surface {
 .monthly-reading{display:grid;gap:.25rem}.monthly-value{font-size:1.35rem;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.035em}.monthly-growth{font-size:.85rem;color:#3f5c50}.monthly-comparison{margin-top:.8rem;padding-top:.6rem;border-top:1px dotted #a8b3a8}.monthly-comparison>span:first-child{font-size:.8rem}.monthly-comparison .monthly-value{font-size:1.1rem}
 .monthly-basis{margin:1rem 0 .6rem;max-width:75ch}.monthly-details>summary{font-size:.85rem;cursor:pointer;width:fit-content}.monthly-details p{max-width:80ch;font-size:.85rem;line-height:1.6}.monthly-source{margin-top:1.4rem;max-width:720px}.monthly-source a{font-size:.85rem}.monthly-trend{margin:.8rem 0}.monthly-trend svg{display:block;width:100%;max-width:560px;height:auto;overflow:visible}.monthly-line{fill:none;stroke:#216b5d;stroke-width:2}.monthly-axis{fill:none;stroke:#b8c1b8}.monthly-trend circle{fill:#216b5d}.monthly-trend text{font-size:10px;fill:#58655e;font-family:inherit}.monthly-table{overflow:auto;max-height:380px;margin-top:.75rem}.monthly-table table{width:100%;border-collapse:collapse;font-size:.8rem}.monthly-table th,.monthly-table td{padding:.55rem;text-align:right;border-bottom:1px solid #d6dbd0;white-space:nowrap}.monthly-table th:first-child{text-align:left}.monthly-table caption{text-align:left;padding-bottom:.6rem}.monthly-energy button{font:inherit;cursor:pointer}.monthly-details>button{margin-top:.6rem;padding:.6rem .8rem;background:transparent;border:1px solid #a8b3a8;border-radius:2px}.monthly-energy :focus-visible{outline:2px solid #a34c31;outline-offset:3px}
 @media(max-width:600px){.monthly-grid{grid-template-columns:1fr}.monthly-grid article+article{padding-top:1rem;border-top:1px solid #d6dbd0}.monthly-value{font-size:1.3rem}.monthly-energy{margin:1rem 0;padding:1rem 0}}
+.ec-intelligence:not(:has(.ec-workspace-host,.ec-answer)){padding:0;border:0;margin:0}
+#energy-economy .ec-context-actions button[data-ec-action='ask']{display:block}
+.ec-evidence .ec-debate{margin-top:28px;padding-top:20px}
+.ec-composer .ec-ai-heading{clear:both;padding-top:16px}
+@media(max-width:760px){
+ .ec-context nav{display:flex;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;gap:12px;padding-bottom:3px;min-width:0}
+ .ec-context nav button{flex:0 0 auto;white-space:nowrap;padding:10px 2px;min-height:44px}
+ .ec-context nav>.ec-data-menu{flex:none}
+ .ec-context-actions{margin-left:auto}
+}

@@ -182,8 +182,9 @@ try{
   await linked.goto(base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy:{section:'explore',forecastYear:forecast.forecastOriginYear+1,story:{chapter:'outlook',focus:'AB',compare:'ON'}}})));
   await open(linked.locator('.pr-independent-outlook'));
   await linked.getByRole('button',{name:'Inspect historical forecast performance',exact:false}).click();
-  await linked.locator('#ec-provincial-forecast .pf-range-chart').waitFor();
+  await linked.locator('#ec-provincial-forecast .pf-history-chart').waitFor();
   assert.equal(await linked.locator('#ec-provincial-forecast').getByRole('button',{name:String(forecast.forecastOriginYear),exact:true}).getAttribute('aria-pressed'),'true');
+  await linked.locator('[aria-label="Forecast display"]').getByRole('button',{name:'Compare',exact:true}).click();
   assert.equal(await linked.locator('#ec-provincial-forecast .pf-range-chart li').count(),2);
   await linked.close();
   checks.push('forecast detail handoff retains year and both provinces');

@@ -89,7 +89,12 @@ export class AtlasMap {
       });
     });
     this.map.on("zoomend", () => this.drawLabels());
-    new ResizeObserver(() => this.map.invalidateSize()).observe(
+    new ResizeObserver(() => {
+      const container=document.getElementById('map');
+      if(!container.clientWidth||!container.clientHeight)return;
+      this.map.invalidateSize({pan:false});
+      if(this.state?.view==='journey')this.focus();
+    }).observe(
       document.getElementById("map"),
     );
   }
@@ -108,17 +113,17 @@ export class AtlasMap {
   update(state, filtered) {
     this.state = state;
     this.filtered = filtered;
-    if (state.layers.bcPermits && !this.map.hasLayer(this.bcLayer)) {
+    if (state.view!=="journey" && state.layers.bcPermits && !this.map.hasLayer(this.bcLayer)) {
       this.bcLayer.addTo(this.map);
       this.map.attributionControl.addAttribution("BC Energy Regulator · Open Data Licence");
-    } else if (!state.layers.bcPermits && this.map.hasLayer(this.bcLayer)) {
+    } else if ((state.view==="journey" || !state.layers.bcPermits) && this.map.hasLayer(this.bcLayer)) {
       this.map.removeLayer(this.bcLayer);
       this.map.attributionControl.removeAttribution("BC Energy Regulator · Open Data Licence");
     }
-    if (state.layers.historical && !this.map.hasLayer(this.historicalLayer)) {
+    if (state.view!=="journey" && state.layers.historical && !this.map.hasLayer(this.historicalLayer)) {
       this.historicalLayer.addTo(this.map);
       this.map.attributionControl.addAttribution('NRCan CanVec · OGL Canada · historical');
-    } else if (!state.layers.historical && this.map.hasLayer(this.historicalLayer)) {
+    } else if ((state.view==="journey" || !state.layers.historical) && this.map.hasLayer(this.historicalLayer)) {
       this.map.removeLayer(this.historicalLayer);
       this.map.attributionControl.removeAttribution('NRCan CanVec · OGL Canada · historical');
     }
@@ -133,7 +138,7 @@ export class AtlasMap {
       .filter(
         (r) =>
           (!wellMode || state.layers.context) &&
-          state.layers[r.commodity] &&
+          (state.view==="journey" ? r.id===state.route : state.layers[r.commodity]) &&
           (r.id === state.route ||
             !r.id.startsWith("trans-mountain-") ||
             r.id === "trans-mountain-burnaby"),
@@ -176,7 +181,7 @@ export class AtlasMap {
             L.marker(c, {
               icon: L.divIcon({
                 className: "",
-                html: '<div class="endpoint"></div>',
+                html: `<div class="endpoint ${state.step===(i?2:0)?'endpoint-current':''}"></div>`,
                 iconSize: [44, 44],
                 iconAnchor: [22, 22],
               }),
@@ -200,7 +205,7 @@ export class AtlasMap {
           );
         }
       });
-    if (state.layers.facilities && (!wellMode || state.layers.context))
+    if (state.view!=="journey" && state.layers.facilities && (!wellMode || state.layers.context))
       this.network.facilities.forEach((f) =>
         L.marker([f.coordinates[1], f.coordinates[0]], {
           icon: L.divIcon({
@@ -294,7 +299,7 @@ export class AtlasMap {
     const selectedPoints =
       this.state.view !== "wells" &&
       !(this.state.view === "lab" && this.state.labTab === "cleanup") &&
-      this.state.layers[r?.commodity]
+      (this.state.view==="journey" || this.state.layers[r?.commodity])
         ? [r.coordinates[0], r.coordinates.at(-1)]
         : [];
     if (zoom >= 3.5)
@@ -325,7 +330,7 @@ export class AtlasMap {
   drawWells() {
     this.wellLayer.clearLayers();
     if (
-      !this.index ||
+      this.state?.view==="journey" || !this.index ||
       !this.state ||
       (this.state.view !== "wells" &&
         !(this.state.view === "lab" && this.state.labTab === "cleanup") &&
@@ -385,7 +390,8 @@ export class AtlasMap {
   }
   focus() {
     if (!this.state || !document.getElementById("map").clientWidth) return;
-    const compact = this.map.getSize().y < 360;
+    this.map.invalidateSize({pan:false});
+    const compact = this.map.getSize().y < 400;
     if (
       this.state.view === "wells" ||
       (this.state.view === "lab" && this.state.labTab === "cleanup")
@@ -430,8 +436,7 @@ export class AtlasMap {
       this.focus();
       return;
     }
-    const c = n === 0 ? r.coordinates[0] : r.coordinates.at(-1);
-    this.map.setView([c[1], c[0]], 7.5);
+    this.focus();
   }
   continent() {
     if (!document.getElementById("map").clientWidth) return;
@@ -444,6 +449,9 @@ export class AtlasMap {
     );
   }
   setCamera(camera) {
+    if(!document.getElementById("map").clientWidth)return;
+    this.map.invalidateSize({pan:false});
+    if(this.state?.view==="journey"){this.focus();return;}
     if (camera) this.map.setView(camera.center, camera.zoom);
     else this.continent();
   }

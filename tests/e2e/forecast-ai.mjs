@@ -37,7 +37,7 @@ let host=page.locator('#ec-dynamic-workspace');
 const question=`Compare the GDP forecasts for Alberta, Ontario and Québec in ${year} and ${year+1}.`;
 const ask=async value=>{
   const composer=page.locator('.ec-composer');
-  if(!await composer.evaluate(e=>e.open))await page.locator('[data-ec-action="ask"]').click();
+  if(!await composer.evaluate(e=>e.open))await page.locator('.ec-context-actions [data-ec-action="ask"]').click();
   await page.getByLabel('Your question',{exact:true}).fill(value);
   await page.getByRole('button',{name:'Analyse',exact:true}).click();
   await host.getByRole('heading',{name:value,exact:true}).waitFor();
@@ -54,7 +54,7 @@ const download=async()=>{
 };
 try{
   await page.goto(url('outlook'));
-  await page.locator('#ec-provincial-forecast .pf-range-chart').waitFor();
+  await page.locator('#ec-provincial-forecast .pf-history-chart').waitFor();
   assert.equal(await page.locator('.ec-composer').evaluate(e=>e.open),false,'question composer starts collapsed');
   await ask(question);
   assert.equal(await page.locator('.ec-composer').evaluate(e=>e.open),false,'question composer collapses after answer');
@@ -65,6 +65,7 @@ try{
   assert.equal(await host.locator('.hw-gdp-forecast').count(),1,'focused result must show one forecast panel');
   const views=host.getByRole('navigation',{name:'Result views'});
   assert.equal(await views.getByRole('button',{name:`GDP outlook ${year}`,exact:true}).getAttribute('aria-pressed'),'true');
+  await host.locator('[aria-label="Forecast display"]').getByRole('button',{name:'Compare',exact:true}).click();
   assert.equal(await host.locator('.pf-range-chart li').count(),3);
   await views.getByRole('button',{name:`GDP outlook ${year+1}`,exact:true}).click();
   assert.equal(await host.locator('[aria-label="Forecast year"]').getByRole('button',{name:String(year+1),exact:true}).getAttribute('aria-pressed'),'true');
@@ -75,7 +76,7 @@ try{
   assert.equal(await host.locator('[aria-label="Forecast year"]').getByRole('button',{name:String(year+1),exact:true}).getAttribute('aria-pressed'),'true');
   checks.push('two independent forecast-year panels, focused navigation and undo');
   await page.getByRole('button',{name:'Return to data',exact:true}).click();
-  await page.locator('#ec-provincial-forecast .pf-range-chart').waitFor();
+  await page.locator('#ec-provincial-forecast .pf-history-chart').waitFor();
   assert.equal(await page.locator('#ec-dynamic-workspace').count(),0);
   await page.getByRole('button',{name:'Previous answer',exact:true}).click();
   await host.locator('.hw-gdp-forecast').waitFor();
@@ -84,17 +85,22 @@ try{
 
   await open(host.locator('.hw-selection'));
   await host.locator('.hw-regions').getByRole('button',{name:'Ontario',exact:true}).click();
+  await host.locator('[aria-label="Forecast display"]').getByRole('button',{name:'Compare',exact:true}).click();
   assert.equal(await host.locator('.pf-range-chart li').count(),2);
-  assert.deepEqual(await host.getByLabel('Inspect provincial forecast',{exact:true}).locator('option').evaluateAll(options=>options.map(o=>o.value)),['AB','QC']);
+  await host.locator('[aria-label="Forecast display"]').getByRole('button',{name:'Outlook',exact:true}).click();
+  assert.deepEqual(await host.locator('.pf-place-buttons button').allTextContents(),['QC','AB']);
   await host.getByRole('button',{name:'Undo',exact:true}).click();
+  await host.locator('[aria-label="Forecast display"]').getByRole('button',{name:'Compare',exact:true}).click();
   assert.equal(await host.locator('.pf-range-chart li').count(),3);
   await host.locator('[aria-label="Forecast display"]').getByRole('button',{name:'Table',exact:true}).click();
   assert.match(await host.getByRole('region',{name:'Provincial GDP forecast table',exact:true}).innerText(),/Alberta/);
-  await host.locator('details.hw-sources').filter({has:page.getByText('Sources & definitions',{exact:true})}).locator('summary').click();
-  const sourceLinks=await host.locator('details.hw-sources[open] a').evaluateAll(links=>links.map(a=>a.href));
+  await host.locator('[data-workspace-sources]').click();
+  const sourceLinks=await host.locator('.context-dialog a').evaluateAll(links=>links.map(a=>a.href));
   assert.ok(sourceLinks.includes(forecast.sources[0].url));assert.ok(sourceLinks.includes(forecast.sources[1].url));
-  await host.locator('.pf-audit > summary').click();
+  await page.keyboard.press('Escape');
+  await host.locator('[data-forecast-evidence]').click();
   assert.ok(await host.getByRole('region',{name:'Alberta forecast backtest',exact:true}).isVisible());
+  await page.keyboard.press('Escape');
   checks.push('linked regional selection, forecast table, original source links and historical validation');
 
   await open(host.locator('.hw-action-menu'));
@@ -112,8 +118,8 @@ try{
   await page.reload();
   host=page.locator('#ec-trade-workspace');
   await host.locator('.hw-shell').waitFor();
-  await open(host.locator('.hw-saved'));
-  await host.locator('.hw-saved li').getByRole('button',{name:new RegExp(`^${question.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}`)}).click();
+  await open(host.locator('.hw-action-menu'));await host.getByRole('button',{name:/^Open saved/}).click();
+  await host.locator('.hw-saved-list li').getByRole('button',{name:new RegExp(`^${question.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}`)}).click();
   await host.getByText('Restored with the original source snapshot.',{exact:true}).waitFor();
   assert.equal(await host.locator('[aria-label="Forecast year"]').getByRole('button',{name:String(year+1),exact:true}).getAttribute('aria-pressed'),'true');
   exported=await download();
@@ -130,7 +136,8 @@ try{
   await host.locator('.hw-heading h2').click();
   assert.equal(await host.locator('.hw-action-menu').evaluate(e=>e.open),false,'an outside click dismisses the mobile action menu');
   await host.getByRole('navigation',{name:'Result views'}).getByRole('button',{name:`GDP outlook ${year}`,exact:true}).click();
-  await host.getByLabel('Inspect provincial forecast',{exact:true}).selectOption('QC');
+  await host.locator('[aria-label="Forecast display"]').getByRole('button',{name:'Outlook',exact:true}).click();
+  await host.locator('.pf-place-buttons').getByRole('button',{name:'Quebec',exact:true}).click();
   assert.ok(await host.locator('.pf-detail').getByRole('heading',{name:'Quebec',exact:true}).isVisible());
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'mobile page must not overflow');
   await page.screenshot({path:'/tmp/cim-forecast-ai-mobile.png',fullPage:true});
@@ -140,11 +147,13 @@ try{
   await ask(`Forecast Canada's GDP growth in ${year}.`);
   assert.match(await host.locator('.hw-coverage').first().innerText(),/does not supply a forecast for Canada as a whole/);
   assert.match(await host.locator('.hw-coverage').first().innerText(),/must not be summed/);
+  await host.locator('[aria-label="Forecast display"]').getByRole('button',{name:'Compare',exact:true}).click();
   assert.equal(await host.locator('.pf-range-chart li').count(),13);
-  assert.match(await host.locator('.hw-gdp-forecast > header').innerText(),/Supporting context/i);
+  assert.match(await host.locator('.hw-gdp-forecast > header').innerText(),/GDP/);
   await ask('Forecast Yukon GDP growth next year.');
-  assert.match(await host.locator('.pf-detail').innerText(),/does not cover this jurisdiction/);
-  assert.equal(await host.locator('.pf-range-chart li strong').innerText(),'—');
+  assert.match(await host.locator('.pf-detail').innerText(),/does not cover comparable monthly employment/);
+  assert.equal(await host.locator('.pf-history-future').count(),0);
+  assert.match(await host.locator('.pf-detail-heading').innerText(),/No forecast/);
   assert.equal(await host.locator('.pf-audit').count(),0);
   await ask('Forecast Alberta GDP next year if oil prices rise 10%.');
   assert.equal(await host.locator('.hw-gdp-forecast').count(),0);

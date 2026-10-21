@@ -12,11 +12,11 @@ await page.route('**/api/analysis',async route=>{
 });
 const base=process.env.TEST_URL||'http://127.0.0.1:4201/';
 const url=base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy:{section:'outlook'}}));
-const open=async()=>{const composer=page.locator('.ec-composer');if(!await composer.evaluate(e=>e.open))await composer.locator(':scope > summary').click();};
+const open=async()=>{const composer=page.locator('.ec-composer');if(!await composer.evaluate(e=>e.open))await page.locator('.ec-context-actions [data-ec-action=ask]').click();};
 try{
   await page.clock.install();
   await page.goto(url);
-  await page.locator('#ec-provincial-forecast .pf-range-chart').waitFor();
+  await page.locator('#ec-provincial-forecast .pf-history-chart').waitFor();
   for(const id of ['outlook','contributions','electricity','trade','prices']){
     await open();await page.locator(`[data-ec-local="${id}"]`).click();
     await page.waitForFunction(()=>!document.querySelector('.ec-composer').open);

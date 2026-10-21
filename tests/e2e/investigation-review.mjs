@@ -31,8 +31,8 @@ const native=page.locator('#ec-trade-workspace');
 const dynamic=page.locator('#ec-dynamic-workspace');
 const actions=async host=>{const menu=host.locator('.hw-action-menu');if(!await menu.evaluate(e=>e.open))await menu.locator('summary').click();};
 const allViews=async host=>{await actions(host);const button=host.getByRole('button',{name:'All views',exact:true});if(await button.getAttribute('aria-pressed')!=='true')await button.click();else await host.locator('.hw-action-menu summary').click();};
-const openLibrary=async host=>{if(!await host.locator('.hw-saved').evaluate(e=>e.open))await host.locator('.hw-saved summary').click();};
-const ask=async question=>{if(!await page.locator('.ec-trade-question').evaluate(e=>e.open))await page.locator('.ec-trade-question > summary').click();await page.getByLabel('Your question',{exact:true}).fill(question);await page.getByRole('button',{name:'Analyse',exact:true}).click();await dynamic.locator('.hw-shell').waitFor();};
+const openLibrary=async host=>{await actions(host);await host.getByRole('button',{name:/^Open saved/}).click();};
+const ask=async question=>{if(!await page.locator('.ec-trade-question').evaluate(e=>e.open))await page.locator('.ec-context-actions [data-ec-action=ask]').click();await page.getByLabel('Your question',{exact:true}).fill(question);await page.getByRole('button',{name:'Analyse',exact:true}).click();await dynamic.locator('.hw-shell').waitFor();};
 try {
   await page.goto(url);await native.locator('.hw-matrix').waitFor();
   // Cardinal navigation must follow columns, including diagonal holes.
@@ -55,7 +55,7 @@ try {
   await actions(native);await native.getByRole('button',{name:'Save investigation',exact:true}).click();
   await native.getByText('Saved on this device with its original data.',{exact:true}).waitFor();
   await native.getByLabel('Energy price change',{exact:true}).fill('10');
-  await openLibrary(native);await native.locator('.hw-saved li button').first().click();
+  await openLibrary(native);await native.locator('.hw-saved-list li button').first().click();
   assert.equal(await native.getByLabel('Energy price change',{exact:true}).inputValue(),'-10');
   assert.equal(JSON.parse(decodeURIComponent((await page.url()).split('#v1=')[1])).economy.priceShock,-10);
   assert.ok(await native.locator('.hw-branch-comparison').isVisible(),'saved baseline must be restored');
@@ -64,10 +64,10 @@ try {
   // A damaged stored item must not hang the library or hide valid snapshots.
   await page.evaluate(()=>new Promise((resolve,reject)=>{const request=indexedDB.open('canada-in-motion-investigations',1);request.onsuccess=()=>{const db=request.result,tx=db.transaction('investigations','readwrite');tx.objectStore('investigations').put({id:'independent-review-invalid',kind:'invalid'});tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);};request.onerror=()=>reject(request.error);}));
   await page.reload();await native.getByText('1 saved investigations could not be verified and were omitted.',{exact:true}).waitFor();
-  await openLibrary(native);assert.equal(await native.locator('.hw-saved li').count(),1);
+  await openLibrary(native);assert.equal(await native.locator('.hw-saved-list li').count(),1);
   checks.push('corrupt saved record is isolated without a runtime error');
 
-  await ask(tradeQuestion);
+  await page.keyboard.press('Escape');await ask(tradeQuestion);
   const pairEntry=dynamic.locator('.hw-matrix button[tabindex="0"]');
   await pairEntry.focus();const beforePair=await page.evaluate(()=>document.activeElement.getAttribute('aria-label'));
   await page.keyboard.press('ArrowRight');
@@ -77,7 +77,7 @@ try {
   assert.ok(await dynamic.locator('.hw-branch-comparison').isVisible(),'trade-only answers must support branch comparison');
   assert.doesNotMatch(await dynamic.locator('.hw-current-question').innerText(),/price change/);
   assert.match(await dynamic.locator('.hw-branch-comparison').innerText(),/Net trade value/);
-  await openLibrary(dynamic);await dynamic.locator('.hw-saved li button').first().click();
+  await openLibrary(dynamic);await dynamic.locator('.hw-saved-list li button').first().click();
   await dynamic.getByText('Restored with the original source snapshot.',{exact:true}).waitFor();
   assert.equal(await page.locator('.ec-answer').count(),0,'restoring a different question must remove original written findings');
   assert.equal(await dynamic.getByLabel('Energy price change',{exact:true}).inputValue(),'-10');
@@ -98,7 +98,7 @@ try {
   assert.equal(await native.getByLabel('Trade year',{exact:true}).count(),0);
   checks.push('physical-only period and source series survive AI-to-native restore');
 
-  await native.getByRole('button',{name:/^Energy between provinces/}).click();
+  await openLibrary(native);await native.getByRole('button',{name:/^Energy between provinces/}).click();
   if(!await native.locator('.hw-selection').evaluate(e=>e.open))await native.locator('.hw-selection summary').click();
   await native.getByRole('button',{name:'All',exact:true}).click();
   await page.setViewportSize({width:390,height:844});

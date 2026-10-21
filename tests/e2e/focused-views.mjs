@@ -49,11 +49,11 @@ try {
   await page.getByRole('button',{name:'Retry data',exact:true}).waitFor();
   fail = false;
   await page.getByRole('button',{name:'Retry data',exact:true}).click();
-  await page.locator('.pf-range-chart').waitFor();
+  await page.locator('.pf-history-chart').waitFor();
   await page.unroute('**/data/provincial-forecasts.json');
 
   await page.setViewportSize({width:390,height:844});
-  for (const [section,ready] of [['trade','.hw-grid'],['futures','.ec-focused-metric'],['income','.ec-ranking'],['outlook','.pf-range-chart']]) {
+  for (const [section,ready] of [['trade','.hw-grid'],['futures','.ec-focused-metric'],['income','.ec-ranking'],['outlook','.pf-history-chart']]) {
     await go(section);
     await page.locator(ready).waitFor();
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${section} mobile overflow`);

@@ -1,0 +1,229 @@
+{
+  "status": "local-checks-passed",
+  "javascriptTests": 395,
+  "pipelineTests": 139,
+  "providerCalls": 0,
+  "browserResults": {
+    "focused-views": {
+      "status": "passed",
+      "checks": [
+        "one result at a time",
+        "named result persists on reload",
+        "All views is reversible",
+        "secondary menu closes",
+        "consistent Futures precision and legend",
+        "indicator, scenario and year survive reload",
+        "forecast failure recovers inline",
+        "four mobile data journeys start with collapsed composer and no overflow"
+      ],
+      "providerCalls": 0
+    },
+    "analysis-recovery": {
+      "status": "passed",
+      "checks": [
+        "outlook opens with AI offline and no inference request",
+        "contributions opens with AI offline and no inference request",
+        "electricity opens with AI offline and no inference request",
+        "trade opens with AI offline and no inference request",
+        "prices opens with AI offline and no inference request",
+        "quota shows reset time, prevents pointless retry, persists across reload and leaves data tools available",
+        "cooldown expires without submitting; provider failure permits retry and preserves previous answer"
+      ],
+      "mockedRequests": 2,
+      "providerCalls": 0
+    },
+    "investigations": {
+      "status": "passed",
+      "matrixCells": 156,
+      "checks": [
+        "direction",
+        "linked map",
+        "branch baseline",
+        "reference-year robustness",
+        "save and reload snapshot",
+        "mobile overflow",
+        "no runtime errors"
+      ]
+    },
+    "investigation-review": {
+      "status": "passed",
+      "providerCalls": 0,
+      "checks": [
+        "matrix cardinal navigation, filtering, exact small-value distinction and desktop fit",
+        "saved price controls, pinned baseline and shared URL restore together",
+        "corrupt saved record is isolated without a runtime error",
+        "trade-only baseline, native-to-AI restore and stale written-answer removal",
+        "physical-only period and source series survive AI-to-native restore",
+        "mobile seller/partner view, exact positive values, linked detail and changed-pair fallback"
+      ]
+    },
+    "map-story": {
+      "status": "passed",
+      "checks": [
+        "motion plays only in view, supports pause and reduced motion, and never changes speed or path with prices",
+        "same map across all stages, exact supported values, failed estimates hidden, keyboard-to-detail focus survives pointer movement",
+        "320/390px sticky map preserves readable labels and visible headings; short landscape has normal scrolling",
+        "source failures show unavailable map values, disable missing targets and recover on retry; zero runtime errors"
+      ],
+      "errors": []
+    },
+    "guided-scenarios": {
+      "status": "passed",
+      "checks": [
+        "selected trade, negative repricing, stage focus, supported-only GDP, annual household caveat, export and URL reload",
+        "gas/electricity unavailable models, explicit independent retail assumption, commodity changes preserve stage",
+        "320/390px layout and offline restored source snapshot",
+        "partial source failure, exchange remains usable, retry, return to selected network, zero runtime errors"
+      ],
+      "errors": []
+    },
+    "well-scope": {
+      "status": "passed",
+      "checks": [
+        "unsupported active status is unavailable rather than zero",
+        "map/list/dock agree",
+        "province totals fetched and clearly separate from filtered records",
+        "failed totals retry",
+        "province totals navigation",
+        "clear status preserves province",
+        "Saskatchewan scope also handled",
+        "real empty BC search remains zero",
+        "mobile width and keyboard action",
+        "no runtime errors"
+      ],
+      "sourceOverride": false
+    },
+    "alberta-table": {
+      "status": "passed",
+      "checks": [
+        "AER totals appear in the Alberta table row",
+        "active and marginal categories stay separate",
+        "no invented map filtering",
+        "late response preserves focus and scroll",
+        "other province inventories stay visible",
+        "totals survive status, province and search filters",
+        "missing data retries without false zeros",
+        "mobile horizontal scrolling"
+      ],
+      "active": 56998,
+      "marginal": 96350,
+      "operating": 153348
+    },
+    "research-late-status": {
+      "status": "passed",
+      "providerCalls": 0,
+      "results": [
+        {
+          "view": "income",
+          "checks": [
+            "DOM identity",
+            "focused control",
+            "open disclosure",
+            "edited inputs",
+            "calculation/episode identity",
+            "late AI status",
+            "late context data"
+          ]
+        },
+        {
+          "view": "history",
+          "checks": [
+            "DOM identity",
+            "focused control",
+            "open disclosure",
+            "edited inputs",
+            "calculation/episode identity",
+            "late AI status",
+            "late context data"
+          ]
+        }
+      ]
+    },
+    "connected-views": {
+      "status": "passed",
+      "checks": [
+        "one evidence destination with citations",
+        "explicit Ask task",
+        "Escape and source focus restore",
+        "Alberta totals separate from mapped records",
+        "record inspection retains map and filters",
+        "atlas context before map",
+        "map remains drawn after mobile resize",
+        "receipt export remains reachable",
+        "transport map visible through all stages",
+        "atlas-to-transport map sizing",
+        "shipment reprices",
+        "destination selection and reload",
+        "320px and landscape",
+        "old layer preferences cannot hide selected route"
+      ],
+      "providerCalls": 0
+    },
+    "dialog-dismissal": {
+      "status": "passed",
+      "checks": [
+        "dismissal survives late context data",
+        "error and draft preserved for intentional reopening"
+      ],
+      "mockedRequests": 1,
+      "providerCalls": 0
+    },
+    "monthly-energy": {
+      "status": "passed",
+      "checks": [
+        "All 14 jurisdictions and all three measures match source-derived monthly observations alongside annual GDP",
+        "Explicit zero, undefined growth and confidential oil remain distinguishable",
+        "24-month trend tables and self-contained data export reproduce the displayed selection",
+        "Changing the annual scenario and projection year leaves monthly actuals unchanged",
+        "Forecast inspector synchronizes province without silently changing model inputs",
+        "Question view follows commodity and comparison; price shocks do not rewrite observations; shared state reloads",
+        "All four views fit 390px and 320px screens",
+        "Monthly endpoint failure leaves annual view usable and retry recovers"
+      ],
+      "errors": [],
+      "dataVersion": "bc33daac7ade7de311b2"
+    },
+    "energy-story": {
+      "status": "passed",
+      "base": "http://127.0.0.1:4201/",
+      "checks": [
+        "source-backed default and late status preservation",
+        "keyboard repricing, reactive explanation, undo and URL reload",
+        "map selection, partner comparison, full directional table and domestic accounting identity",
+        "budget benchmark and period, national scope and duration, independent forecast and missing forecast",
+        "gas local benchmark and electricity and household model gaps",
+        "pin restore, complete export replay, imported snapshot and malformed-file recovery",
+        "browser back and mobile overview and table",
+        "contextual AI handoff and reactive OpenUI findings with one mocked provider request",
+        "forecast detail handoff retains year and both provinces",
+        "source-loading retry and explicit invalid shared-state recovery",
+        "existing and new navigation contains all controls from 320 to 1440 pixels"
+      ],
+      "providerCalls": "mocked; no billed inference",
+      "runtimeErrors": []
+    }
+  },
+  "gdpBrowserSuites": {
+    "provincial-forecast": "passed by implementation agent",
+    "energy-forecast": "passed by implementation agent",
+    "forecast-ai": "passed by implementation agent"
+  },
+  "betaGate": {
+    "passed": true,
+    "scope": "public-beta",
+    "nationalComplete": false,
+    "releaseId": "e77b2ab3ebae30a03931",
+    "checkedAt": "2026-10-21T06:32:48.423Z",
+    "errors": []
+  },
+  "publication": "pending",
+  "independentReview": {
+    "status": "accepted",
+    "journeyChecks": 90,
+    "mapFitStates": 6,
+    "finalReceiptAndCameraChecks": 8,
+    "runtimeErrors": 0,
+    "providerCalls": 0,
+    "report": "CONNECTED-VIEWS-EXPERIENCE-REVIEW.md"
+  }
+}

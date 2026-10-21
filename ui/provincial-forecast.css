@@ -1,0 +1,64 @@
+.pf-shell.pf-shell{margin-top:0;padding-top:0;border-top:0}
+.pf-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.2rem}
+.pf-heading h2{margin:0;font-size:clamp(1.4rem,2.4vw,2rem)}
+.pf-heading button{margin-left:auto}
+.pf-shell .pf-toolbar{margin:0 0 1.4rem;flex-wrap:wrap}
+.pf-displays{margin-left:auto}
+.pf-story{display:grid;grid-template-columns:minmax(210px,.7fr) minmax(0,1.3fr);gap:2rem;align-items:start}
+.pf-place{position:sticky;top:1rem;min-width:0}
+.pf-place-map{width:100%;height:auto;display:block;max-height:330px}
+.pf-place-map path{fill:#e7e8df;stroke:#faf9f2;stroke-width:1;cursor:pointer;vector-effect:non-scaling-stroke}
+.pf-place-map path.is-selected{fill:#315d4c;stroke:#163d2e;stroke-width:1.5}
+.pf-place-map path:hover,.pf-place-map path:focus-visible{fill:#a9c2b0;stroke:#315d4c;stroke-width:2;outline:0}
+.pf-place-buttons,.pf-compare-places{display:flex;flex-wrap:wrap;gap:.3rem}
+.pf-shell .pf-place-buttons button,.pf-shell .pf-compare-places button{min-width:44px;min-height:44px;padding:.45rem;border:0;background:transparent;font-size:.85rem}
+.pf-shell .pf-place-buttons button[aria-pressed=true],.pf-shell .pf-compare-places button[aria-pressed=true]{background:#294c43;color:#fff}
+.pf-shell .pf-detail{margin:0;padding:0;border:0;min-width:0}
+.pf-detail-heading p{font-size:.85rem;color:#5a6d62}
+.pf-shell .pf-detail-heading{margin-bottom:.8rem;gap:1rem}
+.pf-shell .pf-detail-heading h3{font-size:clamp(1.3rem,2.2vw,1.8rem);line-height:1.15;margin:0 0 .35rem}
+.pf-shell .pf-detail-heading strong{font-size:2.5rem;white-space:nowrap}
+.pf-history-chart{margin:0}
+.pf-history-chart svg{width:100%;height:auto;display:block;overflow:visible}
+.pf-history-chart svg text{font-size:12px;fill:#52675c;font-family:inherit}
+.pf-future-area{fill:#e9eee5}
+.pf-history-grid{stroke:#d9ded3;stroke-width:1}
+.pf-history-zero{stroke:#8b9e90;stroke-width:1}
+.pf-history-line{fill:none;stroke:#294c43;stroke-width:2;stroke-linejoin:round}
+.pf-history-projected{stroke-dasharray:4 5}
+.pf-history-actual circle{fill:#294c43;stroke:#faf9f2;stroke-width:1.5}
+.pf-history-future circle{fill:#faf9f2;stroke:#577c66;stroke-width:2}
+.pf-history-future.is-selected circle{stroke:#943f2b;stroke-width:3}
+.pf-history-future.is-selected .pf-history-whisker{stroke:#943f2b}
+.pf-history-whisker{stroke:#688b75;stroke-width:2;fill:none}
+.pf-history-chart figcaption{display:flex;gap:.5rem 1rem;justify-content:center;flex-wrap:wrap;font-size:.7rem;color:#52675c;margin:.5rem 0 1rem}
+.pf-history-chart figcaption span{display:inline-flex;align-items:center;gap:.35rem}
+.pf-history-chart figcaption i{display:inline-block;width:8px;height:8px;border-radius:50%;border:1.5px solid #294c43}
+.pf-history-chart .pf-legend-observed{background:#294c43}
+.pf-history-chart .pf-legend-range{width:16px;height:1px;border-radius:0;background:#688b75}
+.pf-year-readings{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #cbd3c7}
+.pf-shell .pf-year-readings button{border:0;border-radius:0;background:transparent;display:grid;grid-template-columns:1fr auto;gap:.3rem .5rem;text-align:left;min-height:78px;padding:.75rem}
+.pf-shell .pf-year-readings button[aria-pressed=true]{box-shadow:inset 0 -3px #943f2b;background:#f0f0e7;color:#294c43}
+.pf-year-readings strong{font-size:1.2rem;font-variant-numeric:tabular-nums}
+.pf-year-readings small{grid-column:1/-1;color:#52675c;font-size:.75rem}
+.pf-shell .pf-uncertainty{font-size:.82rem;line-height:1.5;margin:1rem 0 0;color:#52675c}
+.pf-shell .pf-basis{border-top:1px solid #d3d9ce;margin:1.5rem 0 0;padding-top:.65rem;color:#52675c;font-size:.75rem}
+.pf-compare-places{margin-bottom:.8rem}
+.pf-evidence{box-sizing:border-box;width:min(950px,calc(100% - 2rem));max-height:calc(100dvh - 2rem);border:1px solid #a8b6a6;padding:0;color:#243c34;background:#faf9f2;overflow:auto}
+.pf-evidence::backdrop{background:#15251fd1}
+.pf-evidence>header{position:sticky;top:0;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1rem 1.4rem;border-bottom:1px solid #cbd3c7;background:#faf9f2}
+.pf-evidence h3{font-size:1.25rem!important;margin:0}
+.pf-evidence h4{margin:1.2rem 0 .6rem;font-size:1.05rem}
+.pf-evidence>nav{display:flex;flex-wrap:wrap;gap:.4rem;padding:.8rem 1.4rem;border-bottom:1px solid #cbd3c7}
+.pf-evidence nav button{border:0;background:transparent;font-size:.85rem;padding:.65rem;min-height:44px}
+.pf-evidence nav button[aria-pressed=true]{background:#294c43;color:white}
+.pf-evidence-content{padding:.4rem 1.4rem 1.2rem}
+.pf-evidence-content p,.pf-evidence-content li{font-size:.88rem;line-height:1.55;margin:.7rem 0!important}
+.pf-evidence-content a{text-decoration:underline;text-underline-offset:.15em;color:#315d4c}
+.pf-evidence footer{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:1rem 1.4rem;border-top:1px solid #cbd3c7}
+.pf-evidence footer span{font-size:.72rem;overflow-wrap:anywhere}
+.pf-evidence .pf-energy-audit{border-top:1px solid #cbd3c7;margin-top:2rem;padding-top:1rem}
+.pf-evidence .hw-table-wrap{max-width:100%;overflow:auto}
+.pf-evidence .monthly-energy{margin-top:0;border:0;padding-top:1rem}
+@media(max-width:760px){.pf-story{grid-template-columns:1fr;gap:1.2rem}.pf-place{position:static;display:grid;grid-template-columns:minmax(110px,.75fr) minmax(0,1fr);gap:.4rem;align-items:center}.pf-place-map{max-height:180px}.pf-place-buttons{justify-content:flex-end;gap:.1rem}.pf-shell .pf-place-buttons button{min-width:44px;padding:.25rem;font-size:.75rem}.pf-shell .pf-detail-heading strong{font-size:2rem}.pf-shell .pf-toolbar{gap:.65rem}.pf-history-chart figcaption{font-size:.68rem;gap:.4rem .75rem}.pf-evidence{width:calc(100% - 1rem);max-height:calc(100dvh - 1rem)}.pf-evidence>header,.pf-evidence>nav,.pf-evidence-content,.pf-evidence>footer{padding-inline:.9rem}.pf-evidence .pf-scorecard{grid-template-columns:1fr}.pf-evidence .pf-scorecard>div{display:flex;align-items:center;justify-content:space-between}.pf-evidence .pf-scorecard strong{text-align:right}.pf-evidence h3{font-size:1.05rem!important}.pf-evidence nav button{padding:.5rem;font-size:.78rem}}
+@media(max-width:380px){.pf-place{grid-template-columns:1fr}.pf-place-map{max-height:145px}.pf-place-buttons{justify-content:flex-start}.pf-shell .pf-place-buttons button{min-width:44px}.pf-shell .pf-toolbar .hw-switch button{font-size:13px;padding:7px 9px}.pf-history-chart svg text{font-size:11px}.pf-year-readings strong{font-size:1.05rem}}

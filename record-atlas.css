@@ -243,3 +243,37 @@
 #record-atlas .ra-not-applicable abbr { text-decoration:none; }
 #record-atlas .ra-aer-load { text-align:left; white-space:normal; font:13px/1.5 'IBM Plex Sans',sans-serif; }
 #record-atlas .ra-aer-load button { display:inline-block; text-decoration:underline; }
+
+#record-atlas .ra-workspace{grid-template-rows:auto minmax(420px,1fr)}
+#record-atlas .ra-place-context{grid-column:1/-1;display:grid;grid-template-columns:minmax(180px,1fr) minmax(200px,1fr) auto;align-items:center;gap:12px 28px;padding:18px 28px;border-bottom:1px solid var(--ra-line)}
+#record-atlas .ra-place-context .ra-region-picker{margin:0}
+#record-atlas .ra-place-context .ra-selection-heading{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin:0;padding:0}
+#record-atlas .ra-place-context .ra-place{display:none}
+#record-atlas .ra-place-context .ra-total{position:static;font-size:25px;letter-spacing:-.5px;order:0}
+#record-atlas .ra-place-context .ra-match-label{position:static;font-size:13px;order:1;margin:0}
+#record-atlas .ra-place-context .ra-coverage-label{order:2;flex-basis:100%;margin:0;font-size:12px}
+#record-atlas .ra-evidence-button{min-height:44px;text-decoration:underline;text-underline-offset:4px}
+#record-atlas .ra-place-context .ra-provincial-summary{grid-column:1/-1;margin:0;padding:10px 0 0;border:0;border-top:1px solid var(--ra-line);display:flex;align-items:baseline;gap:8px 24px;background:none}
+#record-atlas .ra-provincial-summary>div{display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+#record-atlas .ra-provincial-summary .ra-operating-total{font-size:25px;line-height:1.3;margin:0;letter-spacing:-.5px}
+#record-atlas .ra-provincial-summary span,#record-atlas .ra-provincial-summary p{font-size:12px;margin:0;line-height:1.5}
+#record-atlas .ra-preview h3{font-size:14px;font-weight:500;margin:16px 0 8px}
+#record-atlas .ra-evidence{width:min(720px,calc(100vw - 32px));max-height:calc(100dvh - 32px);padding:24px;color:var(--ra-ink);background:var(--ra-paper);border:1px solid var(--ra-line);line-height:1.6;overflow:auto}
+#record-atlas .ra-evidence::backdrop{background:rgb(24 34 29 / .46)}
+#record-atlas .ra-evidence>header{display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+#record-atlas .ra-evidence button{min-height:44px}
+#record-atlas .ra-evidence h2{font-size:23px}
+#record-atlas .ra-evidence dl>div{display:flex;justify-content:space-between;gap:16px}
+#record-atlas .ra-evidence .ra-source-list{margin-top:24px}
+@media(max-width:760px){
+ #record-atlas .ra-place-context{grid-template-columns:1fr auto;padding:14px 18px;gap:8px 12px}
+ #record-atlas .ra-place-context .ra-selection-heading{grid-column:1;grid-row:2}
+ #record-atlas .ra-place-context .ra-evidence-button{grid-column:2;grid-row:1/3}
+ #record-atlas .ra-place-context .ra-provincial-summary{display:block}
+ #record-atlas .ra-provincial-summary>div{flex-wrap:wrap;white-space:normal;gap:3px 8px}
+ #record-atlas .ra-main .ra-stage{height:300px;min-height:300px}
+ #record-atlas .ra-inspector{padding:16px 18px}
+ #record-atlas .ra-map-tools{left:18px;top:10px}
+ #record-atlas .ra-toolbar{padding-top:6px}
+ #record-atlas .ra-legend{padding-top:7px}
+}

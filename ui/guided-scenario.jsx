@@ -68,6 +68,6 @@ export function GuidedScenario({shapes,result,selection,update,ready,loadStatus,
       </>}
     </div></div>
     <div className="gs-footer">{step>0?<button onClick={()=>update({guideStep:GUIDE_STEPS[step-1]})}>← Back</button>:<span/>}{step<2?<button onClick={()=>update({guideStep:GUIDE_STEPS[step+1]})}>{labels[step+1]} →</button>:null}</div>
-    <details className="gs-details gs-sources"><summary>Sources & methods</summary><p>{result.interpretation}</p>{result.sources.map((source,i)=><p key={`${source.id}-${i}`}><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title}</a></p>)}<dl>{Object.entries(result.versions).map(([name,version])=><div key={name}><dt>{name}</dt><dd>{version}</dd></div>)}</dl></details>
+
   </section>;
 }

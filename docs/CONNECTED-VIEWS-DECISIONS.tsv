@@ -1,0 +1,12 @@
+time	decision	reason	evidence
+2026-10-21	Remove footer accordion stack	Separate component ownership leaked into repeated UI	User screenshot and independent baseline review
+2026-10-21	Selected province history is primary GDP view	National range chart plus repeated selected detail makes a long report	Outlook implementation agent compared two alternatives
+2026-10-21	One contextual evidence destination	Source attribution must stay accessible without repeated methods sections	Subtract before you add; user correction
+2026-10-21	Keep mobile maps visible with context	Atlas context was below a large map; transport map was hidden	Independent desktop/mobile baseline review
+2026-10-21	Use stage-specific transport content	Camera-only steps did not change the explanatory task	Independent baseline review
+2026-10-21	Observe final map dimensions and refit	Maps initialized hidden or retained desktop offsets on mobile	Headless screenshots and six-state endpoint bounds probe
+2026-10-21	Keep selected route independent of inventory layers	Old links could hide the route with no visible recovery	Independent hidden-route reproduction
+2026-10-21	Keep dismissed Ask dialog closed	A retained error reopened the dialog after late context data	Independent mocked-503 reproduction and dialog-dismissal regression
+2026-10-21	Restore receipt export inside calculation evidence	Subtraction accidentally removed the only export entry point	Independent diff review and browser download assertion
+2026-10-21	Stop automatic atlas fitting after manual movement	A later resize must respect keyboard and pointer camera changes	Independent camera review
+2026-10-21	Keep interpretation beside the result	Sources can be consolidated but missingness and uncertainty cannot be hidden	GDP uncertainty, AER totals, schematic routes and government-charge coverage retained

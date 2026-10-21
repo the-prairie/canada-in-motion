@@ -22,9 +22,9 @@ try{
  assert.match(await page.locator('.hw-branch-comparison').innerText(),/Current: Electricity · 2024 · -10%/);
  await page.locator('.hw-robustness summary').click();assert.match(await page.locator('.hw-robustness').innerText(),/2022/);
  await actions();await page.getByRole('button',{name:'Save investigation',exact:true}).click();await page.getByText('Saved on this device with its original data.',{exact:true}).waitFor();
- await page.reload();await page.locator('.hw-saved summary').click();
- assert.equal(await page.locator('.hw-saved li').count(),1);
- await page.locator('.hw-saved li button').first().click();
+ await page.reload();await page.locator('.hw-grid').waitFor();await actions();await page.getByRole('button',{name:/^Open saved/}).click();
+ assert.equal(await page.locator('.hw-saved-list li').count(),1);
+ await page.locator('.hw-saved-list li button').first().click();
  await page.getByText('Restored with the original source snapshot.',{exact:true}).waitFor();
  assert.equal(await page.getByLabel('Energy price change',{exact:true}).inputValue(),'-10');
  await page.screenshot({path:'/tmp/cim-investigations-desktop.png',fullPage:true});
