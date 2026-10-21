@@ -7,7 +7,7 @@ const browser=await chromium.launch({headless:true,...(process.env.TEST_BROWSER_
 const base=process.env.TEST_URL||'http://127.0.0.1:4203/';
 const artifacts=path.resolve(process.env.TEST_ARTIFACT_DIR||'.data-cache/follow-dollar');
 await mkdir(artifacts,{recursive:true});
-const snapshot=JSON.parse(await readFile(new URL('../../data/income-paths.json',import.meta.url),'utf8'));
+const snapshot=await fetch(new URL('data/income-paths.json',base)).then(response=>{assert.equal(response.status,200);return response.json();});
 const results=[],errors=[],inferenceRequests=[];
 const location=state=>base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy:{section:'supply',region:'AB',incomeIndustry:'oil-gas',incomeYear:2022,demandMillion:100,...state}}));
 const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce',acceptDownloads:true});

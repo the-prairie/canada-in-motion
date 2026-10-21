@@ -1,5 +1,5 @@
 {
-  "status": "candidate-verified",
+  "status": "published-and-verified",
   "javascriptTests": 395,
   "pipelineTests": 139,
   "independentReview": "EXPLORE-DOLLAR-EXPERIENCE-REVIEW.md",
@@ -192,5 +192,111 @@
     "Follow the dollar shows one outcome and its provincial allocation; sources and full calculations share one Evidence dialog.",
     "Failed models, missing values, benchmark definitions and household spending qualifiers remain explicit.",
     "Selected outcomes persist through shared links and exports; resizing keeps the active account visible."
-  ]
+  ],
+  "implementationCommit": "05142d66defc3c774f486ddc12f1d973d779068e",
+  "workflow": "https://github.com/the-prairie/canada-in-motion/actions/runs/39567277685",
+  "deploymentConclusion": "success",
+  "refreshedModelAuditChecks": 24438,
+  "publicIntegrity": {
+    "status": "passed",
+    "checkedAt": "2026-10-21T08:19:16.722Z",
+    "health": {
+      "codeVersion": "4023c241564f35f0fcec",
+      "status": "public-beta",
+      "releaseId": "6e50f5b7fe67a57c00ce",
+      "records": 317942,
+      "retrievedAt": "2026-10-21T08:13:44Z",
+      "builtAt": "2026-10-21T08:18:17.337Z",
+      "nationalComplete": false
+    },
+    "files": [
+      {
+        "path": "economy-model.mjs",
+        "sha256": "70d6e5e42d5fc978088ec09c2534435401d59c4f68a83a180760d1e47c78321d"
+      },
+      {
+        "path": "energy-economy.js",
+        "sha256": "6cfc55c6a971558fe441ddadfe26d7625a48575656ba3010f3fabb09d896273a"
+      },
+      {
+        "path": "energy-story.css",
+        "sha256": "2c3b92cd45f6348139ebe9e09ec4c6eddcff169e083b0616c76ea4fa7326ddd0"
+      },
+      {
+        "path": "energy-workspace.css",
+        "sha256": "595271ed679d669e48072257c7e8eef42b5e42c53abc322a004842a7e690547c"
+      },
+      {
+        "path": "vendor/energy-workspace.js",
+        "sha256": "c351a0b3604a5aa6cb406c439f7dba81113fc71f5a7048682a68ef0c25e88326"
+      },
+      {
+        "path": "vendor/energy-workspace.css",
+        "sha256": "02f53f6a5df7dac0c93cf59e46ce88278a18d50a8fb6544bee5f74c5c066c118"
+      }
+    ]
+  },
+  "publicBrowserResults": {
+    "energy-story": {
+      "status": "passed",
+      "base": "https://the-prairie.github.io/canada-in-motion/",
+      "checks": [
+        "source-backed default and late status preservation",
+        "keyboard repricing, reactive explanation, undo and URL reload",
+        "map selection, partner comparison, full directional table and domestic accounting identity",
+        "budget benchmark and period, national scope and duration, unchanged forecast dataset and unavailable provincial response",
+        "gas local benchmark and electricity and household model gaps",
+        "pin restore, complete export replay, imported snapshot and malformed-file recovery",
+        "browser back and mobile overview and table",
+        "contextual AI handoff and reactive OpenUI findings with one mocked provider request",
+        "forecast detail handoff retains year and both provinces",
+        "source-loading retry and explicit invalid shared-state recovery",
+        "existing and new navigation contains all controls from 320 to 1440 pixels"
+      ],
+      "providerCalls": "mocked; no billed inference",
+      "runtimeErrors": []
+    },
+    "follow-dollar": {
+      "status": "passed",
+      "checks": [
+        "GDP, labour income and jobs show distinct model results with direct allocation values",
+        "Published zero stays zero and unavailable coefficients remain unavailable even at zero demand",
+        "Evidence exposes all exact measures, stages, definitions and official source, exports the full snapshot, and restores keyboard focus",
+        "All scenario inputs and the chosen outcome survive URL reload",
+        "1440px, 390px and 320px layouts keep labels apart and evidence in the viewport",
+        "Large calculated totals hide binary arithmetic residue while the export retains the model values",
+        "Initial Canada scope, invalid reference year and excessive demand retain existing normalization"
+      ],
+      "errors": [],
+      "inferenceRequests": []
+    },
+    "monthly-energy": {
+      "checks": [
+        "All 14 jurisdictions and all three measures match source-derived monthly observations alongside annual GDP",
+        "Explicit zero, undefined growth and confidential oil remain distinguishable",
+        "24-month trend tables and self-contained data export reproduce the displayed selection",
+        "Changing the annual scenario and projection year leaves monthly actuals unchanged",
+        "Forecast inspector synchronizes province without silently changing model inputs",
+        "Question view follows commodity and comparison; price shocks do not rewrite observations; shared state reloads",
+        "All four views fit 390px and 320px screens",
+        "Monthly endpoint failure leaves annual view usable and retry recovers"
+      ],
+      "errors": [],
+      "dataVersion": "bc33daac7ade7de311b2"
+    },
+    "price-impacts": {
+      "status": "passed",
+      "checks": [
+        "AB exploratory result requires disclosure; QC accepted result is visible; five signed and zero shocks match raw-data arithmetic",
+        "Response horizon changes the result; held-out historical errors and complete table are reachable",
+        "Both provincial oil spending equivalents match raw CPI response paths for five shocks; annual accuracy caveat and 72 audit months are reachable",
+        "Gas failed calibration does not display a bill estimate; gas and electricity retail scenarios require explicit selection and use direct spending arithmetic",
+        "Unavailable territory household data and electricity GDP response do not become zero",
+        "Both chapters have no page overflow at 390 and 320 pixels",
+        "Household price basis and shock survive a shared URL reload"
+      ],
+      "errors": [],
+      "providerCalls": 0
+    }
+  }
 }
