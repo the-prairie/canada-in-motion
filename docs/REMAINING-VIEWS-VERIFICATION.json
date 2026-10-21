@@ -1,0 +1,540 @@
+{
+  "status": "published-and-verified",
+  "implementationCommit": "fb306409ba06c8482ab40051817f748afe51a9a3",
+  "workflow": "https://github.com/the-prairie/canada-in-motion/actions/runs/39561533730",
+  "javascriptTests": 395,
+  "pipelineTests": 139,
+  "independentReview": "REMAINING-VIEWS-EXPERIENCE-REVIEW.md",
+  "independentAcceptanceChecks": 150,
+  "browserMode": "headless",
+  "billedInferenceRequests": 0,
+  "localHealth": {
+    "codeVersion": "ed79dd2aa60e3fcc9d59",
+    "status": "public-beta",
+    "releaseId": "e77b2ab3ebae30a03931",
+    "records": 317936,
+    "retrievedAt": "2026-10-18T23:28:38Z",
+    "builtAt": "2026-10-21T07:20:00.695Z",
+    "nationalComplete": false
+  },
+  "localBrowserResults": {
+    "remaining-views": {
+      "status": "passed",
+      "checks": [
+        "Income keeps nominal value and recent real growth distinct, comparison precedes monthly activity, map/ranking/table link selection, monthly evidence exports",
+        "Futures has one series, explicitly global benchmarks, missing values, conditional retail indices, selected annual data export and shared-state restoration",
+        "Oil national export matches visible calculation; experiment and history are exclusive, mode survives reload and prior inputs persist",
+        "390px,320px and short landscape fit; futures axis text remains at least11px; zero runtime errors"
+      ],
+      "errors": [],
+      "providerCalls": 0
+    },
+    "focused-views": {
+      "status": "passed",
+      "checks": [
+        "one result at a time",
+        "named result persists on reload",
+        "All views is reversible",
+        "secondary menu closes",
+        "consistent Futures precision and legend",
+        "indicator, scenario and year survive reload",
+        "forecast failure recovers inline",
+        "four mobile data journeys start with collapsed composer and no overflow"
+      ],
+      "providerCalls": 0
+    },
+    "data-freshness": {
+      "checks": 6,
+      "errors": [],
+      "nominalYear": 2022,
+      "activityYear": 2025
+    },
+    "monthly-energy": {
+      "checks": [
+        "All 14 jurisdictions and all three measures match source-derived monthly observations alongside annual GDP",
+        "Explicit zero, undefined growth and confidential oil remain distinguishable",
+        "24-month trend tables and self-contained data export reproduce the displayed selection",
+        "Changing the annual scenario and projection year leaves monthly actuals unchanged",
+        "Forecast inspector synchronizes province without silently changing model inputs",
+        "Question view follows commodity and comparison; price shocks do not rewrite observations; shared state reloads",
+        "All four views fit 390px and 320px screens",
+        "Monthly endpoint failure leaves annual view usable and retry recovers"
+      ],
+      "errors": [],
+      "dataVersion": "bc33daac7ade7de311b2"
+    },
+    "connected-views": {
+      "status": "passed",
+      "checks": [
+        "one evidence destination with citations",
+        "explicit Ask task",
+        "Escape and source focus restore",
+        "Alberta totals separate from mapped records",
+        "record inspection retains map and filters",
+        "atlas context before map",
+        "map remains drawn after mobile resize",
+        "receipt export remains reachable",
+        "transport map visible through all stages",
+        "atlas-to-transport map sizing",
+        "shipment reprices",
+        "destination selection and reload",
+        "320px and landscape",
+        "old layer preferences cannot hide selected route"
+      ],
+      "providerCalls": 0
+    },
+    "dialog-dismissal": {
+      "status": "passed",
+      "checks": [
+        "dismissal survives late context data",
+        "error and draft preserved for intentional reopening"
+      ],
+      "mockedRequests": 1,
+      "providerCalls": 0
+    },
+    "energy-story": {
+      "status": "passed",
+      "base": "http://127.0.0.1:4202/",
+      "checks": [
+        "source-backed default and late status preservation",
+        "keyboard repricing, reactive explanation, undo and URL reload",
+        "map selection, partner comparison, full directional table and domestic accounting identity",
+        "budget benchmark and period, national scope and duration, independent forecast and missing forecast",
+        "gas local benchmark and electricity and household model gaps",
+        "pin restore, complete export replay, imported snapshot and malformed-file recovery",
+        "browser back and mobile overview and table",
+        "contextual AI handoff and reactive OpenUI findings with one mocked provider request",
+        "forecast detail handoff retains year and both provinces",
+        "source-loading retry and explicit invalid shared-state recovery",
+        "existing and new navigation contains all controls from 320 to 1440 pixels"
+      ],
+      "providerCalls": "mocked; no billed inference",
+      "runtimeErrors": []
+    }
+  },
+  "independentGeometryFollowup": {
+    "base": "http://127.0.0.1:4202/",
+    "results": [
+      {
+        "label": "desktop",
+        "texts": [
+          {
+            "text": "84,134",
+            "font": 14.228125000000002,
+            "x": 59.35885238647461,
+            "y": 771.57275390625,
+            "w": 51.203128814697266,
+            "h": 19
+          },
+          {
+            "text": "116,644",
+            "font": 14.228125000000002,
+            "x": 50.82760238647461,
+            "y": 656.957275390625,
+            "w": 59.734378814697266,
+            "h": 19
+          },
+          {
+            "text": "149,154",
+            "font": 14.228125000000002,
+            "x": 50.82760238647461,
+            "y": 542.3418579101562,
+            "w": 59.734378814697266,
+            "h": 19
+          },
+          {
+            "text": "Projected",
+            "font": 14.228125000000002,
+            "x": 152.63156127929688,
+            "y": 498.0765686035156,
+            "w": 76.79685974121094,
+            "h": 18.999969482421875
+          },
+          {
+            "text": "2023",
+            "font": 14.228125000000002,
+            "x": 120.04739379882812,
+            "y": 821.7664184570312,
+            "w": 34.140625,
+            "h": 18.99993896484375
+          },
+          {
+            "text": "2030",
+            "font": 14.228125000000002,
+            "x": 426.35955810546875,
+            "y": 821.7664184570312,
+            "w": 34.140594482421875,
+            "h": 18.99993896484375
+          },
+          {
+            "text": "2040",
+            "font": 14.228125000000002,
+            "x": 888.33447265625,
+            "y": 821.7664184570312,
+            "w": 34.14056396484375,
+            "h": 18.99993896484375
+          },
+          {
+            "text": "2050",
+            "font": 14.228125000000002,
+            "x": 1333.2391357421875,
+            "y": 821.7664184570312,
+            "w": 34.1405029296875,
+            "h": 18.99993896484375
+          }
+        ],
+        "overlaps": [],
+        "overflow": false,
+        "pickers": [
+          {
+            "id": "ec-scenario",
+            "value": "Current Measures",
+            "width": 344.125
+          },
+          {
+            "id": "ec-year",
+            "value": "2040",
+            "width": 110
+          }
+        ],
+        "valuePreserved": true,
+        "pass": true
+      },
+      {
+        "label": "mobile",
+        "texts": [
+          {
+            "text": "84,134",
+            "font": 12,
+            "x": 20.796875,
+            "y": 892.734375,
+            "w": 43.203125,
+            "h": 15
+          },
+          {
+            "text": "116,644",
+            "font": 12,
+            "x": 13.59375,
+            "y": 825.234375,
+            "w": 50.40625,
+            "h": 15
+          },
+          {
+            "text": "149,154",
+            "font": 12,
+            "x": 13.59375,
+            "y": 757.734375,
+            "w": 50.40625,
+            "h": 15
+          },
+          {
+            "text": "Projected",
+            "font": 12,
+            "x": 85.29629516601562,
+            "y": 726.234375,
+            "w": 64.8125,
+            "h": 15
+          },
+          {
+            "text": "2023",
+            "font": 12,
+            "x": 72,
+            "y": 929.234375,
+            "w": 28.8125,
+            "h": 15
+          },
+          {
+            "text": "2035",
+            "font": 12,
+            "x": 184.70486450195312,
+            "y": 929.234375,
+            "w": 28.8125,
+            "h": 15
+          },
+          {
+            "text": "2050",
+            "font": 12,
+            "x": 329.1875,
+            "y": 929.234375,
+            "w": 28.8125,
+            "h": 15
+          }
+        ],
+        "overlaps": [],
+        "overflow": false,
+        "pickers": [
+          {
+            "id": "ec-scenario",
+            "value": "Current Measures",
+            "width": 232
+          },
+          {
+            "id": "ec-year",
+            "value": "2040",
+            "width": 110
+          }
+        ],
+        "valuePreserved": true,
+        "pass": true
+      },
+      {
+        "label": "narrow",
+        "texts": [
+          {
+            "text": "84,134",
+            "font": 12,
+            "x": 20.796875,
+            "y": 892.734375,
+            "w": 43.203125,
+            "h": 15
+          },
+          {
+            "text": "116,644",
+            "font": 12,
+            "x": 13.59375,
+            "y": 825.234375,
+            "w": 50.40625,
+            "h": 15
+          },
+          {
+            "text": "149,154",
+            "font": 12,
+            "x": 13.59375,
+            "y": 757.734375,
+            "w": 50.40625,
+            "h": 15
+          },
+          {
+            "text": "Projected",
+            "font": 12,
+            "x": 84,
+            "y": 726.234375,
+            "w": 64.8125,
+            "h": 15
+          },
+          {
+            "text": "2023",
+            "font": 12,
+            "x": 72,
+            "y": 929.234375,
+            "w": 28.8125,
+            "h": 15
+          },
+          {
+            "text": "2035",
+            "font": 12,
+            "x": 153.59375,
+            "y": 929.234375,
+            "w": 28.8125,
+            "h": 15
+          },
+          {
+            "text": "2050",
+            "font": 12,
+            "x": 259.1875,
+            "y": 929.234375,
+            "w": 28.8125,
+            "h": 15
+          }
+        ],
+        "overlaps": [],
+        "overflow": false,
+        "pickers": [
+          {
+            "id": "ec-scenario",
+            "value": "Current Measures",
+            "width": 162
+          },
+          {
+            "id": "ec-year",
+            "value": "2040",
+            "width": 110
+          }
+        ],
+        "valuePreserved": true,
+        "pass": true
+      },
+      {
+        "label": "landscape",
+        "texts": [
+          {
+            "text": "84,134",
+            "font": 12,
+            "x": 36.556884765625,
+            "y": 766.4010620117188,
+            "w": 43.203125,
+            "h": 15
+          },
+          {
+            "text": "116,644",
+            "font": 12,
+            "x": 29.353759765625,
+            "y": 669.734375,
+            "w": 50.40625,
+            "h": 15
+          },
+          {
+            "text": "149,154",
+            "font": 12,
+            "x": 29.353759765625,
+            "y": 573.0676879882812,
+            "w": 50.40625,
+            "h": 15
+          },
+          {
+            "text": "Projected",
+            "font": 12,
+            "x": 108.88001251220703,
+            "y": 535.734375,
+            "w": 64.81249237060547,
+            "h": 15
+          },
+          {
+            "text": "2023",
+            "font": 12,
+            "x": 87.760009765625,
+            "y": 808.734375,
+            "w": 28.8125,
+            "h": 15
+          },
+          {
+            "text": "2030",
+            "font": 12,
+            "x": 257.03375244140625,
+            "y": 808.734375,
+            "w": 28.8125,
+            "h": 15
+          },
+          {
+            "text": "2040",
+            "font": 12,
+            "x": 519.4337768554688,
+            "y": 808.734375,
+            "w": 28.8125,
+            "h": 15
+          },
+          {
+            "text": "2050",
+            "font": 12,
+            "x": 767.427490234375,
+            "y": 808.734375,
+            "w": 28.8125,
+            "h": 15
+          }
+        ],
+        "overlaps": [],
+        "overflow": false,
+        "pickers": [
+          {
+            "id": "ec-scenario",
+            "value": "Current Measures",
+            "width": 181.90625
+          },
+          {
+            "id": "ec-year",
+            "value": "2040",
+            "width": 110
+          }
+        ],
+        "valuePreserved": true,
+        "pass": true
+      }
+    ],
+    "errors": []
+  },
+  "deploymentConclusion": "success",
+  "refreshedModelAuditChecks": 24438,
+  "publicIntegrity": {
+    "status": "passed",
+    "checkedAt": "2026-10-21T07:31:13.800Z",
+    "health": {
+      "codeVersion": "ed79dd2aa60e3fcc9d59",
+      "status": "public-beta",
+      "releaseId": "395bf0f8206444dd73d7",
+      "records": 317942,
+      "retrievedAt": "2026-10-21T07:25:51Z",
+      "builtAt": "2026-10-21T07:30:16.807Z",
+      "nationalComplete": false
+    },
+    "files": [
+      {
+        "path": "energy-economy.js",
+        "sha256": "61b92b961c8a6cbbdc20f14609148af4e871fa2e009d8c66dfc568bc13a28552"
+      },
+      {
+        "path": "energy-economy.css",
+        "sha256": "8ecdfa740fc5dfe7d7201e00c391e52010187a278e7360c8a8754899fde02a6b"
+      },
+      {
+        "path": "economy-model.mjs",
+        "sha256": "2005b243057adce2cf71010ab90355da5a9d1e25f9287ef4d2b756fa085e80d6"
+      },
+      {
+        "path": "vendor/energy-workspace.js",
+        "sha256": "2b5c390f715a4d66e918ad8ece81701facb02b94ca0669a21e65cc6bbcc67799"
+      },
+      {
+        "path": "vendor/energy-workspace.css",
+        "sha256": "8d3b0d0c54a4d0517b9a4a776ee9935153514fa937ee892c0ba5d95571819a24"
+      }
+    ]
+  },
+  "publicBrowserResults": {
+    "remaining-views": {
+      "status": "passed",
+      "checks": [
+        "Income keeps nominal value and recent real growth distinct, comparison precedes monthly activity, map/ranking/table link selection, monthly evidence exports",
+        "Futures has one series, explicitly global benchmarks, missing values, conditional retail indices, selected annual data export and shared-state restoration",
+        "Oil national export matches visible calculation; experiment and history are exclusive, mode survives reload and prior inputs persist",
+        "390px,320px and short landscape fit; futures axis text remains at least11px; zero runtime errors"
+      ],
+      "errors": [],
+      "providerCalls": 0
+    },
+    "oil-history": {
+      "status": "passed",
+      "checks": [
+        "one primary chart or table",
+        "published 2015 GDP values",
+        "five selectable episodes",
+        "episode and horizon survive reload",
+        "full province names accessible",
+        "last region cannot be removed",
+        "Evidence dialog restores focus on Escape",
+        "source-pinned export",
+        "desktop, 390px and 320px chart labels fit and do not overlap",
+        "mobile table containment",
+        "no runtime errors"
+      ],
+      "providerCalls": 0
+    },
+    "monthly-energy": {
+      "checks": [
+        "All 14 jurisdictions and all three measures match source-derived monthly observations alongside annual GDP",
+        "Explicit zero, undefined growth and confidential oil remain distinguishable",
+        "24-month trend tables and self-contained data export reproduce the displayed selection",
+        "Changing the annual scenario and projection year leaves monthly actuals unchanged",
+        "Forecast inspector synchronizes province without silently changing model inputs",
+        "Question view follows commodity and comparison; price shocks do not rewrite observations; shared state reloads",
+        "All four views fit 390px and 320px screens",
+        "Monthly endpoint failure leaves annual view usable and retry recovers"
+      ],
+      "errors": [],
+      "dataVersion": "bc33daac7ade7de311b2"
+    },
+    "focused-views": {
+      "status": "passed",
+      "checks": [
+        "one result at a time",
+        "named result persists on reload",
+        "All views is reversible",
+        "secondary menu closes",
+        "consistent Futures precision and legend",
+        "indicator, scenario and year survive reload",
+        "forecast failure recovers inline",
+        "four mobile data journeys start with collapsed composer and no overflow"
+      ],
+      "providerCalls": 0
+    }
+  }
+}
