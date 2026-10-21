@@ -74,6 +74,16 @@ The final scripted review passed 132 behavior checks with no runtime errors or h
 
 On narrow portrait screens, the map remains above the stage and selected province detail. On short landscape screens, the map scrolls normally so it does not cover the result. The guide keeps essential model qualifications beside amounts, while its calculation and source details remain expandable.
 
-Local evidence is in `.data-cache/map-story-review/`. `review.mjs` reproduces the desktop and mobile checks. `edge-review.mjs` reproduces the additional cases. `review-results.json` records the final results, and the candidate PNGs preserve the visual review. The public deployment still needs its release smoke check.
+The final mobile correction limits the sticky-map exception to number inputs. I reviewed the selector change and independently dragged the price slider at 320 and 390 pixels. The map stays attached during dragging and keyboard range changes. Focusing the number input releases it to leave room for typing. `input-focus-review.mjs` reproduces this check.
+
+Local evidence is in `.data-cache/map-story-review/`. `review.mjs` reproduces the desktop and mobile checks. `edge-review.mjs` reproduces the additional cases. `review-results.json` records the final results, and the candidate PNGs preserve the visual review.
+
+## Public acceptance
+
+The [public app](https://the-prairie.github.io/canada-in-motion/) passed the same independent review after deployment `39547513173`. I verified [health.json](https://the-prairie.github.io/canada-in-motion/health.json) reported code version `01826d94e06de3ddc2c6` and release `e572d65b0dc3b486ebad` before testing.
+
+All 132 desktop and mobile behavior checks passed against the public URL, with no findings or runtime errors. The zero-trade, long-name, keyboard, contrast, failed-source, and slider-focus checks also passed. I inspected the new public desktop, Maritime mobile, and small-screen household screenshots. The guide retained its map and readable endpoint values through the stages. The mobile slider kept the map attached during dragging. Browser routes blocked inference calls throughout the review.
+
+Public evidence is in `.data-cache/map-story-review/public/`. It includes the observed health response, browser results, and screenshots. To repeat the review, set `TEST_URL=https://the-prairie.github.io/canada-in-motion/` when running the three review scripts.
 
 Subtract Before You Add shaped the deletion list. Experience First selected the persistent map over scrolling scenes because the app is an interactive comparison tool. Prove It Works required interaction with the built app and screenshot inspection before acceptance.

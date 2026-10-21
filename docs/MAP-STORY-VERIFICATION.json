@@ -1,6 +1,6 @@
 {
   "date": "2026-10-20",
-  "status": "candidate-verified",
+  "status": "public-verified",
   "candidate": {
     "codeVersion": "01826d94e06de3ddc2c6",
     "status": "public-beta",
@@ -96,6 +96,158 @@
     "The full-national-coverage release gate remains inapplicable: this release retains the approved public-beta scope with disclosed coverage gaps.",
     "Economic models and their validity limits are unchanged."
   ],
-  "public": null,
-  "cancelledPrepublicationRun": 39547368183
+  "public": {
+    "health": {
+      "codeVersion": "01826d94e06de3ddc2c6",
+      "status": "public-beta",
+      "releaseId": "e572d65b0dc3b486ebad",
+      "records": 317942,
+      "retrievedAt": "2026-10-21T05:07:36Z",
+      "builtAt": "2026-10-21T05:12:12.501Z",
+      "nationalComplete": false
+    },
+    "verified": [
+      {
+        "path": "vendor/energy-workspace.js",
+        "sha256": "ae33a9d26522418e454f2100ebb49d2fec3d04eed81fea925fb6a53ff7f1fcd3",
+        "size": 936654
+      },
+      {
+        "path": "vendor/energy-workspace.css",
+        "sha256": "363b92678cb72ed25314e416d74e19c652f49abccf71961604079ac8c71b86b1",
+        "size": 8687
+      },
+      {
+        "path": "energy-economy.js",
+        "sha256": "a770e2925fd179369f02b0fa3619ee9946e4cf29955b42c5a87471778707f11e",
+        "size": 53133
+      }
+    ],
+    "verifiedAt": "2026-10-21T05:13:05.283Z",
+    "browserTests": {
+      "map-story": {
+        "status": "passed",
+        "checks": [
+          "motion plays only in view, supports pause and reduced motion, and never changes speed or path with prices",
+          "same map across all stages, exact supported values, failed estimates hidden, keyboard-to-detail focus survives pointer movement",
+          "320/390px sticky map preserves readable labels and visible headings; short landscape has normal scrolling",
+          "source failures show unavailable map values, disable missing targets and recover on retry; zero runtime errors"
+        ],
+        "errors": []
+      },
+      "guided-scenarios": {
+        "status": "passed",
+        "checks": [
+          "selected trade, negative repricing, stage focus, supported-only GDP, annual household caveat, export and URL reload",
+          "gas/electricity unavailable models, explicit independent retail assumption, commodity changes preserve stage",
+          "320/390px layout and offline restored source snapshot",
+          "partial source failure, exchange remains usable, retry, return to selected network, zero runtime errors"
+        ],
+        "errors": []
+      },
+      "trade-network": {
+        "status": "passed",
+        "checks": [
+          "linked diagram, exact selected value, next connection, focus and URL reload",
+          "keyboard link selection, reduced motion, clear, commodity/year changes and undo",
+          "mobile layout, touch-sized steps, save and shared display persistence"
+        ],
+        "errors": []
+      },
+      "investigations": {
+        "status": "passed",
+        "matrixCells": 156,
+        "checks": [
+          "direction",
+          "linked map",
+          "branch baseline",
+          "reference-year robustness",
+          "save and reload snapshot",
+          "mobile overflow",
+          "no runtime errors"
+        ]
+      },
+      "analysis-recovery": {
+        "status": "passed",
+        "checks": [
+          "outlook opens with AI offline and no inference request",
+          "contributions opens with AI offline and no inference request",
+          "electricity opens with AI offline and no inference request",
+          "trade opens with AI offline and no inference request",
+          "prices opens with AI offline and no inference request",
+          "quota shows reset time, prevents pointless retry, persists across reload and leaves data tools available",
+          "cooldown expires without submitting; provider failure permits retry and preserves previous answer"
+        ],
+        "mockedRequests": 2,
+        "providerCalls": 0
+      }
+    },
+    "independentAcceptance": {
+      "status": "passed",
+      "checks": 132,
+      "viewports": [
+        "1440x1100",
+        "390x844",
+        "320x740",
+        "844x390"
+      ],
+      "additionalChecks": [
+        "zero trade",
+        "long province names",
+        "keyboard and pointer focus",
+        "pause control contrast",
+        "reduced motion",
+        "source failure and retry",
+        "slider drag and number focus"
+      ],
+      "runtimeErrors": 0,
+      "providerCalls": 0,
+      "report": "MAP-STORY-EXPERIENCE-REVIEW.md"
+    }
+  },
+  "cancelledPrepublicationRun": 39547368183,
+  "deployment": {
+    "runId": 39547513173,
+    "url": "https://github.com/the-prairie/canada-in-motion/actions/runs/39547513173",
+    "commit": "d6bf854748ff50c2e39fff5b631d1944ea59effd",
+    "conclusion": "success"
+  },
+  "pipelineTests": {
+    "passed": 139,
+    "failed": 0
+  },
+  "refreshedModelAudit": {
+    "status": "passed",
+    "checks": 24438,
+    "maxAbsoluteDifference": 2.2453150450019166e-12,
+    "counts": {
+      "gdpModels": 52,
+      "gdpHistoricalPredictions": 779,
+      "householdMonthlyPredictions": 2112,
+      "householdAnnualPredictions": 176,
+      "spendingReferences": 30,
+      "guidedCases": 36,
+      "guidedInvarianceAssertions": 28
+    },
+    "gdpSupported": 8,
+    "householdSupported": 10,
+    "snapshots": {
+      "energy-flows": {
+        "dataVersion": "eaa874e962ee1870e336",
+        "sha256": "85035ec167232a733f337382fa76d1ebe8a8b8da55c69c2d20d996c41a277c01"
+      },
+      "provincial-impacts": {
+        "dataVersion": "a8b38429a8a6db24fabc",
+        "sha256": "e0121d93c05799c104e6f1fb45b1ceb930dcf8cfebbd1219ca75c1d415fe753f"
+      },
+      "provincial-price-response": {
+        "dataVersion": "af6adb3db40101deca94",
+        "sha256": "b509b0ad3a74bcd77dea7c7e1a34f73af821209181dc4e049bc6186f0fca7936"
+      },
+      "household-energy-costs": {
+        "dataVersion": "0037bffb86f1daa02974",
+        "sha256": "253a122ef3dbac44c3f2f41473904f8f55f7b607cdbf0a518d1570755206a73c"
+      }
+    }
+  }
 }

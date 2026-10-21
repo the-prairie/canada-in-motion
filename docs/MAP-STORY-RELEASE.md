@@ -16,6 +16,6 @@ The [independent experience review](MAP-STORY-EXPERIENCE-REVIEW.md) passed 132 b
 
 The approved public-beta coverage disclosures and economic model limits remain in place. Trade receipts are not GDP or profit. Provincial results are separate conditional relationships and budget sensitivities. Household amounts are spending equivalents, not validated individual bills. This visual release introduces no new economic coefficients or paid service.
 
-Exact candidate and public verification receipts are recorded in [MAP-STORY-VERIFICATION.json](MAP-STORY-VERIFICATION.json). Public verification follows deployment.
+Exact candidate and public verification receipts are recorded in [MAP-STORY-VERIFICATION.json](MAP-STORY-VERIFICATION.json). Deployment succeeded in [run 39547513173](https://github.com/the-prairie/canada-in-motion/actions/runs/39547513173). Public code version `01826d94e06de3ddc2c6` matches the tested candidate. All five browser suites passed against the public site. The independent reviewer repeated all 132 desktop/mobile checks and the edge cases on the live release, with no runtime errors or inference calls. CI also passed 139 pipeline tests and reproduced 24,438 model checks against the refreshed data.
 
-Subtract Before You Add shaped the removed content. Prove It Works required actual desktop and mobile interaction, semantic checks and error-state recovery before release.
+Subtract Before You Add shaped the removed content. Model the Domain keeps the map scene derived from the existing scenario result. Prove It Works required actual desktop and mobile interaction, semantic checks and error-state recovery before release.

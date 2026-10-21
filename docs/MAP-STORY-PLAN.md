@@ -7,7 +7,7 @@
 3. Subtract duplicate headings, eyebrow labels, repeated connection values and stage counters before adding the map. Complete.
 4. Implement a derived map scene and shared coordinate model. Preserve the economic calculations and saved-state contract. Complete.
 5. Independently review desktop and mobile. Test keyboard, motion, source failures and saved investigations. Complete.
-6. Deploy, verify public assets and user journeys, and record the evidence.
+6. Deploy, verify public assets and user journeys, and record the evidence. Complete: deployment, five public browser suites and independent public acceptance passed.
 
 ## Throughput checkpoint
 
