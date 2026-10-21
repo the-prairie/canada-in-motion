@@ -18,6 +18,7 @@ export function normalizeEconomyState(input = {}) {
     scenario: ECONOMY_SCENARIOS.includes(raw.scenario) ? raw.scenario : 'Current Measures',
     year: bounded(Math.round(number(raw.year, 2030)), 2023, 2050),
     oilShock: bounded(number(raw.oilShock, 10), -20, 20),
+    oilView: raw.oilView === 'history' ? 'history' : 'experiment',
     duration: raw.duration === 'temporary' ? 'temporary' : 'persistent',
     tradePanelId: typeof raw.tradePanelId==='string'&&/^[a-zA-Z0-9_-]{1,80}$/.test(raw.tradePanelId)?raw.tradePanelId:null,
     tradeDisplay: ['matrix','map','table'].includes(raw.tradeDisplay)?raw.tradeDisplay:'matrix',

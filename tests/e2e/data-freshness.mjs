@@ -19,8 +19,9 @@ try{
  assert.match(await page.locator('.ec-latest-activity').innerText(),/2025/);
  assert.equal(await page.locator('.ec-latest-activity dd').nth(0).innerText(),'+3.5%');
  assert.equal(await page.locator('.ec-latest-activity dd').nth(1).innerText(),'+2.7%');
- await page.getByText('Why two dates?',{exact:true}).click();
- assert.match(await page.locator('.ec-latest-activity details').innerText(),/81,627.5 million chained 2017/);
+ await page.locator('.ec-view-heading').getByRole('button',{name:'Evidence',exact:true}).click();
+ assert.match(await page.locator('dialog.ec-evidence').innerText(),/81,627.5 million chained 2017/);
+ await page.keyboard.press('Escape');
  await page.screenshot({path:out+'alberta-desktop.png',fullPage:true});
  checks.push('Alberta2022nominal dollars and2025real growth appear together; source basis is disclosed');
  for(const row of data.gdpActivity.regions){
@@ -33,7 +34,7 @@ try{
  assert.equal(await page.locator('.ec-latest-activity dd').count(),0);
  assert.match(await page.locator('.ec-activity-national').innerText(),new RegExp(`${data.gdpActivity.regions.filter(r=>r.energyGrowthPct>0).length} of 13`));
  assert.equal(await page.locator('.ec-ranking li').count(),13);
- assert.equal(await page.locator('.ec-rank-growth').count(),13);
+ assert.equal(await page.locator('.ec-rank-growth').count(),0);
  await page.locator('#ec-display-table').click();
  assert.equal(await page.locator('.ec-income-chart tbody tr').count(),13);
  assert.match(await page.locator('.ec-income-chart thead').innerText(),/2025 energy growth/);

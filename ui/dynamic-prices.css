@@ -1,0 +1,53 @@
+.hw-oil-history{min-width:0}
+.oh-heading{display:flex;align-items:start;justify-content:space-between;gap:24px;margin-bottom:24px}
+.oh-heading>button{flex-shrink:0}
+.hw-oil-history .oh-scope{font-size:14px;line-height:1.55;max-width:72ch;color:var(--hw-muted);margin-top:10px}
+.oh-controls{display:flex;flex-wrap:wrap;align-items:end;gap:16px 24px;margin-bottom:22px}
+.oh-controls label{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.oh-controls select{font-size:15px;max-width:100%;min-height:44px}
+.oh-episode-picker>p,.oh-provinces>p{font-size:13px;color:var(--hw-muted)}
+.hw-oil-history .hw-episodes{display:flex;flex-wrap:wrap;gap:8px;padding:8px 0 20px;overflow:visible}
+.hw-oil-history .hw-episodes button{min-width:104px;padding:8px 12px;gap:2px}
+.hw-oil-history .hw-episodes strong{font-size:17px;font-weight:500}
+.hw-oil-history .hw-episodes span{font-size:12px;white-space:nowrap}
+.hw-oil-history .hw-regions{margin:8px 0 24px;gap:6px}
+.hw-oil-history .hw-regions button{min-width:44px;min-height:44px;font-size:13px}
+.hw-oil-history .hw-regions button:disabled{opacity:1}
+.oh-result{border-top:1px solid var(--hw-rule);padding-top:22px}
+.oh-result-heading{display:flex;align-items:start;justify-content:space-between;gap:16px}
+.hw-oil-history .oh-result-heading h3{font-size:24px}
+.oh-result-heading p{font-size:14px;color:var(--hw-muted);margin-top:6px}
+.hw-oil-history .hw-switch button{min-height:44px;padding:8px 12px;font-size:13px}
+.hw-oil-history .oh-baseline{font-size:13px;color:var(--hw-muted);margin:20px 0 8px}
+.oh-chart{width:100%;min-width:0}
+.hw-oil-history .hw-history-chart{display:block;width:100%;max-width:none;height:auto;margin:0;overflow:visible}
+.hw-oil-history .hw-history-chart text{font-size:12px;fill:var(--hw-muted)}
+.oh-grid-line{stroke:#d5dcd3;stroke-width:1}
+.oh-zero-line{stroke:#84988b;stroke-width:1;stroke-dasharray:4 3}
+.oh-legend{display:flex;flex-wrap:wrap;gap:8px 20px;list-style:none;padding:0;margin:10px 0 0;font-size:13px}
+.oh-legend li{display:flex;align-items:center;gap:7px}
+.oh-legend i{display:inline-block;width:24px;border-top-width:3px}
+.hw-oil-history .oh-values table{font-size:14px}
+.hw-oil-history .oh-values thead th{font-size:13px}
+.oh-evidence .hw-table-wrap{max-width:100%}
+.oh-evidence .hw-table-wrap table{min-width:560px}
+.oh-evidence .context-dialog-content>button{margin-top:14px}
+@media(max-width:600px){
+ .oh-heading{gap:12px;margin-bottom:20px}
+ .hw-oil-history .oh-heading h2{font-size:23px}
+ .oh-heading>button{font-size:13px;padding-inline:10px}
+ .oh-controls{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-bottom:18px}
+ .oh-controls label{flex-direction:row;justify-content:space-between;align-items:center;gap:14px}
+ #energy-economy .oh-controls select{width:170px;flex-shrink:0;font-size:13px;padding-inline:8px}
+ .hw-oil-history .hw-episodes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding-bottom:18px}
+ .hw-oil-history .hw-episodes button{min-width:0;padding:8px}
+ .oh-result-heading{flex-wrap:wrap;gap:12px}
+ .hw-oil-history .oh-result-heading h3{font-size:22px}
+ .oh-result-heading p{font-size:13px}
+ .hw-oil-history .oh-baseline{margin-top:16px}
+ .hw-oil-history .oh-values table{font-size:12px}
+ .hw-oil-history .oh-values thead th{font-size:12px}
+ .oh-values th:first-child{min-width:85px}
+ .oh-legend{gap:8px 14px}
+}
+@media(max-width:360px){.oh-controls label{flex-direction:column;align-items:stretch;gap:5px}#energy-economy .oh-controls select{width:100%}}

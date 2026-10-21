@@ -32,8 +32,8 @@ try {
   await page.getByLabel('Energy indicator',{exact:true}).waitFor();
   assert.equal(await page.locator('.ec-focused-metric article').count(),1);
   assert.equal((await page.locator('.ec-line-key').innerText()).match(/Current Measures/g)?.length,1);
-  const chartValue = (await page.locator('.ec-metric-value').innerText()).split(/\s/)[0];
-  assert.ok((await page.locator('.ec-future-answer').innerText()).startsWith(chartValue));
+  assert.equal(await page.locator('.ec-metric-value').count(),1);
+  assert.equal(await page.locator('.ec-future-answer').count(),0);
   await page.getByLabel('Energy indicator',{exact:true}).selectOption('wti');
   await page.locator('#ec-scenario').selectOption('Higher');
   await page.locator('#ec-year').selectOption('2040');

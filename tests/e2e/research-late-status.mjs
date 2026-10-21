@@ -15,14 +15,15 @@ async function check(kind){
   await page.route('**/api/analysis/status',async route=>{statusRequested=true;await statusGate;await route.fulfill({json:{available:true,provider:'cloudflare',workspaceEnabled:true,jevEnabled:false}});});
   await page.route('**/data/energy-debate.json',async route=>{debateRequested=true;await debateGate;await route.fulfill({json:debate});});
   await page.route('**/api/analysis',route=>route.abort('blockedbyclient'));
-  const state=kind==='income'?{section:'supply',region:'AB',demandMillion:100}:{section:'oil',historyRegions:['AB','ON'],historyOilChange:-40,historyHorizon:2};
+  const state=kind==='income'?{section:'supply',region:'AB',demandMillion:100}:{section:'oil',oilView:'history',historyRegions:['AB','ON'],historyOilChange:-40,historyHorizon:2};
   const hostId=kind==='income'?'#ec-income-paths':'#ec-oil-history';
   try{
     await page.goto(base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy:state})));
     const host=page.locator(hostId);await host.locator('.hw-shell').waitFor();
     const hostHandle=await host.elementHandle();
-    const detail=host.locator('.hw-method-inline');await detail.locator('summary').click();
-    let controlHandle,selectedEpisode;
+    const detail=kind==='income'?host.locator('.hw-method-inline'):host.getByRole('dialog',{name:'Historical oil and GDP evidence'});
+    if(kind==='income')await detail.locator('summary').click();
+    let controlHandle,focusHandle,selectedEpisode;
     if(kind==='income'){
       const input=host.getByLabel('Additional final demand in million dollars',{exact:true});
       await input.fill('250');controlHandle=await input.elementHandle();
@@ -35,12 +36,16 @@ async function check(kind){
       await host.locator('.hw-episodes button').nth(2).click();
       selectedEpisode=await host.locator('.hw-episodes button[aria-pressed="true"]').innerText();
     }
-    await controlHandle.focus();
+    if(kind==='history'){
+      await host.getByRole('button',{name:'Evidence',exact:true}).click();
+      focusHandle=await detail.getByRole('button',{name:'Close Historical oil and GDP evidence',exact:true}).elementHandle();
+    }else focusHandle=controlHandle;
+    await focusHandle.focus();
     const originalContent=await host.innerText();
     const verify=async phase=>{
       assert.equal(await hostHandle.evaluate(node=>node.isConnected),true,`${kind}: host replaced after ${phase}`);
       assert.equal(await controlHandle.evaluate(node=>node.isConnected),true,`${kind}: control replaced after ${phase}`);
-      assert.equal(await controlHandle.evaluate(node=>node===document.activeElement),true,`${kind}: control lost focus after ${phase}`);
+      assert.equal(await focusHandle.evaluate(node=>node===document.activeElement),true,`${kind}: control lost focus after ${phase}`);
       assert.equal(await detail.evaluate(node=>node.open),true,`${kind}: disclosure closed after ${phase}`);
       assert.equal(await host.innerText(),originalContent,`${kind}: local result changed after ${phase}`);
       if(kind==='income'){
@@ -57,8 +62,10 @@ async function check(kind){
     releaseStatus();
     await page.waitForFunction(()=>document.querySelector('.ec-context-actions [data-ec-action="ask"]')?.textContent==='Ask a question');
     await verify('late AI status');
+    const debateResponse=page.waitForResponse(response=>response.url().endsWith('/data/energy-debate.json'));
     releaseDebate();
-    await page.locator('.ec-debate').waitFor({state:'attached'});
+    await (await debateResponse).finished();
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
     await verify('late debate data');
     assert.deepEqual(errors,[]);
     results.push({view:kind,checks:['DOM identity','focused control','open disclosure','edited inputs','calculation/episode identity','late AI status','late context data']});
