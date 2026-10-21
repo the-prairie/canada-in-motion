@@ -75,3 +75,9 @@ The final pass found that opening or closing the guide removed the focused butto
 The screenshot files `accepted-exchange-desktop.png`, `accepted-households-mobile.png`, `accepted-gas-retail-mobile.png` and `accepted-electricity-retail-mobile.png` show the reviewed layouts. The full-element mobile capture can include the existing offscreen skip link because the screenshot enlarges the captured area. A normal viewport check confirmed that the unfocused link remains at -100 pixels and does not overlay the live viewport.
 
 The final candidate passes this independent UX review. All three acceptance scripts passed again after the focus repair, with no browser errors or inference requests. The review covers Chromium and the tested viewport sizes. It is not a claim of a complete screen-reader or cross-browser accessibility audit.
+
+## Public acceptance
+
+The independent public check passed after deployment run 39523679441 for commit `231998d`. Both public health and build-manifest responses reported code version `34c15e420377a940b542`. The health response reported release ID `933b6d91755ff8b06c67`.
+
+The headless check selected Alberta to British Columbia crude-oil trade in 2024, opened the guide by keyboard, and loaded all three stages from the public data. Typing a -10% commodity change produced the expected negative transaction delta. The unsupported Alberta GDP estimate remained suppressed. The retail scenario started at zero, and changing it to +7% left the commodity assumption at -10%. The 390-pixel mobile layout fit the viewport. Explicit entry and exit retained meaningful keyboard focus. No inference request or browser error occurred. The receipt is `.data-cache/guided-design/public-acceptance.json`.

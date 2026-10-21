@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-10-21T00:58:44.228Z",
+  "site": "https://the-prairie.github.io/canada-in-motion/",
+  "commit": "231998dec76063b2dfa10c43369674b25417fa62",
+  "deployment": {
+    "runId": 39523679441,
+    "url": "https://github.com/the-prairie/canada-in-motion/actions/runs/39523679441",
+    "conclusion": "success"
+  },
+  "worker": {
+    "version": "8d05fb8f-2079-4722-beac-2fb59ed9abbb",
+    "statusEndpointAvailable": true,
+    "providerAndBudgetUnchanged": true
+  },
+  "health": {
+    "codeVersion": "34c15e420377a940b542",
+    "status": "public-beta",
+    "releaseId": "933b6d91755ff8b06c67",
+    "records": 317936,
+    "retrievedAt": "2026-10-21T00:52:54Z",
+    "builtAt": "2026-10-21T00:56:32.451Z",
+    "nationalComplete": false
+  },
+  "verified": [
+    {
+      "path": "vendor/energy-workspace.js",
+      "sha256": "2e9e1f2c418eb6ba6b6127a70f50468d7ea593b2d99c43b0dd711156102c19a7",
+      "size": 932411
+    },
+    {
+      "path": "vendor/energy-workspace.css",
+      "sha256": "05c9d255b115397fdc2422f45008768edc46021ac98fba2e4deda64dd5003d4d",
+      "size": 5955
+    },
+    {
+      "path": "energy-economy.js",
+      "sha256": "aab781cd49b454a28a8b16cd07cf92a69d69a5860089c09c4658fd05454328f1",
+      "size": 53133
+    },
+    {
+      "path": "economy-model.mjs",
+      "sha256": "912294702f15e3798dc539873e9bd0567d5a94bb61a2bfd25199eb5123b8375f",
+      "size": 14689
+    }
+  ],
+  "automatedTests": {
+    "javascript": 388,
+    "pipeline": 139,
+    "worker": 23
+  },
+  "independentAudit": {
+    "status": "passed",
+    "checks": 24438,
+    "maxAbsoluteDifference": 2.2453150450019166e-12,
+    "counts": {
+      "gdpModels": 52,
+      "gdpHistoricalPredictions": 779,
+      "householdMonthlyPredictions": 2112,
+      "householdAnnualPredictions": 176,
+      "spendingReferences": 30,
+      "guidedCases": 36,
+      "guidedInvarianceAssertions": 28
+    },
+    "gdpSupported": 8,
+    "householdSupported": 10,
+    "snapshots": {
+      "energy-flows": {
+        "dataVersion": "eaa874e962ee1870e336",
+        "sha256": "f48bd7b48e28601eff07ab33ba75e36d8541e716a93e9b7529707cf60afd9e69"
+      },
+      "provincial-impacts": {
+        "dataVersion": "a8b38429a8a6db24fabc",
+        "sha256": "a6f3f83fef525b6ba737e59ec5aa78ff295efeb376203086bd406e4848b99bab"
+      },
+      "provincial-price-response": {
+        "dataVersion": "af6adb3db40101deca94",
+        "sha256": "48c063050aa0845d983f866b5e5230451d220c06b64849933cf6c1dd30d83c14"
+      },
+      "household-energy-costs": {
+        "dataVersion": "4fb3ceed27a44e2d4bdb",
+        "sha256": "c234101139d28f9f630db81489cd05824912e62878b2b5d496051b6db921fe5b"
+      }
+    }
+  },
+  "publicBrowserTests": [
+    {
+      "status": "passed",
+      "checks": [
+        "selected trade, negative repricing, stage focus, supported-only GDP, annual household caveat, export and URL reload",
+        "gas/electricity unavailable models, explicit independent retail assumption, commodity changes preserve stage",
+        "320/390px layout and offline restored source snapshot",
+        "partial source failure, exchange remains usable, retry, return to selected network, zero runtime errors"
+      ],
+      "errors": []
+    },
+    {
+      "status": "passed",
+      "checks": [
+        "linked diagram, exact selected value, next connection, focus and URL reload",
+        "keyboard link selection, reduced motion, clear, commodity/year changes and undo",
+        "mobile layout, touch-sized steps, save and shared display persistence"
+      ],
+      "errors": []
+    },
+    {
+      "status": "passed",
+      "base": "https://the-prairie.github.io/canada-in-motion/",
+      "codeVersion": "34c15e420377a940b542",
+      "releaseId": "933b6d91755ff8b06c67",
+      "checks": [
+        "published code version matches release",
+        "map-selected AB to BC oil connection opens guide by keyboard",
+        "all three stages load public source data",
+        "negative commodity input works by typing",
+        "unsupported GDP stays suppressed",
+        "retail starts at zero and remains independent",
+        "390px layout fits",
+        "explicit entry and exit focus work",
+        "no inference calls or runtime errors"
+      ],
+      "inferenceRequests": 0,
+      "runtimeErrors": []
+    }
+  ],
+  "inferenceCalls": 0
+}

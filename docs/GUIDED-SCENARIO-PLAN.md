@@ -8,7 +8,7 @@
 4. Implement the pure scenario contract and behavioral checks before the view. Completed.
 5. Add the guided view, lazy source loading, pinned snapshots and URL-backed controls. Completed.
 6. Independently review model arithmetic and actual desktop/mobile journeys. Fix material findings. Completed.
-7. Run affected regression suites, deploy, verify public assets and public user journeys, and record the release.
+7. Run affected regression suites, deploy, verify public assets and public user journeys, and record the release. Completed.
 
 ## Definition of done
 

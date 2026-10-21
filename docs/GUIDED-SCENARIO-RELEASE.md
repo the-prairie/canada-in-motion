@@ -22,4 +22,6 @@ The [independent design review](GUIDED-SCENARIO-DESIGN-REVIEW.md) inspected the 
 
 The candidate passed 388 JavaScript tests, 139 pipeline tests and 23 Worker tests. The new headless journey test covers all stages, oil, gas, electricity, independent retail controls, unsupported results, exports, source-pinned restore, source failures and retry. It also checks 320- and 390-pixel layouts, negative-number typing and mobile footer navigation. The existing linked-map test passes. All browser tests run in the background with AI requests blocked or mocked.
 
-Public deployment and verification are recorded separately in `GUIDED-SCENARIO-VERIFICATION.json` after completion.
+The public deployment succeeded in [run 39523679441](https://github.com/the-prairie/canada-in-motion/actions/runs/39523679441). The public code version is `34c15e420377a940b542`. Both public browser suites and an independent public walkthrough passed. The refreshed data passed all 24,438 numerical checks with a maximum difference of 2.25 × 10⁻¹². Exact assets, data versions and test receipts appear in [GUIDED-SCENARIO-VERIFICATION.json](GUIDED-SCENARIO-VERIFICATION.json).
+
+The older investigation browser test used a previous preview port and map selector. Its setup now targets the current app, blocks inference and passes its comparison, saved-state and mobile checks. The final scoped code review also removed an empty model-details disclosure from retail scenarios. No unresolved review blockers remain.

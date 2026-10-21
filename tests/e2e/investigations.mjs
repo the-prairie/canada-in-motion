@@ -3,7 +3,9 @@ const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
 const browser=await chromium.launch({headless:true,...(process.env.TEST_BROWSER_PATH?{executablePath:process.env.TEST_BROWSER_PATH}:{})});
 const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'});
 const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
-const base=process.env.TEST_URL||'http://127.0.0.1:4188/';
+await page.route('**/api/analysis/status',route=>route.fulfill({json:{available:false}}));
+await page.route('**/api/analysis',()=>{throw Error('No inference expected');});
+const base=process.env.TEST_URL||'http://127.0.0.1:4201/';
 const url=base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy:{section:'trade',region:'CA',tradeCommodity:'electricity',tradeYear:2024}}));
 const actions=async()=>{const menu=page.locator('.hw-action-menu');if(!await menu.evaluate(e=>e.open))await menu.locator('summary').click();};
 try{
@@ -12,7 +14,7 @@ try{
  assert.equal(await page.locator('.hw-matrix tbody button').count(),156);
  await page.getByRole('button',{name:'Alberta to British Columbia: 60.209 million CAD',exact:true}).click();
  assert.match(await page.locator('.hw-link-detail').innerText(),/60.209/);
- await page.getByRole('button',{name:'Show on map',exact:true}).click();assert.ok(await page.locator('.hw-trade-map').isVisible());
+ await page.getByRole('button',{name:'Show on map',exact:true}).click();assert.ok(await page.locator('.tn-explorer').isVisible());
  await page.getByRole('button',{name:'Show in matrix',exact:true}).click();
  await actions();await page.getByRole('button',{name:'All views',exact:true}).click();
  await actions();await page.getByRole('button',{name:'Pin this comparison',exact:true}).click();
