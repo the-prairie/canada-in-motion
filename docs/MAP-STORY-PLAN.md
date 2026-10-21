@@ -3,10 +3,10 @@
 ## Workflow
 
 1. Ground the existing workspace, guide and map ownership. Complete.
-2. Compare persistent geography with scroll-driven scenes. Choose a persistent map that does not advance the guide automatically.
-3. Subtract duplicate headings, eyebrow labels, repeated connection values and stage counters before adding the map.
-4. Implement a derived map scene and shared coordinate model. Preserve the economic calculations and saved-state contract.
-5. Independently review desktop and mobile. Test keyboard, motion, source failures and saved investigations.
+2. Compare persistent geography with scroll-driven scenes. Choose a persistent map that does not advance the guide automatically. Complete.
+3. Subtract duplicate headings, eyebrow labels, repeated connection values and stage counters before adding the map. Complete.
+4. Implement a derived map scene and shared coordinate model. Preserve the economic calculations and saved-state contract. Complete.
+5. Independently review desktop and mobile. Test keyboard, motion, source failures and saved investigations. Complete.
 6. Deploy, verify public assets and user journeys, and record the evidence.
 
 ## Throughput checkpoint

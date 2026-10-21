@@ -64,6 +64,11 @@ try{
     await page.setViewportSize({width,height:844});await stableMap();
     await stage('The exchange').click();await visibleHeading();
     assert.ok(await noOverflow(),`${width}px overflow`);
+    await page.getByRole('slider',{name:'Commodity price change',exact:true}).focus();
+    assert.equal(await page.locator('.gsm-map').evaluate(node=>getComputedStyle(node).position),'sticky');
+    await page.getByLabel('Commodity price change percent',{exact:true}).focus();
+    assert.equal(await page.locator('.gsm-map').evaluate(node=>getComputedStyle(node).position),'static');
+    await page.getByRole('slider',{name:'Commodity price change',exact:true}).focus();
     const map=await page.locator('.gsm-map').boundingBox();assert.ok(map.height<=255,`compact map ${map.height}px`);
     assert.equal(await page.locator('.gsm-anchor text').first().evaluate(node=>getComputedStyle(node).fontSize),'15px');
     await page.locator('.gs-footer').getByRole('button',{name:'Provincial economy →',exact:true}).click();await visibleHeading();

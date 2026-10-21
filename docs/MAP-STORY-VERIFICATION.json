@@ -2,12 +2,12 @@
   "date": "2026-10-20",
   "status": "candidate-verified",
   "candidate": {
-    "codeVersion": "ca763fb8c30dd031fd7b",
+    "codeVersion": "01826d94e06de3ddc2c6",
     "status": "public-beta",
     "releaseId": "e77b2ab3ebae30a03931",
     "records": 317936,
     "retrievedAt": "2026-10-18T23:28:38Z",
-    "builtAt": "2026-10-21T04:59:56.250Z",
+    "builtAt": "2026-10-21T05:03:48.005Z",
     "nationalComplete": false
   },
   "unitTests": {
@@ -21,7 +21,8 @@
         "motion plays only in view, supports pause and reduced motion, and never changes speed or path with prices",
         "same map across all stages, exact supported values, failed estimates hidden, keyboard-to-detail focus survives pointer movement",
         "320/390px sticky map preserves readable labels and visible headings; short landscape has normal scrolling",
-        "source failures show unavailable map values, disable missing targets and recover on retry; zero runtime errors"
+        "source failures show unavailable map values, disable missing targets and recover on retry; zero runtime errors",
+        "mobile range focus retains sticky map; number entry releases it for the on-screen keyboard"
       ],
       "errors": []
     },
@@ -95,5 +96,6 @@
     "The full-national-coverage release gate remains inapplicable: this release retains the approved public-beta scope with disclosed coverage gaps.",
     "Economic models and their validity limits are unchanged."
   ],
-  "public": null
+  "public": null,
+  "cancelledPrepublicationRun": 39547368183
 }
