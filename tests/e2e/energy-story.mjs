@@ -40,7 +40,7 @@ try{
   const select=await host.getByLabel('Comparison province',{exact:true}).elementHandle();
   await select.focus();
   releaseStatus();releaseDebate();
-  await page.locator('.ec-ai-status').filter({hasText:'Ready for a question'}).waitFor({state:'attached'});
+  await page.locator('.ec-ai-status').filter({hasText:'AI ready'}).waitFor({state:'attached'});
   assert.equal(await select.evaluate(e=>e.isConnected&&e===document.activeElement),true,'late status preserves the mounted investigation and focus');
   assert.equal((await shareState()).compare,'ON');
   checks.push('source-backed default and late status preservation');

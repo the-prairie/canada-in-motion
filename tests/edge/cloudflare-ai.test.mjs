@@ -80,7 +80,7 @@ test('visitor quota persists across an actual Worker runtime restart',async t=>{
   assert.equal((await f.post()).status,200);
   await f.restart();
   assert.equal((await f.post()).status,200);assert.equal((await f.post()).status,200);
-  const blocked=await f.post();assert.equal(blocked.status,429);assert.equal((await blocked.json()).error.code,'visitor_limit');assert.ok(Number(blocked.headers.get('Retry-After'))>0);assert.equal(f.calls,6);
+  const blocked=await f.post();assert.equal(blocked.status,429);const failure=(await blocked.json()).error;assert.equal(failure.code,'visitor_limit');assert.ok(Number(blocked.headers.get('Retry-After'))>0);assert.equal(failure.retryAfter,Number(blocked.headers.get('Retry-After')));assert.ok(Date.parse(failure.resetAt)>Date.now());assert.equal(blocked.headers.get('Access-Control-Expose-Headers'),'Retry-After');assert.equal(f.calls,6);
 });
 
 test('atomic concurrency admission allows only two reservations and releases only the named lease',async t=>{

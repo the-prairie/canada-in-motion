@@ -1,0 +1,61 @@
+import assert from 'node:assert/strict';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
+const browser=await chromium.launch({headless:true,...(process.env.TEST_BROWSER_PATH?{executablePath:process.env.TEST_BROWSER_PATH}:{})});
+const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'});
+const page=await context.newPage(),errors=[],checks=[];
+page.on('pageerror',error=>errors.push(error.message));
+let available=false,posts=0,limited=true;
+await page.route('**/api/analysis/status',route=>route.fulfill({json:{available,provider:'cloudflare',limits:{visitorDaily:3}}}));
+await page.route('**/api/analysis',async route=>{
+  posts++;
+  await route.fulfill(limited?{status:429,json:{error:{code:'visitor_limit',message:'Network limit.',retryAfter:60}}}:{status:503,json:{error:{code:'provider_unavailable',message:'The AI service is temporarily unavailable.'}}});
+});
+const base=process.env.TEST_URL||'http://127.0.0.1:4201/';
+const url=base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy:{section:'outlook'}}));
+const open=async()=>{const composer=page.locator('.ec-composer');if(!await composer.evaluate(e=>e.open))await composer.locator(':scope > summary').click();};
+try{
+  await page.clock.install();
+  await page.goto(url);
+  await page.locator('#ec-provincial-forecast .pf-range-chart').waitFor();
+  for(const id of ['outlook','contributions','electricity','trade','prices']){
+    await open();await page.locator(`[data-ec-local="${id}"]`).click();
+    await page.waitForFunction(()=>!document.querySelector('.ec-composer').open);
+    await page.locator('#ec-dynamic-workspace .hw-grid').waitFor();
+    assert.equal(await page.locator('.ec-composer').evaluate(e=>e.open),false);
+    assert.ok(await page.locator('#ec-dynamic-workspace .hw-panel').count());
+    assert.equal(posts,0);
+    checks.push(`${id} opens with AI offline and no inference request`);
+  }
+  await open();await page.getByLabel('Your question',{exact:true}).fill('Keep this question while I explore.');
+  await page.locator('[data-ec-local="outlook"]').click();
+  await page.locator('#ec-dynamic-workspace .hw-gdp-forecast').waitFor();
+  await open();assert.equal(await page.getByLabel('Your question',{exact:true}).inputValue(),'Keep this question while I explore.');
+  available=true;await page.reload();
+  await open();await page.getByLabel('Your question',{exact:true}).fill('What explains the differences in provincial income?');
+  await page.getByRole('button',{name:'Analyse',exact:true}).click();
+  await page.getByText(/daily AI allowance for this network is used up/).waitFor();
+  assert.equal(posts,1);assert.equal(await page.getByRole('button',{name:'Try again',exact:true}).count(),0);
+  assert.ok(await page.getByRole('button',{name:'Analyse',exact:true}).isDisabled());
+  assert.match(await page.locator('.ec-analysis-error').innerText(),/Available again/);
+  await page.reload();await open();
+  assert.ok(await page.getByRole('button',{name:'Analyse',exact:true}).isDisabled(),'limit survives a reload');
+  await page.locator('[data-ec-local="outlook"]').click();
+  await page.locator('#ec-dynamic-workspace .hw-gdp-forecast').waitFor();
+  assert.equal(posts,1,'local comparison remains usable during quota cooldown');
+  checks.push('quota shows reset time, prevents pointless retry, persists across reload and leaves data tools available');
+  await page.setViewportSize({width:390,height:844});await open();
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+  await page.screenshot({path:'/tmp/cim-analysis-limit-mobile.png',fullPage:true});
+  await page.clock.fastForward(61000);
+  await page.getByRole('button',{name:'Analyse',exact:true}).waitFor();
+  assert.ok(await page.getByRole('button',{name:'Analyse',exact:true}).isEnabled());
+  assert.equal(posts,1,'expiry must not automatically send or bill a question');
+  limited=false;await page.getByLabel('Your question',{exact:true}).fill('Explain provincial energy income.');
+  await page.getByRole('button',{name:'Analyse',exact:true}).click();
+  await page.getByRole('button',{name:'Try again',exact:true}).waitFor();
+  assert.ok(await page.locator('#ec-dynamic-workspace .hw-gdp-forecast').isVisible(),'previous answer remains usable after failure');
+  assert.equal(posts,2);
+  checks.push('cooldown expires without submitting; provider failure permits retry and preserves previous answer');
+  assert.deepEqual(errors,[]);
+  console.log(JSON.stringify({status:'passed',checks,mockedRequests:posts,providerCalls:0}));
+}finally{await browser.close();}

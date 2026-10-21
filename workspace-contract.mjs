@@ -1,3 +1,4 @@
+import {normalizeNetworkSelection} from './trade-network-model.mjs';
 import {summarizeEconomy,validateEconomy} from './economy-model.mjs';
 import {selectInfrastructure} from './infrastructure-model.mjs';
 import {buildTradePanels,normalizeTradeSelection,ENERGY_COMMODITIES} from './trade-workspace-model.mjs';
@@ -67,8 +68,15 @@ export function compileWorkspace(value) {
   return `root = EnergyWorkspace([${value.panels.map(panel=>`${PANEL_COMPONENTS[panel.type]}(${JSON.stringify(panel.id)})`).join(', ')}])`;
 }
 
+export function normalizeWorkspaceTradeSelection(workspace,selection) {
+  if(!workspace.tradeSnapshot)return selection;
+  const regions=selection.regions.filter(code=>code!=='CA');
+  const links=workspace.tradeSnapshot.trade.observations.filter(row=>row.year===selection.tradeYear&&row.commodity===selection.tradeCommodity&&row.origin!==row.destination&&(!regions.length||(selection.linkScope==='between'?regions.includes(row.origin)&&regions.includes(row.destination):regions.includes(row.origin)||regions.includes(row.destination))));
+  return normalizeNetworkSelection(links,selection);
+}
+
 export function initialSelection(workspace) {
-  return {regions:workspace.plan.regions.includes('CA')?[]:[...workspace.plan.regions],year:workspace.plan.year,scenario:workspace.plan.scenario,oilShock:workspace.plan.oilShock,duration:workspace.plan.duration,panelId:(workspace.panels.find(p=>p.type!=='coverage-note'&&p.role==='answer')||workspace.panels.find(p=>p.type!=='coverage-note')||workspace.panels[0]).id,viewMode:'focus',...(workspace.tradeSnapshot?normalizeTradeSelection(workspace.tradeSnapshot,workspace.plan):{}),...(workspace.forecastSnapshot?{forecastYearsByPanel:Object.fromEntries(workspace.panels.filter(p=>p.type==='gdp-forecast').map(p=>[p.id,p.year]))}:{})};
+  return {regions:workspace.plan.regions.includes('CA')?[]:[...workspace.plan.regions],year:workspace.plan.year,scenario:workspace.plan.scenario,oilShock:workspace.plan.oilShock,duration:workspace.plan.duration,panelId:(workspace.panels.find(p=>p.type!=='coverage-note'&&p.role==='answer')||workspace.panels.find(p=>p.type!=='coverage-note')||workspace.panels[0]).id,viewMode:'focus',...(workspace.tradeSnapshot?{...normalizeTradeSelection(workspace.tradeSnapshot,workspace.plan),tradeDisplay:workspace.plan.tradeDisplay==='map'?'map':'matrix',tradeConnection:null,tradeFocus:null}:{}),...(workspace.forecastSnapshot?{forecastYearsByPanel:Object.fromEntries(workspace.panels.filter(p=>p.type==='gdp-forecast').map(p=>[p.id,p.year]))}:{})};
 }
 
 export function resolveWorkspace(workspace,selection,economy) {
@@ -87,6 +95,9 @@ export function resolveWorkspace(workspace,selection,economy) {
   const total=economy.gdp.regions.reduce((sum,row)=>sum+row.energy,0);
   const gdpRows=economy.gdp.regions.map(row=>({...row,value:row.energy,nationalSharePct:row.energy/total*100,activity:economy.gdpActivity?.regions.find(activity=>activity.code===row.code)||null}));
   const tradeTypes=['energy-trade','energy-transfers','provincial-impact'];
+  if(selection.tradeDisplay!==undefined&&!['matrix','map','table'].includes(selection.tradeDisplay))fail();
+  if(selection.tradeFocus!=null&&(!REGION_CODES.includes(selection.tradeFocus)||selection.tradeFocus==='CA'))fail();
+  if(selection.tradeConnection!=null&&(typeof selection.tradeConnection!=='string'||!/^([A-Z]{2})-([A-Z]{2})$/.test(selection.tradeConnection)||selection.tradeConnection.split('-').some(code=>!REGION_CODES.includes(code)||code==='CA')))fail();
   const tradePanels=workspace.tradeSnapshot?buildTradePanels({flows:workspace.tradeSnapshot,fiscal:workspace.fiscalSnapshot,selection,regions:selection.regions,includeFlows:workspace.panels.some(p=>p.type==='energy-trade'),includePhysical:workspace.panels.some(p=>p.type==='energy-transfers'),includeImpacts:workspace.panels.some(p=>p.type==='provincial-impact')}).panels:[];
   const panels=workspace.panels.map(panel=>{
     if(panel.type==='gdp-forecast'){

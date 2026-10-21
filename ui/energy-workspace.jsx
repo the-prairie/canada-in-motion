@@ -3,7 +3,7 @@ import {createRoot} from 'react-dom/client';
 import {Renderer,createLibrary,defineComponent} from '@openuidev/react-lang';
 import {WorkspaceFindings} from './workspace-findings.jsx';
 import {z} from 'zod/v4';
-import {compileWorkspace,initialSelection,resolveWorkspace,validateWorkspace} from '../workspace-contract.mjs';
+import {compileWorkspace,initialSelection,resolveWorkspace,validateWorkspace,normalizeWorkspaceTradeSelection} from '../workspace-contract.mjs';
 import {project} from '../atlas-model.mjs';
 import {createTradeViews} from './trade-views.jsx';
 import {createTradeWorkspace,ENERGY_COMMODITIES} from '../trade-workspace-model.mjs';
@@ -122,14 +122,14 @@ function Workspace({workspace:seed,economy:providedEconomy,network:providedNetwo
   const [library,setLibrary]=useState([]),[notice,setNotice]=useState(''),[baseline,setBaseline]=useState(null);
   useEffect(()=>{listInvestigations().then(items=>{setLibrary(items);if(items.invalidCount)setNotice(`${items.invalidCount} saved investigations could not be verified and were omitted.`);}).catch(()=>setNotice('Saved investigations are unavailable in this browser. Export data still works.'));},[]);
   useEffect(()=>{onReady?.();},[]);
-  const original=useMemo(()=>initialSelection(workspace),[workspace]);const [selection,setSelection]=useState(saved||original);const [history,setHistory]=useState([]);const [renderError,setRenderError]=useState(false);
+  const original=useMemo(()=>initialSelection(workspace),[workspace]);const [selection,setSelection]=useState(()=>normalizeWorkspaceTradeSelection(workspace,saved||original));const [history,setHistory]=useState([]);const [renderError,setRenderError]=useState(false);
   const compatible=workspace.dataVersion===economy.generatedAt;
   const resolved=useMemo(()=>resolveWorkspace(workspace,selection,economy),[workspace,selection,economy]);
   const focusId=workspace.panels.some(p=>p.id===selection.panelId&&p.type!=='coverage-note')?selection.panelId:original.panelId;
   const visiblePanels=workspace.panels.filter(p=>selection.viewMode==='all'||p.id===focusId||p.type==='coverage-note');
   const response=useMemo(()=>compileWorkspace({...workspace,panels:visiblePanels}),[workspace,focusId,selection.viewMode]);
   const panelLabel=p=>({'energy-trade':'Trade value','energy-transfers':'Physical transfers','provincial-impact':'Price exposure','province-map':'Map','province-comparison':'Provincial comparison','infrastructure-map':'Infrastructure','oil-sensitivity':'National oil effect'}[p.type]||(p.type==='gdp-forecast'?`GDP outlook ${resolved.panels.find(r=>r.id===p.id)?.year}`:p.title));
-  const update=patch=>{setHistory(old=>[...old.slice(-19),selection]);const next={...selection,...patch};setSelection(next);onState?.(next);};
+  const update=patch=>{setHistory(old=>[...old.slice(-19),selection]);const next=normalizeWorkspaceTradeSelection(workspace,{...selection,...patch});setSelection(next);onState?.(next);};
   const toggle=code=>{if(!compatible)return;update({regions:selection.regions.includes(code)?selection.regions.filter(r=>r!==code):[...selection.regions,code]});};
   const headingId=workspace.authored?'hw-trade-heading':'hw-heading';
   const hasScenario=visiblePanels.some(p=>p.type==='scenario-comparison');
@@ -159,7 +159,7 @@ function Workspace({workspace:seed,economy:providedEconomy,network:providedNetwo
     {!workspace.authored&&<WorkspaceFindings workspace={resolved} selection={selection}/>}
     {renderError?<p role="alert" className="hw-coverage">The interactive layout could not be verified. The written findings remain below.</p>:<Renderer response={response} library={energyLibrary} isStreaming={false} publishObservability={false} onError={errors=>{if(errors.some(error=>error.severity!=='warning'))setRenderError(true);}}/>}
     <details className="hw-saved"><summary>Saved investigations{library.length?` (${library.length})`:''}</summary><p className="hw-caption">Saved on this device with the original data.</p>{!library.length?<p>No saved investigations yet.</p>:<ul>{library.map(item=><li key={item.id}><button onClick={()=>restore(item)}><strong>{item.title}</strong><small>{new Date(item.savedAt).toLocaleDateString('en-CA')} · {item.workspace.panels.some(p=>p.type==='gdp-forecast')?`GDP outlook ${[...new Set(Object.values(item.selection.forecastYearsByPanel||{}))].sort().join(' / ')}`:item.selection.tradeCommodity||item.selection.scenario} · {item.selection.regions.join(', ')||'Canada'}</small></button><button aria-label={`Delete saved investigation ${item.title}`} onClick={async()=>{try{await deleteInvestigation(item.id);setLibrary(await listInvestigations());}catch{setNotice('Could not remove the saved investigation.');}}}>Remove</button></li>)}</ul>}</details>
-    <details className="hw-method"><summary>{workspace.authored?'Methods & coverage':'How this workspace was assembled'}</summary>{workspace.authored?<p>Published trade estimates, measured physical transfers and price calculations use separate sources and periods. Every view includes its definition and source. Controls recalculate locally without an AI request.</p>:<p>The language model selected the topics and regions. {workspace.decision?.provider==='jev'?'Jev suggested the display order and assessed whether the evidence addressed the question.':'The app used its standard view rules; Jev was not used for this answer.'} Code checked the available measures and retrieved every displayed value from the cited data. Jev’s decision affects display order; coverage labels follow the app’s data checks. OpenUI arranges the registered maps and comparisons.</p>}<p>Data snapshot: {workspace.dataVersion?.slice(0,10)}. {workspace.decision?.status==='budget-exhausted'?'The Jev allowance has been reached.':''}</p>{workspace.limitations?.length>0&&<ul>{workspace.limitations.map((text,i)=><li key={i}>{text}</li>)}</ul>}</details>
+    <details className="hw-method"><summary>{workspace.authored?'Methods & coverage':'How this workspace was assembled'}</summary>{workspace.localComparison?<p>This built-in comparison uses published data and fixed view rules. No language model or Jev request was made. OpenUI displays the checked maps and comparisons; changing controls recalculates locally.</p>:workspace.authored?<p>Published trade estimates, measured physical transfers and price calculations use separate sources and periods. Every view includes its definition and source. Controls recalculate locally without an AI request.</p>:<p>The language model selected the topics and regions. {workspace.decision?.provider==='jev'?'Jev suggested the display order and assessed whether the evidence addressed the question.':'The app used its standard view rules; Jev was not used for this answer.'} Code checked the available measures and retrieved every displayed value from the cited data. Jev’s decision affects display order; coverage labels follow the app’s data checks. OpenUI arranges the registered maps and comparisons.</p>}<p>Data snapshot: {workspace.dataVersion?.slice(0,10)}. {workspace.decision?.status==='budget-exhausted'?'The Jev allowance has been reached.':''}</p>{workspace.limitations?.length>0&&<ul>{workspace.limitations.map((text,i)=><li key={i}>{text}</li>)}</ul>}</details>
   </div></Context.Provider>;
 }
 export function mountWorkspace(element,options){
@@ -171,7 +171,7 @@ export function mountWorkspace(element,options){
 
 export function mountTradeExplorer(element,{economy,flows,fiscal,selection,regions,shapes,onState}) {
   const workspace=createTradeWorkspace({economy,flows,fiscal,selection,regions});
-  const saved={...initialSelection(workspace),...(workspace.panels.some(p=>p.id===selection.tradePanelId)?{panelId:selection.tradePanelId}:{}),viewMode:selection.tradeViewMode==='all'?'all':'focus'};
+  const saved={...initialSelection(workspace),tradeDisplay:selection.tradeDisplay||'matrix',tradeConnection:selection.tradeConnection||null,tradeFocus:selection.tradeFocus||null,...(workspace.panels.some(p=>p.id===selection.tradePanelId)?{panelId:selection.tradePanelId}:{}),viewMode:selection.tradeViewMode==='all'?'all':'focus'};
   return mountWorkspace(element,{workspace,economy,shapes,saved,question:'Energy between provinces',onState});
 }
 
@@ -182,3 +182,5 @@ export {mountProvincialForecast} from './provincial-forecast.jsx';
 export {mountEnergyStory} from './energy-story.jsx';
 
 export {mountMonthlyEnergy} from './monthly-energy.jsx';
+
+export {loadLocalInvestigation} from '../local-investigations.mjs';

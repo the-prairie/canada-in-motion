@@ -1324,7 +1324,7 @@ document.addEventListener("click", async (e) => {
       announce(state.view === "economy" && energyEconomy?.answer?.workspace ? "Original data view link copied. Use Export data to save the question workspace." : "View link copied.");
     } catch {
       openDialog(
-        `<div class="source-entry"><h3>Copy view link</h3><p>Copy the link below to reopen this view with the same settings.</p><textarea aria-label="View link" readonly style="width:100%;height:120px">${esc(url)}</textarea></div>`,
+        `<div class="source-entry"><h3>Copy view link</h3><p>${state.view === "economy" && energyEconomy?.answer?.workspace && energyEconomy.answerVisible !== false ? "This link opens the original data view. Use Export data in the comparison to preserve this question workspace." : "Copy the link below to reopen this view with the same settings."}</p><textarea aria-label="View link" readonly style="width:100%;height:120px">${esc(url)}</textarea></div>`,
       );
     }
   }

@@ -1,0 +1,101 @@
+{
+  "passed": true,
+  "independentImplementation": "Raw source parser; augmented least-squares ridge; SVD principal components; independently replayed incumbent and selection; no prototype imports.",
+  "sourceRows": 22110,
+  "sourceHashes": {
+    "16100048": "7acefec69daad7033390ac760f761727995f2e92670ba3aab6ba6abebee0e2ed",
+    "18100004": "7852a5ea863a62129c7733059ba031c661348b8b3d38a3744d77e9053d10a390",
+    "14100287": "c1cfb244022b8ed68840e53adc4afbe0b0d2ac231a592fe451e95ec57bc5922c"
+  },
+  "forecastRows": 350,
+  "evaluationRows": 220,
+  "features": 280,
+  "numericComparisons": 32236,
+  "cutoffMutationPassed": true,
+  "futureGdpMutationPassed": true,
+  "horizons": [
+    {
+      "horizon": 0,
+      "incumbent": {
+        "count": 110,
+        "mae": 1.74292431930911,
+        "rmse": 2.6005092687643727,
+        "bias": 0.5780808510706804
+      },
+      "policy": {
+        "count": 110,
+        "mae": 1.4299725310875357,
+        "rmse": 2.035345537115257,
+        "bias": 0.5783783676082571
+      },
+      "maeGainPct": 17.95555806723882,
+      "incumbentIntervals": {
+        "count": 110,
+        "coverage": 0.8454545454545455,
+        "meanWidth": 8.672001965832777,
+        "meanIntervalScore": 11.287037615465465
+      },
+      "policyIntervals": {
+        "count": 110,
+        "coverage": 0.8636363636363636,
+        "meanWidth": 7.83986945072563,
+        "meanIntervalScore": 9.268180208532874
+      },
+      "gates": {
+        "complete": true,
+        "mae": true,
+        "rmse": true,
+        "years": true,
+        "provinces": true,
+        "pandemic": true,
+        "postPandemic": false,
+        "intervalPairs": true,
+        "intervalCoverage": true,
+        "intervalScore": true
+      },
+      "passed": false
+    },
+    {
+      "horizon": 1,
+      "incumbent": {
+        "count": 110,
+        "mae": 2.124454445269851,
+        "rmse": 3.0631838603350485,
+        "bias": 0.27583274720990236
+      },
+      "policy": {
+        "count": 110,
+        "mae": 2.1902989099168546,
+        "rmse": 3.11843195337895,
+        "bias": 0.249800592944625
+      },
+      "maeGainPct": -3.099358745658587,
+      "incumbentIntervals": {
+        "count": 90,
+        "coverage": 0.6666666666666666,
+        "meanWidth": 7.548112997960938,
+        "meanIntervalScore": 14.784498289909473
+      },
+      "policyIntervals": {
+        "count": 90,
+        "coverage": 0.6444444444444445,
+        "meanWidth": 7.604986156949861,
+        "meanIntervalScore": 15.033467274517509
+      },
+      "gates": {
+        "complete": true,
+        "mae": false,
+        "rmse": false,
+        "years": true,
+        "provinces": true,
+        "pandemic": false,
+        "postPandemic": false,
+        "intervalPairs": true,
+        "intervalCoverage": false,
+        "intervalScore": false
+      },
+      "passed": false
+    }
+  ],
+  "recommendation": "Retain the public incumbent at both horizons; broader policy failed the frozen admission gates."
+}

@@ -19,7 +19,7 @@
     "build:ai": "wrangler deploy --dry-run --outdir .worker-build",
     "deploy:ai": "wrangler deploy",
     "dev:ai:edge": "wrangler dev --local --port 8787",
-    "test:ai:edge": "npm run build:ai && node --test tests/edge/*.test.mjs",
+    "test:ai:edge": "npm run build:ai && node --test --test-concurrency=1 tests/edge/*.test.mjs",
     "build:workspace": "node scripts/build-workspace.mjs",
     "refresh:forecasts": "python3 pipeline/refresh_provincial_forecast.py"
   },

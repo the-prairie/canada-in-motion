@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "experiment": "broad-monthly-gdp-v1",
+  "decision": "retain-incumbent-both-horizons",
+  "frozenOn": "2026-10-20",
+  "files": {
+    "README.md": "c0b356db97941f026a3b95cb71ea3dd99bbe7a53cc928b3d16c4879b76499d0d",
+    "check_prototype.py": "9bfd15d3fc5fc78b2a8da8a71694da034de03c745f6a9751adf09073a80f6de0",
+    "independent-review.json": "2d08ac60fa8ac587f3ef18cd1f29cecffcbc02991b4546f7d9a6d4d0434ab027",
+    "inputs/incumbent-before.json.gz": "a96b79ef639c845779d5400c5fa063eefdc458d62bc1aae5e0cc2888585f91f0",
+    "inputs/independent-features.json.gz": "a0a108dbe9bcd124fa1c9842b06e017ad1c99039138d4e338b42e9e06dd1e038",
+    "inputs/selected-series.json.gz": "669175ff8efb667b0a100cf71e0651172c5340874233ba50973c87f96593f258",
+    "protocol.json": "42731efb8699b2a33aa6017f298f702609002dda8936a53b6b8582f767e74a39",
+    "prototype-checks.json": "bbaabe595a850993a40e3fd47f41aec27a993c7bb2eafd3cf607558ca95e46a1",
+    "prototype.py": "695362860bf41a3a367d039d6858bf1083d71bc0486050dc6b4213706bb24024",
+    "requirements.txt": "18594d2c584337ab07c9d8ce86826e9bb3339a0ef72611fb213c659f89972d77",
+    "results.json": "5606de24db7e04e1e2f11e7632e9bc01f843c41d34dfc1a83bc28748fb52cc14",
+    "source-audit.json": "cef6d7194cd308151a6d2ed6115e19d75f4f55da813681ca2561603dc9ea1597"
+  },
+  "reviewCodeDependencies": {
+    "tests/review/energy-forecast-independent-audit.py": "97e274fa745dd60d2c5a0534bf045b52bb73641d20515da021b781956a7c1800",
+    "tests/review/broad-forecast-independent-audit.py": "dd6a3b5e39c30f6690acea45eb9b487b445fa8e769c1f109588c27fb32fa0790"
+  }
+}

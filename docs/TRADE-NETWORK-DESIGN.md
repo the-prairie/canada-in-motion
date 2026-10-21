@@ -1,0 +1,13 @@
+# Linked energy-trade map
+
+The reference animation links a geographic network to a relationship diagram. Canada in Motion uses that principle for province-to-province economic transactions, not facility supply chains: the source does not identify individual buyers, pipeline movements or ultimate beneficiaries.
+
+The analytical task is to locate an energy trade relationship, compare its magnitude, and trace its direction. One React-owned SVG map and one stable bipartite seller/buyer diagram share the selected connection. An ordered HTML list supplies exact values and a keyboard/touch equivalent. A neutral geographic substrate establishes location; teal marks ordinary trade and rust marks the selected connection. Line width uses a documented square-root scale. A selected direction can animate only after the user enables it; speed and moving marks do not encode physical shipments or quantity.
+
+At most twelve largest positive links are shown, plus a pinned connection outside that set. Their share of the published positive trade value remains visible. Province focus narrows both views. Missing and zero records remain available in the complete table; neither is drawn as a positive flow. Geography, diagram and values derive from the same filtered records and year. Stable province order prevents gratuitous movement between years.
+
+The geographic and graph layers use SVG because the dataset has only thirteen jurisdictions and at most156 directed records. No new rendering library, map tiles, commercial account or GPU requirement is needed. The existing province projection and source metadata remain authoritative. The parent component owns URL-backed display, focus and selected connection; hover and animation are ephemeral. Save, export and undo retain the analytical selection.
+
+Desktop puts the map and supplier/buyer diagram side by side. Mobile stacks a geographic overview over the diagram, with readable labels and full-width connection buttons; all meaningful actions have tap and keyboard paths. Landscape uses the same responsive composition. Reduced motion is static. No scroll hijacking, autoplay, geolocation or new permission is involved.
+
+QA checks include exact selected-link values, arrow direction, scope/omitted-value accounting, reciprocal edges, province focus, year/commodity changes, missing and zero-only selections, keyboard activation, mobile overflow, shared-state reload, undo, save/export, and browser errors. Parent owns implementation and the geospatial/node-link skill passes; independent agents review behavior and evidence after implementation. Existing matrix and table views remain available.

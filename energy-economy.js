@@ -1,6 +1,6 @@
 import {normalizeEconomyState, summarizeEconomy, validateEconomy} from './economy-model.mjs';
 import {project} from './atlas-model.mjs';
-import {loadAnalysisStatus, requestChallengeToken} from './ai-client.mjs';
+import {loadAnalysisStatus, requestChallengeToken, analysisFailure, readAnalysisCooldown, saveAnalysisCooldown, analysisLimitMessage} from './ai-client.mjs';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const num = (value, digits=1) => Number.isFinite(value) ? new Intl.NumberFormat('en-CA',{maximumFractionDigits:digits}).format(value) : 'Unavailable';
@@ -44,6 +44,8 @@ export class EnergyEconomy {
     root.addEventListener('input',event=>{if(event.target.id==='energy-question')this.question=event.target.value;});
     root.addEventListener('submit',event=>{if(event.target.id==='energy-question-form'){event.preventDefault();void this.ask();}});
     root.addEventListener('keydown',event=>{if(event.target.tagName.toLowerCase()==='path' && event.target.dataset.ecRegion && ['Enter',' '].includes(event.key)){event.preventDefault();this.change({region:event.target.dataset.ecRegion});}});
+    try{this.aiLimit=readAnalysisCooldown(globalThis.sessionStorage);}catch{}
+    this.scheduleLimitReset();
     void this.load();
     fetch('data/energy-debate.json').then(response=>response.ok?response.json():null).then(context=>{if(context){this.context=context;this.render();}}).catch(()=>{});
     loadAnalysisStatus().then(status=>{this.status=status;}).catch(()=>{}).finally(()=>{this.statusLoading=false;this.render();});
@@ -54,7 +56,7 @@ export class EnergyEconomy {
     catch {this.error='Economic data could not load. The well atlas and transport views remain available.';}
     this.loading=false;this.render();
   }
-  deactivate() {this.request?.abort();this.request=null;this.busy=false;this.verifying=false;}
+  deactivate() {this.request?.abort();this.request=null;this.busy=false;this.verifying=false;this.localLoading=false;}
   update(state) {const next=normalizeEconomyState(state);if(JSON.stringify(next)!==JSON.stringify(this.state))this.deactivate();this.state=next;this.render();}
   change(patch) {
     this.deactivate();this.aiError=null;
@@ -63,7 +65,8 @@ export class EnergyEconomy {
     this.state=normalizeEconomyState({...this.state,...patch});this.onChange(this.state);this.render();
   }
   click(event) {
-    const target=event.target.closest('[data-ec-prompt],[data-ec-region],[data-ec-question],[data-ec-action],[data-ec-section],[data-ec-display],[data-ec-metric]');if(!target)return;
+    const target=event.target.closest('[data-ec-local],[data-ec-prompt],[data-ec-region],[data-ec-question],[data-ec-action],[data-ec-section],[data-ec-display],[data-ec-metric]');if(!target)return;
+    if(target.dataset.ecLocal){void this.openComparison(target.dataset.ecLocal);return;}
     if(target.dataset.ecPrompt){this.tradeQuestionOpen=true;this.question=target.dataset.ecPrompt;this.render();this.root.querySelector('#energy-question')?.focus();return;}
     if(target.dataset.ecRegion){this.change({region:target.dataset.ecRegion});return;}
     for(const field of ['section','display','metric'])if(target.dataset[`ec${field[0].toUpperCase()}${field.slice(1)}`]){this.change({[field]:target.dataset[`ec${field[0].toUpperCase()}${field.slice(1)}`]});return;}
@@ -96,11 +99,11 @@ export class EnergyEconomy {
     }
   }
   async ask() {
-    if(!this.status.available||this.busy||!this.question.trim())return;
+    if(!this.status.available||this.busy||!this.question.trim()||this.activeLimit())return;
     this.request?.abort();const request=this.request=new AbortController();
     const {region,scenario,year,oilShock,duration}=this.state;const apiState={region,scenario,year,oilShock,duration};
     if(this.state.section==='trade')this.tradeQuestionOpen=true;
-    const submittedQuestion=this.question;this.busy=true;this.verifying=false;this.aiError=null;this.render();
+    const submittedQuestion=this.question;this.busy=true;this.verifying=false;this.localLoading=false;this.localErrorId=null;this.aiError=null;this.render();
     try {
       const headers={'Content-Type':'application/json'};
       if(this.status.turnstileSiteKey){
@@ -111,10 +114,13 @@ export class EnergyEconomy {
       }
       request.signal.throwIfAborted();
       const response=await fetch(this.status.endpoint||'api/analysis',{method:'POST',credentials:'omit',headers,body:JSON.stringify({question:submittedQuestion,state:apiState}),signal:AbortSignal.any([request.signal,AbortSignal.timeout(80000)])});
-      const result=await response.json();if(!response.ok)throw Error(result.error?.message||'Analysis is unavailable.');
+      const result=await response.json();if(!response.ok)throw analysisFailure(response,result);
       if(this.request!==request)return;
       this.state=normalizeEconomyState({...this.state,...result.state});this.onChange(this.state);this.answer={...result,question:submittedQuestion};this.answerVisible=true;this.tradeQuestionOpen=false;this.workspaceSelection=null;this.focusWorkspace=true;
-    } catch(error) {if(this.request===request&&error.name!=='AbortError')this.aiError=error.name==='TimeoutError'?'The analysis took too long. Try again.':error.message;}
+    } catch(error) {if(this.request===request&&error.name!=='AbortError'){
+      this.aiError=error.name==='TimeoutError'?'The analysis took too long. Try again.':error.message;
+      if(error.resetAt){this.aiLimit={code:error.code,resetAt:error.resetAt};try{saveAnalysisCooldown(error,globalThis.sessionStorage);}catch{}this.scheduleLimitReset();}
+    }}
     finally {if(this.request===request){this.busy=false;this.verifying=false;this.render();}}
   }
   sourceLink(id,label) {
@@ -192,15 +198,46 @@ export class EnergyEconomy {
     const labels={equalization:'Federal transfers',trade:'Trade and transportation', 'oil-shock':'Producer income and fuel costs','rights-positions':'Indigenous ownership and rights',labour:'Workers and investment',producer:'Producer priorities',climate:'Emissions and climate','lng-risk':'LNG market risk',electricity:'Electricity supply and reliability',households:'Household affordability'};
     return `<details class="ec-debate"><summary>Who benefits and who pays?</summary><p>Economic totals do not settle how income, costs and risks are shared. These sources address different parts of the debate.</p><p class="ec-caption">Research reviewed ${esc(this.context.reviewDate)}. Stakeholder statements describe the named organization’s position. This selection is not a complete account of every community or project.</p><div class="ec-debate-grid">${this.context.facts.map(fact=>`<article><h3>${esc(labels[fact.id]||fact.id)}</h3><p>${esc(fact.text)}</p><div class="ec-links">${fact.sourceIds.map(id=>sourceAnchor(this.context.sources.find(source=>source.id===id))).join('')}</div></article>`).join('')}</div></details>`;
   }
+  activeLimit() {return this.aiLimit?.resetAt>Date.now()?this.aiLimit:null;}
+  scheduleLimitReset() {
+    clearTimeout(this.limitTimer);
+    if(!this.activeLimit())return;
+    this.limitTimer=setTimeout(()=>{if(this.activeLimit())this.scheduleLimitReset();else{this.aiLimit=null;this.aiError=null;this.render();}},Math.min(this.aiLimit.resetAt-Date.now()+50,2147483647));
+  }
+  async openComparison(id) {
+    if(this.busy)return;
+    this.deactivate();const request=this.request=new AbortController();
+    this.busy=true;this.localLoading=true;this.localErrorId=null;this.aiError=null;this.render();
+    try{
+      const {loadLocalInvestigation}=await import('./vendor/energy-workspace.js');
+      request.signal.throwIfAborted();
+      const result=await loadLocalInvestigation(id,{data:this.data,state:this.state},fetch,request.signal);
+      if(this.request!==request)return;
+      this.state=normalizeEconomyState({...this.state,...result.state});this.onChange(this.state);
+      this.answer=result;this.answerVisible=true;this.tradeQuestionOpen=false;this.workspaceSelection=null;this.focusWorkspace=true;
+    }catch(error){if(this.request===request&&error.name!=='AbortError'){this.aiError='The comparison could not load. Check your connection and try again.';this.localErrorId=id;}}
+    finally{if(this.request===request){this.busy=false;this.localLoading=false;this.render();}}
+  }
   analyst() {
-    return `<section class="ec-intelligence" aria-labelledby="ec-ai-title"><details class="ec-trade-question ec-composer" ${this.tradeQuestionOpen||this.busy||this.aiError?'open':''}><summary>${this.answer&&this.answerVisible!==false?'Ask another question':'Ask a question about this data'}</summary><div class="ec-ai-heading"><div><p class="ec-kicker">ASK ABOUT THE EVIDENCE</p><h2 id="ec-ai-title" tabindex="-1">Ask about Canada’s energy economy</h2></div><span class="ec-ai-status">${this.aiError?'Analysis unavailable':this.busy?'Working…':this.answer?'Answer ready':this.status.available?'Ready for a question':this.statusLoading?'Checking connection…':'Analysis offline'}</span></div><div class="ec-question-presets">${[['Provincial GDP outlook','Compare the GDP forecasts for Alberta, Ontario and Québec in 2026 and 2027.'],['Provincial contributions','Compare energy GDP in Alberta, Ontario and Québec. Include a map.'],['Electricity in 2040','Compare electricity generation in Alberta, Ontario and Québec in the Higher scenario in 2040.'],['Energy trade','Show the value of oil traded between Alberta and British Columbia.'],['Provincial price effects','If oil prices rise 10%, compare trade exposure and published budget sensitivities in Alberta and Saskatchewan.']].map(([label,question])=>`<button data-ec-prompt="${esc(question)}">${label}</button>`).join('')}</div><form id="energy-question-form"><label for="energy-question">Your question</label><div class="ec-ask"><textarea id="energy-question" maxlength="1200" rows="2" placeholder="If oil prices fall, what changes for Alberta and Canada?" ${!this.status.available?'disabled':''}>${esc(this.question)}</textarea><button class="primary-button" type="submit" ${!this.status.available||this.busy?'disabled':''}>${this.busy?'Analysing…':'Analyse'}</button>${this.busy?'<button class="secondary-button" type="button" data-ec-action="cancel">Cancel</button>':''}</div></form><details class="ec-question-info"><summary>Privacy & usage</summary><p class="ec-caption">${this.status.available?`Your question and selected public data are sent to ${this.status.provider==='cloudflare'?'Cloudflare Workers AI':'OpenAI'}${this.status.jevEnabled?' and TypeSafe (Jev)':''}. Do not include personal information.`:this.statusLoading?'Checking the analysis service.':'Live AI is not connected here. The observed data, official scenarios and oil-price calculation work without it.'}</p>${this.status.turnstileSiteKey?'<p class="ec-caption">Up to three questions per network each day. Cloudflare checks for automated requests. We store temporary usage counts, not your questions or answers.</p>':''}</details><div id="ec-ai-progress" role="status" aria-live="polite">${this.busy?`${this.status.turnstileSiteKey?'Complete the security check to send your question.':'Checking the available evidence.'}${this.answer?' Your previous answer remains below.':''}`:''}</div>${this.busy?'<div id="ec-verification"></div>':''}${this.aiError?`<div class="ec-analysis-error" role="alert"><p>${esc(this.aiError)}</p><button data-ec-action="ask-again">Try again</button></div>`:''}</details>${this.answer?.workspace&&this.answerVisible!==false?'<div id="ec-dynamic-workspace" class="ec-workspace-host"><p class="ec-workspace-load" role="status">Loading the maps and comparisons…</p></div>':''}${this.renderAnswer()}</section>`;
+    const limit=this.activeLimit();
+    const error=this.aiError||limit;
+    const status=this.busy?(this.localLoading?'Opening comparison…':'Working…'):limit?(['busy','rate_limit'].includes(limit.code)?'AI busy':'AI allowance used'):this.aiError?'Could not complete':this.answer?'Answer ready':this.status.available?'AI ready':this.statusLoading?'Checking connection…':'AI offline';
+    const presets=[['outlook','Provincial GDP outlook'],['contributions','Provincial contributions'],['electricity','Electricity in 2040'],['trade','Energy trade'],['prices','Provincial price effects']];
+    return `<section class="ec-intelligence" aria-labelledby="ec-ai-title"><details class="ec-trade-question ec-composer" ${this.tradeQuestionOpen||this.busy||this.aiError?'open':''}><summary>${this.answer&&this.answerVisible!==false?'Ask another question':'Ask a question about this data'}</summary>
+      <div class="ec-ai-heading"><div><h2 id="ec-ai-title" tabindex="-1">Explore Canada’s energy economy</h2></div><span class="ec-ai-status">${status}</span></div>
+      <p class="ec-caption">Open a comparison. No AI allowance needed.</p><div class="ec-question-presets">${presets.map(([id,label])=>`<button data-ec-local="${id}" ${this.busy?'disabled':''}>${label}</button>`).join('')}</div>
+      <form id="energy-question-form"><label for="energy-question">Your question</label><div class="ec-ask"><textarea id="energy-question" maxlength="1200" rows="2" placeholder="If oil prices fall, what changes for Alberta and Canada?">${esc(this.question)}</textarea><button class="primary-button" type="submit" ${!this.status.available||this.busy||limit?'disabled':''}>${this.busy?'Working…':'Analyse'}</button>${this.busy?'<button class="secondary-button" type="button" data-ec-action="cancel">Cancel</button>':''}</div></form>
+      <details class="ec-question-info"><summary>Privacy & usage</summary><p class="ec-caption">Built-in comparisons run in your browser using the published data.${this.status.available?` AI questions and selected public data are sent to ${this.status.provider==='cloudflare'?'Cloudflare Workers AI':'OpenAI'}${this.status.jevEnabled?' and TypeSafe (Jev)':''}. Do not include personal information.`:this.statusLoading?' Checking the AI connection.':' AI is offline. The comparisons and data tools still work.'}</p>${this.status.turnstileSiteKey?`<p class="ec-caption">Up to ${esc(this.status.limits?.visitorDaily||3)} AI questions per network each day, shared by people on the same connection. The service also has daily and monthly limits. Cloudflare checks for automated requests. We store temporary usage counts, not your questions or answers.</p>`:''}</details>
+      <div id="ec-ai-progress" role="status" aria-live="polite">${this.busy?`${this.localLoading?'Opening published data…':this.status.turnstileSiteKey?'Complete the security check to send your question.':'Checking the available evidence.'}${this.answer?' Your previous answer remains below.':''}`:''}</div>${this.busy&&!this.localLoading?'<div id="ec-verification"></div>':''}
+      ${error?`<div class="ec-analysis-error" role="alert"><p>${esc(this.localErrorId?this.aiError:limit?analysisLimitMessage(limit):this.aiError)}</p>${this.localErrorId?`<button data-ec-local="${esc(this.localErrorId)}">Reload comparison</button>`:limit?'':this.status.available?'<button data-ec-action="ask-again">Try again</button>':''}</div>`:''}</details>
+      ${this.answer?.workspace&&this.answerVisible!==false?'<div id="ec-dynamic-workspace" class="ec-workspace-host"><p class="ec-workspace-load" role="status">Loading the maps and comparisons…</p></div>':''}${this.renderAnswer()}</section>`;
   }
   renderAnswer() {
     if(!this.answer?.analysis||this.answerVisible===false)return '';
     const analysis=this.answer.analysis;const sources=[...(analysis.sources||[]),...(this.answer.summary?.sources||[])];
     const renderBlock=block=>`<div class="ec-answer-block"><p>${esc(block.text)}</p><div class="ec-links">${[...new Set(block.sourceIds||[])].map(id=>sourceAnchor(sources.find(source=>source.id===id))).join('')}</div></div>`;
     const blocks=analysis.blocks||[];const extra=blocks.slice(2);const limitations=analysis.limitations||[];
-    return `${this.answer.workspace?'<details class="ec-answer"><summary>Written analysis & citations</summary>':'<article class="ec-answer">'}<p class="ec-kicker">COMPLETED ANALYSIS</p><p class="ec-answer-question">${esc(this.answer.question||'')}</p><h3>${esc(analysis.headline)}</h3>${blocks.slice(0,2).map(renderBlock).join('')}${extra.length?`<details><summary>Read the supporting analysis</summary>${extra.map(renderBlock).join('')}</details>`:''}${limitations.length?`<details><summary>Assumptions and limits (${limitations.length})</summary><ul>${limitations.map(text=>`<li>${esc(text)}</li>`).join('')}</ul></details>`:''}<p class="ec-caption">${this.answer.answerMode==='source-backed-findings'?'AI selected these published findings; figures and citations come from the app’s data. ':''}These findings describe the original submitted question. Current-selection explanations appear beside the interactive results above.</p><button class="text-link" data-ec-action="download">Download answer, calculations and sources</button>${this.answer.workspace?'</details>':'</article>'}`;
+    return `${this.answer.workspace?'<details class="ec-answer"><summary>Written analysis & citations</summary>':'<article class="ec-answer">'}<p class="ec-kicker">${this.answer.answerMode==='local-data-workspace'?'PUBLISHED DATA COMPARISON':'COMPLETED ANALYSIS'}</p><p class="ec-answer-question">${esc(this.answer.question||'')}</p><h3>${esc(analysis.headline)}</h3>${blocks.slice(0,2).map(renderBlock).join('')}${extra.length?`<details><summary>Read the supporting analysis</summary>${extra.map(renderBlock).join('')}</details>`:''}${limitations.length?`<details><summary>Assumptions and limits (${limitations.length})</summary><ul>${limitations.map(text=>`<li>${esc(text)}</li>`).join('')}</ul></details>`:''}<p class="ec-caption">${this.answer.answerMode==='source-backed-findings'?'AI selected these published findings; figures and citations come from the app’s data. ':''}These findings describe the original submitted question. Current-selection explanations appear beside the interactive results above.</p><button class="text-link" data-ec-action="download">Download answer, calculations and sources</button>${this.answer.workspace?'</details>':'</article>'}`;
   }
   render() {
     if(this.verifying&&this.busy)return;
@@ -208,7 +245,7 @@ export class EnergyEconomy {
     this.monthlyMount?.unmount();this.monthlyMount=null;
     const previousHost=this.workspaceAnswer===this.answer?this.root.querySelector('#ec-dynamic-workspace'):null;
     if(!previousHost){this.workspaceMount?.unmount();this.workspaceMount=null;}
-    const tradeKey=JSON.stringify([this.state.tradeCommodity,this.state.tradeYear,this.state.priceShock,this.state.linkScope,this.state.tradeRegions,this.state.transferSet,this.state.tradePanelId,this.state.tradeViewMode]);
+    const tradeKey=JSON.stringify([this.state.tradeCommodity,this.state.tradeYear,this.state.priceShock,this.state.linkScope,this.state.tradeRegions,this.state.transferSet,this.state.tradePanelId,this.state.tradeViewMode,this.state.tradeDisplay,this.state.tradeConnection,this.state.tradeFocus]);
     const previousTrade=this.state.section==='trade'&&this.tradeMountKey===tradeKey?this.root.querySelector('#ec-trade-workspace'):null;
     if(!previousTrade){this.tradeMount?.unmount();this.tradeMount=null;}
     const storyKey=JSON.stringify(this.state.story);
@@ -293,8 +330,8 @@ export class EnergyEconomy {
       this.flows=flows;this.fiscal=fiscal;host.replaceChildren();
       const selection={...this.state,tradeYear:flows.trade.years.includes(this.state.tradeYear)?this.state.tradeYear:flows.trade.latestYear};
       this.tradeMount=mountTradeExplorer(host,{economy:this.data,flows,fiscal,shapes:this.shapes,selection,regions:this.state.tradeRegions,onState:next=>{
-        this.state=normalizeEconomyState({...this.state,tradeCommodity:next.tradeCommodity,tradeYear:next.tradeYear,priceShock:next.priceShock,linkScope:next.linkScope,tradeRegions:next.regions,transferSet:next.transferSet,tradePanelId:next.panelId,tradeViewMode:next.viewMode});
-        this.tradeMountKey=JSON.stringify([this.state.tradeCommodity,this.state.tradeYear,this.state.priceShock,this.state.linkScope,this.state.tradeRegions,this.state.transferSet,this.state.tradePanelId,this.state.tradeViewMode]);
+        this.state=normalizeEconomyState({...this.state,tradeCommodity:next.tradeCommodity,tradeYear:next.tradeYear,priceShock:next.priceShock,linkScope:next.linkScope,tradeRegions:next.regions,transferSet:next.transferSet,tradePanelId:next.panelId,tradeViewMode:next.viewMode,tradeDisplay:next.tradeDisplay,tradeConnection:next.tradeConnection,tradeFocus:next.tradeFocus});
+        this.tradeMountKey=JSON.stringify([this.state.tradeCommodity,this.state.tradeYear,this.state.priceShock,this.state.linkScope,this.state.tradeRegions,this.state.transferSet,this.state.tradePanelId,this.state.tradeViewMode,this.state.tradeDisplay,this.state.tradeConnection,this.state.tradeFocus]);
         this.onChange(this.state);
       }});
     }catch{if(host.isConnected)host.innerHTML='<p role="alert">Trade data could not load. Reload to try again. The other economic views remain available.</p>';}

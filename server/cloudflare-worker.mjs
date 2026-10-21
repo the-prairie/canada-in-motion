@@ -174,7 +174,7 @@ export class AnalysisQuota {
         [`visitor:${day}:${visitor}`,LIMITS.visitorDaily,nextDay,'visitor_limit','This network has reached its daily allowance of three questions. It resets at midnight UTC.'],
         [`minute:${minute}`,LIMITS.minute,(minute+1)*60000,'rate_limit','Too many questions arrived at once. Try again in a minute.'],
       ];
-      for(const [key,limit,expires,code,message] of checks){const rows=this.sql.exec('SELECT count FROM counters WHERE key = ?',key).toArray();if((rows[0]?.count||0)>=limit)return {allowed:false,code,message,retryAfter:Math.max(1,Math.ceil((expires-now)/1000))};}
+      for(const [key,limit,expires,code,message] of checks){const rows=this.sql.exec('SELECT count FROM counters WHERE key = ?',key).toArray();if((rows[0]?.count||0)>=limit)return {allowed:false,code,message,retryAfter:Math.max(1,Math.ceil((expires-now)/1000)),resetAt:new Date(expires).toISOString()};}
       for(const [key,,expires] of checks)this.sql.exec('INSERT INTO counters (key,count,expires) VALUES (?,1,?) ON CONFLICT(key) DO UPDATE SET count=count+1',key,expires);
       const id=crypto.randomUUID();
       this.sql.exec('INSERT INTO leases (id,expires) VALUES (?,?)',id,now+120000);
@@ -197,7 +197,7 @@ export class AnalysisQuota {
       const {data,debate}=await loadPublishedEvidence();
       const visitor=await visitorID(ip,env.VISITOR_HASH_KEY,Date.now());
       const admission=await this.reserve(visitor);
-      if(!admission.allowed)return json({error:{code:admission.code,message:admission.message}},429,{'Retry-After':String(admission.retryAfter)});
+      if(!admission.allowed)return json({error:{code:admission.code,message:admission.message,retryAfter:admission.retryAfter,resetAt:admission.resetAt||new Date(Date.now()+admission.retryAfter*1000).toISOString()}},429,{'Retry-After':String(admission.retryAfter)});
       reservation=admission.id;
       const selected=providerConfig(env);
       const workspace=workspaceConfig(env);
@@ -225,7 +225,7 @@ export class AnalysisQuota {
 export default {
   async fetch(request,env) {
     const origin=request.headers.get('Origin');
-    const cors=origin===SITE_ORIGIN?{'Access-Control-Allow-Origin':SITE_ORIGIN,Vary:'Origin'}:{Vary:'Origin'};
+    const cors=origin===SITE_ORIGIN?{'Access-Control-Allow-Origin':SITE_ORIGIN,'Access-Control-Expose-Headers':'Retry-After',Vary:'Origin'}:{Vary:'Origin'};
     const reply=(value,status=200,headers={})=>json(value,status,{...cors,...headers});
     const path=new URL(request.url).pathname;
     if(!['/api/analysis','/api/analysis/status'].includes(path))return reply({error:{message:'Not found.'}},404);

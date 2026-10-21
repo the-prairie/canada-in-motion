@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "matchingProductionObservations": 11080,
+  "sources": {
+    "retail": {
+      "table": "20100056",
+      "sha256": "eb3ba0e000bb96c321de3bb28b3269671c44e0f04010a75a41f510a8eb978e2b",
+      "rows": 1150,
+      "first": "2017-01",
+      "latest": "2026-07",
+      "unavailable": 0,
+      "sourceUnit": "Dollars",
+      "sourceScale": "thousands"
+    },
+    "manufacturing": {
+      "table": "16100048",
+      "sha256": "7acefec69daad7033390ac760f761727995f2e92670ba3aab6ba6abebee0e2ed",
+      "rows": 4160,
+      "first": "1992-01",
+      "latest": "2026-08",
+      "unavailable": 0,
+      "sourceUnit": "Dollars",
+      "sourceScale": "thousands"
+    },
+    "cpi": {
+      "table": "18100004",
+      "sha256": "7852a5ea863a62129c7733059ba031c661348b8b3d38a3744d77e9053d10a390",
+      "rows": 5770,
+      "first": "1978-09",
+      "latest": "2026-09",
+      "unavailable": 0,
+      "sourceUnit": "2002=100",
+      "sourceScale": "units"
+    },
+    "employment": {
+      "table": "14100287",
+      "sha256": "c1cfb244022b8ed68840e53adc4afbe0b0d2ac231a592fe451e95ec57bc5922c",
+      "rows": 6090,
+      "first": "1976-01",
+      "latest": "2026-09",
+      "unavailable": 0,
+      "sourceUnit": "Persons in thousands",
+      "sourceScale": "thousands"
+    },
+    "unemployment": {
+      "table": "14100287",
+      "sha256": "c1cfb244022b8ed68840e53adc4afbe0b0d2ac231a592fe451e95ec57bc5922c",
+      "rows": 6090,
+      "first": "1976-01",
+      "latest": "2026-09",
+      "unavailable": 0,
+      "sourceUnit": "Percent",
+      "sourceScale": "units"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import {validateWorkspace,initialSelection,resolveWorkspace} from './workspace-contract.mjs';
+import {validateWorkspace,initialSelection,resolveWorkspace,normalizeWorkspaceTradeSelection} from './workspace-contract.mjs';
 import {summarizeEnergyFlows,FLOW_REGIONS} from './energy-flow-model.mjs';
 
 export function tradeMatrix(summary) {
@@ -38,7 +38,7 @@ export function normalizeInvestigationSelection(workspace,value={}) {
   const base=initialSelection(workspace),result={...base};
   for(const key of Object.keys(base))if(Object.hasOwn(value,key))result[key]=structuredClone(value[key]);
   resolveWorkspace(workspace,result,workspace.economySnapshot);
-  return result;
+  return normalizeWorkspaceTradeSelection(workspace,result);
 }
 export function validateInvestigation(value) {
   if(value?.kind!=='canada-in-motion-investigation'||value.schemaVersion!==1||typeof value.id!=='string'||value.id.length>100||typeof value.title!=='string'||value.title.length>200||!Number.isFinite(Date.parse(value.savedAt)))throw Error('Invalid saved investigation');
