@@ -1,6 +1,6 @@
 {
   "feature": "Follow the dollar connected visual story",
-  "status": "candidate-verified",
+  "status": "live-verified",
   "design": {
     "reference": "https://followthemoney.emilylai.com/#tap",
     "approach": "A persistent illustrated economic-contribution scene progresses through demand, direct industry, suppliers, optional induced household spending and geographic allocation. Native scrolling and explicit chapter controls share normalized URL state. A compact landscape layout and reduced-motion states preserve the same values.",
@@ -98,5 +98,26 @@
         "Headless Chromium review; no claim of complete cross-browser or screen-reader audit."
       ]
     }
+  },
+  "deployment": {
+    "runId": 39692234351,
+    "url": "https://github.com/the-prairie/canada-in-motion/actions/runs/39692234351",
+    "commit": "a889a392068920fe051042e91501591af959c3fb",
+    "codeVersion": "231032e5b4dc155009a9",
+    "dataReleaseId": "6e50f5b7fe67a57c00ce",
+    "records": 317942,
+    "publicStoryBrowser": {
+      "status": "passed",
+      "checks": [
+        "All five chapters share a scenario; direct, supplier, optional induced and published totals match source-derived expected values; GDP, labour and jobs remain distinct",
+        "Zero demand stays zero; unpublished coefficients stay unavailable even at zero demand",
+        "Scenario changes, induced effects, precise evidence, source-snapshot export, modal focus restoration and deep-linked chapter reload pass",
+        "Desktop, 390px/320px mobile and short landscape: forward/reverse chapters, scene containment, final map and no horizontal overflow",
+        "Native forward/reverse scrolling and ordinary-motion chapter loading pass; no inference calls"
+      ],
+      "errors": [],
+      "inferenceRequests": []
+    },
+    "publicNavigation": "All 12 destinations, keyboard modal behavior, context, browser Back/Forward and URL reload passed at 1440, 390, 320 and 844 pixels; zero provider calls."
   }
 }
