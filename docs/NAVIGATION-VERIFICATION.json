@@ -41,7 +41,13 @@
   "providerCalls": 0,
   "independentReview": "NAVIGATION-EXPERIENCE-REVIEW.md",
   "releaseGate": "passed",
-  "deployment": "pending",
+  "deployment": {
+    "status": "published-and-verified",
+    "runId": 39663152695,
+    "url": "https://github.com/the-prairie/canada-in-motion/actions/runs/39663152695",
+    "commit": "c3a33a4178c6ded77c5ae39e0c2ba1e58f3a9df2",
+    "publicURL": "https://the-prairie.github.io/canada-in-motion/"
+  },
   "independentChecks": {
     "screens": 48,
     "keyboardAndNavigation": 16,
@@ -59,5 +65,75 @@
     "replayedPipelineTests": 139,
     "gateAndBuild": "passed",
     "independentReview": "NAVIGATION-RELEASE-RECOVERY-REVIEW.md"
+  },
+  "publicIntegrity": {
+    "health": {
+      "codeVersion": "c6ad14510208f3737706",
+      "status": "public-beta",
+      "releaseId": "6e50f5b7fe67a57c00ce",
+      "records": 317942,
+      "retrievedAt": "2026-10-21T08:13:44Z",
+      "builtAt": "2026-10-21T19:37:29.997Z",
+      "nationalComplete": false
+    },
+    "sha256": {
+      "index.html": "e5f4df6877b93d747bb057adf56bdc123b55a1fe1ae7d77dcccb4b4d42ffc999",
+      "app.js": "2aad9389de0f86e76586d3e8c0dd4c423521a623d28b3332d9a882b72eed5a6f",
+      "navigation-model.mjs": "b5326d6f56bfedfe9d31d1a6f36cc2c1df389b1ac648275df1867691827c887f",
+      "navigation.css": "8ea3831de2f45208760b7a163a607dddbb2b106706ba1af78e65a60fed063ee1",
+      "energy-economy.js": "558d5f035134b2a914fe90cd27ab5b8d11e464fab6e27839716616922f5d6576",
+      "energy-workspace.css": "9896740b78d156a7f947e7943b43f650fb20c89ff5b385f2d50ca34fd3c77eb9"
+    },
+    "verifiedAt": "2026-10-21T19:38:44.853Z"
+  },
+  "publicDataManifestMatchesPriorArtifact": true,
+  "liveBrowserResults": {
+    "navigation": {
+      "status": "passed",
+      "checks": [
+        "1440px: all12 destinations, current location, no overflow",
+        "390px: all12 destinations, current location, no overflow",
+        "320px: all12 destinations, current location, no overflow",
+        "844px: all12 destinations, current location, no overflow",
+        "keyboard modal focus containment, Escape restores location and Ask",
+        "province context, browser Back/Forward, shared URL reload",
+        "closure default and arbitrary positive costs valid, Ask scoped to supported views"
+      ],
+      "providerCalls": 0
+    },
+    "connected-views": {
+      "status": "passed",
+      "checks": [
+        "one evidence destination with citations",
+        "explicit Ask task",
+        "Escape and source focus restore",
+        "Alberta totals separate from mapped records",
+        "record inspection retains map and filters",
+        "atlas context before map",
+        "map remains drawn after mobile resize",
+        "receipt export remains reachable",
+        "transport map visible through all stages",
+        "atlas-to-transport map sizing",
+        "shipment reprices",
+        "destination selection and reload",
+        "320px and landscape",
+        "old layer preferences cannot hide selected route"
+      ],
+      "providerCalls": 0
+    },
+    "follow-dollar": {
+      "status": "passed",
+      "checks": [
+        "GDP, labour income and jobs show distinct model results with direct allocation values",
+        "Published zero stays zero and unavailable coefficients remain unavailable even at zero demand",
+        "Evidence exposes all exact measures, stages, definitions and official source, exports the full snapshot, and restores keyboard focus",
+        "All scenario inputs and the chosen outcome survive URL reload",
+        "1440px, 390px and 320px layouts keep labels apart and evidence in the viewport",
+        "Large calculated totals hide binary arithmetic residue while the export retains the model values",
+        "Initial Canada scope, invalid reference year and excessive demand retain existing normalization"
+      ],
+      "errors": [],
+      "inferenceRequests": []
+    }
   }
 }
