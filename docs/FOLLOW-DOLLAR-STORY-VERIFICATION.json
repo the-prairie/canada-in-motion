@@ -1,0 +1,102 @@
+{
+  "feature": "Follow the dollar connected visual story",
+  "status": "candidate-verified",
+  "design": {
+    "reference": "https://followthemoney.emilylai.com/#tap",
+    "approach": "A persistent illustrated economic-contribution scene progresses through demand, direct industry, suppliers, optional induced household spending and geographic allocation. Native scrolling and explicit chapter controls share normalized URL state. A compact landscape layout and reduced-motion states preserve the same values.",
+    "dataMeaning": "Official input-output multipliers estimate economic contributions, not traced payments. Rest of Canada remains aggregate; labour income overlaps GDP; jobs are positions supported.",
+    "implementation": "React owns scenario and chapter state. One SVG/HTML scene uses CSS transitions, requestAnimationFrame-throttled native scroll observation and existing province geometry. No added dependency, inference call or generated data.",
+    "referenceTransformation": "Original industry/supplier/household line illustrations and provincial geography replace the reference payment-card objects. No reference assets or text copied."
+  },
+  "data": {
+    "releaseId": "6e50f5b7fe67a57c00ce",
+    "unchangedPublicSnapshot": true,
+    "freshRetrievalClaimed": false,
+    "priorDeploymentRun": 39663152695
+  },
+  "validation": {
+    "javascriptTests": 423,
+    "pipelineTests": 139,
+    "betaReleaseGate": {
+      "passed": true,
+      "scope": "public-beta",
+      "nationalComplete": false,
+      "releaseId": "6e50f5b7fe67a57c00ce",
+      "checkedAt": "2026-10-21T23:14:06.481Z",
+      "errors": []
+    },
+    "storyBrowser": {
+      "status": "passed",
+      "checks": [
+        "All five chapters share a scenario; direct, supplier, optional induced and published totals match source-derived expected values; GDP, labour and jobs remain distinct",
+        "Zero demand stays zero; unpublished coefficients stay unavailable even at zero demand",
+        "Scenario changes, induced effects, precise evidence, source-snapshot export, modal focus restoration and deep-linked chapter reload pass",
+        "Desktop, 390px/320px mobile and short landscape: forward/reverse chapters, scene containment, final map and no horizontal overflow",
+        "Native forward/reverse scrolling and ordinary-motion chapter loading pass; no inference calls"
+      ],
+      "errors": [],
+      "inferenceRequests": []
+    },
+    "independentNumerical": {
+      "status": "passed",
+      "snapshot": "237a9a1fdb3ad466a250",
+      "scenarios": 2340,
+      "cells": 65520,
+      "missing": 15120,
+      "maxResidualAtMaxDemand": 10.000000000014552,
+      "negativeRestCount": 0,
+      "negativeRestExamples": [],
+      "checks": [
+        "Every summarized cell independently matches source coefficient \u00d7 demand",
+        "Geography remainder independently matches national minus provincial coefficient",
+        "Missing coefficients remain null even at zero demand",
+        "Stage IDs respect induced toggle",
+        "Stage sums reconcile to published totals through retained rounding residual"
+      ],
+      "limitations": [
+        "Checks verify extracted snapshot and arithmetic; no claim of fresh source availability or causal model validation."
+      ]
+    },
+    "independentSource": {
+      "status": "passed",
+      "source": "retained selected publisher CSV",
+      "checkedCells": 12000,
+      "notPublishedCells": 3600,
+      "duplicateCsvKeys": 0,
+      "claims": "Independent mapping confirms values, source vectors, units, missingness and all 390 observation identities; this is retained source verification, not a fresh network retrieval."
+    },
+    "independentExperience": {
+      "accepted": true,
+      "viewports": [
+        "1440x1000",
+        "390x844",
+        "320x700",
+        "844x390",
+        "667x375",
+        "740x360"
+      ],
+      "issuesFixed": [
+        "Global typography overrides",
+        "Oversized mobile sticky scene",
+        "Subpixel chapter-scroll threshold",
+        "Short landscape content clipping",
+        "Persistent access to scenario and evidence"
+      ],
+      "checks": [
+        "Forward and reverse chapters",
+        "Native scrolling",
+        "Scenario editing",
+        "GDP/labour/jobs results",
+        "Optional household effects",
+        "Zero and unavailable outcomes",
+        "Exact evidence and source links",
+        "Keyboard focus and Escape",
+        "URL chapter reload",
+        "No document horizontal overflow or page errors"
+      ],
+      "limitations": [
+        "Headless Chromium review; no claim of complete cross-browser or screen-reader audit."
+      ]
+    }
+  }
+}

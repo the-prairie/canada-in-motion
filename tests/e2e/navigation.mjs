@@ -35,7 +35,7 @@ try{
  await page.locator('#header-ask').click();await page.locator('.ec-composer[open]').waitFor();await page.keyboard.press('Escape');
  assert.ok(await page.locator('#header-ask').evaluate(e=>e===document.activeElement));
  checks.push('keyboard modal focus containment, Escape restores location and Ask');
- await navigate('supply');assert.equal(await page.getByLabel('Demand origin province',{exact:true}).inputValue(),'BC');
+ await navigate('supply');await page.getByRole('button',{name:'Change scenario',exact:true}).click();assert.equal(await page.getByLabel('Demand origin province',{exact:true}).inputValue(),'BC');await page.getByRole('dialog',{name:'Change the demand scenario'}).getByRole('button',{name:'Done',exact:true}).click();
  await navigate('explore');assert.equal(decodeURIComponent(await page.evaluate(()=>location.hash)).includes('"focus":"BC"'),true);
  await navigate('income');await navigate('futures');await page.goBack();await page.locator('.ec-ranking').waitFor();assert.equal(await page.locator('#location-label').innerText(),'Income');
  await page.goForward();await page.locator('.ec-focused-metric').waitFor();assert.equal(await page.locator('#location-label').innerText(),'Energy futures');

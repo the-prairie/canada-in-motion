@@ -166,3 +166,13 @@ test('new visits resolve dataset years later while explicit historical selection
   assert.equal(normalizeEconomyState({tradeYear:2023,incomeYear:2021}).incomeYear,2021);
   assert.deepEqual(normalizeEconomyState(normalizeEconomyState()),normalizeEconomyState());
 });
+
+test('Follow the dollar chapter links normalize without changing the economic scenario',()=>{
+  for(let step=0;step<=4;step++)assert.equal(normalizeEconomyState({incomeStep:step}).incomeStep,step);
+  for(const step of [null,'3',1.5,NaN,{},undefined])assert.equal(normalizeEconomyState({incomeStep:step}).incomeStep,0);
+  assert.equal(normalizeEconomyState({incomeStep:100}).incomeStep,4);
+  assert.equal(normalizeEconomyState({incomeStep:-1}).incomeStep,0);
+  const selected={section:'supply',region:'ON',incomeIndustry:'electricity',demandMillion:250,includeInduced:true,incomeMeasure:'labour',incomeYear:2021};
+  const a=normalizeEconomyState({...selected,incomeStep:0}),b=normalizeEconomyState({...selected,incomeStep:4});
+  delete a.incomeStep;delete b.incomeStep;assert.deepEqual(a,b);
+});
