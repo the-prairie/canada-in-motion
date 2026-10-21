@@ -26,8 +26,12 @@ try{
   assert.ok(targets.length>0&&targets.every(text=>text.includes('Alberta')));
   await page.reload();assert.equal(await page.getByLabel('Network province focus',{exact:true}).inputValue(),'AB');
   checks.push('linked diagram, exact selected value, next connection, focus and URL reload');
+  assert.equal(await page.getByRole('button',{name:'Motion off',exact:true}).isDisabled(),true);
+  assert.equal(await page.locator('.tn-direction').count(),0);
+  await page.emulateMedia({reducedMotion:'no-preference'});
   await page.getByRole('button',{name:'Animate direction',exact:true}).click();
-  assert.equal(await page.locator('.tn-direction').first().evaluate(node=>getComputedStyle(node).animationName),'none');
+  await page.locator('.tn-direction').first().waitFor();
+  assert.notEqual(await page.locator('.tn-direction').first().evaluate(node=>getComputedStyle(node).animationName),'none');
   await page.getByRole('button',{name:'Stop direction',exact:true}).click();
   const target=page.locator('.tn-diagram .tn-edge-target').last();await target.focus();await page.keyboard.press('Enter');
   assert.ok(await target.getAttribute('aria-pressed')==='true');

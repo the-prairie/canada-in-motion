@@ -16,9 +16,9 @@ try{
   await page.locator('.gs-guide').waitFor();
   assert.equal(await page.locator('.gs-stage>h4').evaluate(e=>e===document.activeElement),true);
   assert.match(await page.locator('.gs-exchange').innerText(),/1.4B.*1.5B/s);
-  assert.match(await page.locator('.gs-pair').innerText(),/136.2M/);
+  assert.match(await page.locator('.gsm-endpoints').innerText(),/136.2M/);
   await page.getByLabel('Commodity price change percent',{exact:true}).fill('-10');
-  assert.match(await page.locator('.gs-pair').innerText(),/−\$136.2M/);
+  assert.match(await page.locator('.gsm-endpoints').innerText(),/−\$136.2M/);
   await stage('Provincial economy').click();
   await page.locator('[data-guide-province="AB"]').waitFor();
   assert.match(await page.locator('[data-guide-province="AB"]').innerText(),/No supported estimate/);
@@ -67,7 +67,7 @@ try{
   checks.push('320/390px layout and offline restored source snapshot');
   await page.goto(url({guideStep:'provinces'}));await page.reload();
   await page.getByRole('button',{name:'Retry sources',exact:true}).waitFor();
-  await stage('The exchange').click();assert.match(await page.locator('.gs-pair').innerText(),/136.2M/);
+  await stage('The exchange').click();assert.match(await page.locator('.gsm-endpoints').innerText(),/136.2M/);
   await page.unroute('**/data/provincial-price-response.json');await page.unroute('**/data/household-energy-costs.json');
   await stage('Provincial economy').click();await page.getByRole('button',{name:'Retry sources',exact:true}).click();await page.locator('[data-guide-province="AB"]').waitFor();
   await page.getByRole('button',{name:'Back to connections',exact:true}).click();await page.locator('.tn-explorer').waitFor();

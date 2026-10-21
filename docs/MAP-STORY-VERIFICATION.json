@@ -1,0 +1,99 @@
+{
+  "date": "2026-10-20",
+  "status": "candidate-verified",
+  "candidate": {
+    "codeVersion": "ca763fb8c30dd031fd7b",
+    "status": "public-beta",
+    "releaseId": "e77b2ab3ebae30a03931",
+    "records": 317936,
+    "retrievedAt": "2026-10-18T23:28:38Z",
+    "builtAt": "2026-10-21T04:59:56.250Z",
+    "nationalComplete": false
+  },
+  "unitTests": {
+    "passed": 392,
+    "failed": 0
+  },
+  "browserTests": {
+    "map-story": {
+      "status": "passed",
+      "checks": [
+        "motion plays only in view, supports pause and reduced motion, and never changes speed or path with prices",
+        "same map across all stages, exact supported values, failed estimates hidden, keyboard-to-detail focus survives pointer movement",
+        "320/390px sticky map preserves readable labels and visible headings; short landscape has normal scrolling",
+        "source failures show unavailable map values, disable missing targets and recover on retry; zero runtime errors"
+      ],
+      "errors": []
+    },
+    "guided-scenarios": {
+      "status": "passed",
+      "checks": [
+        "selected trade, negative repricing, stage focus, supported-only GDP, annual household caveat, export and URL reload",
+        "gas/electricity unavailable models, explicit independent retail assumption, commodity changes preserve stage",
+        "320/390px layout and offline restored source snapshot",
+        "partial source failure, exchange remains usable, retry, return to selected network, zero runtime errors"
+      ],
+      "errors": []
+    },
+    "trade-network": {
+      "status": "passed",
+      "checks": [
+        "linked diagram, exact selected value, next connection, focus and URL reload",
+        "keyboard link selection, reduced motion, clear, commodity/year changes and undo",
+        "mobile layout, touch-sized steps, save and shared display persistence"
+      ],
+      "errors": []
+    },
+    "investigations": {
+      "status": "passed",
+      "matrixCells": 156,
+      "checks": [
+        "direction",
+        "linked map",
+        "branch baseline",
+        "reference-year robustness",
+        "save and reload snapshot",
+        "mobile overflow",
+        "no runtime errors"
+      ]
+    },
+    "analysis-recovery": {
+      "status": "passed",
+      "checks": [
+        "outlook opens with AI offline and no inference request",
+        "contributions opens with AI offline and no inference request",
+        "electricity opens with AI offline and no inference request",
+        "trade opens with AI offline and no inference request",
+        "prices opens with AI offline and no inference request",
+        "quota shows reset time, prevents pointless retry, persists across reload and leaves data tools available",
+        "cooldown expires without submitting; provider failure permits retry and preserves previous answer"
+      ],
+      "mockedRequests": 2,
+      "providerCalls": 0
+    }
+  },
+  "independentReviews": {
+    "experience": {
+      "passedChecks": 132,
+      "viewports": [
+        "1440x1100",
+        "390x844",
+        "320x740",
+        "844x390"
+      ],
+      "report": "MAP-STORY-EXPERIENCE-REVIEW.md"
+    },
+    "implementation": {
+      "directedPairs": 156,
+      "curveSamples": 15756,
+      "modelValueChecks": 108,
+      "report": "MAP-STORY-CODE-REVIEW.md"
+    }
+  },
+  "providerCalls": 0,
+  "limitations": [
+    "The full-national-coverage release gate remains inapplicable: this release retains the approved public-beta scope with disclosed coverage gaps.",
+    "Economic models and their validity limits are unchanged."
+  ],
+  "public": null
+}

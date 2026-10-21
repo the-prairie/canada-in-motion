@@ -1,8 +1,9 @@
 import React,{useId,useState,useEffect,useRef} from 'react';
-import {project} from '../atlas-model.mjs';
+import {TRADE_ANCHORS,tradeMapGeometry} from '../trade-map-model.mjs';
+import {useFlowMotion} from './flow-motion.jsx';
 import {networkConnections,tradeLinkKey} from '../trade-network-model.mjs';
 
-const anchors={BC:[-125,54],AB:[-115,54],SK:[-106,54],MB:[-98,54],ON:[-85,50],QC:[-71,51],NB:[-66,46.5],NS:[-63,45],PE:[-63.2,46.5],NL:[-57,53],YT:[-136,64],NT:[-120,65],NU:[-95,67]};
+const anchors=TRADE_ANCHORS;
 const order=Object.keys(anchors);
 const compact={NL:'Nfld. & Labrador',PE:'P.E.I.',NT:'Northwest Terr.',YT:'Yukon',NU:'Nunavut'};
 const labelOffsets={NB:[-42,18],NS:[16,44],PE:[34,-16]};
@@ -12,26 +13,16 @@ const activate=(event,action)=>{if(['Enter',' '].includes(event.key)){event.prev
 export function TradeNetwork({links,shapes,named,valueMoney,active,onSelect,focus,onFocus,onClear,onGuide,year,commodity}) {
   const [narrow,setNarrow]=useState(()=>globalThis.matchMedia?.('(max-width: 760px)').matches||false);
   useEffect(()=>{const media=matchMedia('(max-width: 760px)'),change=()=>setNarrow(media.matches);media.addEventListener('change',change);return()=>media.removeEventListener('change',change);},[]);
-  const [hover,setHover]=useState(null),[animate,setAnimate]=useState(false),[visible,setVisible]=useState(true);
+  const [hover,setHover]=useState(null);
   const host=useRef(null),marker=useId().replace(/:/g,'');
-  useEffect(()=>{
-    const observer=new IntersectionObserver(entries=>setVisible(entries[0].isIntersecting&&!document.hidden));
-    observer.observe(host.current);
-    const visibility=()=>setVisible(!document.hidden&&Boolean(host.current?.getBoundingClientRect().bottom>0));
-    document.addEventListener('visibilitychange',visibility);
-    return()=>{observer.disconnect();document.removeEventListener('visibilitychange',visibility);};
-  },[]);
+  const motion=useFlowMotion(host);
   const network=networkConnections(links,{focus,active});
   const {shown}=network;
   const selected=shown.find(row=>tradeLinkKey(row)===(hover||active))||shown[0];
   const selectedKey=selected?tradeLinkKey(selected):null;
   const max=Math.max(1,...shown.map(row=>row.value));
-  const points=shapes.flatMap(shape=>shape.rings.flat());
-  const [west,east,south,north]=[Math.min(...points.map(p=>p[0])),Math.max(...points.map(p=>p[0])),Math.min(...points.map(p=>p[1])),Math.max(...points.map(p=>p[1]))];
-  const scale=Math.min(584/(east-west),430/(north-south));
-  const convert=([x,y])=>[18+(x-west)*scale,16+(north-y)*scale];
-  const xy=code=>convert(project(...anchors[code]));
-  const mapPath=row=>{const [x,y]=xy(row.origin),[u,v]=xy(row.destination);return `M${x},${y} Q${(x+u)/2-(v-y)*.2},${(y+v)/2+(u-x)*.2} ${u},${v}`;};
+  const geometry=tradeMapGeometry(shapes),xy=code=>geometry.anchors[code];
+  const mapPath=row=>geometry.path(row.origin,row.destination);
   const sellers=order.filter(code=>shown.some(row=>row.origin===code)),buyers=order.filter(code=>shown.some(row=>row.destination===code));
   const graphWidth=narrow?360:480,leftX=narrow?110:132,rightX=narrow?250:348;
   const rowHeight=narrow?78:52;
@@ -41,22 +32,22 @@ export function TradeNetwork({links,shapes,named,valueMoney,active,onSelect,focu
   const choose=row=>onSelect(tradeLinkKey(row)===active?null:tradeLinkKey(row));
   const path=(row,d,diagram=false)=>{const key=tradeLinkKey(row),highlight=key===selectedKey;return <g key={key} className={`tn-connection ${highlight?'is-highlighted':''}`} style={{opacity:selectedKey&&!highlight?.15:1}}>
     <path d={d} fill="none" stroke={highlight?'#ae492f':'#38776b'} strokeWidth={1+5*Math.sqrt(row.value/max)} vectorEffect="non-scaling-stroke" markerEnd={`url(#${marker}-${diagram?'graph':'map'})`}/>
-    {highlight&&animate&&visible&&<path className="tn-direction" d={d} fill="none" stroke="#fffdf6" strokeWidth="2" strokeDasharray="2 14" vectorEffect="non-scaling-stroke" aria-hidden="true"/>}
+    {highlight&&motion.playing&&<path className="tn-direction" d={d} fill="none" stroke="#fffdf6" strokeWidth="2" strokeDasharray="2 14" vectorEffect="non-scaling-stroke" aria-hidden="true"/>}
     <path d={d} className="tn-edge-target" fill="none" stroke="transparent" strokeWidth="18" vectorEffect="non-scaling-stroke" role="button" tabIndex={0} aria-pressed={active===key} aria-label={`${named(row.origin)} to ${named(row.destination)}: ${valueMoney(row.value)} in ${year}`} onPointerEnter={()=>setHover(key)} onPointerLeave={()=>setHover(null)} onFocus={()=>setHover(key)} onBlur={()=>setHover(null)} onClick={()=>choose(row)} onKeyDown={event=>activate(event,()=>choose(row))}/>
   </g>;};
   const definitions=kind=><defs><marker id={`${marker}-${kind}`} viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" orient="auto"><path d="M0,1 L9,5 L0,9" fill="none" stroke="#ae492f" strokeWidth="1.5"/></marker></defs>;
   const codes=order.filter(code=>shown.some(row=>row.origin===code||row.destination===code));
   const step=direction=>{const index=shown.findIndex(row=>tradeLinkKey(row)===selectedKey);const row=shown[(index+direction+shown.length)%shown.length];if(row)onSelect(tradeLinkKey(row));};
   return <div ref={host} className="tn-explorer">
-    <div className="tn-toolbar"><label>Focus on<select aria-label="Network province focus" value={focus||''} onChange={event=>onFocus(event.target.value||null)}><option value="">All selected provinces</option>{order.filter(code=>links.some(row=>row.origin===code||row.destination===code)).map(code=><option key={code} value={code}>{named(code)}</option>)}</select></label><button onClick={onClear} disabled={!focus&&!active}>Clear focus</button><button aria-pressed={animate} onClick={()=>setAnimate(!animate)} disabled={!shown.length}>{animate?'Stop direction':'Animate direction'}</button></div>
+    <div className="tn-toolbar"><label>Focus on<select aria-label="Network province focus" value={focus||''} onChange={event=>onFocus(event.target.value||null)}><option value="">All selected provinces</option>{order.filter(code=>links.some(row=>row.origin===code||row.destination===code)).map(code=><option key={code} value={code}>{named(code)}</option>)}</select></label><button onClick={onClear} disabled={!focus&&!active}>Clear focus</button><button aria-pressed={motion.requested&&!motion.reduced} onClick={motion.toggle} disabled={!shown.length||motion.reduced}>{motion.reduced?'Motion off':motion.requested?'Stop direction':'Animate direction'}</button></div>
     <div className="tn-linked-views">
-      <div className="tn-geography"><div className="tn-view-title"><span>01 / Geography</span><span>Seller → buyer</span></div><svg className="hw-trade-map tn-map" viewBox="0 0 620 464" role="group" aria-label="Geographic trade connections; select a connection or province">
+      <div className="tn-geography"><svg className="hw-trade-map tn-map" viewBox="0 0 620 464" role="group" aria-label="Geographic trade connections; select a connection or province">
         {definitions('map')}
-        {shapes.map(shape=><path key={shape.code} className="tn-land" d={shape.rings.map(ring=>ring.map((point,i)=>`${i?'L':'M'}${convert(point).join(',')}`).join(' ')+'Z').join(' ')} fill={selected&&(shape.code===selected.origin||shape.code===selected.destination)?'#d9ddd0':'#eaebe3'} stroke="#faf9f2" strokeWidth="1"/>)}
+        {geometry.paths.map(shape=><path key={shape.code} className="tn-land" d={shape.d} fill={selected&&(shape.code===selected.origin||shape.code===selected.destination)?'#d9ddd0':'#eaebe3'} stroke="#faf9f2" strokeWidth="1"/>)}
         {shown.slice().reverse().map(row=>path(row,mapPath(row)))}
         {codes.map(code=>{const [x,y]=xy(code),[dx,dy]=labelOffsets[code]||[8,-9];const selectedProvince=selected&&(code===selected.origin||code===selected.destination);return <g key={code} className={`tn-map-node ${selectedProvince?'is-highlighted':''}`} role="button" tabIndex={0} aria-pressed={focus===code} aria-label={`Focus on ${named(code)}`} onClick={()=>onFocus(focus===code?null:code)} onKeyDown={event=>activate(event,()=>onFocus(focus===code?null:code))}><circle cx={x} cy={y} r="13" fill="transparent"/>{labelOffsets[code]&&<path d={`M${x},${y} L${x+dx+10},${y+dy-7}`} fill="none" stroke="#65766c" strokeWidth="1"/>}<circle cx={x} cy={y} r={selectedProvince?5:3} fill={selectedProvince?'#ae492f':'#3f665d'}/><text x={x+dx} y={y+dy} fontSize="12" fill="#243d35" stroke="#f7f6ee" strokeWidth="4" paintOrder="stroke">{code}</text></g>;})}
       </svg><p className="tn-map-note">Connections show trade relationships, not shipment routes.</p></div>
-      <div className="tn-relationships"><div className="tn-view-title"><span>02 / Relationships</span><span>Same connections</span></div><svg className="tn-diagram" viewBox={`0 0 ${graphWidth} ${graphHeight}`} role="group" aria-label="Linked seller and buyer diagram">
+      <div className="tn-relationships"><svg className="tn-diagram" viewBox={`0 0 ${graphWidth} ${graphHeight}`} role="group" aria-label="Linked seller and buyer diagram">
         {definitions('graph')}<text x={leftX-12} y="23" textAnchor="end" className="tn-column-label">SELLERS</text><text x={rightX+12} y="23" className="tn-column-label">BUYERS</text>
         {shown.slice().reverse().map(row=>path(row,graphPath(row),true))}
         {[['seller',sellers,leftX],['buyer',buyers,rightX]].flatMap(([side,values,x])=>values.map(code=>{const y=graphY(code,side),left=side==='seller',highlight=selected&&(left?selected.origin===code:selected.destination===code);const label=compact[code]||named(code),words=label.split(' '),lines=[];for(const word of words){if(lines.length&&(lines.at(-1)+' '+word).length<=12)lines[lines.length-1]+=' '+word;else lines.push(word);}
@@ -64,7 +55,7 @@ export function TradeNetwork({links,shapes,named,valueMoney,active,onSelect,focu
       </svg></div>
     </div>
     <div className="tn-inspector" aria-live="polite">{selected?<><div><span>{commodity} · {year}</span><h4>{named(selected.origin)} <span aria-label="to">→</span> {named(selected.destination)}</h4><p><strong>{valueMoney(selected.value)}</strong> <span>in modelled trade value</span></p>{onGuide&&<button className="gs-entry" onClick={()=>onGuide(selectedKey)}>Follow this trade →</button>}</div><div className="tn-step"><button aria-label="Previous trade connection" onClick={()=>step(-1)}>←</button><span>{shown.findIndex(row=>tradeLinkKey(row)===selectedKey)+1} / {shown.length}</span><button aria-label="Next trade connection" onClick={()=>step(1)}>→</button></div></>:<p>No positive published trade values in this selection. The table distinguishes zero from unpublished records.</p>}</div>
-    <p className="tn-coverage">{shown.length?`${shown.length} connections · ${format(network.share)}% of published positive trade value${focus?` involving ${named(focus)}`:' in this selection'}. `:''}Line width follows the square root of value. {animate?'Motion indicates direction only. ':''}{network.unpublished?`${network.unpublished} unpublished records. `:''}{network.omitted?`${network.omitted} smaller connections remain in the table.`:''}{active&&links.some(row=>tradeLinkKey(row)===active&&!(row.value>0))?' The selected zero or unpublished record has no flow line.':''}</p>
+    <p className="tn-coverage">{shown.length?`${shown.length} connections · ${format(network.share)}% of published positive trade value${focus?` involving ${named(focus)}`:' in this selection'}. `:''}Line width follows the square root of value. {motion.requested?'Motion indicates direction only. ':''}{network.unpublished?`${network.unpublished} unpublished records. `:''}{network.omitted?`${network.omitted} smaller connections remain in the table.`:''}{active&&links.some(row=>tradeLinkKey(row)===active&&!(row.value>0))?' The selected zero or unpublished record has no flow line.':''}</p>
     <details className="tn-connection-list"><summary>Connection values ({shown.length})</summary><ol className="hw-flow-links">{shown.map(row=><li key={tradeLinkKey(row)}><button aria-pressed={active===tradeLinkKey(row)} onClick={()=>choose(row)}><span>{row.origin} → {row.destination}</span><strong>{valueMoney(row.value)}</strong></button></li>)}</ol></details>
   </div>;
 }
