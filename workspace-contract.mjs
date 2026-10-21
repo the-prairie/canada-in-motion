@@ -1,3 +1,4 @@
+import {GUIDE_DEFAULTS,validateGuideSelection,validateGuidedSnapshot,summarizeGuidedConnection} from './guided-scenario-model.mjs';
 import {normalizeNetworkSelection} from './trade-network-model.mjs';
 import {summarizeEconomy,validateEconomy} from './economy-model.mjs';
 import {selectInfrastructure} from './infrastructure-model.mjs';
@@ -23,6 +24,7 @@ export function validateWorkspace(value) {
   if(value.tradeSnapshot){try{validateEnergyFlows(value.tradeSnapshot);}catch{fail();}}
   if(value.fiscalSnapshot){try{validateProvincialImpacts(value.fiscalSnapshot);}catch{fail();}}
   if(value.forecastSnapshot){try{validateProvincialForecast(value.forecastSnapshot);}catch{fail();}}
+  if(value.guidedSnapshot){try{validateGuidedSnapshot(value.guidedSnapshot);}catch{fail();}}
   const sources=new Set();
   for(const source of value.sources){
     if(typeof source.id!=='string'||typeof source.title!=='string'||source.title.length>500||typeof source.url!=='string')fail();
@@ -72,15 +74,18 @@ export function normalizeWorkspaceTradeSelection(workspace,selection) {
   if(!workspace.tradeSnapshot)return selection;
   const regions=selection.regions.filter(code=>code!=='CA');
   const links=workspace.tradeSnapshot.trade.observations.filter(row=>row.year===selection.tradeYear&&row.commodity===selection.tradeCommodity&&row.origin!==row.destination&&(!regions.length||(selection.linkScope==='between'?regions.includes(row.origin)&&regions.includes(row.destination):regions.includes(row.origin)||regions.includes(row.destination))));
-  return normalizeNetworkSelection(links,selection);
+  const next=normalizeNetworkSelection(links,{...GUIDE_DEFAULTS,...selection});
+  if(!next.tradeConnection)next.guideStep=null;
+  return next;
 }
 
 export function initialSelection(workspace) {
-  return {regions:workspace.plan.regions.includes('CA')?[]:[...workspace.plan.regions],year:workspace.plan.year,scenario:workspace.plan.scenario,oilShock:workspace.plan.oilShock,duration:workspace.plan.duration,panelId:(workspace.panels.find(p=>p.type!=='coverage-note'&&p.role==='answer')||workspace.panels.find(p=>p.type!=='coverage-note')||workspace.panels[0]).id,viewMode:'focus',...(workspace.tradeSnapshot?{...normalizeTradeSelection(workspace.tradeSnapshot,workspace.plan),tradeDisplay:workspace.plan.tradeDisplay==='map'?'map':'matrix',tradeConnection:null,tradeFocus:null}:{}),...(workspace.forecastSnapshot?{forecastYearsByPanel:Object.fromEntries(workspace.panels.filter(p=>p.type==='gdp-forecast').map(p=>[p.id,p.year]))}:{})};
+  return {regions:workspace.plan.regions.includes('CA')?[]:[...workspace.plan.regions],year:workspace.plan.year,scenario:workspace.plan.scenario,oilShock:workspace.plan.oilShock,duration:workspace.plan.duration,panelId:(workspace.panels.find(p=>p.type!=='coverage-note'&&p.role==='answer')||workspace.panels.find(p=>p.type!=='coverage-note')||workspace.panels[0]).id,viewMode:'focus',...(workspace.tradeSnapshot?{...GUIDE_DEFAULTS,...normalizeTradeSelection(workspace.tradeSnapshot,workspace.plan),tradeDisplay:workspace.plan.tradeDisplay==='map'?'map':'matrix',tradeConnection:null,tradeFocus:null}:{}),...(workspace.forecastSnapshot?{forecastYearsByPanel:Object.fromEntries(workspace.panels.filter(p=>p.type==='gdp-forecast').map(p=>[p.id,p.year]))}:{})};
 }
 
 export function resolveWorkspace(workspace,selection,economy) {
   validateWorkspace(workspace);
+  validateGuideSelection(selection);
   economy=workspace.economySnapshot||economy;
   if(workspace.dataVersion!==economy.generatedAt)return workspace;
   if(!Array.isArray(selection.regions)||selection.regions.some(code=>!REGION_CODES.includes(code)||code==='CA')||!economy.years.includes(selection.year)||!economy.scenarios.includes(selection.scenario))fail();
@@ -132,7 +137,8 @@ export function resolveWorkspace(workspace,selection,economy) {
     }
     return panel;
   });
-  return {...workspace,panels};
+  const guidedResult=selection.guideStep&&selection.tradeConnection&&workspace.tradeSnapshot?summarizeGuidedConnection(workspace.tradeSnapshot,workspace.guidedSnapshot,selection):null;
+  return {...workspace,panels,guidedResult};
 }
 
 const formatFinding=value=>new Intl.NumberFormat('en-CA',{maximumFractionDigits:Math.abs(value)>0&&Math.abs(value)<.01?4:2}).format(Object.is(value,-0)?0:value);

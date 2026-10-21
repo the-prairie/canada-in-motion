@@ -245,7 +245,7 @@ export class EnergyEconomy {
     this.monthlyMount?.unmount();this.monthlyMount=null;
     const previousHost=this.workspaceAnswer===this.answer?this.root.querySelector('#ec-dynamic-workspace'):null;
     if(!previousHost){this.workspaceMount?.unmount();this.workspaceMount=null;}
-    const tradeKey=JSON.stringify([this.state.tradeCommodity,this.state.tradeYear,this.state.priceShock,this.state.linkScope,this.state.tradeRegions,this.state.transferSet,this.state.tradePanelId,this.state.tradeViewMode,this.state.tradeDisplay,this.state.tradeConnection,this.state.tradeFocus]);
+    const tradeKey=JSON.stringify([this.state.tradeCommodity,this.state.tradeYear,this.state.priceShock,this.state.linkScope,this.state.tradeRegions,this.state.transferSet,this.state.tradePanelId,this.state.tradeViewMode,this.state.tradeDisplay,this.state.tradeConnection,this.state.tradeFocus,this.state.guideStep,this.state.guideHorizon,this.state.guideHouseholdBasis,this.state.guideRetailShock]);
     const previousTrade=this.state.section==='trade'&&this.tradeMountKey===tradeKey?this.root.querySelector('#ec-trade-workspace'):null;
     if(!previousTrade){this.tradeMount?.unmount();this.tradeMount=null;}
     const storyKey=JSON.stringify(this.state.story);
@@ -330,8 +330,8 @@ export class EnergyEconomy {
       this.flows=flows;this.fiscal=fiscal;host.replaceChildren();
       const selection={...this.state,tradeYear:flows.trade.years.includes(this.state.tradeYear)?this.state.tradeYear:flows.trade.latestYear};
       this.tradeMount=mountTradeExplorer(host,{economy:this.data,flows,fiscal,shapes:this.shapes,selection,regions:this.state.tradeRegions,onState:next=>{
-        this.state=normalizeEconomyState({...this.state,tradeCommodity:next.tradeCommodity,tradeYear:next.tradeYear,priceShock:next.priceShock,linkScope:next.linkScope,tradeRegions:next.regions,transferSet:next.transferSet,tradePanelId:next.panelId,tradeViewMode:next.viewMode,tradeDisplay:next.tradeDisplay,tradeConnection:next.tradeConnection,tradeFocus:next.tradeFocus});
-        this.tradeMountKey=JSON.stringify([this.state.tradeCommodity,this.state.tradeYear,this.state.priceShock,this.state.linkScope,this.state.tradeRegions,this.state.transferSet,this.state.tradePanelId,this.state.tradeViewMode,this.state.tradeDisplay,this.state.tradeConnection,this.state.tradeFocus]);
+        this.state=normalizeEconomyState({...this.state,tradeCommodity:next.tradeCommodity,tradeYear:next.tradeYear,priceShock:next.priceShock,linkScope:next.linkScope,tradeRegions:next.regions,transferSet:next.transferSet,tradePanelId:next.panelId,tradeViewMode:next.viewMode,tradeDisplay:next.tradeDisplay,tradeConnection:next.tradeConnection,tradeFocus:next.tradeFocus,guideStep:next.guideStep,guideHorizon:next.guideHorizon,guideHouseholdBasis:next.guideHouseholdBasis,guideRetailShock:next.guideRetailShock});
+        this.tradeMountKey=JSON.stringify([this.state.tradeCommodity,this.state.tradeYear,this.state.priceShock,this.state.linkScope,this.state.tradeRegions,this.state.transferSet,this.state.tradePanelId,this.state.tradeViewMode,this.state.tradeDisplay,this.state.tradeConnection,this.state.tradeFocus,this.state.guideStep,this.state.guideHorizon,this.state.guideHouseholdBasis,this.state.guideRetailShock]);
         this.onChange(this.state);
       }});
     }catch{if(host.isConnected)host.innerHTML='<p role="alert">Trade data could not load. Reload to try again. The other economic views remain available.</p>';}

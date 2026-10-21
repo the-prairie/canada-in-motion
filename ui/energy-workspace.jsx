@@ -1,3 +1,4 @@
+import {GUIDE_DEFAULTS,loadGuidedSnapshot} from '../guided-scenario-model.mjs';
 import React, {createContext,useContext,useMemo,useState,useEffect,useRef,Component} from 'react';
 import {createRoot} from 'react-dom/client';
 import {Renderer,createLibrary,defineComponent} from '@openuidev/react-lang';
@@ -123,6 +124,17 @@ function Workspace({workspace:seed,economy:providedEconomy,network:providedNetwo
   useEffect(()=>{listInvestigations().then(items=>{setLibrary(items);if(items.invalidCount)setNotice(`${items.invalidCount} saved investigations could not be verified and were omitted.`);}).catch(()=>setNotice('Saved investigations are unavailable in this browser. Export data still works.'));},[]);
   useEffect(()=>{onReady?.();},[]);
   const original=useMemo(()=>initialSelection(workspace),[workspace]);const [selection,setSelection]=useState(()=>normalizeWorkspaceTradeSelection(workspace,saved||original));const [history,setHistory]=useState([]);const [renderError,setRenderError]=useState(false);
+  const [guideLoad,setGuideLoad]=useState('idle'),[guideAttempt,setGuideAttempt]=useState(0);
+  const guideOpen=Boolean(selection.guideStep);
+  useEffect(()=>{
+    if(!guideOpen||workspace.guidedSnapshot)return;
+    const controller=new AbortController();setGuideLoad('loading');
+    loadGuidedSnapshot(workspace.fiscalSnapshot,fetch,controller.signal).then(snapshot=>{
+      if(!controller.signal.aborted){setWorkspace(old=>({...old,guidedSnapshot:snapshot}));setGuideLoad('ready');}
+    }).catch(()=>{if(!controller.signal.aborted)setGuideLoad('error');});
+    return()=>controller.abort();
+  },[guideOpen,workspace.guidedSnapshot,workspace.tradeSnapshot,guideAttempt]);
+  const guidePending=guideOpen&&!workspace.guidedSnapshot;
   const compatible=workspace.dataVersion===economy.generatedAt;
   const resolved=useMemo(()=>resolveWorkspace(workspace,selection,economy),[workspace,selection,economy]);
   const focusId=workspace.panels.some(p=>p.id===selection.panelId&&p.type!=='coverage-note')?selection.panelId:original.panelId;
@@ -141,8 +153,8 @@ function Workspace({workspace:seed,economy:providedEconomy,network:providedNetwo
   const restore=value=>{setWorkspace(value.workspace);setQuestion(value.title);setSelection(value.selection);setHistory([]);setBaseline(value.baseline||null);setRenderError(false);setNotice('Restored with the original source snapshot.');onState?.(value.selection);onRestore?.(value);};
   const comparison=baseline&&hasTrade?compareTradeSelections(workspace,baseline,selection):null;
   const download=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify({schemaVersion:1,workspace:resolved,selection,sourceDataVersion:economy.generatedAt},null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='energy-workspace.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-  return <Context.Provider value={{workspace,resolved,economy,network,shapes,selection,toggle,update}}><div className={`hw-shell ${selection.viewMode!=='all'?'hw-focused':''}`} role="region" aria-labelledby={headingId}>
-    <div className="hw-heading"><div>{!workspace.authored&&<p className="hw-eyebrow">Interactive answer</p>}<h2 tabIndex={-1} id={headingId}>{question}</h2></div><div className="hw-actions"><button onClick={()=>{const previous=history.at(-1);if(previous){setSelection(previous);onState?.(previous);setHistory(history.slice(0,-1));}}} disabled={!history.length}>Undo</button><ActionMenu><button onClick={store}>Save investigation</button><button data-workspace-export onClick={download}>Export data</button><button onClick={()=>update(original)} disabled={!compatible}>Reset comparison</button>{hasMonetary&&<button onClick={()=>setBaseline(structuredClone(selection))}>{baseline?'Replace pinned baseline':'Pin this comparison'}</button>}{workspace.panels.filter(p=>p.type!=='coverage-note').length>1&&<button aria-pressed={selection.viewMode==='all'} onClick={()=>update({viewMode:selection.viewMode==='all'?'focus':'all'})}>All views</button>}</ActionMenu></div></div>
+  return <Context.Provider value={{workspace,resolved,economy,network,shapes,selection,toggle,update,guideLoad,retryGuide:()=>setGuideAttempt(n=>n+1)}}><div className={`hw-shell ${selection.viewMode!=='all'?'hw-focused':''}`} role="region" aria-labelledby={headingId}>
+    <div className="hw-heading"><div>{!workspace.authored&&<p className="hw-eyebrow">Interactive answer</p>}<h2 tabIndex={-1} id={headingId}>{question}</h2></div><div className="hw-actions"><button onClick={()=>{const previous=history.at(-1);if(previous){setSelection(previous);onState?.(previous);setHistory(history.slice(0,-1));}}} disabled={!history.length}>Undo</button><ActionMenu><button onClick={store} disabled={guidePending}>Save investigation</button><button data-workspace-export onClick={download} disabled={guidePending}>Export data</button><button onClick={()=>update(original)} disabled={!compatible}>Reset comparison</button>{hasMonetary&&<button onClick={()=>setBaseline(structuredClone(selection))}>{baseline?'Replace pinned baseline':'Pin this comparison'}</button>}{workspace.panels.filter(p=>p.type!=='coverage-note').length>1&&<button aria-pressed={selection.viewMode==='all'} onClick={()=>update({viewMode:selection.viewMode==='all'?'focus':'all'})}>All views</button>}</ActionMenu></div></div>
     {workspace.panels.filter(p=>p.type!=='coverage-note').length>1&&<nav className="hw-view-nav" aria-label="Result views">{workspace.panels.filter(p=>p.type!=='coverage-note').map(p=><button key={p.id} aria-pressed={selection.viewMode!=='all'&&focusId===p.id} onClick={()=>update({panelId:p.id,viewMode:'focus'})}>{panelLabel(p)}</button>)}</nav>}
     {notice&&<p className="hw-save-notice" role="status">{notice}</p>}
 
@@ -171,7 +183,7 @@ export function mountWorkspace(element,options){
 
 export function mountTradeExplorer(element,{economy,flows,fiscal,selection,regions,shapes,onState}) {
   const workspace=createTradeWorkspace({economy,flows,fiscal,selection,regions});
-  const saved={...initialSelection(workspace),tradeDisplay:selection.tradeDisplay||'matrix',tradeConnection:selection.tradeConnection||null,tradeFocus:selection.tradeFocus||null,...(workspace.panels.some(p=>p.id===selection.tradePanelId)?{panelId:selection.tradePanelId}:{}),viewMode:selection.tradeViewMode==='all'?'all':'focus'};
+  const saved={...initialSelection(workspace),...Object.fromEntries(Object.entries(GUIDE_DEFAULTS).map(([key,value])=>[key,selection[key]??value])),tradeDisplay:selection.tradeDisplay||'matrix',tradeConnection:selection.tradeConnection||null,tradeFocus:selection.tradeFocus||null,...(workspace.panels.some(p=>p.id===selection.tradePanelId)?{panelId:selection.tradePanelId}:{}),viewMode:selection.tradeViewMode==='all'?'all':'focus'};
   return mountWorkspace(element,{workspace,economy,shapes,saved,question:'Energy between provinces',onState});
 }
 

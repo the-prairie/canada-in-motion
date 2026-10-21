@@ -4,7 +4,7 @@ const value=(n,d=2)=>Number.isFinite(n)?new Intl.NumberFormat('en-CA',{maximumFr
 const pct=n=>`${n>0?'+':''}${value(n)}%`;
 const cash=n=>Number.isFinite(n)?`${n<0?'−':n>0?'+':''}$${value(Math.abs(n),0)}`:'Unavailable';
 
-function HistoricalCheck({validation}) {
+export function HistoricalCheck({validation}) {
   if(!validation)return null;
   const records=validation.origins||[];
   const all=records.flatMap(r=>[r.actual,r.prediction,r.baseline]).filter(Number.isFinite);

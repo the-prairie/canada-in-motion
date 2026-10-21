@@ -85,6 +85,10 @@ jobs:
           PYTHON
       - name: Verify published provincial budget sensitivities
         run: python pipeline/refresh_provincial_impacts.py
+      - name: Independently verify guided price models after refresh
+        run: |
+          python -m pip install --disable-pip-version-check -r tests/review/requirements.txt
+          python tests/review/guided-scenario-independent-audit.py
       - name: Build verified beta candidate
         run: npm run build
       - name: Report beta technical readiness without authorizing launch
