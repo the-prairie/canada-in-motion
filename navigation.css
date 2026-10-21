@@ -1,0 +1,47 @@
+.masthead {gap:24px;}
+.location-button {display:flex;align-items:center;gap:10px;margin-left:auto;min-height:44px;max-width:420px;padding:8px 12px;border:1px solid var(--line);border-radius:3px;background:transparent;color:var(--ink);font:14px/1.25 'IBM Plex Sans',sans-serif;text-align:left;}
+.location-button strong {font-weight:500;}
+#location-group {color:var(--muted);padding-right:10px;border-right:1px solid var(--line);}
+.location-button>span:last-child {margin-left:auto;}
+.header-actions {margin-left:0;gap:16px;}
+.header-ask {background:transparent;border:0;min-height:44px;padding:8px 0;font:14px 'IBM Plex Sans',sans-serif;color:var(--ink);}
+.header-ask[hidden] {display:none;}
+#navigation-dialog {position:fixed;inset:0;margin:auto;overscroll-behavior:contain;width:min(760px,calc(100% - 32px));max-height:calc(100dvh - 32px);padding:28px;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--ink);overflow:auto;}
+#navigation-dialog::backdrop {background:rgb(25 33 29 / 35%);}
+#navigation-dialog>header {display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px;}
+#navigation-dialog h2 {margin:0;font-size:21px;font-weight:500;line-height:1.2;}
+#navigation-dialog header button {background:transparent;border:1px solid var(--line);padding:10px 14px;min-height:44px;color:inherit;}
+#destination-list {display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:24px;}
+#destination-list h3 {font-size:14px;font-weight:500;color:var(--muted);margin:0 0 12px;padding-bottom:12px;border-bottom:1px solid var(--line);}
+#destination-list button {display:block;width:100%;min-height:44px;text-align:left;padding:10px;border:0;border-radius:2px;background:transparent;color:var(--ink);font:15px/1.35 'IBM Plex Sans',sans-serif;}
+#destination-list button:hover {background:var(--line);}
+#destination-list button[aria-current='page'] {background:var(--ink);color:var(--paper);}
+.location-button:focus-visible,#navigation-dialog button:focus-visible,.header-ask:focus-visible {outline:2px solid #345b6d;outline-offset:3px;}
+@media(max-width:900px) and (min-width:761px) {
+  .masthead {gap:12px;padding-inline:16px;}
+  #location-group {display:none;}
+}
+@media(max-width:760px) {
+  .masthead {height:auto;min-height:112px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:56px auto;gap:0 14px;padding:0 16px 12px;}
+  .masthead .brand {grid-column:1;grid-row:1;min-width:0;}
+  .masthead .brand-symbol {width:26px;height:26px;}
+  .masthead .brand>span {font-size:16px;}
+  .masthead .brand small {display:none;}
+  .header-actions {grid-column:2;grid-row:1;gap:12px;}
+  .header-actions .share-button {font-size:12px;min-height:40px;padding:6px 8px;}
+  .header-actions .share-button span {display:none;}
+  .header-ask {font-size:12px;min-height:40px;}
+  .location-button {grid-column:1/-1;grid-row:2;max-width:none;width:100%;margin:0;font-size:14px;}
+  #navigation-dialog {padding:20px;}
+  #destination-list {grid-template-columns:1fr;gap:20px;}
+  #destination-list h3 {margin-bottom:4px;padding-bottom:8px;}
+  #navigation-dialog>header {margin-bottom:20px;}
+  #navigation-dialog h2 {font-size:19px;}
+}
+@media(max-width:370px) {
+  .masthead {padding-inline:10px;column-gap:8px;}
+  .masthead .brand-symbol {display:none;}
+  .header-actions {gap:8px;}
+  .header-actions .share-button {padding-inline:5px;}
+  .location-button {font-size:13px;}
+}

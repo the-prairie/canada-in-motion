@@ -21,7 +21,8 @@ const outcome=label=>host.getByRole('button',{name:label,exact:true});
 const evidence=()=>host.getByRole('button',{name:'Evidence',exact:true});
 const dialog=()=>host.getByRole('dialog',{name:'Follow the dollar evidence',exact:true});
 const checkLayout=async label=>{
- await page.waitForFunction(()=>{const nav=document.querySelector('.ec-context nav'),active=nav?.querySelector('[aria-current=page]');if(!active)return false;const n=nav.getBoundingClientRect(),a=active.getBoundingClientRect();return a.left>=n.left-1&&a.right<=n.right+1;});
+ assert.ok(await page.locator('#location-button').isVisible());
+ assert.match(await page.locator('#location-label').innerText(),/Follow the dollar/);
  const geometry=await page.evaluate(()=>({viewport:innerWidth,width:document.documentElement.scrollWidth,rows:[...document.querySelectorAll('.ip-allocation-row>div:first-child')].map(row=>{const label=row.firstElementChild.getBoundingClientRect(),value=row.lastElementChild.getBoundingClientRect();return {labelRight:label.right,valueLeft:value.left};})}));
  assert(geometry.width<=geometry.viewport,`${label}: document overflows`);
  assert(geometry.rows.every(row=>row.labelRight<=row.valueLeft),`${label}: allocation labels overlap values`);

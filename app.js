@@ -1,3 +1,4 @@
+import { DESTINATIONS, currentDestination, destinationState } from "./navigation-model.mjs";
 import {
   DEFAULT_STATE,
   normalizeState,
@@ -288,18 +289,34 @@ async function ensureSelectedDetail(record) {
   }
 }
 function renderNavigation() {
-  const inventory = state.view === "atlas" || state.view === "wells" || (state.view === "lab" && state.labTab === "cleanup");
-  const destination = state.view === "economy" ? "economy" : inventory ? "atlas" : "journey";
-  document.querySelectorAll("[data-destination]").forEach(button => {
-    const active = button.dataset.destination === destination;
-    button.classList.toggle("selected", active);
-    if (active) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current");
+  const current = currentDestination(state);
+  $("location-group").textContent = current.group;
+  $("location-label").textContent = current.label;
+  $("location-button").setAttribute("aria-label", `${current.group}: ${current.label}. Change view`);
+  $("header-ask").hidden = state.view !== "economy";
+  document.title = `${current.label} | Canada in Motion`;
+  const nav = $("destination-list");
+  if (!nav.children.length) nav.innerHTML = [...new Set(DESTINATIONS.map(item => item.group))].map((group, i) => `<section aria-labelledby="navigation-group-${i}"><h3 id="navigation-group-${i}">${esc(group)}</h3>${DESTINATIONS.filter(item => item.group === group).map(item => `<button ${item.section ? `id="ec-section-${item.section}"` : ''} data-page="${item.id}">${esc(item.label)}</button>`).join('')}</section>`).join('');
+  nav.querySelectorAll('[data-page]').forEach(button => {
+    if (button.dataset.page === current.id) button.setAttribute('aria-current', 'page');
+    else button.removeAttribute('aria-current');
   });
-  const nav = $("workspace-nav");
-  nav.hidden = destination === "economy";
-  const items = inventory ? [["atlas", "", "Map & comparison"], ["wells", "", "Find a well"], ["lab", "cleanup", "Closure budget"]] : [["journey", "", "Carrier quotes"], ["lab", "transport", "Cost experiment"]];
-  nav.innerHTML = items.map(([view, tab, label]) => `<button data-workspace="${view}" data-tab="${tab}" aria-current="${state.view === view && (!tab || state.labTab === tab) ? "page" : "false"}">${label}</button>`).join("");
 }
+function chooseDestination(id) {
+  state = destinationState(state, id);
+  energyEconomy?.showData();
+  $("navigation-dialog").close();
+  chooseView(state.view, state.labTab);
+  window.scrollTo({top: 0, behavior: 'instant'});
+}
+$("navigation-dialog").addEventListener('keydown', event => {
+  if (event.key !== 'Tab') return;
+  const buttons = [...$("navigation-dialog").querySelectorAll('button')];
+  const first = buttons[0], last = buttons.at(-1);
+  if (event.shiftKey && document.activeElement === first) {event.preventDefault();last.focus();}
+  else if (!event.shiftKey && document.activeElement === last) {event.preventDefault();first.focus();}
+});
+$("navigation-dialog").addEventListener('close', () => $("location-button").setAttribute('aria-expanded', 'false'));
 function showEconomicEvidence() {
   const snapshot = energyEconomy?.data;
   if (!snapshot) {announce("Economic sources are still loading.");return;}
@@ -327,7 +344,7 @@ function render() {
   recordAtlas?.setVisible(exploring);
   if (economy) {
     clearTimeout(resultTimer);
-    if (!energyEconomy) energyEconomy = new EnergyEconomy($("energy-economy"), {provinces:provinceGeometry,onChange: value => {state.economy = value;persist("push");},onInventory: province => {state.province = province;state.cohort="all";state.query="";state.orphan="all";state.closure="all";state.eventYear="all";state.eventType="all";state.exploration.area=null;chooseView("atlas");}});
+    if (!energyEconomy) energyEconomy = new EnergyEconomy($("energy-economy"), {provinces:provinceGeometry,onChange: value => {state.economy = value;renderNavigation();persist("push");},onInventory: province => {state.province = province;state.cohort="all";state.query="";state.orphan="all";state.closure="all";state.eventYear="all";state.eventType="all";state.exploration.area=null;chooseView("atlas");}});
     $("coverage-line").textContent = "Economic sources & methods";
     $("snapshot-label").textContent = "Observation dates and forecasts are labelled in each view";
     energyEconomy.update(state.economy);
@@ -642,7 +659,7 @@ function wellDetail(w) {
     .join("")}</details></div>`;
 }
 function labPanel() {
-  return `<div class="panel-head"><span class="eyebrow">CALCULATE FROM YOUR ASSUMPTIONS</span><h1>${state.labTab === "transport" ? "Cost experiment" : "Closure budget"}</h1></div>${state.labTab === "transport" ? transportLab() : cleanupLab()}<div class="panel-section"><h3>Save or export</h3><p class="micro">Save scenarios in this browser, or download the inputs, results and sources.</p><div class="action-row"><button class="primary-button" data-action="save-scenario">Save scenario</button><button class="secondary-button" data-action="saved-scenarios">Saved scenarios</button><button class="secondary-button" data-action="export-scenario">Download scenario</button><button class="text-link" data-action="reset-scenario">Reset assumptions</button></div></div>`;
+  return `<div class="panel-head"><h1>${state.labTab === "transport" ? "Cost experiment" : "Closure budget"}</h1></div>${state.labTab === "transport" ? transportLab() : cleanupLab()}<div class="panel-section"><h3>Save or export</h3><p class="micro">Save scenarios in this browser, or download the inputs, results and sources.</p><div class="action-row"><button class="primary-button" data-action="save-scenario">Save scenario</button><button class="secondary-button" data-action="saved-scenarios">Saved scenarios</button><button class="secondary-button" data-action="export-scenario">Download scenario</button><button class="text-link" data-action="reset-scenario">Reset assumptions</button></div></div>`;
 }
 
 function scenarioChart(base, alternative) {
@@ -661,7 +678,7 @@ function cleanupLab() {
   const eligible = data.wells.wells.filter(isCleanupRecord),
     s = state.scenario;
   const q = cleanupScenario(s.budget, s.costLow, s.costHigh, eligible.length);
-  return `<section class="panel-section sticky-result" id="cleanup-results"><span class="eyebrow">BUDGET ESTIMATE</span>${q.status === "invalid" ? '<div class="callout amber" role="alert">Enter a budget between $0 and $10 billion. Each cost must be above $0 and no more than $100 million. The high cost must equal or exceed the low cost.</div>' : `<div class="receipt-total" data-testid="cleanup-result">${fmt(q.low)}–${fmt(q.high)}</div><p class="receipt-label">records covered by this budget · ${fmt(eligible.length)} eligible SK records</p>`}</section><div class="panel-section"><h3>Budget assumptions</h3>${field("Illustrative budget · CAD", "budget", `<input id="budget" data-scenario="budget" type="number" min="0" max="10000000000" step="100000" value="${Number.isFinite(s.budget) ? s.budget : ""}">`)}<div class="field-grid">${field("Low cost / record · CAD", "cost-low", `<input id="cost-low" data-scenario="costLow" type="number" min="1" max="100000000" step="5000" value="${Number.isFinite(s.costLow) ? s.costLow : ""}">`)}${field("High cost / record · CAD", "cost-high", `<input id="cost-high" data-scenario="costHigh" type="number" min="1" max="100000000" step="5000" value="${Number.isFinite(s.costHigh) ? s.costHigh : ""}">`)}</div><p class="micro">Enter your own cost range. These costs are assumptions, and several records may refer to one site.</p><button class="secondary-button wide" data-action="view-cleanup-cohort">Inspect ${fmt(eligible.length)} eligible records</button><details id="cleanup-method" class="disclosure"><summary>Eligibility & calculation</summary><p class="micro">Saskatchewan orphan records marked as requiring reclamation. Records with a transfer or reclamation event are excluded.</p><p class="micro">The range divides the budget by each cost estimate and rounds down, up to the number of eligible records. It excludes savings from shared-site work and does not predict completed or certified reclamation.</p></details></div>`;
+  return `<section class="panel-section sticky-result" id="cleanup-results">${q.status === "invalid" ? '<div class="callout amber" role="alert">Enter a budget between $0 and $10 billion. Each cost must be above $0 and no more than $100 million. The high cost must equal or exceed the low cost.</div>' : `<div class="receipt-total" data-testid="cleanup-result">${fmt(q.low)}–${fmt(q.high)}</div><p class="receipt-label">records covered by this budget · ${fmt(eligible.length)} eligible SK records</p>`}</section><div class="panel-section"><h3>Budget assumptions</h3>${field("Illustrative budget · CAD", "budget", `<input id="budget" data-scenario="budget" type="number" min="0" max="10000000000" step="100000" value="${Number.isFinite(s.budget) ? s.budget : ""}">`)}<div class="field-grid">${field("Low cost / record · CAD", "cost-low", `<input id="cost-low" data-scenario="costLow" type="number" min="1" max="100000000" step="any" value="${Number.isFinite(s.costLow) ? s.costLow : ""}">`)}${field("High cost / record · CAD", "cost-high", `<input id="cost-high" data-scenario="costHigh" type="number" min="1" max="100000000" step="any" value="${Number.isFinite(s.costHigh) ? s.costHigh : ""}">`)}</div><p class="micro">Enter your own cost range. These costs are assumptions, and several records may refer to one site.</p><button class="secondary-button wide" data-action="view-cleanup-cohort">Inspect ${fmt(eligible.length)} eligible records</button><details id="cleanup-method" class="disclosure"><summary>Eligibility & calculation</summary><p class="micro">Saskatchewan orphan records marked as requiring reclamation. Records with a transfer or reclamation event are excluded.</p><p class="micro">The range divides the budget by each cost estimate and rounds down, up to the number of eligible records. It excludes savings from shared-site work and does not predict completed or certified reclamation.</p></details></div>`;
 }
 
 function chooseRoute(id) {
@@ -1100,9 +1117,13 @@ document.addEventListener("click", async (e) => {
   if (!b || !data) return;
   if (b.matches("a.brand")) {
     e.preventDefault();
-    chooseView("economy");
+    chooseDestination("explore");
     return;
   }
+  if (b.dataset.page) {chooseDestination(b.dataset.page);return;}
+  if (b.dataset.action === "navigation") {$("navigation-dialog").showModal();$("location-button").setAttribute("aria-expanded", "true");$("destination-list").querySelector("[aria-current=page]")?.focus();return;}
+  if (b.dataset.action === "close-navigation") {$("navigation-dialog").close();return;}
+  if (b.dataset.action === "ask") {energyEconomy?.openQuestion();return;}
   if (b.dataset.action === "rate-coverage") {showRateCoverage();return;}
   if (state.view === "economy" && ["coverage", "evidence"].includes(b.dataset.action)) {showEconomicEvidence();return;}
   if (b.dataset.statusFilter) {

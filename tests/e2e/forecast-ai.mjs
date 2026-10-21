@@ -37,7 +37,7 @@ let host=page.locator('#ec-dynamic-workspace');
 const question=`Compare the GDP forecasts for Alberta, Ontario and Québec in ${year} and ${year+1}.`;
 const ask=async value=>{
   const composer=page.locator('.ec-composer');
-  if(!await composer.evaluate(e=>e.open))await page.locator('.ec-context-actions [data-ec-action="ask"]').click();
+  if(!await composer.evaluate(e=>e.open))await page.locator('#header-ask').click();
   await page.getByLabel('Your question',{exact:true}).fill(value);
   await page.getByRole('button',{name:'Analyse',exact:true}).click();
   await host.getByRole('heading',{name:value,exact:true}).waitFor();
@@ -162,6 +162,13 @@ try{
 
   await ask(question);
   await page.screenshot({path:'/tmp/cim-forecast-ai-desktop.png',fullPage:true});
+  await page.locator('#location-button').click();await page.locator('[data-page=income]').click();
+  await page.locator('.ec-ranking').waitFor();
+  assert.equal(await page.locator('.ec-authored-data').count(),0,'Navigation opens the selected view rather than hiding it below an old AI answer');
+  await page.getByRole('button',{name:'Previous answer',exact:true}).click();await host.locator('.hw-grid').waitFor();
+  await page.locator('#location-button').click();await page.locator('[data-page=income]').click();await page.locator('.ec-ranking').waitFor();
+  assert.equal(await page.locator('.ec-authored-data').count(),0,'Selecting the same view also exits an AI answer');
+  checks.push('View menu exits previous AI answers without losing the answer');
   assert.deepEqual(errors,[]);
   assert.equal(requests,5,'only intercepted local fixture requests should be sent');
   const focusDiagnostics=await page.evaluate(()=>{const link=document.querySelector('.skip-link'),rect=link.getBoundingClientRect();return {activeElement:document.activeElement?.id||document.activeElement?.tagName,skipLinkTop:getComputedStyle(link).top,skipLinkViewportTop:rect.top,scrollY};});

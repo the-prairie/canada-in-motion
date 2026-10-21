@@ -32,7 +32,7 @@ const dynamic=page.locator('#ec-dynamic-workspace');
 const actions=async host=>{const menu=host.locator('.hw-action-menu');if(!await menu.evaluate(e=>e.open))await menu.locator('summary').click();};
 const allViews=async host=>{await actions(host);const button=host.getByRole('button',{name:'All views',exact:true});if(await button.getAttribute('aria-pressed')!=='true')await button.click();else await host.locator('.hw-action-menu summary').click();};
 const openLibrary=async host=>{await actions(host);await host.getByRole('button',{name:/^Open saved/}).click();};
-const ask=async question=>{if(!await page.locator('.ec-trade-question').evaluate(e=>e.open))await page.locator('.ec-context-actions [data-ec-action=ask]').click();await page.getByLabel('Your question',{exact:true}).fill(question);await page.getByRole('button',{name:'Analyse',exact:true}).click();await dynamic.locator('.hw-shell').waitFor();};
+const ask=async question=>{if(!await page.locator('.ec-trade-question').evaluate(e=>e.open))await page.locator('#header-ask').click();await page.getByLabel('Your question',{exact:true}).fill(question);await page.getByRole('button',{name:'Analyse',exact:true}).click();await dynamic.locator('.hw-shell').waitFor();};
 try {
   await page.goto(url);await native.locator('.hw-matrix').waitFor();
   // Cardinal navigation must follow columns, including diagonal holes.

@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-21",
+  "candidateCodeVersion": "c6ad14510208f3737706",
+  "browserMode": "headless Chromium",
+  "viewports": [
+    [
+      1440,
+      1000
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      320,
+      844
+    ],
+    [
+      844,
+      390
+    ]
+  ],
+  "navigationDestinations": 12,
+  "unitTestsPassed": 398,
+  "pipelineTestsPassed": 139,
+  "e2eSuitesPassed": [
+    "navigation",
+    "connected-views",
+    "follow-dollar",
+    "remaining-views",
+    "monthly-energy",
+    "energy-story",
+    "research-late-status",
+    "analysis-recovery",
+    "dialog-dismissal",
+    "guided-scenarios",
+    "focused-views",
+    "forecast-ai",
+    "investigation-review"
+  ],
+  "providerCalls": 0,
+  "independentReview": "NAVIGATION-EXPERIENCE-REVIEW.md",
+  "releaseGate": "passed",
+  "deployment": "pending",
+  "independentChecks": {
+    "screens": 48,
+    "keyboardAndNavigation": 16,
+    "deepInteractionGroups": 8
+  },
+  "finalParentRegression": "Selecting a view exits the previous AI answer, including selecting the same account; previous answer remains available."
+}

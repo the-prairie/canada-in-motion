@@ -12,7 +12,7 @@ await page.route('**/api/analysis',async route=>{
 });
 const base=process.env.TEST_URL||'http://127.0.0.1:4201/';
 const url=base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy:{section:'outlook'}}));
-const open=async()=>{const composer=page.locator('.ec-composer');if(!await composer.evaluate(e=>e.open))await page.locator('.ec-context-actions [data-ec-action=ask]').click();};
+const open=async()=>{const composer=page.locator('.ec-composer');if(!await composer.evaluate(e=>e.open))await page.locator('#header-ask').click();};
 try{
   await page.clock.install();
   await page.goto(url);

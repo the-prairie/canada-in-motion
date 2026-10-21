@@ -24,7 +24,7 @@ export class EnergyEconomy {
     root.addEventListener('click',event=>this.click(event));
     root.addEventListener('cancel',event=>{if(event.target.matches('.ec-composer'))this.tradeQuestionOpen=false;if(event.target.matches('dialog.ec-evidence')){event.preventDefault();event.target.close();this.root.querySelector('[data-ec-action=sources]')?.focus({preventScroll:true});}},true);
     root.addEventListener('change',event=>{const key=event.target.dataset.econField;if(key==='futureMeasure')this.change(event.target.value==='electricity-price'?{metric:'retail'}:{metric:'production',futureIndicator:event.target.value});else if(key)this.change({[key]:event.target.value});});
-    window.addEventListener('resize',()=>{clearTimeout(this.resizeTimer);this.resizeTimer=setTimeout(()=>{if(this.state.section==='futures')this.render();this.revealActiveAccount();},100);});
+    window.addEventListener('resize',()=>{clearTimeout(this.resizeTimer);this.resizeTimer=setTimeout(()=>{if(this.state.section==='futures')this.render();},100);});
     root.addEventListener('input',event=>{if(event.target.id==='energy-question')this.question=event.target.value;});
     root.addEventListener('submit',event=>{if(event.target.id==='energy-question-form'){event.preventDefault();void this.ask();}});
     root.addEventListener('keydown',event=>{if(event.target.tagName.toLowerCase()==='path' && event.target.dataset.ecRegion && ['Enter',' '].includes(event.key)){event.preventDefault();this.change({region:event.target.dataset.ecRegion});}});
@@ -41,7 +41,7 @@ export class EnergyEconomy {
     this.loading=false;this.render();
   }
   deactivate() {this.request?.abort();this.request=null;this.busy=false;this.verifying=false;this.localLoading=false;}
-  update(state) {const next=normalizeEconomyState(state);if(next.section!==this.state.section)this.evidenceView='sources';if(JSON.stringify(next)!==JSON.stringify(this.state))this.deactivate();this.state=next;this.render();}
+  update(state) {const next=normalizeEconomyState(state);if(next.section!==this.state.section){this.evidenceView='sources';this.showData();}if(JSON.stringify(next)!==JSON.stringify(this.state))this.deactivate();this.state=next;this.render();}
   change(patch) {
     this.deactivate();this.aiError=null;
     if(Object.hasOwn(patch,'section')){this.answerVisible=false;this.evidenceView='sources';}
@@ -68,8 +68,8 @@ export class EnergyEconomy {
     if(action==='retry-story'){const host=this.root.querySelector('#ec-energy-story');if(host){this.storyMount?.unmount();this.storyMount=null;host.innerHTML='<p role="status">Loading the investigation…</p>';void this.mountStory(host);}}
     if(action==='retry-research'){const kind=target.dataset.researchKind,host=this.root.querySelector(({income:'#ec-income-paths',history:'#ec-oil-history',forecast:'#ec-provincial-forecast'})[kind]);if(host){host.innerHTML='<p role="status">Loading data…</p>';void this.mountResearchView(host,kind);}}
     if(action==='inventory')this.onInventory(this.state.region==='CA'?'all':this.state.region);
-    if(action==='ask'){this.tradeQuestionOpen=true;this.root.querySelector('.ec-composer')?.showModal();this.root.querySelector(this.status.available?'#energy-question':'#ec-ai-title')?.focus({preventScroll:true});}
-    if(action==='close-ask'){this.tradeQuestionOpen=false;this.root.querySelector('.ec-composer')?.close();this.root.querySelector('[data-ec-action=ask]')?.focus({preventScroll:true});}
+    if(action==='ask')this.openQuestion();
+    if(action==='close-ask'){this.tradeQuestionOpen=false;this.root.querySelector('.ec-composer')?.close();document.querySelector('#header-ask')?.focus({preventScroll:true});}
     if(action==='sources'){this.root.querySelector('dialog.ec-evidence')?.showModal();if(this.evidenceView==='monthly')void this.mountMonthlyEvidence();}
     if(action==='evidence-tab'){this.evidenceView=target.dataset.evidenceView;this.render();if(this.evidenceView==='monthly')void this.mountMonthlyEvidence();}
     if(action==='retry-monthly-evidence'){this.root.querySelector('#ec-monthly-evidence')?.replaceChildren();void this.mountMonthlyEvidence();}
@@ -78,7 +78,7 @@ export class EnergyEconomy {
     if(action==='cancel'){this.deactivate();this.aiError=null;this.render();}
     if(action==='ask-again')void this.ask();
     if(action==='show-answer'){this.answerVisible=true;this.render();}
-    if(action==='browse-data'){this.answerVisible=false;this.render();}
+    if(action==='browse-data'){this.showData();this.render();}
     if(action==='download'){
       if(this.state.section==='explore'&&target.closest('.ec-context-actions')){this.root.querySelector('[data-story-export]')?.click();return;}
       if(['supply','outlook'].includes(this.state.section)&&target.closest('.ec-context-actions')){this.root.querySelector('[data-research-export]')?.click();return;}
@@ -274,12 +274,10 @@ export class EnergyEconomy {
     const start=activeId==='energy-question'?document.activeElement.selectionStart:null;
     const summary=summarizeEconomy(this.data,this.state);
     const isResearch=!this.answer?.workspace||this.answerVisible===false;
-    const sections=[['income','Income'],['outlook','Provincial outlook'],['trade','Trade & prices'],['supply','Follow the dollar'],['futures','Energy futures'],['oil','Oil & the economy']];
-    const sectionButtons=sections.map(([id,label])=>`<button id="ec-section-${id}" data-ec-section="${id}" aria-current="${this.state.section===id?'page':'false'}">${label}</button>`).join('');
     const exploring=this.state.section==='explore';
-    this.root.innerHTML=`<div class="ec-context ${exploring?'ec-context-explore':''}"><nav aria-label="Energy economy accounts"><button id="ec-section-explore" data-ec-section="explore" aria-current="${exploring?'page':'false'}">Explore a question</button>${sectionButtons}</nav><div class="ec-context-actions">${this.answer?.workspace?`<button data-ec-action="${isResearch?'show-answer':'browse-data'}">${isResearch?'Previous answer':'Return to data'}</button>`:''}${exploring?'':'<button data-ec-action="ask">Ask a question</button>'}</div></div>
+    this.root.innerHTML=`${this.answer?.workspace?`<div class="ec-context"><div class="ec-context-actions"><button data-ec-action="${isResearch?'show-answer':'browse-data'}">${isResearch?'Previous answer':'Return to data'}</button></div></div>`:''}
     ${isResearch?'':this.analyst()}${this.answer?.workspace&&!isResearch?'<details class="ec-authored-data"><summary>Browse the original data views</summary>':''}<div class="ec-workspace">${exploring?'<div id="ec-energy-story"><p role="status">Loading the connected investigation…</p></div>':this.state.section==='outlook'?'<div id="ec-provincial-forecast"><p role="status">Loading provincial GDP forecasts…</p></div>':this.state.section==='trade'?'<div id="ec-trade-workspace"><p role="status">Loading energy trade and price effects…</p></div>':this.state.section==='futures'?this.futures(summary):this.state.section==='oil'?this.oil():this.state.section==='supply'?'<div id="ec-income-paths"><p role="status">Loading supply-chain effects…</p></div>':this.income(summary)}</div>${isResearch?this.analyst():''}${this.answer?.workspace&&!isResearch?'</details>':''}${this.evidence(summary)}`;
-    this.revealActiveAccount();
+
     const monthlyHost=this.root.querySelector('#ec-monthly-energy');if(monthlyHost&&previousMonthly)monthlyHost.replaceWith(previousMonthly);else if(monthlyHost)void this.mountMonthly(monthlyHost);
     const monthlyEvidenceHost=this.root.querySelector('#ec-monthly-evidence');if(monthlyEvidenceHost&&previousMonthlyEvidence){monthlyEvidenceHost.replaceWith(previousMonthlyEvidence);previousMonthlyEvidence.hidden=this.evidenceView!=='monthly';}
     for(const [kind,id] of [['income','#ec-income-paths'],['history','#ec-oil-history'],['forecast','#ec-provincial-forecast']]){const host=this.root.querySelector(id);if(host&&previousResearch[kind])host.replaceWith(previousResearch[kind]);else if(host)void this.mountResearchView(host,kind);}
@@ -295,9 +293,13 @@ export class EnergyEconomy {
     if(activeElement?.isConnected)activeElement.focus({preventScroll:true});
     else if(activeId){const node=this.root.querySelector(`#${CSS.escape(activeId)}`);node?.focus({preventScroll:true});if(start!==null)node?.setSelectionRange?.(start,start);}
   }
-  revealActiveAccount() {
-    const nav=this.root.querySelector('.ec-context nav'),active=nav?.querySelector('[aria-current=page]');
-    if(nav&&active&&nav.scrollWidth>nav.clientWidth)nav.scrollLeft=Math.max(0,active.offsetLeft-nav.offsetLeft-(nav.clientWidth-active.offsetWidth)/2);
+  showData() {this.answerVisible=false;this.tradeQuestionOpen=false;}
+  openQuestion() {
+    const composer=this.root.querySelector('.ec-composer');
+    if(!composer)return;
+    this.tradeQuestionOpen=true;
+    composer.showModal();
+    this.root.querySelector(this.status.available?'#energy-question':'#ec-ai-title')?.focus({preventScroll:true});
   }
   async mountMonthly(host) {
     try {const {mountMonthlyEnergy}=await import('./vendor/energy-workspace.js');if(host.isConnected)this.monthlyMount=mountMonthlyEnergy(host,{region:this.state.region,context:this.state.section,compact:true});}

@@ -8,7 +8,7 @@ page.on('pageerror', error => errors.push(error.message));
 await page.route('**/api/analysis', route => route.abort());
 const go = async section => {
   await page.goto(base + '#v1=' + encodeURIComponent(JSON.stringify({view:'economy',economy:{section}})));
-  await page.locator('#energy-economy .ec-context').waitFor({timeout:60000});
+  await page.locator('#energy-economy .ec-workspace').waitFor({timeout:60000});
 };
 try {
   await go('trade');

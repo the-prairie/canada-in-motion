@@ -16,7 +16,7 @@ try{
  await go({view:'economy',economy:{section:'trade',tradeConnection:'AB-BC',guideStep:'exchange'}});await page.locator('.gsm-map').waitFor();
  assert.equal(await page.locator('.hw-saved,.hw-method,.hw-sources,.ec-methods,.gs-sources').count(),0,'Repeated evidence/footer sections removed');
  await page.locator('[data-workspace-sources]').click();await page.getByRole('dialog',{name:'Sources and methods'}).waitFor();assert.ok(await page.getByRole('dialog').locator('a[href^="https:"]').count()>0);await page.keyboard.press('Escape');assert.equal(await page.locator('[data-workspace-sources]').evaluate(e=>e===document.activeElement),true);
- await page.locator('[data-ec-action=ask]').click();await page.locator('.ec-composer[open]').waitFor();await page.keyboard.press('Escape');assert.equal(await page.locator('.ec-composer').evaluate(e=>e.open),false);
+ await page.locator('#header-ask').click();await page.locator('.ec-composer[open]').waitFor();await page.keyboard.press('Escape');assert.equal(await page.locator('.ec-composer').evaluate(e=>e.open),false);
  checks.push('one evidence destination with citations','explicit Ask task','Escape and source focus restore');
  await go({view:'atlas',province:'AB'});await page.locator('.ra-operating-total').waitFor();
  assert.match(await page.locator('.ra-provincial-summary').innerText(),/Active [\d,]+ \+ marginal/);
@@ -28,7 +28,7 @@ try{
  assert.ok(await page.locator('.ra-place-context').evaluate(e=>e.getBoundingClientRect().bottom<document.querySelector('.ra-stage').getBoundingClientRect().top));
  await page.waitForFunction(()=>{const c=document.querySelector('.ra-boundaries'),p=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let n=0;for(let i=3;i<p.length;i+=4)if(p[i]>0)n++;return n>c.width*c.height*.1;});
  checks.push('Alberta totals separate from mapped records','record inspection retains map and filters','atlas context before map','map remains drawn after mobile resize');
- await page.getByRole('button',{name:'Transport',exact:true}).click();await page.locator('.transport-stage').waitFor();await routeVisible();
+ await page.locator('#location-button').click();await page.locator('[data-page=journey]').click();await page.locator('.transport-stage').waitFor();await routeVisible();
  await page.locator('[data-step="0"]').first().click();await page.getByLabel('Shipment volume',{exact:true}).fill('2000');await page.getByLabel('Shipment volume',{exact:true}).press('Tab');
  await page.getByRole('button',{name:'See carrier charge →',exact:true}).click();await page.locator('[data-testid=receipt-total]').waitFor();const receipt=await page.locator('[data-testid=receipt-total]').innerText();assert.match(receipt,/\$/);await routeVisible();
  await page.getByRole('button',{name:'Compare destinations →',exact:true}).click();await page.locator('.route-option').first().waitFor();await page.locator('.route-option').nth(1).click();await page.locator('[data-testid=receipt-total]').waitFor();await routeVisible();

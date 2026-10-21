@@ -60,7 +60,7 @@ async function check(kind){
     };
     assert.equal(statusRequested,true);assert.equal(debateRequested,true);
     releaseStatus();
-    await page.waitForFunction(()=>document.querySelector('.ec-context-actions [data-ec-action="ask"]')?.textContent==='Ask a question');
+    await page.waitForFunction(()=>document.querySelector('#header-ask')?.textContent==='Ask a question');
     await verify('late AI status');
     const debateResponse=page.waitForResponse(response=>response.url().endsWith('/data/energy-debate.json'));
     releaseDebate();

@@ -41,7 +41,7 @@ try{
  assert.equal(exported.summary.metrics[0].latest.value,summarizeMonthlyEnergy(data,{region:'AB'}).metrics[0].latest.value);
  checks.push('24-month trend tables and self-contained data export reproduce the displayed selection');
  await page.keyboard.press('Escape');await page.screenshot({path:out+'income-desktop.png',fullPage:true});
- await page.locator('#ec-section-futures').click();await page.locator('[data-monthly-ready]').waitFor();
+ await page.locator('#location-button').click();await page.locator('#ec-section-futures').click();await page.locator('[data-monthly-ready]').waitFor();
  await page.locator('#ec-year').selectOption('2040');await page.locator('[data-monthly-ready]').waitFor();
  assert.match(await page.locator('.ec-series-period').innerText(),/2040/);assert.match(await page.locator('.monthly-date').first().innerText(),/2026/);
  const before=await page.locator('.monthly-grid').innerText();await page.locator('#ec-scenario').selectOption('Higher');await page.locator('[data-monthly-ready]').waitFor();assert.equal(await page.locator('.monthly-grid').innerText(),before);
