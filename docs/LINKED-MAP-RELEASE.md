@@ -24,4 +24,14 @@ The [frozen research package](../research/broad-gdp-2026-10/README.md) includes 
 
 Model the Domain kept economic transactions separate from physical routes and measured observations separate from forecasts. Explain the Number kept exact values, dates, scope and omitted-connection accounting available beside the visualization. Prove It Works required independent source comparisons, temporal model checks and headless journey tests before release.
 
-Publication and public verification are recorded in `LINKED-MAP-VERIFICATION.json` after deployment.
+## Public acceptance
+
+Published from application commit `8ac039cf5fc32b3f16789cdb24f97abe6943407f` by [deployment 39519120440](https://github.com/the-prairie/canada-in-motion/actions/runs/39519120440). Public code version is `664e6b1df219a6b0db46`; release ID is `fdff39572cef9fddb5b8`.
+
+- Public assets and the forecast file match their build-manifest hashes.
+- All 20 current forecast points and uncertainty ranges match the pre-release snapshot.
+- Four headless suites passed against the public URL: linked map, analysis recovery, investigations and focused views. They exercised mobile layout, source values, state reload, save/export, Undo and quota recovery without inference calls.
+- Local acceptance passed 376 JavaScript tests, 139 Python tests, 23 Worker tests and six browser suites. Edge test files now run serially after a local parallel-runtime fetch failure; all 23 passed in the serial run.
+- Worker version `a71e41f8-73ac-4229-8226-b7af86fc758c` returned availability true and exposes the Retry-After header to the public app. Provider and spending limits are unchanged.
+
+The structured [verification record](LINKED-MAP-VERIFICATION.json) preserves hashes and public test results.

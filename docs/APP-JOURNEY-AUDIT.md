@@ -78,3 +78,7 @@ All network tests used a headless browser with inference requests blocked. There
 The next improvement should shorten the distance from a user's question to its answer. On the default story, monthly activity competes with the price-experiment result even though the two describe different things. Keep the answer and its essential qualification together; make current activity a contextual expansion or clearly secondary section. This is a design recommendation, not a demonstrated calculation defect.
 
 The interface also has three persistence concepts—view links, saved scenarios, and exported investigations. Their capabilities differ. Explain the distinction at the action itself, especially when a link cannot reproduce a question-generated workspace. This is more useful than adding a general warning elsewhere on the page.
+
+## Public acceptance after deployment
+
+An independent reviewer retested the deployed release at 00:15 UTC on 21 October 2026. Public source JSON reports 2024 AB→BC electricity trade of $60.209 million; the map correctly rounds it to $60.2M. Province focus and Clear focus passed. Desktop and 320px screenshots showed no clipping, overflow or skip-link overlay. The built-in Energy trade comparison opened with AI mocked offline. No browser errors or inference requests occurred. See [the public verification receipt](LINKED-MAP-VERIFICATION.json).

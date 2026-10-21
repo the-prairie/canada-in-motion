@@ -1,0 +1,149 @@
+{
+  "verifiedAt": "2026-10-21T00:14:15.317886+00:00",
+  "applicationCommit": "8ac039cf5fc32b3f16789cdb24f97abe6943407f",
+  "deploymentRun": "https://github.com/the-prairie/canada-in-motion/actions/runs/39519120440",
+  "publicUrl": "https://the-prairie.github.io/canada-in-motion/",
+  "health": {
+    "codeVersion": "664e6b1df219a6b0db46",
+    "status": "public-beta",
+    "releaseId": "fdff39572cef9fddb5b8",
+    "records": 317936,
+    "retrievedAt": "2026-10-21T00:08:50Z",
+    "builtAt": "2026-10-21T00:13:06.381Z",
+    "nationalComplete": false
+  },
+  "assetIntegrity": [
+    {
+      "path": "vendor/energy-workspace.js",
+      "sha256": "5b0fc5fd5bd7fcdf461c65feb3d36815d7e1077b8349432bb5968533d0e1eaa5"
+    },
+    {
+      "path": "energy-economy.js",
+      "sha256": "854a9151f837939284c19430d7ff00ac98d7be67c4a6a7fbda7fb12b3f6a5131"
+    },
+    {
+      "path": "energy-workspace.css",
+      "sha256": "815a58f154adca3cd60f25f3bd88fe87e8b50a1a6504a936d0f48c3d72f20ce8"
+    },
+    {
+      "path": "ai-client.mjs",
+      "sha256": "5f0cc1f256e492d5b5f42d653d9f4d46adda11ce6a1b020b34f7f4aa2384bf58"
+    },
+    {
+      "path": "data/provincial-forecasts.json",
+      "sha256": "3ae441a97657cbe5316d0bfe7dadc60269144ad7f60d5dd660b5b324f744f4c1"
+    }
+  ],
+  "forecast": {
+    "dataVersion": "8e901838ff845d611a73",
+    "unchangedPointAndIntervalRecords": 20,
+    "broaderExperimentPromoted": false
+  },
+  "workerVersion": "a71e41f8-73ac-4229-8226-b7af86fc758c",
+  "workerHealth": {
+    "response": {
+      "available": true,
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "provider": "cloudflare",
+      "turnstileSiteKey": "0x4AAAAAAFbE-EHrmceVEeJi",
+      "limits": {
+        "daily": 10,
+        "monthly": 100,
+        "visitorDaily": 3,
+        "minute": 6,
+        "concurrent": 2
+      },
+      "workspaceEnabled": true,
+      "jevEnabled": true
+    },
+    "retryAfterHeaderExposed": true,
+    "providerRequestsDuringAcceptance": 0
+  },
+  "localAcceptance": {
+    "javascriptTests": 376,
+    "pythonTests": 139,
+    "workerTests": 23,
+    "endToEndSuites": [
+      "trade-network",
+      "analysis-recovery",
+      "investigations",
+      "forecast-ai",
+      "focused-views",
+      "energy-story"
+    ],
+    "status": "passed",
+    "edgeRuntimeNote": "One parallel local Worker dispatch failed during concurrent browser tests; all 23 passed serially. Edge files now run serially."
+  },
+  "publicEndToEnd": {
+    "trade-network": {
+      "status": "passed",
+      "checks": [
+        "linked diagram, exact selected value, next connection, focus and URL reload",
+        "keyboard link selection, reduced motion, clear, commodity/year changes and undo",
+        "mobile layout, touch-sized steps, save and shared display persistence"
+      ],
+      "errors": []
+    },
+    "analysis-recovery": {
+      "status": "passed",
+      "checks": [
+        "outlook opens with AI offline and no inference request",
+        "contributions opens with AI offline and no inference request",
+        "electricity opens with AI offline and no inference request",
+        "trade opens with AI offline and no inference request",
+        "prices opens with AI offline and no inference request",
+        "quota shows reset time, prevents pointless retry, persists across reload and leaves data tools available",
+        "cooldown expires without submitting; provider failure permits retry and preserves previous answer"
+      ],
+      "mockedRequests": 2,
+      "providerCalls": 0
+    },
+    "investigations": {
+      "status": "passed",
+      "matrixCells": 156,
+      "checks": [
+        "direction",
+        "linked map",
+        "branch baseline",
+        "reference-year robustness",
+        "save and reload snapshot",
+        "mobile overflow",
+        "no runtime errors"
+      ]
+    },
+    "focused-views": {
+      "status": "passed",
+      "checks": [
+        "one result at a time",
+        "named result persists on reload",
+        "All views is reversible",
+        "secondary menu closes",
+        "consistent Futures precision and legend",
+        "indicator, scenario and year survive reload",
+        "forecast failure recovers inline",
+        "four mobile data journeys start with collapsed composer and no overflow"
+      ],
+      "providerCalls": 0
+    }
+  },
+  "independentPublicAcceptance": {
+    "status": "passed",
+    "reviewedAt": "2026-10-21T00:15Z",
+    "sourceValue": {
+      "commodity": "electricity",
+      "year": 2024,
+      "origin": "AB",
+      "destination": "BC",
+      "millionCAD": 60.209,
+      "display": "$60.2M"
+    },
+    "checks": [
+      "public source-derived exact value and rounded display",
+      "province focus and atomic clear",
+      "desktop and 320px visual inspection",
+      "local comparison with AI offline"
+    ],
+    "pageErrors": 0,
+    "inferenceRequests": 0
+  }
+}
