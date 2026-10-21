@@ -25,7 +25,7 @@ try{
   assert.match(await page.locator('[data-guide-province="BC"] .gs-result').innerText(),/%/);
   assert.equal(await page.locator('.gs-stage>h4').evaluate(e=>e===document.activeElement),true);
   await page.getByLabel('GDP response period',{exact:true}).selectOption('1');
-  assert.match(await page.locator('.gs-unit').innerText(),/cumulative/);
+  assert.match(await page.locator('.gs-stage > .gs-unit').innerText(),/cumulative/);
   await stage('Household spending').click();
   assert.match(await page.locator('[data-guide-household="AB"]').innerText(),/Spending equivalent, not a validated bill forecast/);
   assert.match(await page.locator('[data-guide-household="AB"]').innerText(),/Annual CPI test error/);
@@ -66,10 +66,10 @@ try{
   const restored=await exportData();assert.deepEqual(restored.workspace.guidedSnapshot,captured.workspace.guidedSnapshot);
   checks.push('320/390px layout and offline restored source snapshot');
   await page.goto(url({guideStep:'provinces'}));await page.reload();
-  await page.getByRole('button',{name:'Retry sources',exact:true}).waitFor();
+  await page.locator('.gs-stage').getByRole('button',{name:'Retry sources',exact:true}).waitFor();
   await stage('The exchange').click();assert.match(await page.locator('.gsm-endpoints').innerText(),/136.2M/);
   await page.unroute('**/data/provincial-price-response.json');await page.unroute('**/data/household-energy-costs.json');
-  await stage('Provincial economy').click();await page.getByRole('button',{name:'Retry sources',exact:true}).click();await page.locator('[data-guide-province="AB"]').waitFor();
+  await stage('Provincial economy').click();await page.locator('.gs-stage').getByRole('button',{name:'Retry sources',exact:true}).click();await page.locator('[data-guide-province="AB"]').waitFor();
   await page.getByRole('button',{name:'Back to connections',exact:true}).click();await page.locator('.tn-explorer').waitFor();
   assert.equal(await page.locator('.tn-inspector .gs-entry').evaluate(e=>e===document.activeElement),true);
   assert.deepEqual(errors,[]);checks.push('partial source failure, exchange remains usable, retry, return to selected network, zero runtime errors');

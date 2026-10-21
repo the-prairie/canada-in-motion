@@ -29,7 +29,8 @@ try{
   assert.equal(await page.getByRole('button',{name:'Motion off',exact:true}).isDisabled(),true);
   assert.equal(await page.locator('.tn-direction').count(),0);
   await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.getByRole('button',{name:'Animate direction',exact:true}).click();
+  // Direction resumes when the user removes the reduced-motion preference.
+  await page.getByRole('button',{name:'Stop direction',exact:true}).waitFor();
   await page.locator('.tn-direction').first().waitFor();
   assert.notEqual(await page.locator('.tn-direction').first().evaluate(node=>getComputedStyle(node).animationName),'none');
   await page.getByRole('button',{name:'Stop direction',exact:true}).click();

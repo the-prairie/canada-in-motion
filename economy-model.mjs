@@ -21,7 +21,7 @@ export function normalizeEconomyState(input = {}) {
     oilView: raw.oilView === 'history' ? 'history' : 'experiment',
     duration: raw.duration === 'temporary' ? 'temporary' : 'persistent',
     tradePanelId: typeof raw.tradePanelId==='string'&&/^[a-zA-Z0-9_-]{1,80}$/.test(raw.tradePanelId)?raw.tradePanelId:null,
-    tradeDisplay: ['matrix','map','table'].includes(raw.tradeDisplay)?raw.tradeDisplay:'matrix',
+    tradeDisplay: ['matrix','map','table'].includes(raw.tradeDisplay)?raw.tradeDisplay:'map',
     tradeConnection: typeof raw.tradeConnection==='string'&&/^[A-Z]{2}-[A-Z]{2}$/.test(raw.tradeConnection)&&raw.tradeConnection.split('-').every(code=>ECONOMY_REGIONS.includes(code)&&code!=='CA')?raw.tradeConnection:null,
     tradeFocus: ECONOMY_REGIONS.includes(raw.tradeFocus)&&raw.tradeFocus!=='CA'?raw.tradeFocus:null,
     guideStep: ['exchange','provinces','households'].includes(raw.guideStep)?raw.guideStep:null,

@@ -11,7 +11,7 @@ const stage=name=>page.getByRole('navigation',{name:'Scenario stages'}).getByRol
 const stableMap=()=>page.waitForFunction(()=>{const svg=document.querySelector('.gsm-map svg');if(!svg)return false;const rect=svg.getBoundingClientRect(),box=svg.viewBox.baseVal;return Math.abs(rect.width-box.width)<.1&&Math.abs(rect.height-box.height)<.1;});
 const noOverflow=()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1);
 const inspect=region=>page.locator(`.gsm-endpoint.gsm-${region==='AB'?'seller':'buyer'}`);
-const visibleHeading=()=>page.waitForFunction(()=>{const heading=document.querySelector('.gs-stage>h4').getBoundingClientRect(),map=document.querySelector('.gsm-map'),inset=getComputedStyle(map).position==='sticky'?map.getBoundingClientRect().bottom:0;return heading.top>=inset-1&&heading.bottom<innerHeight;});
+const visibleHeading=()=>page.waitForFunction(()=>{const heading=document.querySelector('.gs-stage>h4').getBoundingClientRect(),map=document.querySelector('.gs-map-column'),inset=innerWidth<=680&&getComputedStyle(map).position==='sticky'?map.getBoundingClientRect().bottom:0;return heading.top>=inset-1&&heading.bottom<innerHeight;});
 try{
   await page.goto(url({}));await page.locator('.gsm-map').waitFor();await stableMap();
   await page.locator('.gsm-map').scrollIntoViewIfNeeded();
@@ -68,9 +68,9 @@ try{
     await stage('The exchange').click();await visibleHeading();
     assert.ok(await noOverflow(),`${width}px overflow`);
     await page.getByRole('slider',{name:'Commodity price change',exact:true}).focus();
-    assert.equal(await page.locator('.gsm-map').evaluate(node=>getComputedStyle(node).position),'sticky');
+    assert.equal(await page.locator('.gs-map-column').evaluate(node=>getComputedStyle(node).position),'sticky');
     await page.getByLabel('Commodity price change percent',{exact:true}).focus();
-    assert.equal(await page.locator('.gsm-map').evaluate(node=>getComputedStyle(node).position),'static');
+    assert.equal(await page.locator('.gs-map-column').evaluate(node=>getComputedStyle(node).position),'static');
     await page.getByRole('slider',{name:'Commodity price change',exact:true}).focus();
     const map=await page.locator('.gsm-map').boundingBox();assert.ok(map.height<=255,`compact map ${map.height}px`);
     assert.equal(await page.locator('.gsm-anchor text').first().evaluate(node=>getComputedStyle(node).fontSize),'15px');
@@ -90,11 +90,11 @@ try{
   await page.route('**/data/provincial-price-response.json',route=>route.abort());
   await page.route('**/data/household-energy-costs.json',route=>route.abort());
   await page.goto(url({guideStep:'provinces'}));await page.reload();
-  await page.getByRole('button',{name:'Retry sources',exact:true}).waitFor();
+  await page.locator('.gs-stage').getByRole('button',{name:'Retry sources',exact:true}).waitFor();
   assert.deepEqual(await page.locator('.gsm-endpoint strong').allTextContents(),['Unavailable','Unavailable']);
   assert.equal(await page.locator('.gsm-endpoint:disabled').count(),2);
   await page.unroute('**/data/provincial-price-response.json');await page.unroute('**/data/household-energy-costs.json');
-  await page.getByRole('button',{name:'Retry sources',exact:true}).click();await page.locator('[data-guide-province="BC"]').waitFor();
+  await page.locator('.gs-stage').getByRole('button',{name:'Retry sources',exact:true}).click();await page.locator('[data-guide-province="BC"]').waitFor();
   assert.equal(await inspect('BC').isEnabled(),true);
   assert.deepEqual(errors,[]);checks.push('source failures show unavailable map values, disable missing targets and recover on retry; zero runtime errors');
   console.log(JSON.stringify({status:'passed',checks,errors}));

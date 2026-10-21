@@ -1,0 +1,25 @@
+{
+  "checkedAt": "2026-10-21T23:54:21.319Z",
+  "dataRelease": "6e50f5b7fe67a57c00ce",
+  "dataChanged": false,
+  "scope": [
+    "Explore a question",
+    "Energy trade"
+  ],
+  "unitTests": 423,
+  "pythonTests": 139,
+  "betaGate": "passed; national coverage remains incomplete",
+  "browserTests": [
+    "energy-story",
+    "explore-connected",
+    "trade-connected",
+    "guided-scenarios",
+    "map-story",
+    "trade-network",
+    "investigations",
+    "navigation"
+  ],
+  "independentReview": "CONNECTED-STORY-EXPERIENCE-REVIEW.md",
+  "models": "Existing calculations and source snapshots preserved; missing estimates never coerced to zero",
+  "deployment": "pending"
+}

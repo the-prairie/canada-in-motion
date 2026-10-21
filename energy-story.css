@@ -268,3 +268,33 @@
 .es-evidence-dialog .pr-error-grid dd {margin:0;font-size:16px}
 .es-evidence-tabs button {font-size:13px;padding-inline:8px}
 }
+
+/* One scenario, one persistent geography, one account at a time. */
+.es-story-controls{display:flex;align-items:center;justify-content:space-between;gap:32px;padding:10px 0 20px;border-bottom:1px solid var(--line)}
+.es-story-controls .es-edit-scenario{display:grid;text-align:left;gap:6px;padding-left:0;font-size:18px;max-width:55%}
+.es-edit-scenario span{font-size:13px;color:#596b5e;text-decoration:underline;text-underline-offset:3px}
+.es-story-controls .es-price{width:300px;max-width:45%;padding:0}
+.es-scenario-dialog .es-assumptions{grid-template-columns:1fr 1fr;border:0;padding:0 0 24px}
+.es-scenario-dialog .es-commodity{grid-column:1/-1;flex-direction:row;border:0;border-bottom:1px solid var(--line)}
+.es-scenario-dialog .es-commodity button{flex:1;border:0;border-bottom:2px solid transparent;margin:0;text-align:center;min-height:44px}
+.es-scenario-dialog .es-commodity button[aria-pressed=true]{border-color:var(--es-green)}
+.es-shell .es-edit-done{background:#286b5d;color:white;padding-inline:24px}
+.es-connected-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start;gap:36px;padding-top:28px}
+.es-connected-visual{position:sticky;top:18px;min-width:0}
+.es-connected-account{min-width:0}
+#energy-economy .es-account-premise{font-size:clamp(24px,2.4vw,32px);line-height:1.2;letter-spacing:-.6px;margin:0 0 20px;max-width:24ch}
+.es-connected-account .es-sales{grid-template-columns:1fr;gap:20px}
+.es-connected-account .es-section-heading{padding-top:0}
+.es-connected-account .es-purchases{grid-template-columns:1fr;gap:10px}
+.es-connected-account .es-purchases>p{margin:0}
+.es-connected-account .es-trade-layout{display:block}
+.es-connected-account .es-fiscal,.es-connected-account .es-national{grid-template-columns:1fr;gap:12px}
+.es-connected-account .es-fiscal article,.es-connected-account .es-national article{padding:12px 0}
+.es-connected-account .es-fiscal-value{font-size:34px}
+.es-connected-account .es-table table{font-size:12px}
+.es-story-progress{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid var(--line);padding-top:16px;margin-top:24px}
+.es-story-progress span{font:12px 'IBM Plex Mono',monospace;color:#627064}
+.es-story-progress button{font-size:13px;padding-inline:0}
+#energy-economy .es-account-boundary{font-size:11px;line-height:1.5;color:#667065;margin:10px 0 0}
+@media(max-width:1000px) and (min-width:761px){.es-connected-layout{gap:24px;grid-template-columns:1fr 1fr}.es-connected-account .es-comparison>div{grid-template-columns:1fr;gap:20px}.es-focused .es-chapters{gap:0 14px}}
+@media(max-width:760px){.es-story-controls{gap:16px;padding-bottom:16px}.es-story-controls .es-edit-scenario{font-size:16px;max-width:48%}.es-story-controls .es-price{max-width:50%;width:180px}.es-story-controls .es-price output{font-size:24px}.es-story-controls .es-price>label{display:grid;gap:4px}.es-story-controls .es-price>div{font-size:10px}.es-story-controls .es-price>div button{font-size:11px}.es-connected-layout{grid-template-columns:1fr;gap:22px;padding-top:18px}.es-connected-visual{position:relative;top:auto}.es-connected-account .es-fiscal,.es-connected-account .es-national{gap:8px}#energy-economy .es-account-premise{font-size:26px;margin-bottom:18px}.es-scenario-dialog .es-assumptions{grid-template-columns:1fr}.es-scenario-dialog .es-commodity{grid-column:auto}.es-connected-account .es-section-heading{padding-top:0}}

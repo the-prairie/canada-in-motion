@@ -85,3 +85,43 @@
 @media(max-width:360px){.gs-route{flex-direction:column;gap:.6rem}.gs-exchange strong{font-size:1.7rem}.gs-exchange span{font-size:.75rem}.gs-steps button{font-size:.75rem!important}}
 @media(max-height:600px){.gs-map-column,.gsm-map{position:static}}
 @media(prefers-reduced-motion:reduce){.gsm-flow{animation:none;display:none}}
+
+/* One map holds its place while the explanation moves through three scales. */
+.gs-connected{--gs-paper:#f8f8f0}
+.gs-connected .gs-steps{position:sticky;top:0;z-index:8;background:var(--gs-paper);margin-bottom:0;min-height:62px;align-items:stretch}
+.gs-connected .gs-steps button{display:flex;align-items:center;gap:9px}
+.gs-connected .gs-steps button>span{display:grid;place-items:center;width:23px;height:23px;border:1px solid #acb9ad;border-radius:50%;font-size:12px;flex-shrink:0}
+.gs-connected .gs-steps button[aria-current] span{background:var(--gs-accent);border-color:var(--gs-accent);color:white}
+.gs-connected .gs-layout{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:4vw}
+.gs-connected .gs-map-column{top:86px;padding-top:28px;background:var(--gs-paper)}
+.gs-connected .gsm-map{background:transparent}
+.gs-connected .gsm-land{transition:fill .55s,stroke .55s}
+.gs-connected .gsm-link{transition:opacity .55s,stroke-width .55s}
+.gs-connected .gsm-map[data-scene=provinces] .gsm-link{opacity:.2}
+.gs-connected .gsm-map[data-scene=households] .gsm-link{opacity:.12}
+.gs-connected .gsm-map[data-scene=provinces] .gsm-land.gsm-seller,.gs-connected .gsm-map[data-scene=provinces] .gsm-land.gsm-buyer{stroke:#738b7a;stroke-width:1.5}
+.gs-connected .gs-chapter{min-height:calc(100svh - 62px);box-sizing:border-box;padding:72px 0;display:flex;flex-direction:column;justify-content:center;scroll-margin-top:90px}
+.hw-shell .gs-connected .gs-chapter>h4{font-size:clamp(34px,3.5vw,52px);font-weight:500;line-height:1.08;letter-spacing:-.045em;margin:0 0 25px;max-width:13em;color:#203d34}
+.gs-chapter h4:focus:not(:focus-visible){outline:none}
+.gs-chapter h4:focus-visible{outline:2px solid var(--gs-accent);outline-offset:6px}
+.hw-shell .gs-connected .gs-story-intro{font-size:18px;line-height:1.6;margin:0 0 24px;max-width:35em}
+.gs-connected .gs-exchange{padding:25px 0}
+.gs-connected .gs-exchange strong{font-size:clamp(32px,3.2vw,48px)}
+.gs-connected .gs-footer{border:0;padding:0;margin:28px 0 0}
+.hw-shell .gs-connected .gs-footer button{border:0;border-radius:0;border-bottom:1px solid #93aa9b;background:transparent;padding:12px 0;color:var(--gs-accent);font-size:15px;text-align:left}
+.gs-connected .gs-pair{gap:20px}
+.gs-connected .gs-pair article:first-child{border-top-color:var(--gs-seller)}
+.gs-connected .gs-pair article:last-child{border-top-color:var(--gs-buyer)}
+.gs-connected .gs-narrative{min-width:0}
+.gsm-house{fill:#f8f8f0;stroke:var(--gs-seller);stroke-width:2;vector-effect:non-scaling-stroke}
+.gsm-buyer .gsm-house{stroke:var(--gs-buyer)}
+@media(max-width:900px){.gs-connected .gs-layout{gap:24px}.gs-connected .gs-pair{grid-template-columns:1fr}.gs-connected .gs-chapter{padding:48px 0}}
+@media(max-width:680px){
+ .gs-connected .gs-layout{display:block}.gs-connected .gs-steps{min-height:58px}.gs-connected .gs-steps button{flex-direction:column;gap:4px;font-size:11px!important;padding:6px 3px!important}.gs-connected .gs-steps button>span{width:19px;height:19px;font-size:10px}
+ .gs-connected .gs-map-column{display:block;position:sticky;top:58px;z-index:6;padding:0 0 8px;border-bottom:1px solid #ccd6c8}.gs-connected .gsm-map{position:static;border:0}.gs-connected .gsm-map>svg{height:112px}.gs-connected .gsm-endpoints{padding-top:0}.gs-connected .gsm-map figcaption{padding-block:0;min-height:28px}.gs-connected .gs-map-column>.gs-price{margin:0;padding-top:2px}.gs-connected .gs-map-column .gs-presets{display:none}.gs-connected .gs-map-column .gs-price>label{font-size:11px}.gs-connected .gs-map-column .gs-price>div:not(.gs-presets){margin:0}.gs-connected .gs-number input{font-size:16px}
+ .gs-connected .gs-chapter{min-height:70svh;padding:32px 0 52px}.gs-connected .gs-narrative{padding-bottom:35svh}.hw-shell .gs-connected .gs-chapter>h4{font-size:36px;margin-bottom:20px}.hw-shell .gs-connected .gs-story-intro{font-size:16px;line-height:1.55}.gs-connected .gs-route{padding-bottom:15px}.gs-connected .gs-route h3{font-size:20px!important}.gs-connected .gs-route button{font-size:11px;padding:8px}.gs-connected .gs-exchange strong{font-size:32px}.gs-connected .gs-footer button{font-size:14px!important}
+}
+@media(max-width:360px){.gs-connected .gs-route{flex-direction:row}.hw-shell .gs-connected .gs-chapter>h4{font-size:31px}.gs-connected .gs-exchange strong{font-size:28px}}
+@media(max-height:600px){.gs-connected .gs-map-column{position:static}.gs-connected .gs-narrative{padding-bottom:0}.gs-connected .gs-steps{position:static}.gs-connected .gsm-map>svg{max-height:230px}}
+@media(prefers-reduced-motion:reduce){.gs-connected *{transition:none!important;scroll-behavior:auto!important}}
+@media(max-width:680px){.gs-connected:has(input[type=number]:focus) .gs-map-column{position:static}}

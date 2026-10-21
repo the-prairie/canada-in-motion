@@ -31,11 +31,15 @@ const host=page.locator('#ec-energy-story');
 const chapter=id=>host.locator(`.es-chapters button`).filter({hasText:id});
 const open=async locator=>{if(!await locator.evaluate(e=>e.open))await locator.locator(':scope > summary').click();};
 const shareState=()=>page.evaluate(()=>JSON.parse(decodeURIComponent(location.hash.slice(4))).economy.story);
+const edit=async fn=>{await host.locator('.es-edit-scenario').click();await fn(host.getByRole('dialog',{name:'Change the price scenario'}));await host.getByRole('button',{name:'Done',exact:true}).click();};
+const choose=async(label,value)=>edit(d=>d.getByLabel(label,{exact:true}).selectOption(value));
+const commodity=async name=>edit(d=>d.getByRole('button',{name,exact:true}).click());
 try{
   await page.goto(base);
   await host.locator('.es-sales').waitFor();
   assert.match(await host.locator('h1').innerText(),/oil prices fell 10/);
   assert.match(await host.locator('.es-sales .es-delta').first().innerText(),/−\$2\.19B/);
+  await host.locator('.es-edit-scenario').click();
   await host.getByLabel('Comparison province',{exact:true}).selectOption('ON');
   const select=await host.getByLabel('Comparison province',{exact:true}).elementHandle();
   await select.focus();
@@ -43,6 +47,7 @@ try{
   await page.locator('.ec-ai-status').filter({hasText:'AI ready'}).waitFor({state:'attached'});
   assert.equal(await select.evaluate(e=>e.isConnected&&e===document.activeElement),true,'late status preserves the mounted investigation and focus');
   assert.equal((await shareState()).compare,'ON');
+  await host.getByRole('button',{name:'Done',exact:true}).click();
   checks.push('source-backed default and late status preservation');
 
   await host.locator('#es-price').focus();await page.keyboard.press('End');
@@ -56,13 +61,13 @@ try{
   await host.getByRole('button',{name:'Undo',exact:true}).click();
   await page.reload();await host.locator('.es-sales').waitFor();
   assert.equal(await host.locator('#es-price').inputValue(),'-10');
-  assert.equal(await host.getByLabel('Comparison province',{exact:true}).inputValue(),'ON');
+  assert.equal((await shareState()).compare,'ON');
   checks.push('keyboard repricing, reactive explanation, undo and URL reload');
 
   await chapter('Trading partners').click();
   assert.equal(await host.locator('svg [role=button]').count(),13);
   await host.getByRole('button',{name:/Québec.*\$8\.76B/}).click();
-  assert.equal(await host.getByLabel('Comparison province',{exact:true}).inputValue(),'QC');
+  assert.equal((await shareState()).compare,'QC');
   await host.getByRole('button',{name:'Table',exact:true}).click();
   assert.equal(await host.locator('.es-table tbody tr').count(),24);
   assert.match(await host.locator('.es-table').innerText(),/8,762\.307/);
@@ -73,9 +78,9 @@ try{
   await host.getByRole('button',{name:'Map',exact:true}).click();
   await host.getByRole('button',{name:'Investigate Ontario',exact:true}).focus();
   await page.keyboard.press('Enter');
-  assert.equal(await host.getByLabel('Investigation province',{exact:true}).inputValue(),'ON');
-  await host.getByLabel('Investigation province',{exact:true}).selectOption('AB');
-  await host.getByLabel('Comparison province',{exact:true}).selectOption('SK');
+  assert.equal((await shareState()).focus,'ON');
+  await choose('Investigation province','AB');
+  await choose('Comparison province','SK');
   await page.screenshot({path:new URL('trade-desktop.png',evidence).pathname,fullPage:true});
   checks.push('map selection, partner comparison, full directional table and domestic accounting identity');
 
@@ -94,11 +99,11 @@ try{
   await host.locator('#es-price').focus();await page.keyboard.press('End');
   assert.match(await host.locator('.es-outlook-link').innerText(),/independent of this price experiment/);
   assert.equal(JSON.stringify(await read('provincial-forecasts')),annualForecast);
-  await host.getByLabel('Investigation province',{exact:true}).selectOption('NU');
+  await choose('Investigation province','NU');
   assert.match(await host.locator('[data-price-region=NU]').innerText(),/No supported|did not pass/);
   checks.push('budget benchmark and period, national scope and duration, unchanged forecast dataset and unavailable provincial response');
 
-  await host.getByRole('button',{name:'Electricity',exact:true}).click();
+  await commodity('Electricity');
   await chapter('National GDP').click();
   assert.match(await host.locator('.es-gap').innerText(),/not calibrated/);
   assert.equal(await host.locator('.es-national').count(),0);
@@ -109,8 +114,8 @@ try{
   assert.match(await host.locator('.es-purchases').innerText(),/No change in recorded domestic/);
   await page.keyboard.press('End');
   await chapter('Public revenue').click();
-  await host.getByRole('button',{name:'Natural gas',exact:true}).click();
-  await host.getByLabel('Investigation province',{exact:true}).selectOption('BC');
+  await commodity('Natural gas');
+  await choose('Investigation province','BC');
   assert.match(await host.locator('.es-fiscal').innerText(),/BC plant-inlet natural gas/);
   await chapter('Household costs').click();
   assert.match(await host.locator('.pr-households').innerText(),/Commodity prices did not reliably predict/);
@@ -120,7 +125,7 @@ try{
 
   await host.getByRole('button',{name:'Save scenario',exact:true}).click();
   await host.getByRole('button',{name:'Pin this scenario',exact:true}).click();
-  await host.getByRole('button',{name:'Oil',exact:true}).click();
+  await commodity('Oil');
   await host.getByRole('button',{name:'Return to pinned scenario',exact:true}).click();
   assert.equal((await shareState()).commodity,'gas');
   await host.getByRole('button',{name:'Save scenario',exact:true}).click();
@@ -131,7 +136,7 @@ try{
   const comparable=value=>JSON.parse(JSON.stringify(value,(_,item)=>typeof item==='number'?Number(item.toPrecision(12)):item));
   assert.deepEqual(comparable(summarizeEnergyStory(exported.snapshots,exported.selection)),comparable(exported.result));
   await page.keyboard.press('Escape');
-  await host.getByRole('button',{name:'Oil',exact:true}).click();
+  await commodity('Oil');
   await host.locator('input[type=file]').setInputFiles({name:'investigation.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(exported))});
   await host.locator('.es-notice').filter({hasText:'saved snapshot'}).waitFor();
   assert.equal((await shareState()).commodity,'gas');
@@ -145,8 +150,8 @@ try{
   await page.keyboard.press('Escape');
   checks.push('pin restore, complete export replay, imported snapshot and malformed-file recovery');
 
-  await host.getByRole('button',{name:'Oil',exact:true}).click();
-  await host.getByLabel('Investigation province',{exact:true}).selectOption('AB');
+  await commodity('Oil');
+  await choose('Investigation province','AB');
   await chapter('Sales').click();
   await host.locator('#es-price').focus();await page.keyboard.press('Home');
   await page.goBack();await host.locator('.es-shell').waitFor({state:'attached'}).catch(()=>{});

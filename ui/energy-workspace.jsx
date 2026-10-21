@@ -178,7 +178,7 @@ export function mountWorkspace(element,options){
 
 export function mountTradeExplorer(element,{economy,flows,fiscal,selection,regions,shapes,onState}) {
   const workspace=createTradeWorkspace({economy,flows,fiscal,selection,regions});
-  const saved={...initialSelection(workspace),...Object.fromEntries(Object.entries(GUIDE_DEFAULTS).map(([key,value])=>[key,selection[key]??value])),tradeDisplay:selection.tradeDisplay||'matrix',tradeConnection:selection.tradeConnection||null,tradeFocus:selection.tradeFocus||null,...(workspace.panels.some(p=>p.id===selection.tradePanelId)?{panelId:selection.tradePanelId}:{}),viewMode:selection.tradeViewMode==='all'?'all':'focus'};
+  const saved={...initialSelection(workspace),...Object.fromEntries(Object.entries(GUIDE_DEFAULTS).map(([key,value])=>[key,selection[key]??value])),tradeDisplay:selection.tradeDisplay||'map',tradeConnection:selection.tradeConnection||null,tradeFocus:selection.tradeFocus||null,...(workspace.panels.some(p=>p.id===selection.tradePanelId)?{panelId:selection.tradePanelId}:{}),viewMode:selection.tradeViewMode==='all'?'all':'focus'};
   return mountWorkspace(element,{workspace,economy,shapes,saved,question:'Energy between provinces',onState});
 }
 
