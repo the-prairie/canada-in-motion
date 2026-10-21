@@ -36,6 +36,9 @@ try{
   await page.emulateMedia({reducedMotion:'no-preference'});
   await page.setViewportSize({width:1440,height:500});
   await page.evaluate(()=>window.scrollTo(0,0));
+  const mapTop=await page.locator('.gsm-map').evaluate(node=>node.getBoundingClientRect().top);
+  if(mapTop<500)await page.setViewportSize({width:1440,height:Math.max(1,Math.floor(mapTop)-2)});
+  await page.waitForFunction(()=>document.querySelector('.gsm-map').getBoundingClientRect().top>=innerHeight);
   await page.waitForFunction(()=>!document.querySelector('.gsm-map').classList.contains('is-playing'));
   await page.setViewportSize({width:1440,height:1000});await stableMap();
   await page.locator('.gsm-map').scrollIntoViewIfNeeded();

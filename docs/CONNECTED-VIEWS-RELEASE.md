@@ -19,4 +19,14 @@ The independent experience review exercised desktop, 390px, 320px and short land
 
 No forecast model, energy-price model, AI provider, spending cap or data licence changed. Transport connections remain schematic. Source-record counts remain distinct from provincial licence totals. Estimates remain distinct from observations.
 
-Publication receipt will be added after the GitHub Pages deployment and public acceptance checks complete.
+## Publication
+
+Published implementation `fc90a8fbe201e700ed211b150c65a6078a13fdc0` through [successful deployment 39556810450](https://github.com/the-prairie/canada-in-motion/actions/runs/39556810450). The workflow repeated all JavaScript and pipeline tests, refreshed the public sources, reproduced eligible forecast experiments, and passed 24,438 independent guided-model assertions before the beta release gate.
+
+The public app serves code version `62401d85d27534f946ff`, matching the locally tested build. Ten deployed application assets match the verified manifest and local hashes. Public data release `52756433709d2e3bd6d5` contains 317,942 records, retrieved October 21, 2026 at 06:43:18 UTC.
+
+Four public browser suites passed: connected-views, dialog-dismissal, map-story and guided-scenarios. The independent reviewer repeated all 90 desktop/mobile checks on the public URL with zero page errors and zero provider calls. See CONNECTED-VIEWS-VERIFICATION.json for the machine-readable receipt.
+
+The public animation check initially assumed a 500px viewport placed the map entirely off-screen. The shorter page left 33px visible, so continued animation was correct. The test now measures actual map visibility before checking that motion pauses. The revised test passed without an application change.
+
+This remains the approved public beta with incomplete national coverage. No live AI services or budgets changed.

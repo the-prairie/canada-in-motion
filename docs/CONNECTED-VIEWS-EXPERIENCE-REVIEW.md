@@ -97,3 +97,9 @@ The final six-state map probe confirms both endpoint labels remain inside the ma
 Release verdict: accepted for the reviewed journeys, subject to the release owner's final artifact and public deployment checks. This is a headless Chromium review, not physical-device or cross-browser certification. No live AI provider calls were made. The remaining record preview in the atlas is a defensible direct inspection shortcut; removing it can be considered later if user testing shows it duplicates Find a well rather than helping map exploration.
 
 Review artifacts include acceptance.json (90 checks), map-fit.json (six navigation and resize states), dialog-lifecycle.json (late-response dismissal), hidden-route.png, receipt-export.json, final-repairs.json (eight focused receipt and camera checks), and the refreshed candidate desktop and mobile screenshots. Deterministic checks and visual inspection complement one another; passing interaction checks alone would not have detected the earlier contrast and mobile-label problems.
+
+## Public deployment verification
+
+The deployed app was independently checked on October 21, 2026. Its health response confirms code version `62401d85d27534f946ff`. The same 90-check suite passes against `https://the-prairie.github.io/canada-in-motion/` at desktop, mobile, narrow-phone, and short-landscape sizes. GDP, atlas, transport, and shared actions retain the reviewed behavior. The repeated sources, saved-work, methods, and analysis footer stack is absent. Public screenshots were inspected after the run. There were no page-level JavaScript errors and no inference requests. The released experience is accepted within the review scope.
+
+Public evidence is retained under `.data-cache/connected-views-review/public/`, including `health.json`, `acceptance.json`, and screenshots of all reviewed views.

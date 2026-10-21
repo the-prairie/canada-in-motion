@@ -1,5 +1,5 @@
 {
-  "status": "local-checks-passed",
+  "status": "published-and-verified",
   "javascriptTests": 395,
   "pipelineTests": 139,
   "providerCalls": 0,
@@ -216,7 +216,40 @@
     "checkedAt": "2026-10-21T06:32:48.423Z",
     "errors": []
   },
-  "publication": "pending",
+  "publication": {
+    "health": {
+      "codeVersion": "62401d85d27534f946ff",
+      "status": "public-beta",
+      "releaseId": "52756433709d2e3bd6d5",
+      "records": 317942,
+      "retrievedAt": "2026-10-21T06:43:18Z",
+      "builtAt": "2026-10-21T06:48:21.505Z",
+      "nationalComplete": false
+    },
+    "codeVersionVerified": true,
+    "assetHashesVerified": [
+      "app.js",
+      "map.js",
+      "record-atlas.js",
+      "energy-economy.js",
+      "design.css",
+      "record-atlas.css",
+      "energy-economy.css",
+      "index.html",
+      "vendor/energy-workspace.css",
+      "vendor/energy-workspace.js"
+    ],
+    "implementationCommit": "fc90a8fbe201e700ed211b150c65a6078a13fdc0",
+    "workflow": "https://github.com/the-prairie/canada-in-motion/actions/runs/39556810450",
+    "workflowConclusion": "success",
+    "numericalAuditChecks": 24438,
+    "independentPublicReview": {
+      "checks": 90,
+      "pageErrors": 0,
+      "providerCalls": 0,
+      "status": "passed"
+    }
+  },
   "independentReview": {
     "status": "accepted",
     "journeyChecks": 90,
@@ -225,5 +258,56 @@
     "runtimeErrors": 0,
     "providerCalls": 0,
     "report": "CONNECTED-VIEWS-EXPERIENCE-REVIEW.md"
+  },
+  "publicBrowserResults": {
+    "connected-views": {
+      "status": "passed",
+      "checks": [
+        "one evidence destination with citations",
+        "explicit Ask task",
+        "Escape and source focus restore",
+        "Alberta totals separate from mapped records",
+        "record inspection retains map and filters",
+        "atlas context before map",
+        "map remains drawn after mobile resize",
+        "receipt export remains reachable",
+        "transport map visible through all stages",
+        "atlas-to-transport map sizing",
+        "shipment reprices",
+        "destination selection and reload",
+        "320px and landscape",
+        "old layer preferences cannot hide selected route"
+      ],
+      "providerCalls": 0
+    },
+    "dialog-dismissal": {
+      "status": "passed",
+      "checks": [
+        "dismissal survives late context data",
+        "error and draft preserved for intentional reopening"
+      ],
+      "mockedRequests": 1,
+      "providerCalls": 0
+    },
+    "guided-scenarios": {
+      "status": "passed",
+      "checks": [
+        "selected trade, negative repricing, stage focus, supported-only GDP, annual household caveat, export and URL reload",
+        "gas/electricity unavailable models, explicit independent retail assumption, commodity changes preserve stage",
+        "320/390px layout and offline restored source snapshot",
+        "partial source failure, exchange remains usable, retry, return to selected network, zero runtime errors"
+      ],
+      "errors": []
+    },
+    "map-story": {
+      "status": "passed",
+      "checks": [
+        "motion plays only in view, supports pause and reduced motion, and never changes speed or path with prices",
+        "same map across all stages, exact supported values, failed estimates hidden, keyboard-to-detail focus survives pointer movement",
+        "320/390px sticky map preserves readable labels and visible headings; short landscape has normal scrolling",
+        "source failures show unavailable map values, disable missing targets and recover on retry; zero runtime errors"
+      ],
+      "errors": []
+    }
   }
 }
