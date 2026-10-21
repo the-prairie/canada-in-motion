@@ -17,3 +17,7 @@ The parent owns the registry, header, state integration and regression harness. 
 ## Final review
 
 Independent desktop/mobile review approved all twelve destinations. Parent code review additionally found that destination selection bypassed the old account button's answer-dismissal behavior. Destination changes now open the selected data view and retain the previous answer behind its existing action. The mocked forecast end-to-end test covers both a different account and reselecting the current account.
+
+## Release recovery
+
+The fresh deployment stopped because Statistics Canada served its outage page with HTTP 200 in place of monthly ZIP archives. An explicit deployment input now permits reusing data from a successful main run of the same release workflow. Archive paths, every manifested file, release identity and complete required public data coverage are verified before a transactional directory replacement. Current application code is retained. Source dates are not rewritten. Unit and pipeline tests run after restoration; the existing release and build freshness gates remain mandatory. Default scheduled and manual releases still refresh data. This navigation release reuses run 39567277685 and its unchanged 414 public data files.

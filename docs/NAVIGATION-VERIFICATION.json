@@ -21,7 +21,7 @@
     ]
   ],
   "navigationDestinations": 12,
-  "unitTestsPassed": 398,
+  "unitTestsPassed": 422,
   "pipelineTestsPassed": 139,
   "e2eSuitesPassed": [
     "navigation",
@@ -47,5 +47,17 @@
     "keyboardAndNavigation": 16,
     "deepInteractionGroups": 8
   },
-  "finalParentRegression": "Selecting a view exits the previous AI answer, including selecting the same account; previous answer remains available."
+  "finalParentRegression": "Selecting a view exits the previous AI answer, including selecting the same account; previous answer remains available.",
+  "releaseRecovery": {
+    "reason": "Statistics Canada archive endpoints returned their site-unavailable HTML page with HTTP 200",
+    "failedRun": 39661595390,
+    "dataSourceRun": 39567277685,
+    "dataReleaseId": "6e50f5b7fe67a57c00ce",
+    "dataFilesUnchanged": 414,
+    "originalRetrievedAt": "2026-10-21T08:13:44Z",
+    "replayedOriginalJavaScriptTests": 398,
+    "replayedPipelineTests": 139,
+    "gateAndBuild": "passed",
+    "independentReview": "NAVIGATION-RELEASE-RECOVERY-REVIEW.md"
+  }
 }

@@ -1,6 +1,12 @@
 name: Publish approved public beta
 on:
   workflow_dispatch:
+    inputs:
+      data_run_id:
+        description: 'Optional successful deploy run whose unchanged public data should be reused'
+        required: false
+        type: string
+        default: ''
   workflow_run:
     workflows: [Refresh verified data candidate]
     types: [completed]
@@ -29,9 +35,43 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check -r pipeline/requirements.txt
+      - name: Verify prior public deployment
+        if: ${{ inputs.data_run_id }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DATA_RUN_ID: ${{ inputs.data_run_id }}
+        run: |
+          [[ "$DATA_RUN_ID" =~ ^[0-9]+$ ]] || exit 1
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$DATA_RUN_ID" > prior-run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/deploy.yml" > deploy-workflow.json
+          node --input-type=module -e "import fs from 'node:fs';const run=JSON.parse(fs.readFileSync('prior-run.json')),workflow=JSON.parse(fs.readFileSync('deploy-workflow.json'));if(run.conclusion!=='success'||run.workflow_id!==workflow.id||run.head_branch!=='main')throw Error('Data must come from a successful main deployment');"
+      - name: Download verified public deployment
+        if: ${{ inputs.data_run_id }}
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: github-pages
+          path: .previous-public/archive
+          run-id: ${{ inputs.data_run_id }}
+          github-token: ${{ github.token }}
+      - name: Restore unchanged public data and original retrieval dates
+        if: ${{ inputs.data_run_id }}
+        run: |
+          python - <<'PYTHON'
+          import pathlib, tarfile
+          with tarfile.open('.previous-public/archive/artifact.tar') as archive:
+              seen = set()
+              for member in archive.getmembers():
+                  path = pathlib.PurePosixPath(member.name)
+                  if path.is_absolute() or '..' in path.parts or '\\' in member.name or path in seen or not (member.isfile() or member.isdir()):
+                      raise ValueError('Unsafe public artifact member')
+                  seen.add(path)
+              archive.extractall('.previous-public/unpacked', filter='data')
+          PYTHON
+          node scripts/restore-public-data.mjs .previous-public/unpacked .
       - run: node --test tests/*.test.mjs
       - run: python -m unittest discover -s pipeline -p 'test_*.py'
       - name: Find previous successful refresh baseline
+        if: ${{ !inputs.data_run_id }}
         id: baseline
         env:
           GH_TOKEN: ${{ github.token }}
@@ -39,7 +79,7 @@ jobs:
           previous=$(gh api "repos/${{ github.repository }}/actions/workflows/refresh.yml/runs?status=success&per_page=1" --jq '.workflow_runs[0].id // empty')
           echo "run=$previous" >> "$GITHUB_OUTPUT"
       - name: Restore previous source counts
-        if: steps.baseline.outputs.run != ''
+        if: ${{ !inputs.data_run_id && steps.baseline.outputs.run != '' }}
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: source-baseline
@@ -47,29 +87,42 @@ jobs:
           run-id: ${{ steps.baseline.outputs.run }}
           github-token: ${{ github.token }}
       - run: python pipeline/refresh.py
+        if: ${{ !inputs.data_run_id }}
       - name: Refresh licensed BC permit inventory when seven days old
+        if: ${{ !inputs.data_run_id }}
         run: python pipeline/refresh_bcer.py
       - name: Refresh openly licensed context when seven days old
+        if: ${{ !inputs.data_run_id }}
         run: python pipeline/refresh_context.py
       - name: Refresh official monthly oil, gas and electricity activity
+        if: ${{ !inputs.data_run_id }}
         run: python pipeline/refresh_monthly_energy.py
       - name: Refresh observed GDP and official energy scenarios
+        if: ${{ !inputs.data_run_id }}
         run: python pipeline/refresh_economy.py
       - name: Refresh Alberta well counts unless the verified snapshot is less than a day old
+        if: ${{ !inputs.data_run_id }}
         run: python pipeline/refresh_alberta_status.py --max-age-hours 24
       - name: Refresh interprovincial energy trade and physical balances
+        if: ${{ !inputs.data_run_id }}
         run: python pipeline/refresh_energy_flows.py
       - name: Refresh official industry income multipliers
+        if: ${{ !inputs.data_run_id }}
         run: python pipeline/refresh_income_paths.py
       - name: Refresh oil history and reproduce conditional model checks
+        if: ${{ !inputs.data_run_id }}
         run: python pipeline/refresh_dynamic_price.py
       - name: Rebuild conditional provincial price responses
+        if: ${{ !inputs.data_run_id }}
         run: python pipeline/refresh_price_response.py
       - name: Refresh household retail price models and spending references
+        if: ${{ !inputs.data_run_id }}
         run: python pipeline/refresh_household_energy.py
       - name: Refresh GDP and employment inputs and rebuild provincial forecasts
+        if: ${{ !inputs.data_run_id }}
         run: python pipeline/refresh_provincial_forecast.py
       - name: Independently reproduce eligible energy forecast experiments
+        if: ${{ !inputs.data_run_id }}
         run: |
           python - <<'PYTHON'
           import json, subprocess, sys
@@ -83,8 +136,10 @@ jobs:
               raise ValueError('Energy forecast evaluation is missing or has an unknown status')
           PYTHON
       - name: Verify published provincial budget sensitivities
+        if: ${{ !inputs.data_run_id }}
         run: python pipeline/refresh_provincial_impacts.py
       - name: Independently verify guided price models after refresh
+        if: ${{ !inputs.data_run_id }}
         run: |
           python -m pip install --disable-pip-version-check -r tests/review/requirements.txt
           python tests/review/guided-scenario-independent-audit.py
