@@ -1,0 +1,196 @@
+{
+  "status": "candidate-verified",
+  "javascriptTests": 395,
+  "pipelineTests": 139,
+  "independentReview": "EXPLORE-DOLLAR-EXPERIENCE-REVIEW.md",
+  "independentChecks": {
+    "functional": 99,
+    "sourceRecovery": 24,
+    "mapMonthlyAndPrecision": 99,
+    "orientation": 71,
+    "malformedImport": 7
+  },
+  "browserMode": "headless Chromium",
+  "viewports": [
+    "1440x1000",
+    "390x844",
+    "320x844",
+    "844x390"
+  ],
+  "billedInferenceRequests": 0,
+  "localHealth": {
+    "codeVersion": "4023c241564f35f0fcec",
+    "status": "public-beta",
+    "releaseId": "e77b2ab3ebae30a03931",
+    "records": 317936,
+    "retrievedAt": "2026-10-18T23:28:38Z",
+    "builtAt": "2026-10-21T08:08:03.136Z",
+    "nationalComplete": false
+  },
+  "localBrowserResults": {
+    "energy-story": {
+      "status": "passed",
+      "base": "http://127.0.0.1:4203/",
+      "checks": [
+        "source-backed default and late status preservation",
+        "keyboard repricing, reactive explanation, undo and URL reload",
+        "map selection, partner comparison, full directional table and domestic accounting identity",
+        "budget benchmark and period, national scope and duration, unchanged forecast dataset and unavailable provincial response",
+        "gas local benchmark and electricity and household model gaps",
+        "pin restore, complete export replay, imported snapshot and malformed-file recovery",
+        "browser back and mobile overview and table",
+        "contextual AI handoff and reactive OpenUI findings with one mocked provider request",
+        "forecast detail handoff retains year and both provinces",
+        "source-loading retry and explicit invalid shared-state recovery",
+        "existing and new navigation contains all controls from 320 to 1440 pixels"
+      ],
+      "providerCalls": "mocked; no billed inference",
+      "runtimeErrors": []
+    },
+    "follow-dollar": {
+      "status": "passed",
+      "checks": [
+        "GDP, labour income and jobs show distinct model results with direct allocation values",
+        "Published zero stays zero and unavailable coefficients remain unavailable even at zero demand",
+        "Evidence exposes all exact measures, stages, definitions and official source, exports the full snapshot, and restores keyboard focus",
+        "All scenario inputs and the chosen outcome survive URL reload",
+        "1440px, 390px and 320px layouts keep labels apart and evidence in the viewport",
+        "Large calculated totals hide binary arithmetic residue while the export retains the model values",
+        "Initial Canada scope, invalid reference year and excessive demand retain existing normalization"
+      ],
+      "errors": [],
+      "inferenceRequests": []
+    },
+    "monthly-energy": {
+      "checks": [
+        "All 14 jurisdictions and all three measures match source-derived monthly observations alongside annual GDP",
+        "Explicit zero, undefined growth and confidential oil remain distinguishable",
+        "24-month trend tables and self-contained data export reproduce the displayed selection",
+        "Changing the annual scenario and projection year leaves monthly actuals unchanged",
+        "Forecast inspector synchronizes province without silently changing model inputs",
+        "Question view follows commodity and comparison; price shocks do not rewrite observations; shared state reloads",
+        "All four views fit 390px and 320px screens",
+        "Monthly endpoint failure leaves annual view usable and retry recovers"
+      ],
+      "errors": [],
+      "dataVersion": "bc33daac7ade7de311b2"
+    },
+    "price-impacts": {
+      "status": "passed",
+      "checks": [
+        "AB exploratory result requires disclosure; QC accepted result is visible; five signed and zero shocks match raw-data arithmetic",
+        "Response horizon changes the result; held-out historical errors and complete table are reachable",
+        "Both provincial oil spending equivalents match raw CPI response paths for five shocks; annual accuracy caveat and 72 audit months are reachable",
+        "Gas failed calibration does not display a bill estimate; gas and electricity retail scenarios require explicit selection and use direct spending arithmetic",
+        "Unavailable territory household data and electricity GDP response do not become zero",
+        "Both chapters have no page overflow at 390 and 320 pixels",
+        "Household price basis and shock survive a shared URL reload"
+      ],
+      "errors": [],
+      "providerCalls": 0
+    },
+    "price-impacts-retry": {
+      "status": "passed",
+      "checks": [
+        "household-energy-costs correctly identifies HTTP 503 and reload restores data with all selected scenario controls preserved",
+        "provincial-price-response correctly identifies HTTP 503 and reload restores data with all selected scenario controls preserved"
+      ],
+      "errors": [],
+      "providerCalls": 0
+    },
+    "research-late-status": {
+      "status": "passed",
+      "providerCalls": 0,
+      "results": [
+        {
+          "view": "income",
+          "checks": [
+            "DOM identity",
+            "focused control",
+            "open disclosure",
+            "edited inputs",
+            "calculation/episode identity",
+            "late AI status",
+            "late context data"
+          ]
+        },
+        {
+          "view": "history",
+          "checks": [
+            "DOM identity",
+            "focused control",
+            "open disclosure",
+            "edited inputs",
+            "calculation/episode identity",
+            "late AI status",
+            "late context data"
+          ]
+        }
+      ]
+    },
+    "connected-views": {
+      "status": "passed",
+      "checks": [
+        "one evidence destination with citations",
+        "explicit Ask task",
+        "Escape and source focus restore",
+        "Alberta totals separate from mapped records",
+        "record inspection retains map and filters",
+        "atlas context before map",
+        "map remains drawn after mobile resize",
+        "receipt export remains reachable",
+        "transport map visible through all stages",
+        "atlas-to-transport map sizing",
+        "shipment reprices",
+        "destination selection and reload",
+        "320px and landscape",
+        "old layer preferences cannot hide selected route"
+      ],
+      "providerCalls": 0
+    },
+    "dialog-dismissal": {
+      "status": "passed",
+      "checks": [
+        "dismissal survives late context data",
+        "error and draft preserved for intentional reopening"
+      ],
+      "mockedRequests": 1,
+      "providerCalls": 0
+    },
+    "remaining-views": {
+      "status": "passed",
+      "checks": [
+        "Income keeps nominal value and recent real growth distinct, comparison precedes monthly activity, map/ranking/table link selection, monthly evidence exports",
+        "Futures has one series, explicitly global benchmarks, missing values, conditional retail indices, selected annual data export and shared-state restoration",
+        "Oil national export matches visible calculation; experiment and history are exclusive, mode survives reload and prior inputs persist",
+        "390px,320px and short landscape fit; futures axis text remains at least11px; zero runtime errors"
+      ],
+      "errors": [],
+      "providerCalls": 0
+    },
+    "guided-scenarios": {
+      "status": "passed",
+      "checks": [
+        "selected trade, negative repricing, stage focus, supported-only GDP, annual household caveat, export and URL reload",
+        "gas/electricity unavailable models, explicit independent retail assumption, commodity changes preserve stage",
+        "320/390px layout and offline restored source snapshot",
+        "partial source failure, exchange remains usable, retry, return to selected network, zero runtime errors"
+      ],
+      "errors": []
+    }
+  },
+  "publicBetaGate": {
+    "passed": true,
+    "scope": "public-beta",
+    "nationalComplete": false,
+    "releaseId": "e77b2ab3ebae30a03931",
+    "checkedAt": "2026-10-21T08:06:50.309Z",
+    "errors": []
+  },
+  "changes": [
+    "Explore puts the selected chapter result directly below its controls; one contextual Evidence and one Save dialog replace repeated reports and disclosures.",
+    "Follow the dollar shows one outcome and its provincial allocation; sources and full calculations share one Evidence dialog.",
+    "Failed models, missing values, benchmark definitions and household spending qualifiers remain explicit.",
+    "Selected outcomes persist through shared links and exports; resizing keeps the active account visible."
+  ]
+}

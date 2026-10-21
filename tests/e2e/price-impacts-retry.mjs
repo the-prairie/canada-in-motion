@@ -24,7 +24,7 @@ for(const [dataset,chapter,selector] of [['household-energy-costs','households',
  assert.equal(await panel.locator('.pr-estimate').count(),0);
  fail=false;await panel.getByRole('button',{name:'Reload published sources',exact:true}).click();
  if(chapter==='households')await panel.locator('[data-household-region=QC] .pr-estimate').waitFor();
- else await panel.locator('[data-price-region=QC] .pr-validation').waitFor();
+ else await panel.locator('[data-price-region=QC]').filter({hasText:/Passed the stated|did not pass/}).waitFor();
  assert.equal(await root.getByLabel('Investigation province',{exact:true}).inputValue(),'QC');
  assert.equal(await root.getByLabel('Comparison province',{exact:true}).inputValue(),'AB');
  assert.equal(await root.locator('#es-price').inputValue(),'10');

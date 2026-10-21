@@ -21,14 +21,15 @@ async function check(kind){
     await page.goto(base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy:state})));
     const host=page.locator(hostId);await host.locator('.hw-shell').waitFor();
     const hostHandle=await host.elementHandle();
-    const detail=kind==='income'?host.locator('.hw-method-inline'):host.getByRole('dialog',{name:'Historical oil and GDP evidence'});
-    if(kind==='income')await detail.locator('summary').click();
+    const evidenceTitle=kind==='income'?'Follow the dollar evidence':'Historical oil and GDP evidence';
+    const detail=host.getByRole('dialog',{name:evidenceTitle});
     let controlHandle,focusHandle,selectedEpisode;
     if(kind==='income'){
       const input=host.getByLabel('Additional final demand in million dollars',{exact:true});
       await input.fill('250');controlHandle=await input.elementHandle();
       await host.getByLabel('Multiplier reference year',{exact:true}).selectOption('2021');
-      await host.locator('.hw-induced input').check();
+      await host.getByRole('checkbox',{name:/Include household spending/}).check();
+      await host.getByRole('button',{name:'Labour income',exact:true}).click();
     }else{
       const horizon=host.getByLabel('Historical GDP horizon',{exact:true});
       await horizon.selectOption('1');controlHandle=await horizon.elementHandle();
@@ -36,10 +37,8 @@ async function check(kind){
       await host.locator('.hw-episodes button').nth(2).click();
       selectedEpisode=await host.locator('.hw-episodes button[aria-pressed="true"]').innerText();
     }
-    if(kind==='history'){
-      await host.getByRole('button',{name:'Evidence',exact:true}).click();
-      focusHandle=await detail.getByRole('button',{name:'Close Historical oil and GDP evidence',exact:true}).elementHandle();
-    }else focusHandle=controlHandle;
+    await host.getByRole('button',{name:'Evidence',exact:true}).click();
+    focusHandle=await detail.getByRole('button',{name:`Close ${evidenceTitle}`,exact:true}).elementHandle();
     await focusHandle.focus();
     const originalContent=await host.innerText();
     const verify=async phase=>{
@@ -51,7 +50,8 @@ async function check(kind){
       if(kind==='income'){
         assert.equal(await host.getByLabel('Additional final demand in million dollars',{exact:true}).inputValue(),'250');
         assert.equal(await host.getByLabel('Multiplier reference year',{exact:true}).inputValue(),'2021');
-        assert.equal(await host.locator('.hw-induced input').isChecked(),true);
+        assert.equal(await host.getByRole('checkbox',{name:/Include household spending/}).isChecked(),true);
+        assert.equal(await host.getByRole('button',{name:'Labour income',exact:true}).getAttribute('aria-pressed'),'true');
       }else{
         assert.equal(await host.getByLabel('Historical GDP horizon',{exact:true}).inputValue(),'1');
         assert.equal(await host.getByLabel('Historical oil price change',{exact:true}).inputValue(),'-20');

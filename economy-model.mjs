@@ -38,6 +38,7 @@ export function normalizeEconomyState(input = {}) {
     incomeYear: raw.incomeYear == null ? null : bounded(Math.round(number(raw.incomeYear,2022)),2010,2100),
     demandMillion: bounded(number(raw.demandMillion,100),0,10000),
     includeInduced: raw.includeInduced===true,
+    incomeMeasure: ['gdp','labour','jobs'].includes(raw.incomeMeasure)?raw.incomeMeasure:'gdp',
     historyRegions: Array.isArray(raw.historyRegions)&&raw.historyRegions.some(c=>ECONOMY_REGIONS.includes(c))?[...new Set(raw.historyRegions.filter(c=>ECONOMY_REGIONS.includes(c)))]:['AB','ON','QC'],
     historyOilChange: [-60,-40,-20,-10,0,10,20,40,60,100].includes(raw.historyOilChange)?raw.historyOilChange:10,
     historyYear: Number.isInteger(raw.historyYear)&&raw.historyYear>=1980&&raw.historyYear<=2100?raw.historyYear:null,

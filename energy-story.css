@@ -1,3 +1,4 @@
+
 .ec-context-explore {padding:10px 0;min-height:65px}
 .ec-context-explore nav {align-items:center}
 .ec-data-menu {position:relative}
@@ -10,20 +11,12 @@
 .es-shell button:disabled {opacity:.4;cursor:default}
 .es-shell input:focus-visible,.es-shell svg [role=button]:focus-visible {outline:2px solid var(--es-green);outline-offset:4px}
 .es-heading {display:flex;gap:24px;justify-content:space-between;align-items:flex-start;padding:20px 0 32px}
-#energy-economy .es-eyebrow {font:11px/1.5 'IBM Plex Mono',monospace;letter-spacing:1px;text-transform:uppercase;color:#5b665e;margin:0 0 12px}
 #energy-economy .es-heading h1 {font-size:clamp(30px,4.2vw,56px);max-width:800px;letter-spacing:-1.8px;line-height:1.12;margin:0;font-weight:500}
-.es-actions {display:flex;gap:8px;align-items:center;flex-shrink:0}
-.es-actions>button {font-size:13px}
-.es-actions details {position:relative}
-#energy-economy .es-actions summary {padding:11px 14px;border:1px solid #a4aca1;font-size:13px}
-.es-actions details>div {position:absolute;right:0;top:100%;min-width:220px;background:var(--paper);border:1px solid var(--line);z-index:12;display:grid;box-shadow:0 8px 24px #24312a14;padding:6px}
-.es-actions details button {text-align:left;font-size:13px}
-.es-actions button:hover,.es-actions details button:focus-visible {background:var(--es-soft)}
 .es-assumptions {display:grid;grid-template-columns:auto 1fr 1fr minmax(220px,1.2fr);gap:24px;align-items:center;padding:24px 0;border-top:1px solid #aab3a7;border-bottom:1px solid var(--line)}
 .es-commodity {display:flex;flex-direction:column;border-left:2px solid var(--line);min-width:120px}
 .es-commodity button {text-align:left;padding:6px 16px;min-height:32px;font-size:14px;border-left:2px solid transparent;margin-left:-2px;color:#657065}
 .es-commodity button[aria-pressed=true] {color:var(--es-green);font-weight:600;border-color:var(--es-green);background:#dfe8df6b}
-.es-assumptions>label,.es-assumption-detail label,.es-duration {font-size:12px;color:#586259;display:grid;gap:7px}
+.es-assumptions>label,.es-duration {font-size:12px;color:#586259;display:grid;gap:7px}
 #energy-economy .es-shell select {background:transparent;border:0;border-bottom:1px solid #9fa99c;border-radius:0;font-size:16px;padding-left:0;cursor:pointer}
 .es-price {min-width:0;padding-left:12px}
 .es-price>label {display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#586259}
@@ -31,19 +24,12 @@
 .es-price input {display:block;width:100%;height:28px;margin:9px 0 0;accent-color:var(--es-green);cursor:pointer}
 .es-price>div {display:flex;align-items:center;justify-content:space-between;font:11px 'IBM Plex Mono',monospace;color:#657065}
 .es-price>div button {min-height:28px;font:12px 'IBM Plex Sans',sans-serif;padding:3px 8px;text-decoration:underline;text-underline-offset:3px}
-#energy-economy .es-assumption-detail {margin:2px 0 24px}
-#energy-economy .es-assumption-detail summary {font-size:12px;color:#586259}
-.es-assumption-detail[open] {background:#ebeee5;padding:0 18px 12px}
-.es-assumption-detail p {max-width:850px}
-.es-assumption-detail label {max-width:220px}
 .es-chapters {display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border-bottom:1px solid #a7b1a4;gap:8px}
 .es-chapters button {text-align:left;border-bottom:3px solid transparent;margin-bottom:-1px;padding:8px 8px 14px;color:#637061;font-size:14px;white-space:nowrap}
 .es-chapters button span {display:block;font:10px 'IBM Plex Mono',monospace;letter-spacing:1px;margin-bottom:7px;color:#768271}
 .es-chapters button[aria-pressed=true] {border-color:var(--es-green);color:var(--es-green);font-weight:600}
 .es-chapters button[aria-pressed=true] span {color:var(--es-green)}
 .es-chapters button:hover {background:#e8ece350}
-.es-current-answer {padding:28px 0 26px;max-width:960px}
-#energy-economy .es-current-answer p {font-size:clamp(20px,2.2vw,29px);line-height:1.38;letter-spacing:-.45px;margin:0;color:#213d33}
 .es-section-heading {display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:1px solid var(--line);padding:24px 0 20px}
 #energy-economy .es-section-heading h2 {font-size:20px;letter-spacing:-.35px;margin:0}
 #energy-economy .es-section-heading p {font:11px/1.55 'IBM Plex Mono',monospace;color:#657065;margin:6px 0 0}
@@ -66,15 +52,9 @@
 .es-metric>strong {font-size:36px;line-height:1.15;font-weight:500;letter-spacing:-1.3px;font-variant-numeric:tabular-nums;color:var(--es-green)}
 .es-metric>small {font-size:12px;color:#677063;max-width:280px;line-height:1.5}
 #energy-economy .es-purchases h3 {font-size:20px;margin-bottom:5px}
-.es-purchases button,.es-text-button,.es-comparison-note button,.es-people button {text-decoration:underline;text-underline-offset:4px;padding-left:0}
+.es-purchases button,.es-text-button {text-decoration:underline;text-underline-offset:4px;padding-left:0}
 .es-comparison {border-block:1px solid var(--line);padding:24px 0;margin-bottom:24px}
 .es-comparison>div {display:grid;grid-template-columns:1fr 1fr;gap:40px;margin:18px 0 8px}
-.es-next-steps {display:grid;grid-template-columns:1fr 1fr;gap:26px}
-.es-next-steps button {display:grid;grid-template-columns:1fr auto;text-align:left;padding:20px 0;border-top:2px solid #9bac98}
-.es-next-steps button>span:first-child {font-size:11px;color:#657065;grid-column:1}
-.es-next-steps strong {grid-column:1;font-size:16px;font-weight:500;line-height:1.4;margin-top:10px;max-width:390px}
-.es-next-steps button>span:last-child {grid-column:2;grid-row:1 / span 2;align-self:center;font-size:24px;padding-left:20px}
-.es-next-steps button:hover {color:var(--es-green)}
 .es-view-switch {display:flex;border:1px solid #9fad99}
 .es-view-switch button {min-height:34px;font-size:12px;padding:6px 14px}
 .es-view-switch [aria-pressed=true] {background:var(--es-green);color:white}
@@ -104,32 +84,15 @@
 .es-table th,.es-table td {border-bottom:1px solid var(--line);padding:13px 10px;text-align:left;white-space:nowrap}
 .es-table th {font-weight:500}
 .es-table td:nth-child(3),.es-table td:nth-child(4) {font-family:'IBM Plex Mono',monospace;text-align:right}
-.es-fiscal,.es-national,.es-context-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:36px;padding:4px 0 22px}
-.es-fiscal article,.es-national article,.es-context-grid article {padding:24px;background:#e7ece1;border-top:2px solid #859f85}
-.es-fiscal-value,.es-national article>strong,.es-context-grid article>strong {font-size:44px;font-weight:500;letter-spacing:-1.6px;color:var(--es-green);display:block;margin:18px 0 10px}
+.es-fiscal,.es-national {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:36px;padding:4px 0 22px}
+.es-fiscal article,.es-national article {padding:24px;background:#e7ece1;border-top:2px solid #859f85}
+.es-fiscal-value,.es-national article>strong {font-size:44px;font-weight:500;letter-spacing:-1.6px;color:var(--es-green);display:block;margin:18px 0 10px}
 .es-national article>strong {font-size:58px}
 .es-national small {font-size:12px;line-height:1.5;color:#657065;display:block}
 .es-duration {max-width:230px;margin:0 0 10px}
 #energy-economy .es-scope {font-size:13px;border-left:2px solid #a59b7e;padding:4px 0 4px 16px;color:#5f685c;max-width:800px}
 .es-gap {padding:24px;background:#ecece1;max-width:800px}
 .es-gap button {border:1px solid #a6ae9e;margin-top:8px}
-.es-people {display:grid;grid-template-columns:1fr 1fr;gap:30px 40px;padding-top:10px}
-.es-people article {display:flex;gap:16px;border-top:1px solid var(--line);padding-top:22px}
-.es-people article>span {font:12px 'IBM Plex Mono',monospace;color:#6b7867}
-.es-people strong {font-size:12px;font-weight:500}
-.es-evidence {border-block:1px solid var(--line);margin-top:32px}
-.es-evidence[open] {padding-bottom:16px}
-.es-evidence small {display:block;color:#687464}
-.es-followup {margin:34px 0 12px;padding:24px 0 0}
-#energy-economy .es-followup h2 {font-size:20px}
-.es-followup-buttons {display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
-.es-followup-buttons button {border:1px solid #a8b3a1;padding:11px 16px;font-size:13px;text-align:left}
-.es-followup-buttons button:hover {background:#e5ebe1}
-.es-ask {max-width:800px}
-.es-ask label {font-size:12px;display:block;margin:10px 0}
-.es-ask form>div {display:flex;gap:12px}
-.es-ask input {min-width:0;flex:1;padding:12px;background:transparent;border:1px solid #9fad99}
-.es-ask button {background:var(--es-green);color:white}
 .es-notice,.es-pinned {padding:12px 16px;background:#e5ebe1;font-size:13px}
 .es-pinned {display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
 .es-pinned>span {margin-right:auto}
@@ -138,59 +101,66 @@
 #energy-economy .hw-finding-primary {font-size:20px;line-height:1.5;max-width:950px}
 .hw-finding-evidence ul {margin-bottom:0}
 @media(max-width:1100px) {
- .es-heading {display:block}.es-actions {justify-content:flex-end;margin-top:16px}
- .es-assumptions {gap:20px;grid-template-columns:100px 1fr 1fr 1.2fr}
- .es-commodity {min-width:0}.es-commodity button {padding-inline:10px}
- .es-chapters {gap:0}.es-chapters button {font-size:12px}
- .es-sales {gap:28px}.es-delta {flex-direction:column;gap:0!important}
- .es-trade-layout {grid-template-columns:minmax(0,1.5fr) 1fr;gap:24px}
+.es-heading {display:block}
+.es-assumptions {gap:20px;grid-template-columns:100px 1fr 1fr 1.2fr}
+.es-commodity {min-width:0}
+.es-commodity button {padding-inline:10px}
+.es-chapters {gap:0}
+.es-chapters button {font-size:12px}
+.es-sales {gap:28px}
+.es-delta {flex-direction:column;gap:0!important}
+.es-trade-layout {grid-template-columns:minmax(0,1.5fr) 1fr;gap:24px}
 }
 @media(max-width:700px) {
- .ec-context-explore {min-height:54px}.ec-context-explore nav {display:flex;flex-wrap:nowrap;order:0;flex-basis:auto}
- .ec-context-explore nav>button {padding:8px 12px}.ec-context-explore .ec-context-actions:empty {display:none}
- .ec-data-menu>div {left:auto;right:0}
- .es-heading {padding:6px 0 22px}#energy-economy .es-heading h1 {font-size:34px;line-height:1.13;letter-spacing:-1.2px;margin:0}
- #energy-economy .es-eyebrow {font-size:9px;letter-spacing:.7px}.es-actions {margin-top:12px}
- .es-assumptions {grid-template-columns:1fr 1fr;gap:18px;padding:18px 0}
- .es-commodity {grid-column:1 / -1;flex-direction:row;border:0;border-bottom:1px solid var(--line)}
- .es-commodity button {border:0;border-bottom:2px solid transparent;flex:1;margin:0 0 -1px;min-height:40px;text-align:center}
- #energy-economy .es-shell select {font-size:14px}
- .es-price {grid-column:1 / -1;padding:5px 0 0}.es-price output {font-size:28px}
- .es-chapters {grid-template-columns:repeat(3,minmax(0,1fr));border:0;gap:5px 0}
- .es-chapters button {min-height:50px;font-size:11px;white-space:normal;border-bottom:1px solid #b8c2b0;padding:8px 5px}
- .es-chapters button span {font-size:9px;margin-bottom:4px}
- .es-chapters button[aria-pressed=true] {border-bottom:3px solid var(--es-green)}
- #energy-economy .es-assumption-detail {margin-bottom:15px}
- .es-current-answer {padding:24px 0}#energy-economy .es-current-answer p {font-size:22px}
- .es-section-heading {display:block;padding:20px 0 14px}#energy-economy .es-section-heading h2 {font-size:18px}
- .es-sales {grid-template-columns:1fr;gap:26px}.es-value-change>div:first-child {margin-bottom:12px}
- #energy-economy .es-delta {flex-direction:row;gap:12px!important;margin-top:12px}.es-delta strong {font-size:30px}.es-delta span {font-size:11px;max-width:120px}
- .es-purchases {grid-template-columns:1fr;gap:22px;margin:20px 0}.es-purchases h3 {font-size:18px!important}
- .es-metric>strong {font-size:32px}.es-comparison>div {gap:18px}
- .es-next-steps {grid-template-columns:1fr;gap:8px}.es-next-steps button {padding:15px 0}
- .es-trade-layout {grid-template-columns:1fr;gap:20px}.es-map-wrap svg {height:290px}
- .es-view-switch {width:max-content;margin:12px 0 0}
- .es-map-key {align-items:flex-start}.es-map-key>span {padding-top:12px}
- .es-fiscal,.es-national,.es-context-grid {gap:16px}
- .es-fiscal article,.es-national article,.es-context-grid article {padding:20px}
- .es-people {grid-template-columns:1fr;gap:18px}
- .es-followup {margin-top:22px}.es-followup-buttons {display:grid;grid-template-columns:1fr}
- .es-ask form>div {flex-direction:column}.es-ask input {width:100%}
- .es-pinned {gap:0 12px}.es-pinned>span {flex-basis:100%}
- #energy-economy .hw-finding-primary {font-size:17px}
+.ec-context-explore {min-height:54px}
+.ec-context-explore nav {display:flex;flex-wrap:nowrap;order:0;flex-basis:auto}
+.ec-context-explore nav>button {padding:8px 12px}
+.ec-context-explore .ec-context-actions:empty {display:none}
+.ec-data-menu>div {left:auto;right:0}
+.es-heading {padding:6px 0 22px}
+#energy-economy .es-heading h1 {font-size:34px;line-height:1.13;letter-spacing:-1.2px;margin:0}
+.es-assumptions {grid-template-columns:1fr 1fr;gap:18px;padding:18px 0}
+.es-commodity {grid-column:1 / -1;flex-direction:row;border:0;border-bottom:1px solid var(--line)}
+.es-commodity button {border:0;border-bottom:2px solid transparent;flex:1;margin:0 0 -1px;min-height:40px;text-align:center}
+#energy-economy .es-shell select {font-size:14px}
+.es-price {grid-column:1 / -1;padding:5px 0 0}
+.es-price output {font-size:28px}
+.es-chapters {grid-template-columns:repeat(3,minmax(0,1fr));border:0;gap:5px 0}
+.es-chapters button {min-height:50px;font-size:11px;white-space:normal;border-bottom:1px solid #b8c2b0;padding:8px 5px}
+.es-chapters button span {font-size:9px;margin-bottom:4px}
+.es-chapters button[aria-pressed=true] {border-bottom:3px solid var(--es-green)}
+.es-section-heading {display:block;padding:20px 0 14px}
+#energy-economy .es-section-heading h2 {font-size:18px}
+.es-sales {grid-template-columns:1fr;gap:26px}
+.es-value-change>div:first-child {margin-bottom:12px}
+#energy-economy .es-delta {flex-direction:row;gap:12px!important;margin-top:12px}
+.es-delta strong {font-size:30px}
+.es-delta span {font-size:11px;max-width:120px}
+.es-purchases {grid-template-columns:1fr;gap:22px;margin:20px 0}
+.es-purchases h3 {font-size:18px!important}
+.es-metric>strong {font-size:32px}
+.es-comparison>div {gap:18px}
+.es-trade-layout {grid-template-columns:1fr;gap:20px}
+.es-map-wrap svg {height:290px}
+.es-view-switch {width:max-content;margin:12px 0 0}
+.es-map-key {align-items:flex-start}
+.es-map-key>span {padding-top:12px}
+.es-fiscal,.es-national {gap:16px}
+.es-fiscal article,.es-national article {padding:20px}
+.es-pinned {gap:0 12px}
+.es-pinned>span {flex-basis:100%}
+#energy-economy .hw-finding-primary {font-size:17px}
 }
 @media(prefers-reduced-motion:no-preference) {
- .es-bar-row>i {transition:width .18s ease-out}
+.es-bar-row>i {transition:width .18s ease-out}
 }
 @media(max-width:760px) {
- .ec-context:not(.ec-context-explore) nav {grid-template-columns:repeat(3,minmax(0,1fr))}
- .ec-context:not(.ec-context-explore) nav button {white-space:normal;min-width:0}
+.ec-context:not(.ec-context-explore) nav {grid-template-columns:repeat(3,minmax(0,1fr))}
+.ec-context:not(.ec-context-explore) nav button {white-space:normal;min-width:0}
 }
-
 .es-trade-balance {border-block:1px solid var(--line);margin:20px 0;padding:0 0 2px}
 .es-balance-grid {display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:12px 0}
 .es-trade-balance p {max-width:780px}
-.es-gdp-context {max-width:750px;margin-bottom:24px!important}
 .pr-cards {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:28px;margin:22px 0}
 .pr-cards>article {min-width:0;border-top:2px solid #8ca28b;padding:22px 0}
 .pr-estimate {display:block;font-family:var(--mono);font-size:44px;font-weight:500;color:#276a5e;line-height:1.3;margin:14px 0}
@@ -201,7 +171,7 @@
 .pr-note {font-size:13px!important;color:#5b665c;line-height:1.7!important}
 .pr-status {font-size:12px!important;color:#356e5c}
 .pr-validation {border-top:1px solid var(--line);margin-top:24px}
-.pr-validation summary,.pr-exploratory summary,.pr-independent-outlook>summary,.pr-other-effects>summary {min-height:44px;padding:13px 0;cursor:pointer}
+.pr-validation summary {min-height:44px;padding:13px 0;cursor:pointer}
 .pr-error-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}
 .pr-error-grid dt,.pr-household-values dt {font-size:12px;color:#667066}
 .pr-error-grid dd,.pr-household-values dd {margin:7px 0;font:18px var(--mono)}
@@ -216,11 +186,85 @@
 .pr-basis {display:flex;gap:0;border-bottom:1px solid var(--line);margin:5px 0 20px}
 .pr-basis button {min-height:44px;padding:10px 18px;background:none;border:0;border-bottom:3px solid transparent;color:#626c62}
 .pr-basis button[aria-pressed=true] {border-bottom-color:#276a5e;color:#214e42}
-.pr-independent-outlook,.pr-other-effects {border-block:1px solid var(--line);margin-top:30px}
 @media(max-width:600px) {
- .pr-cards {gap:12px;margin:16px 0}
- .pr-estimate {font-size:36px}
- .pr-basis button {padding:9px 10px;font-size:13px;flex:1}
- .pr-error-grid {gap:8px}.pr-error-grid dd {font-size:16px}
- .pr-scope,.pr-population {font-size:13px!important}
+.pr-cards {gap:12px;margin:16px 0}
+.pr-estimate {font-size:36px}
+.pr-basis button {padding:9px 10px;font-size:13px;flex:1}
+.pr-error-grid {gap:8px}
+.pr-error-grid dd {font-size:16px}
+.pr-scope,.pr-population {font-size:13px!important}
+}
+.es-focused .es-heading {align-items:start;padding:0 0 20px;display:flex}
+#energy-economy .es-focused .es-heading h1 {font-size:clamp(28px,3.1vw,42px);max-width:900px;letter-spacing:-1px}
+.es-focused .es-evidence-button {border:1px solid #a8b3a8;padding:8px 14px;flex-shrink:0;font-size:14px}
+.es-focused .es-assumptions {padding:18px 0;gap:20px;grid-template-columns:130px minmax(160px,1fr) minmax(160px,1fr) minmax(200px,1.1fr)}
+.es-focused .es-chapters {display:flex;flex-wrap:wrap;gap:0 18px;padding:10px 0 0}
+.es-focused .es-chapters button {font-size:14px;padding:10px 2px;min-height:44px}
+.es-focused .es-section-heading {border-top:0;padding:24px 0 20px}
+.es-focused .es-section-heading h2 {font-size:22px}
+.es-focused .es-trade-year {display:flex;align-items:center;gap:12px;font-size:12px;margin-left:auto;color:#56645c;flex-shrink:0}
+#energy-economy .es-focused .es-trade-year select {width:100px;padding-left:10px;border:1px solid #a8b3a8}
+.es-focused .es-purchases {grid-template-columns:minmax(220px,1fr) 1fr;padding:20px 0;margin:24px 0;gap:28px;align-items:center}
+.es-focused .es-purchases>p {font-size:14px;color:#56645c;max-width:38ch}
+.es-focused .es-comparison {border-bottom:0;margin-bottom:0}
+.es-focused .es-fiscal article,.es-focused .es-national article {background:transparent;padding:20px 0;border-top:1px solid var(--line)}
+.es-focused .es-fiscal,.es-focused .es-national {gap:32px}
+.es-focused .es-national article>strong {font-size:44px}
+.es-focused .es-duration {display:flex;align-items:center;gap:12px;margin:0;max-width:360px}
+.es-focused .es-duration select {min-width:150px}
+.es-focused .es-gap {background:transparent;border-top:1px solid var(--line);padding:24px 0;line-height:1.6}
+.es-focused .pr-scope {font-size:13px;color:#56645c;line-height:1.5;max-width:82ch}
+.es-focused .pr-cards {margin:18px 0}
+.es-focused .pr-cards>article {padding-top:18px;border-top:1px solid var(--line)}
+.es-focused .pr-place {font-size:18px!important}
+.pr-place small {display:block;font-size:13px;font-weight:400;color:#56645c;margin-top:5px}
+.pr-result-status {font-weight:500}
+.es-outlook-link {display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:1px solid var(--line);padding:16px 0;font-size:13px;color:#56645c}
+.es-outlook-link button {font-size:13px;text-decoration:underline;text-underline-offset:3px}
+.es-tools {border-top:1px solid var(--line);margin-top:24px;padding-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+.es-tools button {font-size:13px;padding-inline:8px;text-decoration:underline;text-underline-offset:3px}
+.es-tools button:last-child {margin-left:auto}
+.es-evidence-tabs {display:flex;gap:8px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.es-evidence-tabs button {font-size:14px;border-bottom:2px solid transparent}
+.es-evidence-tabs button[aria-pressed=true] {border-color:#286b5d}
+.es-evidence-dialog section+section {border-top:1px solid var(--line);margin-top:24px;padding-top:8px}
+.es-evidence-dialog .es-table {max-height:350px;margin-block:20px}
+.es-evidence-dialog .pr-validation {margin-top:20px;padding-top:12px}
+.es-evidence-dialog .pr-validation h4 {font-size:15px;font-weight:500;margin:8px 0}
+.es-evidence-dialog .pr-estimate {font-size:28px}
+.es-save-actions {display:grid;gap:10px;margin-bottom:20px}
+.es-save-actions button {border:1px solid #a8b3a8;text-align:left;padding:10px 14px}
+#energy-economy .es-snapshot {font-size:13px;padding:12px 0;color:#56645c}
+@media(max-width:1100px){
+.es-focused .es-assumptions {grid-template-columns:100px minmax(120px,1fr) minmax(120px,1fr) minmax(180px,1fr);gap:16px}}
+@media(max-width:760px){
+.es-focused .es-assumptions {grid-template-columns:1fr 1fr;gap:14px;padding:12px 0 16px}
+.es-focused .es-commodity {grid-column:1/-1;flex-direction:row;border:0;border-bottom:1px solid var(--line)}
+.es-focused .es-commodity button {border:0;border-bottom:2px solid transparent;flex:1;margin:0 0 -1px;min-height:44px;text-align:center;padding:6px}
+.es-focused .es-commodity button[aria-pressed=true] {border-color:#286b5d}
+.es-focused .es-price {grid-column:1/-1;padding:0}
+.es-focused .es-heading {gap:14px;padding-bottom:18px}
+#energy-economy .es-focused .es-heading h1 {font-size:28px;letter-spacing:-.6px;line-height:1.2}
+.es-focused .es-evidence-button {font-size:12px;padding:8px 10px}
+.es-focused .es-chapters {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 8px;border-bottom:1px solid var(--line)}
+.es-focused .es-chapters button {font-size:13px;white-space:normal;text-align:center;line-height:1.3;border-bottom:2px solid transparent;min-height:50px}
+.es-focused .es-chapters button[aria-pressed=true] {border-color:#286b5d}
+.es-focused .es-section-heading {display:flex;flex-wrap:wrap;gap:12px;padding-block:20px 16px}
+.es-focused .es-section-heading h2 {font-size:20px}
+.es-focused .es-trade-year {margin:0;gap:8px}
+.es-focused .es-trade-year select {width:90px!important}
+.es-focused .es-purchases {grid-template-columns:1fr;gap:10px}
+.es-focused .es-purchases>p {margin:0}
+.es-focused .es-duration {display:grid;gap:4px;width:100%;max-width:none}
+.es-outlook-link {display:block}
+.es-outlook-link button {display:block;padding-left:0}
+.es-tools {gap:0}
+.es-tools button {font-size:12px}
+.es-tools button:last-child {margin-left:0}
+.es-focused .es-section-heading label {max-width:100%}
+.es-evidence-dialog .es-balance-grid {grid-template-columns:1fr;gap:20px}
+.es-evidence-dialog .pr-error-grid {grid-template-columns:1fr;gap:12px}
+.es-evidence-dialog .pr-error-grid>div {display:flex;gap:16px;align-items:center;justify-content:space-between}
+.es-evidence-dialog .pr-error-grid dd {margin:0;font-size:16px}
+.es-evidence-tabs button {font-size:13px;padding-inline:8px}
 }

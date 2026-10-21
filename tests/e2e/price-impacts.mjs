@@ -27,39 +27,42 @@ const hhEffect=(region,n)=>{const b=hh.spendingBaselines.find(m=>m.region===regi
 const open=async loc=>{if(!await loc.evaluate(e=>e.open))await loc.locator(':scope > summary').click();};
 try{
 await page.goto(base);await root.locator('.es-sales').waitFor();
-await province('AB');await comparison('QC');await chapter('Provincial outlook');
-await root.locator('[data-price-region=AB] .pr-exploratory').waitFor();
+await province('AB');await comparison('QC');await chapter('Provincial GDP');
+await root.locator('[data-price-region=AB] .pr-result-status').waitFor();
 assert.match(await root.locator('[data-price-region=AB]').innerText(),/did not pass/);
 assert.equal(await root.locator('[data-price-region=AB] .pr-estimate').isVisible(),false);
 assert.match(await root.locator('[data-price-region=QC]').innerText(),/Passed the stated/);
-await open(root.locator('[data-price-region=AB] .pr-exploratory'));
 for(const n of [-20,-10,0,10,20]){
  await shock(n);
- assert.equal(await root.locator('[data-price-region=AB] .pr-estimate').innerText(),percentage(gdpEffect('AB',0,n)));
+ assert.equal(await root.locator('[data-price-region=AB] .pr-estimate').count(),0);
  assert.equal(await root.locator('[data-price-region=QC] .pr-estimate').innerText(),percentage(gdpEffect('QC',0,n)));
+ await root.getByRole('button',{name:'Evidence',exact:true}).click();
+ assert.equal(await root.locator('[data-price-evidence=AB] .pr-estimate').innerText(),percentage(gdpEffect('AB',0,n)));
+ await page.keyboard.press('Escape');
 }
 checks.push('AB exploratory result requires disclosure; QC accepted result is visible; five signed and zero shocks match raw-data arithmetic');
 await shock(10);await root.getByLabel('GDP price response period',{exact:true}).selectOption('1');
-await open(root.locator('[data-price-region=AB] .pr-exploratory'));
-assert.equal(await root.locator('[data-price-region=AB] .pr-estimate').innerText(),percentage(gdpEffect('AB',1,10)));
+await root.getByRole('button',{name:'Evidence',exact:true}).click();
+assert.equal(await root.locator('[data-price-evidence=AB] .pr-estimate').innerText(),percentage(gdpEffect('AB',1,10)));
+await page.keyboard.press('Escape');
 await root.getByLabel('GDP price response period',{exact:true}).selectOption('0');
-await open(root.locator('[data-price-region=QC] .pr-validation'));
-await open(root.locator('[data-price-region=QC] .pr-validation details'));
-assert.equal(await root.locator('[data-price-region=QC] .pr-validation tbody tr').count(),gdp.models.find(m=>m.region==='QC'&&m.commodity==='oil'&&m.horizonYears===0).heldout.length);
-assert.match(await root.locator('[data-price-region=QC] .pr-validation').innerText(),/not a real-time forecasting test/);
+await root.getByRole('button',{name:'Evidence',exact:true}).click();
+assert.equal(await root.locator('[data-price-evidence=QC] .pr-validation tbody tr').count(),gdp.models.find(m=>m.region==='QC'&&m.commodity==='oil'&&m.horizonYears===0).heldout.length);
+assert.match(await root.locator('[data-price-evidence=QC] .pr-validation').innerText(),/not a real-time forecasting test/);
 await page.screenshot({path:out+'gdp-desktop.png',fullPage:true});
-checks.push('Response horizon changes the result; held-out historical chart and complete table are reachable');
-await chapter('People & costs');
+await page.keyboard.press('Escape');
+checks.push('Response horizon changes the result; held-out historical errors and complete table are reachable');
+await chapter('Household costs');
 for(const n of [-20,-10,0,10,20]){
  await shock(n);
  for(const code of ['AB','QC'])assert.match(await root.locator(`[data-household-region=${code}] .pr-estimate`).innerText(),new RegExp(currency(hhEffect(code,n)).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
 }
 await shock(10);
 assert.match(await root.locator('[data-household-region=AB]').innerText(),/not a validated annual bill forecast/);
-await open(root.locator('[data-household-region=AB] .pr-validation'));
-await open(root.locator('[data-household-region=AB] .pr-validation details'));
-assert.equal(await root.locator('[data-household-region=AB] .pr-validation tbody tr').count(),72);
+await root.getByRole('button',{name:'Evidence',exact:true}).click();
+assert.equal(await root.locator('[data-household-evidence=AB] .pr-validation tbody tr').count(),72);
 await page.screenshot({path:out+'household-desktop.png',fullPage:true});
+await page.keyboard.press('Escape');
 checks.push('Both provincial oil spending equivalents match raw CPI response paths for five shocks; annual accuracy caveat and 72 audit months are reachable');
 await commodity('Natural gas');
 assert.match(await root.locator('[data-household-region=AB]').innerText(),/did not reliably predict/);
@@ -78,19 +81,19 @@ assert.equal(await root.locator('[data-household-region=AB] .pr-estimate').inner
 checks.push('Gas failed calibration does not display a bill estimate; gas and electricity retail scenarios require explicit selection and use direct spending arithmetic');
 await province('NU');assert.equal(await root.locator('[data-household-region=NU] .pr-estimate').count(),0);
 assert.match(await root.locator('[data-household-region=NU]').innerText(),/not published/);
-await chapter('Provincial outlook');assert.equal(await root.locator('[data-price-region=NU] .pr-estimate').count(),0);
+await chapter('Provincial GDP');assert.equal(await root.locator('[data-price-region=NU] .pr-estimate').count(),0);
 assert.match(await root.locator('[data-price-region=NU]').innerText(),/no common wholesale electricity benchmark/i);
 await commodity('Oil');assert.match(await root.locator('[data-price-region=NU]').innerText(),/did not pass|No supported/);
 checks.push('Unavailable territory household data and electricity GDP response do not become zero');
-await province('AB');await comparison('QC');await chapter('People & costs');await root.getByRole('button',{name:'Commodity-price response',exact:true}).click();
+await province('AB');await comparison('QC');await chapter('Household costs');await root.getByRole('button',{name:'Commodity-price response',exact:true}).click();
 for(const width of [390,320]){
  await page.setViewportSize({width,height:844});
- for(const name of ['Provincial outlook','People & costs']){
+ for(const name of ['Provincial GDP','Household costs']){
   await chapter(name);
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${name} overflow at ${width}`);
-  const panel=name==='Provincial outlook'?'.pr-gdp':'.pr-households';
+  const panel=name==='Provincial GDP'?'.pr-gdp':'.pr-households';
   observations.push({width,chapter:name,bodyHeight:await page.locator('body').evaluate(e=>e.scrollHeight),panelText:await root.locator(panel).innerText()});
-  await page.screenshot({path:out+(name==='Provincial outlook'?'gdp':'household')+'-'+width+'.png',fullPage:true});
+  await page.screenshot({path:out+(name==='Provincial GDP'?'gdp':'household')+'-'+width+'.png',fullPage:true});
  }
 }
 checks.push('Both chapters have no page overflow at 390 and 320 pixels');

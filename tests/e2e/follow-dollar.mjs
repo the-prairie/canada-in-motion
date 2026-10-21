@@ -1,0 +1,145 @@
+import assert from 'node:assert/strict';
+import {mkdir,readFile,writeFile} from 'node:fs/promises';
+import path from 'node:path';
+
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
+const browser=await chromium.launch({headless:true,...(process.env.TEST_BROWSER_PATH?{executablePath:process.env.TEST_BROWSER_PATH}:{})});
+const base=process.env.TEST_URL||'http://127.0.0.1:4203/';
+const artifacts=path.resolve(process.env.TEST_ARTIFACT_DIR||'.data-cache/follow-dollar');
+await mkdir(artifacts,{recursive:true});
+const snapshot=JSON.parse(await readFile(new URL('../../data/income-paths.json',import.meta.url),'utf8'));
+const results=[],errors=[],inferenceRequests=[];
+const location=state=>base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy:{section:'supply',region:'AB',incomeIndustry:'oil-gas',incomeYear:2022,demandMillion:100,...state}}));
+const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce',acceptDownloads:true});
+const page=await context.newPage();
+page.on('pageerror',error=>errors.push(error.message));
+await page.route('**/api/analysis/status',route=>route.fulfill({json:{available:false}}));
+await page.route('**/api/analysis',route=>{inferenceRequests.push(route.request().url());return route.abort('blockedbyclient');});
+const host=page.locator('#ec-income-paths');
+const demand=()=>host.getByLabel('Additional final demand in million dollars',{exact:true});
+const outcome=label=>host.getByRole('button',{name:label,exact:true});
+const evidence=()=>host.getByRole('button',{name:'Evidence',exact:true});
+const dialog=()=>host.getByRole('dialog',{name:'Follow the dollar evidence',exact:true});
+const checkLayout=async label=>{
+ await page.waitForFunction(()=>{const nav=document.querySelector('.ec-context nav'),active=nav?.querySelector('[aria-current=page]');if(!active)return false;const n=nav.getBoundingClientRect(),a=active.getBoundingClientRect();return a.left>=n.left-1&&a.right<=n.right+1;});
+ const geometry=await page.evaluate(()=>({viewport:innerWidth,width:document.documentElement.scrollWidth,rows:[...document.querySelectorAll('.ip-allocation-row>div:first-child')].map(row=>{const label=row.firstElementChild.getBoundingClientRect(),value=row.lastElementChild.getBoundingClientRect();return {labelRight:label.right,valueLeft:value.left};})}));
+ assert(geometry.width<=geometry.viewport,`${label}: document overflows`);
+ assert(geometry.rows.every(row=>row.labelRight<=row.valueLeft),`${label}: allocation labels overlap values`);
+};
+try{
+ await page.goto(location());await host.getByRole('heading',{name:'Follow the dollar',exact:true}).waitFor();
+ assert.equal(await host.locator('details').count(),0);
+ assert.equal(await host.locator('table').count(),0);
+ assert.equal(await host.locator('.ip-total').innerText(),'$90.6M');
+ assert.deepEqual(await host.locator('.ip-allocation-row strong').allTextContents(),['$85.5M','$5.1M']);
+ assert.match(await host.locator('.ip-scope').innerText(),/Fixed 2022 coefficients and 2022 dollars; not a forecast/);
+ assert.equal(await host.getByRole('checkbox',{name:/Include household spending/}).isChecked(),false);
+ await outcome('Labour income').focus();await page.keyboard.press('Space');
+ assert.equal(await outcome('Labour income').getAttribute('aria-pressed'),'true');
+ assert.equal(await host.locator('.ip-total').innerText(),'$21.9M');
+ assert.deepEqual(await host.locator('.ip-allocation-row strong').allTextContents(),['$19M','$2.9M']);
+ await outcome('Jobs').click();
+ assert.equal(await host.locator('.ip-total').innerText(),'185 jobs');
+ assert.match(await host.locator('.ip-definition').innerText(),/not full-time equivalents or net hires/);
+ assert.deepEqual(await host.locator('.ip-allocation-row strong').allTextContents(),['148 jobs','37 jobs']);
+ results.push('GDP, labour income and jobs show distinct model results with direct allocation values');
+
+ await demand().fill('0');
+ assert.equal(await host.locator('.ip-total').innerText(),'0 jobs');
+ assert.deepEqual(await host.locator('.ip-allocation-row strong').allTextContents(),['0 jobs','0 jobs']);
+ assert.deepEqual(await host.locator('.ip-allocation-track>i').evaluateAll(bars=>bars.map(bar=>bar.getBoundingClientRect().width)),[0,0]);
+ await host.getByLabel('Demand origin province',{exact:true}).selectOption('PE');
+ await host.getByLabel('Demand industry',{exact:true}).selectOption('oil-sands');
+ assert.equal(await host.locator('.ip-total').innerText(),'Not published');
+ assert.equal(await host.locator('.ip-allocation-row').count(),0);
+ assert.match(await host.locator('.ip-unavailable').innerText(),/Unavailable values are not zero/);
+ results.push('Published zero stays zero and unavailable coefficients remain unavailable even at zero demand');
+
+ await host.getByLabel('Demand origin province',{exact:true}).selectOption('ON');
+ await host.getByLabel('Demand industry',{exact:true}).selectOption('electricity');
+ await host.getByLabel('Multiplier reference year',{exact:true}).selectOption('2021');
+ await demand().fill('250');
+ await host.getByRole('checkbox',{name:/Include household spending/}).check();
+ await outcome('GDP').click();
+ assert.equal(await host.locator('.ip-total').innerText(),'$370.3M');
+ assert.deepEqual(await host.locator('.ip-allocation-row strong').allTextContents(),['$348.5M','$21.8M']);
+ await evidence().focus();await page.keyboard.press('Enter');await dialog().waitFor();
+ assert.equal(await dialog().evaluate(node=>node.open),true);
+ assert.equal(await dialog().getByRole('button',{name:'Close Follow the dollar evidence'}).evaluate(node=>node===document.activeElement),true);
+ assert.equal(await dialog().getByRole('region',{name:'Exact effects by measure'}).locator('tbody tr').count(),4);
+ const exactRows=await dialog().getByRole('region',{name:'Exact effects by measure'}).locator('tbody tr').allTextContents();
+ assert(exactRows[0].includes('$370.25M'));
+ assert(exactRows[1].includes('$150.25M'));
+ assert(exactRows[2].includes('1,585.5 jobs'));
+ assert(exactRows[3].includes('$473.25M'));
+ assert.equal(await dialog().getByRole('region',{name:'GDP by stage',exact:true}).locator('tbody tr').count(),3);
+ assert.equal(await dialog().getByRole('link',{name:/Statistics Canada/}).getAttribute('href'),snapshot.sources[0].url);
+ const downloadPromise=page.waitForEvent('download');
+ await dialog().getByRole('button',{name:'Export calculation and source snapshot',exact:true}).click();
+ const download=await downloadPromise,payload=JSON.parse(await readFile(await download.path(),'utf8'));
+ assert.deepEqual(payload.selection,{region:'ON',industry:'electricity',demandMillion:250,year:2021,includeInduced:true,outcome:'gdp'});
+ assert.deepEqual(payload.sourceSnapshot,snapshot);
+ assert.equal(payload.result.metrics.find(metric=>metric.id==='gdp').canada,370.25);
+ assert.equal(payload.result.metrics.length,4);
+ assert.equal(payload.result.metrics.find(metric=>metric.id==='jobs').stages.length,3);
+ assert(payload.result.metrics.every(metric=>metric.coefficients&&metric.roundingResidual));
+ for(let index=0;index<9;index++){await page.keyboard.press('Tab');assert.equal(await dialog().evaluate(node=>node.matches(':modal')&&(document.activeElement===document.body||node.contains(document.activeElement))),true);}
+ await page.keyboard.press('Escape');await dialog().waitFor({state:'detached'});
+ assert.equal(await evidence().evaluate(node=>node===document.activeElement),true);
+ results.push('Evidence exposes all exact measures, stages, definitions and official source, exports the full snapshot, and restores keyboard focus');
+
+ await outcome('Jobs').click();await page.reload();await host.locator('.ip-total').waitFor();
+ assert.equal(await host.getByLabel('Demand origin province',{exact:true}).inputValue(),'ON');
+ assert.equal(await host.getByLabel('Demand industry',{exact:true}).inputValue(),'electricity');
+ assert.equal(await host.getByLabel('Multiplier reference year',{exact:true}).inputValue(),'2021');
+ assert.equal(await demand().inputValue(),'250');
+ assert.equal(await host.getByRole('checkbox',{name:/Include household spending/}).isChecked(),true);
+ assert.equal(await outcome('Jobs').getAttribute('aria-pressed'),'true');
+ assert.equal(await host.locator('.ip-total').innerText(),'1,586 jobs');
+ await evidence().click();await dialog().waitFor();
+ assert.equal(await dialog().getByRole('region',{name:'Jobs by stage',exact:true}).locator('tbody tr').count(),3);
+ const jobsDownloadPromise=page.waitForEvent('download');
+ await dialog().getByRole('button',{name:'Export calculation and source snapshot',exact:true}).click();
+ const jobsPayload=JSON.parse(await readFile(await (await jobsDownloadPromise).path(),'utf8'));
+ assert.equal(jobsPayload.selection.outcome,'jobs');
+ assert.deepEqual(jobsPayload.result.input,{region:'ON',industry:'electricity',year:2021,demandMillion:250,includeInduced:true});
+ await page.keyboard.press('Escape');
+ results.push('All scenario inputs and the chosen outcome survive URL reload');
+
+ await outcome('GDP').click();
+ for(const width of [1440,390,320]){
+  await page.setViewportSize({width,height:1000});await page.evaluate(()=>scrollTo(0,0));
+  await checkLayout(`${width}px`);
+  await page.screenshot({path:path.join(artifacts,`follow-dollar-${width}.png`),fullPage:true});
+  await evidence().click();await dialog().waitFor();await checkLayout(`${width}px evidence`);
+  const box=await dialog().boundingBox();assert(box.x>=0&&box.x+box.width<=width,`${width}px: dialog is offscreen`);
+  await page.screenshot({path:path.join(artifacts,`follow-dollar-evidence-${width}.png`)});
+  await page.keyboard.press('Escape');
+ }
+ results.push('1440px, 390px and 320px layouts keep labels apart and evidence in the viewport');
+
+ await host.getByLabel('Demand origin province',{exact:true}).selectOption('NL');
+ await host.getByLabel('Demand industry',{exact:true}).selectOption('electricity-construction');
+ await host.getByLabel('Multiplier reference year',{exact:true}).selectOption('2022');
+ await demand().fill('10000');
+ await evidence().click();await dialog().waitFor();
+ const largeGdpRow=dialog().getByRole('region',{name:'Exact effects by measure'}).getByRole('row').filter({hasText:'GDP at basic prices'});
+ assert.equal(await largeGdpRow.getByRole('cell').nth(0).innerText(),'$8,020M');
+ assert.doesNotMatch(await dialog().innerText(),/8,020\.000000000001/);
+ const largeDownloadPromise=page.waitForEvent('download');
+ await dialog().getByRole('button',{name:'Export calculation and source snapshot',exact:true}).click();
+ const largePayload=JSON.parse(await readFile(await (await largeDownloadPromise).path(),'utf8'));
+ assert.equal(largePayload.result.metrics.find(metric=>metric.id==='gdp').withinProvince,8020.000000000001);
+ await page.keyboard.press('Escape');
+ results.push('Large calculated totals hide binary arithmetic residue while the export retains the model values');
+
+ await page.goto(location({region:'CA',demandMillion:50000,incomeYear:9999}));await page.reload();await host.locator('.ip-total').waitFor();
+ assert.equal(await host.getByLabel('Demand origin province',{exact:true}).inputValue(),'AB');
+ assert.equal(await host.getByLabel('Multiplier reference year',{exact:true}).inputValue(),'2022');
+ assert.equal(await demand().inputValue(),'10000');
+ results.push('Initial Canada scope, invalid reference year and excessive demand retain existing normalization');
+ assert.deepEqual(errors,[]);assert.deepEqual(inferenceRequests,[]);
+ const report={status:'passed',checks:results,errors,inferenceRequests};
+ await writeFile(path.join(artifacts,'acceptance.json'),JSON.stringify(report,null,2));
+ console.log(JSON.stringify(report,null,2));
+}finally{await context.close();await browser.close();}

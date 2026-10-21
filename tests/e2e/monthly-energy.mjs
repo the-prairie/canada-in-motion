@@ -11,7 +11,7 @@ const base=process.env.TEST_URL||'http://127.0.0.1:4199/';
 const data=await fetch(new URL('data/monthly-energy.json',base)).then(r=>r.json());
 const out=new URL('../../.data-cache/monthly-acceptance/',import.meta.url).pathname;await mkdir(out,{recursive:true});
 const openMonthlyEvidence=async()=>{await page.getByRole('button',{name:'Evidence',exact:true}).click();await page.getByRole('button',{name:'Monthly activity',exact:true}).click();await page.locator('[data-monthly-ready]').waitFor();};
-const go=async economy=>{await page.goto(base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy})));if(economy.section==='outlook'){await page.locator('.pf-history-chart').waitFor();await openMonthlyEvidence();}else await page.locator('[data-monthly-ready]').waitFor();};
+const go=async economy=>{await page.goto(base+'#v1='+encodeURIComponent(JSON.stringify({view:'economy',economy})));if(economy.section==='outlook'){await page.locator('.pf-history-chart').waitFor();await openMonthlyEvidence();}else if(economy.section==='explore'){await page.locator('.es-chapters').waitFor();await openMonthlyEvidence();}else await page.locator('[data-monthly-ready]').waitFor();};
 const number=(n,d=2)=>new Intl.NumberFormat('en-CA',{maximumFractionDigits:d}).format(n);
 const format=(v,u)=>{const scale=v>=1e6?1e6:v>=1e3?1e3:1;return `${number(v/scale)} ${scale===1e6?'million ':scale===1e3?'thousand ':''}${u}`;};
 try{
@@ -57,10 +57,10 @@ try{
  await go({section:'explore',story:{commodity:'electricity',focus:'AB',compare:'BC',shockPct:-10,chapter:'overview'}});
  assert.equal(await page.locator('[data-monthly-metric]').count(),1);assert.equal(await page.locator('.monthly-reading').count(),2);
  assert.match(await page.locator('[data-monthly-metric]').getAttribute('data-monthly-metric'),/electricity/);
- const observed=await page.locator('.monthly-grid').innerText();await page.locator('#es-price').fill('20');assert.equal(await page.locator('.monthly-grid').innerText(),observed);
- await page.getByRole('button',{name:'Natural gas',exact:true}).click();assert.equal(await page.locator('[data-monthly-metric]').getAttribute('data-monthly-metric'),'gas');
- await page.getByLabel('Investigation province',{exact:true}).selectOption('PE');assert.equal(await page.locator('[data-monthly-ready]').getAttribute('data-monthly-focus'),'PE');
- const shared=page.url();await page.reload();await page.locator('[data-monthly-ready]').waitFor();assert.deepEqual(JSON.parse(decodeURIComponent(new URL(page.url()).hash.slice(4))).economy.story,JSON.parse(decodeURIComponent(new URL(shared).hash.slice(4))).economy.story);assert.equal(await page.locator('[data-monthly-metric]').getAttribute('data-monthly-metric'),'gas');
+ const observed=await page.locator('.monthly-grid').innerText();await page.keyboard.press('Escape');await page.locator('#es-price').fill('20');await openMonthlyEvidence();assert.equal(await page.locator('.monthly-grid').innerText(),observed);
+ await page.keyboard.press('Escape');await page.getByRole('button',{name:'Natural gas',exact:true}).click();await openMonthlyEvidence();assert.equal(await page.locator('[data-monthly-metric]').getAttribute('data-monthly-metric'),'gas');
+ await page.keyboard.press('Escape');await page.getByLabel('Investigation province',{exact:true}).selectOption('PE');await openMonthlyEvidence();assert.equal(await page.locator('[data-monthly-ready]').getAttribute('data-monthly-focus'),'PE');
+ const shared=page.url();await page.reload();await page.locator('.es-chapters').waitFor();await openMonthlyEvidence();assert.deepEqual(JSON.parse(decodeURIComponent(new URL(page.url()).hash.slice(4))).economy.story,JSON.parse(decodeURIComponent(new URL(shared).hash.slice(4))).economy.story);assert.equal(await page.locator('[data-monthly-metric]').getAttribute('data-monthly-metric'),'gas');
  checks.push('Question view follows commodity and comparison; price shocks do not rewrite observations; shared state reloads');
  for(const width of [390,320]){
    await page.setViewportSize({width,height:844});
