@@ -21,5 +21,20 @@
   ],
   "independentReview": "CONNECTED-STORY-EXPERIENCE-REVIEW.md",
   "models": "Existing calculations and source snapshots preserved; missing estimates never coerced to zero",
-  "deployment": "pending"
+  "deployment": {
+    "runId": 39696560461,
+    "url": "https://github.com/the-prairie/canada-in-motion/actions/runs/39696560461",
+    "status": "success",
+    "codeVersion": "83d30dacdefd2153ac44"
+  },
+  "publicVerification": {
+    "checkedAt": "2026-10-21T23:58:47.707Z",
+    "health": "same verified release and317942records",
+    "tests": [
+      "explore-connected passed desktop,390,320,844,740",
+      "trade-connected passed desktop,390,320 and shortlandscape"
+    ],
+    "runtimeErrors": [],
+    "inferenceRequests": 0
+  }
 }
