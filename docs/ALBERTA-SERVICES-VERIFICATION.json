@@ -1,5 +1,5 @@
 {
-  "status": "local-validation-passed",
+  "status": "live-verified",
   "scope": "Alberta public-services connected story",
   "codeVersion": "61d8478bc9ad355c26b3",
   "existingDataRelease": "6e50f5b7fe67a57c00ce",
@@ -39,5 +39,32 @@
     "Different measures retain different reporting periods. No policy or migration causal effect is estimated.",
     "Existing national inventory remains incomplete; release remains a public beta."
   ],
-  "publicVerification": null
+  "publicVerification": {
+    "health": {
+      "codeVersion": "61d8478bc9ad355c26b3",
+      "status": "public-beta",
+      "releaseId": "6e50f5b7fe67a57c00ce",
+      "records": 317942,
+      "retrievedAt": "2026-10-21T08:13:44Z",
+      "builtAt": "2026-10-22T00:19:27.132Z",
+      "nationalComplete": false
+    },
+    "datasetMatches": true,
+    "datasetSha256": "26cb82b606e6d8eefbc967c8fb9004f6caa111b0d67123a0f82fc86a95b64597",
+    "checkedAt": "2026-10-22T00:20:42.994Z",
+    "deploymentRun": "https://github.com/the-prairie/canada-in-motion/actions/runs/39698930648",
+    "deploymentConclusion": "success",
+    "browserAcceptance": {
+      "status": "passed",
+      "checks": [
+        "Four chapters expose source endpoint observations; all measure selectors work; conceptual framing is explicitly non-causal",
+        "Keyboard next/previous and chapter focus, evidence tables, source links, full JSON snapshot and modal focus restoration pass",
+        "1440px desktop, 390px and 320px phones, 740px short landscape: forward/reverse navigation, contained evidence scene and no horizontal overflow",
+        "Navigating away and scrolling a hidden story preserves its chapter on return",
+        "Deep-linked reload, external chapter changes, native forward/reverse scrolling and reduced motion pass"
+      ],
+      "errors": [],
+      "inferenceRequests": []
+    }
+  }
 }
