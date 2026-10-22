@@ -22,7 +22,7 @@ test('unknown destinations leave state alone and old links resolve', () => {
   assert.equal(currentDestination(state).id,'cleanup');
   assert.equal(currentDestination({view:'economy',economy:{section:'oil'}}).id,'oil');
   assert.equal(currentDestination({view:'economy'}).id,'explore');
-  assert.equal(new Set(DESTINATIONS.map(d=>d.id)).size,12);
+  assert.equal(new Set(DESTINATIONS.map(d=>d.id)).size,13);
 });
 
 test('first Explore visit inherits the selected province, saved questions retain their focus', () => {

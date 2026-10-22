@@ -176,3 +176,13 @@ test('Follow the dollar chapter links normalize without changing the economic sc
   const a=normalizeEconomyState({...selected,incomeStep:0}),b=normalizeEconomyState({...selected,incomeStep:4});
   delete a.incomeStep;delete b.incomeStep;assert.deepEqual(a,b);
 });
+
+
+test('Alberta story deep links preserve valid chapters and normalize invalid stages', () => {
+  for (const stage of ['population','schools','health','housing']) {
+    const state=normalizeEconomyState({section:'services',albertaStage:stage});
+    assert.equal(state.section,'services');
+    assert.equal(state.albertaStage,stage);
+  }
+  assert.equal(normalizeEconomyState({section:'services',albertaStage:'bogus'}).albertaStage,'population');
+});

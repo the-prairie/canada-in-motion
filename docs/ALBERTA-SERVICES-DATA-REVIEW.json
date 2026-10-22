@@ -1,0 +1,107 @@
+{
+  "reviewedAt": "2026-10-21",
+  "status": "Accepted for the stated descriptive comparisons",
+  "reviewer": "Independent research and data-model agent; not the UI implementer or original evidence-report author",
+  "dataset": "alberta-services-data.json",
+  "sha256": "26cb82b606e6d8eefbc967c8fb9004f6caa111b0d67123a0f82fc86a95b64597",
+  "checks": [
+    {
+      "sourceId": "cihi",
+      "location": "Population figure 1; hospital care figures 3 and 5",
+      "verified": "Population change 2005–2025: Alberta 51.4%, Canada 29.2%. Acute beds 2014–15 to 2023–24: count +4.2%, per resident −9.0%. Hospital government spending per resident, 2015 to 2025: Alberta $1,948 to $2,248; Canada $1,580 to $2,262. 2025 is a forecast.",
+      "limitation": "Do not derive rates from rounded population or bed counts. Government hospital spending is not all health spending. Retain published Canadian growth of 43.1% rather than 43.16% calculated from rounded dollar endpoints."
+    },
+    {
+      "sourceId": "schools",
+      "location": "February 3, 2026 Daily PDF, pages 1–2",
+      "verified": "Alberta 2023/24 growth: students 3.6%, educators 3.0%, compensation 3.2%. Page 2 explicitly specifies constant 2023/24 dollars.",
+      "limitation": "Instructional and educational staff compensation is narrower than total funding. Educator count is not class size."
+    },
+    {
+      "sourceId": "fao",
+      "location": "Figure 5.1 accessible table and note",
+      "verified": "2023–24 school-board spending per student: Alberta $13,607; comparable Canada $15,867. Comparison excludes NB, NL and territories; includes Alberta.",
+      "limitation": "This is not a comparison of provincial operating grants alone, or an adequacy threshold."
+    },
+    {
+      "sourceId": "ahs",
+      "location": "PDF page 2, Provincial table; 2023–24 FQ4YTD and 2024–25 FQ4YTD columns",
+      "verified": "Emergency admitted-patient median length of stay at busiest sites: 12.8 to 13.3 hours. Scheduled hip replacements within CIHI benchmark: 62.4% to 70.1%.",
+      "limitation": "Separate outcomes with different scopes. These are full fiscal year-to-date values, not quarter-only values or the province-wide median across all emergency sites."
+    },
+    {
+      "sourceId": "cmhc",
+      "location": "National turnover-rent table and Calgary section",
+      "verified": "October 2024 to 2025 monthly two-bedroom purpose-built turnover rents: Calgary $1,927 to $1,836; Edmonton $1,560 to $1,600. Calgary 2025 rental supply growth 11%; vacancy rate 5.0%.",
+      "limitation": "CMA turnover rents are not all-tenant rents, a province-wide rent index or a quality-adjusted price index. City rental composition can change."
+    },
+    {
+      "sourceId": "funding-rule",
+      "location": "Average enrolment methodology tables",
+      "verified": "2020/21–2024/25 weights: 20% previous, 30% current and 50% projected enrolment. From 2025/26: 30% current and 70% projected.",
+      "limitation": "The observed 2023/24 school measures predate this change. No policy outcome is estimated."
+    }
+  ],
+  "calculations": {
+    "realCompensationPerStudentPct": -0.38610038610038533,
+    "studentsPerEducatorPct": 0.5825242718446644,
+    "schoolSpendingRelativeToComparatorPct": -14.243398247935968,
+    "EDChangeHours": 0.5,
+    "hipBenchmarkChangePercentagePoints": 7.7,
+    "calgaryNewTenantRentChangeCadPerMonth": -91,
+    "edmontonNewTenantRentChangeCadPerMonth": 40
+  },
+  "testCommand": "node --test tests/alberta-services.test.mjs",
+  "testsPassed": 7,
+  "guardrails": [
+    "Each metric retains its own reporting periods; no annual path is imputed.",
+    "No LLM-generated numbers, causal sliders or claims of policy attribution.",
+    "Missing observations remain null; percentage change from a zero baseline is null.",
+    "Forecast flags accompany each observation.",
+    "Curated snapshot; no automated freshness claim."
+  ],
+  "sources": [
+    {
+      "id": "cihi",
+      "title": "CIHI — Health System Context Series: Alberta",
+      "url": "https://www.cihi.ca/en/health-system-context-series-alberta",
+      "publishedAt": null,
+      "note": "Population profile updated July 2026. Population uses Statistics Canada tables 17-10-0005-01 and 17-10-0008-01, accessed April 2026. Hospital spending uses National Health Expenditure Trends 2025; 2025 is forecast. Capacity comparisons use Hospital Beds Staffed and In Operation 2023–2024."
+    },
+    {
+      "id": "schools",
+      "title": "Statistics Canada — Public school enrolment and compensation, 2023/2024",
+      "url": "https://www150.statcan.gc.ca/n1/daily-quotidien/260203/dq260203a-eng.pdf",
+      "publishedAt": "2026-02-03",
+      "note": "Financial figures in this release are inflation-adjusted to 2023/2024 dollars. Educators are reported counts, not a classroom-size measure."
+    },
+    {
+      "id": "fao",
+      "title": "Financial Accountability Office of Ontario — Education Spending Plan Review, Figure 5.1",
+      "url": "https://fao-on.org/en/report/estimates-2026-edu/",
+      "publishedAt": "2026-09-23",
+      "note": "School-board spending divided by students; FAO analysis of Statistics Canada tables 10-10-0019-01 and 37-10-0007-01. Canada comparison excludes New Brunswick, Newfoundland and Labrador, and the territories; it includes Alberta."
+    },
+    {
+      "id": "ahs",
+      "title": "Alberta Health Services — Monitoring Measures, 2024–25 FQ4",
+      "url": "https://www.albertahealthservices.ca/assets/about/publications/ahs-pub-monitoring-measures-2024-25-q4.pdf",
+      "publishedAt": null,
+      "note": "Provincial table, PDF page 2; fiscal fourth-quarter year-to-date columns. Data as of June 9, 2025. Emergency measure covers busiest sites; hip measure covers scheduled surgeries."
+    },
+    {
+      "id": "cmhc",
+      "title": "CMHC — 2025 Rental Market Report",
+      "url": "https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/market-reports/rental-market-reports-major-centres",
+      "publishedAt": null,
+      "note": "October rental survey; census metropolitan areas. Turnover rent is rent paid by new tenants in two-bedroom purpose-built rental apartments, not average rent for every tenant."
+    },
+    {
+      "id": "funding-rule",
+      "title": "Alberta — K to 12 funding model",
+      "url": "https://www.alberta.ca/k-to-12-education-funding-model",
+      "publishedAt": null,
+      "note": "Official enrolment weighting rules through 2024/25 and from 2025/26."
+    }
+  ]
+}

@@ -66,7 +66,7 @@ export class EnergyEconomy {
     const action=target.dataset.ecAction;
     if(action==='retry')void this.load();
     if(action==='retry-story'){const host=this.root.querySelector('#ec-energy-story');if(host){this.storyMount?.unmount();this.storyMount=null;host.innerHTML='<p role="status">Loading the investigation…</p>';void this.mountStory(host);}}
-    if(action==='retry-research'){const kind=target.dataset.researchKind,host=this.root.querySelector(({income:'#ec-income-paths',history:'#ec-oil-history',forecast:'#ec-provincial-forecast'})[kind]);if(host){host.innerHTML='<p role="status">Loading data…</p>';void this.mountResearchView(host,kind);}}
+    if(action==='retry-research'){const kind=target.dataset.researchKind,host=this.root.querySelector(({income:'#ec-income-paths',history:'#ec-oil-history',forecast:'#ec-provincial-forecast',services:'#ec-alberta-services'})[kind]);if(host){host.innerHTML='<p role="status">Loading data…</p>';void this.mountResearchView(host,kind);}}
     if(action==='inventory')this.onInventory(this.state.region==='CA'?'all':this.state.region);
     if(action==='ask')this.openQuestion();
     if(action==='close-ask'){this.tradeQuestionOpen=false;this.root.querySelector('.ec-composer')?.close();document.querySelector('#header-ask')?.focus({preventScroll:true});}
@@ -81,7 +81,7 @@ export class EnergyEconomy {
     if(action==='browse-data'){this.showData();this.render();}
     if(action==='download'){
       if(this.state.section==='explore'&&target.closest('.ec-context-actions')){this.root.querySelector('[data-story-export]')?.click();return;}
-      if(['supply','outlook'].includes(this.state.section)&&target.closest('.ec-context-actions')){this.root.querySelector('[data-research-export]')?.click();return;}
+      if(['supply','outlook','services'].includes(this.state.section)&&target.closest('.ec-context-actions')){this.root.querySelector('[data-research-export]')?.click();return;}
       if(this.state.section==='trade'&&target.closest('.ec-context-actions')){this.root.querySelector('#ec-trade-workspace [data-workspace-export]')?.click();return;}
       const calculationState=this.state.section==='oil'?{...this.state,region:'CA'}:this.state;
       const payload={dataVersion:this.data.generatedAt,state:calculationState,summary:summarizeEconomy(this.data,calculationState),sourceSnapshot:this.data,analysis:this.answer||null};
@@ -225,6 +225,7 @@ export class EnergyEconomy {
     finally{if(this.request===request){this.busy=false;this.localLoading=false;this.render();}}
   }
   analyst() {
+    if(this.state.section==='services')return '';
     const limit=this.activeLimit();
     const error=this.aiError||limit;
     const status=this.busy?(this.localLoading?'Opening comparison…':'Working…'):limit?(['busy','rate_limit'].includes(limit.code)?'AI busy':'AI allowance used'):this.aiError?'Could not complete':this.answer?'Answer ready':this.status.available?'AI ready':this.statusLoading?'Checking connection…':'AI offline';
@@ -263,7 +264,7 @@ export class EnergyEconomy {
     const previousStory=this.state.section==='explore'&&this.storyMountKey===storyKey?this.root.querySelector('#ec-energy-story'):null;
     if(!previousStory){this.storyMount?.unmount();this.storyMount=null;}
     const previousResearch={};
-    for(const [kind,section,id] of [['income','supply','#ec-income-paths'],['history','oil','#ec-oil-history'],['forecast','outlook','#ec-provincial-forecast']]){
+    for(const [kind,section,id] of [['income','supply','#ec-income-paths'],['history','oil','#ec-oil-history'],['forecast','outlook','#ec-provincial-forecast'],['services','services','#ec-alberta-services']]){
       const host=this.state.section===section&&this[`${kind}MountKey`]===this.researchKey(kind)?this.root.querySelector(id):null;
       if(host)previousResearch[kind]=host;else{this[`${kind}Mount`]?.unmount();this[`${kind}Mount`]=null;}
     }
@@ -273,14 +274,14 @@ export class EnergyEconomy {
     const activeId=activeElement?.id;
     const start=activeId==='energy-question'?document.activeElement.selectionStart:null;
     const summary=summarizeEconomy(this.data,this.state);
-    const isResearch=!this.answer?.workspace||this.answerVisible===false;
+    const isResearch=this.state.section==='services'||!this.answer?.workspace||this.answerVisible===false;
     const exploring=this.state.section==='explore';
-    this.root.innerHTML=`${this.answer?.workspace?`<div class="ec-context"><div class="ec-context-actions"><button data-ec-action="${isResearch?'show-answer':'browse-data'}">${isResearch?'Previous answer':'Return to data'}</button></div></div>`:''}
-    ${isResearch?'':this.analyst()}${this.answer?.workspace&&!isResearch?'<details class="ec-authored-data"><summary>Browse the original data views</summary>':''}<div class="ec-workspace">${exploring?'<div id="ec-energy-story"><p role="status">Loading the connected investigation…</p></div>':this.state.section==='outlook'?'<div id="ec-provincial-forecast"><p role="status">Loading provincial GDP forecasts…</p></div>':this.state.section==='trade'?'<div id="ec-trade-workspace"><p role="status">Loading energy trade and price effects…</p></div>':this.state.section==='futures'?this.futures(summary):this.state.section==='oil'?this.oil():this.state.section==='supply'?'<div id="ec-income-paths"><p role="status">Loading supply-chain effects…</p></div>':this.income(summary)}</div>${isResearch?this.analyst():''}${this.answer?.workspace&&!isResearch?'</details>':''}${this.evidence(summary)}`;
+    this.root.innerHTML=`${this.answer?.workspace&&this.state.section!=='services'?`<div class="ec-context"><div class="ec-context-actions"><button data-ec-action="${isResearch?'show-answer':'browse-data'}">${isResearch?'Previous answer':'Return to data'}</button></div></div>`:''}
+    ${isResearch?'':this.analyst()}${this.answer?.workspace&&!isResearch?'<details class="ec-authored-data"><summary>Browse the original data views</summary>':''}<div class="ec-workspace">${this.state.section==='services'?'<div id="ec-alberta-services"><p role="status">Loading Alberta public-service evidence…</p></div>':exploring?'<div id="ec-energy-story"><p role="status">Loading the connected investigation…</p></div>':this.state.section==='outlook'?'<div id="ec-provincial-forecast"><p role="status">Loading provincial GDP forecasts…</p></div>':this.state.section==='trade'?'<div id="ec-trade-workspace"><p role="status">Loading energy trade and price effects…</p></div>':this.state.section==='futures'?this.futures(summary):this.state.section==='oil'?this.oil():this.state.section==='supply'?'<div id="ec-income-paths"><p role="status">Loading supply-chain effects…</p></div>':this.income(summary)}</div>${isResearch?this.analyst():''}${this.answer?.workspace&&!isResearch?'</details>':''}${this.state.section==='services'?'':this.evidence(summary)}`;
 
     const monthlyHost=this.root.querySelector('#ec-monthly-energy');if(monthlyHost&&previousMonthly)monthlyHost.replaceWith(previousMonthly);else if(monthlyHost)void this.mountMonthly(monthlyHost);
     const monthlyEvidenceHost=this.root.querySelector('#ec-monthly-evidence');if(monthlyEvidenceHost&&previousMonthlyEvidence){monthlyEvidenceHost.replaceWith(previousMonthlyEvidence);previousMonthlyEvidence.hidden=this.evidenceView!=='monthly';}
-    for(const [kind,id] of [['income','#ec-income-paths'],['history','#ec-oil-history'],['forecast','#ec-provincial-forecast']]){const host=this.root.querySelector(id);if(host&&previousResearch[kind])host.replaceWith(previousResearch[kind]);else if(host)void this.mountResearchView(host,kind);}
+    for(const [kind,id] of [['income','#ec-income-paths'],['history','#ec-oil-history'],['forecast','#ec-provincial-forecast'],['services','#ec-alberta-services']]){const host=this.root.querySelector(id);if(host&&previousResearch[kind])host.replaceWith(previousResearch[kind]);else if(host)void this.mountResearchView(host,kind);}
     const storyHost=this.root.querySelector('#ec-energy-story');
     if(storyHost&&previousStory)storyHost.replaceWith(previousStory);else if(storyHost)void this.mountStory(storyHost);
     const tradeHost=this.root.querySelector('#ec-trade-workspace');
@@ -332,19 +333,19 @@ export class EnergyEconomy {
     }catch{if(host.isConnected)host.innerHTML='<p role="alert">The source data for this investigation could not load.</p><button data-ec-action="retry-story">Retry investigation</button>';}
   }
   researchKey(kind) {
-    const s=this.state;return JSON.stringify(kind==='forecast'?[s.region,s.forecastRegions,s.forecastYear,s.forecastFocus]:kind==='income'?[s.region,s.incomeIndustry,s.incomeYear,s.demandMillion,s.includeInduced,s.incomeMeasure,s.incomeStep]:[s.historyRegions,s.historyOilChange,s.historyHorizon,s.historyYear]);
+    const s=this.state;return JSON.stringify(kind==='services'?[s.albertaStage]:kind==='forecast'?[s.region,s.forecastRegions,s.forecastYear,s.forecastFocus]:kind==='income'?[s.region,s.incomeIndustry,s.incomeYear,s.demandMillion,s.includeInduced,s.incomeMeasure,s.incomeStep]:[s.historyRegions,s.historyOilChange,s.historyHorizon,s.historyYear]);
   }
   async mountResearchView(host,kind) {
     this[`${kind}MountKey`]=this.researchKey(kind);
     try {
       const module=await import('./vendor/energy-workspace.js');
       const file=kind==='forecast'?'provincial-forecasts':kind==='income'?'income-paths':'dynamic-price-history';
-      const response=await fetch(`data/${file}.json`);if(!response.ok)throw Error();const data=await response.json();
+      const response=await fetch(kind==='services'?'alberta-services-data.json':`data/${file}.json`);if(!response.ok)throw Error();const data=await response.json();
       const benchmarks=kind==='forecast'?await fetch('data/provincial-outlook-benchmarks.json').then(r=>r.ok?r.json():null).catch(()=>null):null;
       if(!host.isConnected)return;
       host.replaceChildren();
-      this[`${kind}Mount`]=module[kind==='forecast'?'mountProvincialForecast':kind==='income'?'mountIncomePaths':'mountDynamicPrices'](host,{data,benchmarks,shapes:this.shapes,initial:this.state,onChange:selection=>{
-        this.state=normalizeEconomyState({...this.state,...(kind==='forecast'?{region:selection.regions.length===1?selection.regions[0]:'CA',forecastRegions:selection.regions,forecastYear:selection.year,forecastFocus:selection.focus}:kind==='income'?{region:selection.region,incomeIndustry:selection.industry,incomeYear:selection.year,demandMillion:selection.demandMillion,includeInduced:selection.includeInduced,incomeMeasure:selection.outcome,incomeStep:selection.step}:{historyRegions:selection.regions,historyOilChange:selection.oilChangePct,historyHorizon:selection.horizonYears,historyYear:selection.selectedYear??null})});this[`${kind}MountKey`]=this.researchKey(kind);const place=this.root.querySelector('#ec-region');if(place)place.value=this.state.region;this.onChange(this.state);
+      this[`${kind}Mount`]=module[kind==='services'?'mountAlbertaServices':kind==='forecast'?'mountProvincialForecast':kind==='income'?'mountIncomePaths':'mountDynamicPrices'](host,{data,benchmarks,shapes:this.shapes,initial:kind==='services'?{stage:this.state.albertaStage}:this.state,onChange:selection=>{
+        this.state=normalizeEconomyState({...this.state,...(kind==='services'?{albertaStage:selection.stage}:kind==='forecast'?{region:selection.regions.length===1?selection.regions[0]:'CA',forecastRegions:selection.regions,forecastYear:selection.year,forecastFocus:selection.focus}:kind==='income'?{region:selection.region,incomeIndustry:selection.industry,incomeYear:selection.year,demandMillion:selection.demandMillion,includeInduced:selection.includeInduced,incomeMeasure:selection.outcome,incomeStep:selection.step}:{historyRegions:selection.regions,historyOilChange:selection.oilChangePct,historyHorizon:selection.horizonYears,historyYear:selection.selectedYear??null})});this[`${kind}MountKey`]=this.researchKey(kind);const place=this.root.querySelector('#ec-region');if(place)place.value=this.state.region;this.onChange(this.state);
       }});
     }catch{if(host.isConnected)host.innerHTML=`<p role="alert">This dataset could not load.</p><button data-ec-action="retry-research" data-research-kind="${kind}">Retry data</button>`;}
   }

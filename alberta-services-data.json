@@ -1,0 +1,413 @@
+{
+  "version": 1,
+  "reviewedAt": "2026-10-21",
+  "title": "Alberta: growth and public services",
+  "scopeNote": "Published comparisons use different reporting periods. They show changes in demand, resources and access; they do not estimate how much any policy or migration caused those changes.",
+  "updatePolicy": "Curated source snapshot, independently checked on the review date. Observation dates appear with each measure. Not a live feed.",
+  "sources": [
+    {
+      "id": "cihi",
+      "title": "CIHI — Health System Context Series: Alberta",
+      "url": "https://www.cihi.ca/en/health-system-context-series-alberta",
+      "publishedAt": null,
+      "note": "Population profile updated July 2026. Population uses Statistics Canada tables 17-10-0005-01 and 17-10-0008-01, accessed April 2026. Hospital spending uses National Health Expenditure Trends 2025; 2025 is forecast. Capacity comparisons use Hospital Beds Staffed and In Operation 2023–2024."
+    },
+    {
+      "id": "schools",
+      "title": "Statistics Canada — Public school enrolment and compensation, 2023/2024",
+      "url": "https://www150.statcan.gc.ca/n1/daily-quotidien/260203/dq260203a-eng.pdf",
+      "publishedAt": "2026-02-03",
+      "note": "Financial figures in this release are inflation-adjusted to 2023/2024 dollars. Educators are reported counts, not a classroom-size measure."
+    },
+    {
+      "id": "fao",
+      "title": "Financial Accountability Office of Ontario — Education Spending Plan Review, Figure 5.1",
+      "url": "https://fao-on.org/en/report/estimates-2026-edu/",
+      "publishedAt": "2026-09-23",
+      "note": "School-board spending divided by students; FAO analysis of Statistics Canada tables 10-10-0019-01 and 37-10-0007-01. Canada comparison excludes New Brunswick, Newfoundland and Labrador, and the territories; it includes Alberta."
+    },
+    {
+      "id": "ahs",
+      "title": "Alberta Health Services — Monitoring Measures, 2024–25 FQ4",
+      "url": "https://www.albertahealthservices.ca/assets/about/publications/ahs-pub-monitoring-measures-2024-25-q4.pdf",
+      "publishedAt": null,
+      "note": "Provincial table, PDF page 2; fiscal fourth-quarter year-to-date columns. Data as of June 9, 2025. Emergency measure covers busiest sites; hip measure covers scheduled surgeries."
+    },
+    {
+      "id": "cmhc",
+      "title": "CMHC — 2025 Rental Market Report",
+      "url": "https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/market-reports/rental-market-reports-major-centres",
+      "publishedAt": null,
+      "note": "October rental survey; census metropolitan areas. Turnover rent is rent paid by new tenants in two-bedroom purpose-built rental apartments, not average rent for every tenant."
+    },
+    {
+      "id": "funding-rule",
+      "title": "Alberta — K to 12 funding model",
+      "url": "https://www.alberta.ca/k-to-12-education-funding-model",
+      "publishedAt": null,
+      "note": "Official enrolment weighting rules through 2024/25 and from 2025/26."
+    }
+  ],
+  "chapters": {
+    "population": {
+      "id": "population",
+      "title": "More people to serve",
+      "period": "2005–2025",
+      "summary": "Alberta grew faster than Canada. Population growth adds demand for services and can expand the workforce that delivers them.",
+      "metrics": [
+        {
+          "id": "population-growth",
+          "label": "Population growth",
+          "unit": "index",
+          "periods": [
+            "2005",
+            "2025"
+          ],
+          "series": [
+            {
+              "id": "AB",
+              "label": "Alberta",
+              "values": [
+                100,
+                151.4
+              ],
+              "forecast": [
+                false,
+                false
+              ]
+            },
+            {
+              "id": "CA",
+              "label": "Canada",
+              "values": [
+                100,
+                129.2
+              ],
+              "forecast": [
+                false,
+                false
+              ]
+            }
+          ],
+          "sourceId": "cihi",
+          "role": "demand",
+          "note": "2005 = 100. Uses CIHI’s published percentage changes; no annual path is inferred.",
+          "changeKind": "percent",
+          "shortLabel": "Population"
+        }
+      ],
+      "notes": [
+        "CIHI reports Alberta’s population rounded to 3.3 million in 2005 and 5.0 million in 2025. The index uses the published 51.4% change, rather than recalculating from rounded counts.",
+        "Age and location also affect service needs. In 2025, Alberta’s median age was 38.1, compared with 40.6 nationally."
+      ]
+    },
+    "schools": {
+      "id": "schools",
+      "title": "School resources grew more slowly than enrolment",
+      "period": "2022–23 to 2023–24",
+      "summary": "Student enrolment increased faster than educator numbers and inflation-adjusted instructional compensation.",
+      "metrics": [
+        {
+          "id": "school-growth",
+          "label": "Students, educators and compensation",
+          "unit": "index",
+          "periods": [
+            "2022–23",
+            "2023–24"
+          ],
+          "series": [
+            {
+              "id": "students",
+              "label": "Students",
+              "values": [
+                100,
+                103.6
+              ],
+              "forecast": [
+                false,
+                false
+              ]
+            },
+            {
+              "id": "educators",
+              "label": "Educators",
+              "values": [
+                100,
+                103.0
+              ],
+              "forecast": [
+                false,
+                false
+              ]
+            },
+            {
+              "id": "compensation",
+              "label": "Real instructional compensation",
+              "values": [
+                100,
+                103.2
+              ],
+              "forecast": [
+                false,
+                false
+              ]
+            }
+          ],
+          "sourceId": "schools",
+          "role": "capacity",
+          "note": "2022–23 = 100. Compensation covers salaries, wages and benefits for instructional and educational services staff, in constant 2023–24 dollars. It is not total school funding.",
+          "changeKind": "percent",
+          "shortLabel": "Students & resources"
+        },
+        {
+          "id": "school-spending",
+          "label": "School-board spending per student",
+          "unit": "CAD/student",
+          "periods": [
+            "2023–24"
+          ],
+          "series": [
+            {
+              "id": "AB",
+              "label": "Alberta",
+              "values": [
+                13607
+              ],
+              "forecast": [
+                false
+              ]
+            },
+            {
+              "id": "CA",
+              "label": "Comparable Canada average",
+              "values": [
+                15867
+              ],
+              "forecast": [
+                false
+              ]
+            }
+          ],
+          "sourceId": "fao",
+          "role": "resources",
+          "note": "Canada average covers eight provinces, including Alberta. Excludes NB, NL and the territories. Current dollars; this spending comparison differs from inflation-adjusted compensation above.",
+          "changeKind": "percent",
+          "shortLabel": "Spending per student"
+        }
+      ],
+      "notes": [
+        "A lower spending rank does not establish an adequate funding level; provincial structures, costs and student needs differ.",
+        "The educator count is not class size and does not measure how staff are distributed between schools."
+      ],
+      "policy": {
+        "sourceId": "funding-rule",
+        "period": "From 2025–26",
+        "text": "Enrolment weighting changed from 20% previous, 30% current and 50% projected enrolment to 30% current and 70% projected enrolment. The school results above predate this change."
+      }
+    },
+    "health": {
+      "id": "health",
+      "title": "Capacity and access moved in different directions",
+      "period": "Each measure has its own period",
+      "summary": "Hospital spending per resident rose in nominal dollars. Acute beds per resident fell, while emergency waits and hip-surgery access moved in opposite directions.",
+      "metrics": [
+        {
+          "id": "hospital-spending",
+          "label": "Hospital spending per resident",
+          "unit": "CAD/person",
+          "periods": [
+            "2015",
+            "2025"
+          ],
+          "series": [
+            {
+              "id": "AB",
+              "label": "Alberta",
+              "values": [
+                1948,
+                2248
+              ],
+              "forecast": [
+                false,
+                true
+              ],
+              "reportedChangePct": 15.4,
+              "changeNote": "CIHI published percentage; rounded dollar endpoints may yield a slightly different ratio."
+            },
+            {
+              "id": "CA",
+              "label": "Canada",
+              "values": [
+                1580,
+                2262
+              ],
+              "forecast": [
+                false,
+                true
+              ],
+              "reportedChangePct": 43.1,
+              "changeNote": "CIHI published percentage; rounded dollar endpoints may yield a slightly different ratio."
+            }
+          ],
+          "sourceId": "cihi",
+          "role": "resources",
+          "note": "Current dollars, not inflation-adjusted. 2025 is a forecast. This covers provincial/territorial government hospital spending, not all health spending.",
+          "changeKind": "percent",
+          "shortLabel": "Hospital spending"
+        },
+        {
+          "id": "hospital-beds",
+          "label": "Acute hospital beds",
+          "unit": "index",
+          "periods": [
+            "2014–15",
+            "2023–24"
+          ],
+          "series": [
+            {
+              "id": "count",
+              "label": "Total beds",
+              "values": [
+                100,
+                104.2
+              ],
+              "forecast": [
+                false,
+                false
+              ]
+            },
+            {
+              "id": "rate",
+              "label": "Beds per resident",
+              "values": [
+                100,
+                91.0
+              ],
+              "forecast": [
+                false,
+                false
+              ]
+            }
+          ],
+          "sourceId": "cihi",
+          "role": "capacity",
+          "note": "2014–15 = 100. Beds staffed and operating. Uses published changes (+4.2% count; −9.0% per-resident rate), not ratios of rounded bed counts.",
+          "changeKind": "percent",
+          "shortLabel": "Beds"
+        },
+        {
+          "id": "emergency-wait",
+          "label": "Emergency stay before admission",
+          "unit": "hours",
+          "periods": [
+            "2023–24",
+            "2024–25"
+          ],
+          "series": [
+            {
+              "id": "AB",
+              "label": "Median hours at busiest sites",
+              "values": [
+                12.8,
+                13.3
+              ],
+              "forecast": [
+                false,
+                false
+              ]
+            }
+          ],
+          "sourceId": "ahs",
+          "role": "outcomes",
+          "note": "Median emergency-department length of stay for admitted patients at busiest sites; lower is better. Full fiscal year-to-date comparisons.",
+          "changeKind": "absolute",
+          "shortLabel": "Emergency waits"
+        },
+        {
+          "id": "hip-access",
+          "label": "Scheduled hip replacements within benchmark",
+          "unit": "%",
+          "periods": [
+            "2023–24",
+            "2024–25"
+          ],
+          "series": [
+            {
+              "id": "AB",
+              "label": "Within CIHI benchmark",
+              "values": [
+                62.4,
+                70.1
+              ],
+              "forecast": [
+                false,
+                false
+              ]
+            }
+          ],
+          "sourceId": "ahs",
+          "role": "outcomes",
+          "note": "Share of scheduled hip replacements completed within the CIHI benchmark; higher is better. Full fiscal year-to-date comparisons.",
+          "changeKind": "percentage-points",
+          "shortLabel": "Hip surgery"
+        }
+      ],
+      "notes": [
+        "These measures cover different services and periods. They cannot isolate effects of budgets, population change, staffing or care delivery.",
+        "Per-resident spending is not adjusted for age, patient complexity or local costs."
+      ]
+    },
+    "housing": {
+      "id": "housing",
+      "title": "Rental markets can move differently",
+      "period": "October 2024–October 2025",
+      "summary": "New tenants paid less for a two-bedroom purpose-built apartment in Calgary, but more in Edmonton.",
+      "metrics": [
+        {
+          "id": "turnover-rent",
+          "label": "Two-bedroom rent for new tenants",
+          "unit": "CAD/month",
+          "periods": [
+            "Oct 2024",
+            "Oct 2025"
+          ],
+          "series": [
+            {
+              "id": "calgary",
+              "label": "Calgary CMA",
+              "values": [
+                1927,
+                1836
+              ],
+              "forecast": [
+                false,
+                false
+              ]
+            },
+            {
+              "id": "edmonton",
+              "label": "Edmonton CMA",
+              "values": [
+                1560,
+                1600
+              ],
+              "forecast": [
+                false,
+                false
+              ]
+            }
+          ],
+          "sourceId": "cmhc",
+          "role": "outcomes",
+          "note": "Monthly turnover rents, current dollars. These are city-region survey averages, not every tenant’s bill or a province-wide rent index.",
+          "changeKind": "percent",
+          "shortLabel": "New-tenant rents"
+        }
+      ],
+      "notes": [
+        "Calgary’s purpose-built rental supply grew 11% in 2025; the vacancy rate was 5.0%.",
+        "CMHC describes both new supply and changing demand. This comparison does not identify a causal share for migration or government policy."
+      ]
+    }
+  }
+}

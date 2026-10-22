@@ -293,7 +293,7 @@ function renderNavigation() {
   $("location-group").textContent = current.group;
   $("location-label").textContent = current.label;
   $("location-button").setAttribute("aria-label", `${current.group}: ${current.label}. Change view`);
-  $("header-ask").hidden = state.view !== "economy";
+  $("header-ask").hidden = state.view !== "economy" || state.economy.section === "services";
   document.title = `${current.label} | Canada in Motion`;
   const nav = $("destination-list");
   if (!nav.children.length) nav.innerHTML = [...new Set(DESTINATIONS.map(item => item.group))].map((group, i) => `<section aria-labelledby="navigation-group-${i}"><h3 id="navigation-group-${i}">${esc(group)}</h3>${DESTINATIONS.filter(item => item.group === group).map(item => `<button ${item.section ? `id="ec-section-${item.section}"` : ''} data-page="${item.id}">${esc(item.label)}</button>`).join('')}</section>`).join('');
@@ -318,6 +318,11 @@ $("navigation-dialog").addEventListener('keydown', event => {
 });
 $("navigation-dialog").addEventListener('close', () => $("location-button").setAttribute('aria-expanded', 'false'));
 function showEconomicEvidence() {
+  if(state.economy.section === "services") {
+    const button=document.querySelector("#ec-alberta-services .as-evidence-button");
+    if(button) button.click(); else announce("Alberta evidence is still loading.");
+    return;
+  }
   const snapshot = energyEconomy?.data;
   if (!snapshot) {announce("Economic sources are still loading.");return;}
   openDialog(`<p>GDP is observed in ${snapshot.gdp.year}. Energy Futures 2026 contains conditional projections through 2050. The national oil-price experiment uses Finance Canada’s 2026 calibration.</p>${snapshot.sources.map(source => `<section class="source-entry"><h3>${esc(source.title)}</h3><p><a href="${esc(source.url)}" target="_blank" rel="noopener">Open source</a></p></section>`).join("")}<h3>Calculation limits</h3><ul>${snapshot.limitations.map(note => `<li>${esc(note)}</li>`).join("")}</ul>`, "Economic sources & methods");

@@ -1,5 +1,5 @@
 export const DESTINATIONS = [
-  ...[['explore', 'Explore a question'], ['income', 'Income'], ['outlook', 'Provincial outlook'], ['trade', 'Trade & prices'], ['supply', 'Follow the dollar'], ['futures', 'Energy futures'], ['oil', 'Oil & the economy']].map(([id, label]) => ({id, label, group: 'Economy', view: 'economy', section: id})),
+  ...[['explore', 'Explore a question'], ['income', 'Income'], ['outlook', 'Provincial outlook'], ['trade', 'Trade & prices'], ['supply', 'Follow the dollar'], ['futures', 'Energy futures'], ['oil', 'Oil & the economy'], ['services', 'Alberta: public services']].map(([id, label]) => ({id, label, group: 'Economy', view: 'economy', section: id})),
   {id: 'atlas', label: 'Map & comparison', group: 'Well atlas', view: 'atlas'},
   {id: 'wells', label: 'Find a well', group: 'Well atlas', view: 'wells'},
   {id: 'cleanup', label: 'Closure budget', group: 'Well atlas', view: 'lab', labTab: 'cleanup'},

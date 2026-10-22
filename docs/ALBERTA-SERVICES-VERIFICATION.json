@@ -1,0 +1,43 @@
+{
+  "status": "local-validation-passed",
+  "scope": "Alberta public-services connected story",
+  "codeVersion": "61d8478bc9ad355c26b3",
+  "existingDataRelease": "6e50f5b7fe67a57c00ce",
+  "curatedDataReview": "docs/ALBERTA-SERVICES-DATA-REVIEW.json",
+  "checks": {
+    "javascriptTests": 431,
+    "pythonTests": 139,
+    "betaReleaseGate": "passed",
+    "navigation": {
+      "status": "passed",
+      "checks": [
+        "1440px: all13 destinations, current location, no overflow",
+        "390px: all13 destinations, current location, no overflow",
+        "320px: all13 destinations, current location, no overflow",
+        "844px: all13 destinations, current location, no overflow",
+        "keyboard modal focus containment, Escape restores location and Ask",
+        "province context, browser Back/Forward, shared URL reload",
+        "closure default and arbitrary positive costs valid, Ask scoped to supported views"
+      ],
+      "providerCalls": 0
+    },
+    "story": {
+      "status": "passed",
+      "checks": [
+        "Four chapters expose source endpoint observations; all measure selectors work; conceptual framing is explicitly non-causal",
+        "Keyboard next/previous and chapter focus, evidence tables, source links, full JSON snapshot and modal focus restoration pass",
+        "1440px desktop, 390px and 320px phones, 740px short landscape: forward/reverse navigation, contained evidence scene and no horizontal overflow",
+        "Navigating away and scrolling a hidden story preserves its chapter on return",
+        "Deep-linked reload, external chapter changes, native forward/reverse scrolling and reduced motion pass"
+      ],
+      "errors": [],
+      "inferenceRequests": []
+    }
+  },
+  "limitations": [
+    "Curated endpoint evidence snapshot, not an automatically refreshed time series.",
+    "Different measures retain different reporting periods. No policy or migration causal effect is estimated.",
+    "Existing national inventory remains incomplete; release remains a public beta."
+  ],
+  "publicVerification": null
+}

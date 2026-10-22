@@ -9,8 +9,9 @@ export function normalizeEconomyState(input = {}) {
   const storyInput=raw.story&&typeof raw.story==='object'?raw.story:{};
   const story=Object.fromEntries(['commodity','focus','compare','shockPct','tradeYear','duration','chapter','responseHorizon','householdBasis'].filter(key=>Object.hasOwn(storyInput,key)).map(key=>[key,['string','number','boolean'].includes(typeof storyInput[key])?storyInput[key]:null]));
   return {
-    section: ['explore', 'income', 'trade', 'supply', 'futures', 'oil', 'outlook'].includes(raw.section) ? raw.section : 'explore',
+    section: ['explore', 'income', 'trade', 'supply', 'futures', 'oil', 'outlook', 'services'].includes(raw.section) ? raw.section : 'explore',
     story,
+    albertaStage: ['population','schools','health','housing'].includes(raw.albertaStage)?raw.albertaStage:'population',
     display: ['bars', 'map', 'table'].includes(raw.display) ? raw.display : 'bars',
     futureIndicator: ['wti','henry-hub','oil-production','gas-production','electricity-generation','end-use-demand'].includes(raw.futureIndicator)?raw.futureIndicator:'electricity-generation',
     metric: raw.metric === 'retail' ? 'retail' : 'production',

@@ -7,11 +7,11 @@ const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotio
 page.on('pageerror',error=>errors.push(error.message));
 await page.route('**/api/analysis/status',route=>route.fulfill({json:{available:false}}));
 await page.route('**/api/analysis',()=>{throw Error('Navigation must not invoke inference');});
-const ready={explore:'#ec-energy-story .es-sales',income:'.ec-ranking',outlook:'.pf-history-chart',trade:'.hw-grid',supply:'.ip-total',futures:'.ec-focused-metric',oil:'.ec-oil-chart',atlas:'.ra-workspace',wells:'#well-search',cleanup:'#cost-low',journey:'.transport-stage',transport:'#toll-change'};
+const ready={services:'.as-story',explore:'#ec-energy-story .es-sales',income:'.ec-ranking',outlook:'.pf-history-chart',trade:'.hw-grid',supply:'.ip-total',futures:'.ec-focused-metric',oil:'.ec-oil-chart',atlas:'.ra-workspace',wells:'#well-search',cleanup:'#cost-low',journey:'.transport-stage',transport:'#toll-change'};
 const navigate=async id=>{
  await page.locator('#location-button').click();
  await page.locator('#navigation-dialog[open]').waitFor();
- assert.equal(await page.locator('#destination-list button').count(),12);
+ assert.equal(await page.locator('#destination-list button').count(),13);
  await page.locator(`[data-page="${id}"]`).click();
  assert.equal(await page.locator('#navigation-dialog').evaluate(e=>e.open),false);
  await page.locator(ready[id]).first().waitFor();
@@ -24,7 +24,7 @@ try{
  for(const viewport of [{width:1440,height:1000},{width:390,height:844},{width:320,height:844},{width:844,height:390}]){
   await page.setViewportSize(viewport);
   for(const item of DESTINATIONS){await navigate(item.id);await overflow();assert.equal(await page.locator('[data-page][aria-current=page]').count(),1);}
-  checks.push(`${viewport.width}px: all12 destinations, current location, no overflow`);
+  checks.push(`${viewport.width}px: all13 destinations, current location, no overflow`);
  }
  await navigate('income');
  await page.locator('#location-button').click();await page.keyboard.press('Escape');

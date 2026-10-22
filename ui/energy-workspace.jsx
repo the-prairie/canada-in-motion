@@ -191,3 +191,5 @@ export {mountEnergyStory} from './energy-story.jsx';
 export {mountMonthlyEnergy} from './monthly-energy.jsx';
 
 export {loadLocalInvestigation} from '../local-investigations.mjs';
+
+export {mountAlbertaServices} from './alberta-services.jsx';
