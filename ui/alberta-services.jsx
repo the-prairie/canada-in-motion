@@ -3,6 +3,8 @@ import {createRoot} from 'react-dom/client';
 import {computeAlbertaServices} from '../alberta-services-model.mjs';
 import {ContextDialog} from './context-dialog.jsx';
 import './alberta-services.css';
+import {CapacitySimulator} from './capacity-simulator.jsx';
+import {normalizeCapacitySelection,validateCapacityData} from '../capacity-model.mjs';
 
 const stages=['population','schools','health','housing'];
 const names={population:'Population',schools:'Schools',health:'Health',housing:'Housing'};
@@ -38,7 +40,7 @@ function Comparison({metric}){
  </div>;
 }
 
-function AlbertaServices({data,initial={},onChange,externalStage}){
+function ObservedServices({data,initial={},onChange,externalStage}){
  const result=computeAlbertaServices(data);
  const [stage,setStage]=useState(safeStage(initial.stage));
  const [selected,setSelected]=useState({});
@@ -97,6 +99,24 @@ function AlbertaServices({data,initial={},onChange,externalStage}){
    <button type="button" data-research-export onClick={exportData}>Export evidence and source snapshot</button>
   </ContextDialog>}
  </section>;
+}
+
+function AlbertaServices({data,initial={},onChange,externalStage}){
+ const [mode,setMode]=useState(initial.mode==='capacity'?'capacity':'observed');
+ const [stage,setStage]=useState(safeStage(initial.stage));
+ const [capacity,setCapacity]=useState(()=>normalizeCapacitySelection(initial.capacity));
+ const [snapshot,setSnapshot]=useState(null),[error,setError]=useState(null),[attempt,setAttempt]=useState(0);
+ useEffect(()=>{
+  if(mode!=='capacity'||snapshot)return;
+  const controller=new AbortController();setError(null);
+  fetch('capacity-data.json',{signal:controller.signal}).then(response=>{if(!response.ok)throw new Error('Capacity data could not be loaded.');return response.json();}).then(value=>{validateCapacityData(value);setSnapshot(value);}).catch(cause=>{if(cause.name!=='AbortError')setError('Capacity data could not be loaded. Please try again.');});
+  return()=>controller.abort();
+ },[mode,snapshot,attempt]);
+ const changeMode=next=>{setMode(next);onChange?.({mode:next,stage,capacity});};
+ return <div className="as-workspace">
+  <nav className="as-view-switch" aria-label="Alberta services view"><button type="button" aria-pressed={mode==='observed'} onClick={()=>changeMode('observed')}>Observed change</button><button type="button" aria-pressed={mode==='capacity'} onClick={()=>changeMode('capacity')}>Test capacity</button></nav>
+  {mode==='observed'?<ObservedServices data={data} initial={{stage}} externalStage={externalStage} onChange={selection=>{setStage(selection.stage);onChange?.({mode,stage:selection.stage,capacity});}}/>:snapshot?<CapacitySimulator data={snapshot} initial={capacity} onChange={selection=>{setCapacity(selection);onChange?.({mode,stage,capacity:selection});}} onObserved={()=>changeMode('observed')}/>:<div className="as-capacity-loading" role="status">{error?<><p>{error}</p><button type="button" onClick={()=>setAttempt(value=>value+1)}>Try again</button></>:'Loading capacity evidence…'}</div>}
+ </div>;
 }
 
 export function mountAlbertaServices(element,options){

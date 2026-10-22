@@ -333,7 +333,7 @@ export class EnergyEconomy {
     }catch{if(host.isConnected)host.innerHTML='<p role="alert">The source data for this investigation could not load.</p><button data-ec-action="retry-story">Retry investigation</button>';}
   }
   researchKey(kind) {
-    const s=this.state;return JSON.stringify(kind==='services'?[s.albertaStage]:kind==='forecast'?[s.region,s.forecastRegions,s.forecastYear,s.forecastFocus]:kind==='income'?[s.region,s.incomeIndustry,s.incomeYear,s.demandMillion,s.includeInduced,s.incomeMeasure,s.incomeStep]:[s.historyRegions,s.historyOilChange,s.historyHorizon,s.historyYear]);
+    const s=this.state;return JSON.stringify(kind==='services'?[s.albertaStage,s.albertaMode,s.capacity]:kind==='forecast'?[s.region,s.forecastRegions,s.forecastYear,s.forecastFocus]:kind==='income'?[s.region,s.incomeIndustry,s.incomeYear,s.demandMillion,s.includeInduced,s.incomeMeasure,s.incomeStep]:[s.historyRegions,s.historyOilChange,s.historyHorizon,s.historyYear]);
   }
   async mountResearchView(host,kind) {
     this[`${kind}MountKey`]=this.researchKey(kind);
@@ -344,8 +344,8 @@ export class EnergyEconomy {
       const benchmarks=kind==='forecast'?await fetch('data/provincial-outlook-benchmarks.json').then(r=>r.ok?r.json():null).catch(()=>null):null;
       if(!host.isConnected)return;
       host.replaceChildren();
-      this[`${kind}Mount`]=module[kind==='services'?'mountAlbertaServices':kind==='forecast'?'mountProvincialForecast':kind==='income'?'mountIncomePaths':'mountDynamicPrices'](host,{data,benchmarks,shapes:this.shapes,initial:kind==='services'?{stage:this.state.albertaStage}:this.state,onChange:selection=>{
-        this.state=normalizeEconomyState({...this.state,...(kind==='services'?{albertaStage:selection.stage}:kind==='forecast'?{region:selection.regions.length===1?selection.regions[0]:'CA',forecastRegions:selection.regions,forecastYear:selection.year,forecastFocus:selection.focus}:kind==='income'?{region:selection.region,incomeIndustry:selection.industry,incomeYear:selection.year,demandMillion:selection.demandMillion,includeInduced:selection.includeInduced,incomeMeasure:selection.outcome,incomeStep:selection.step}:{historyRegions:selection.regions,historyOilChange:selection.oilChangePct,historyHorizon:selection.horizonYears,historyYear:selection.selectedYear??null})});this[`${kind}MountKey`]=this.researchKey(kind);const place=this.root.querySelector('#ec-region');if(place)place.value=this.state.region;this.onChange(this.state);
+      this[`${kind}Mount`]=module[kind==='services'?'mountAlbertaServices':kind==='forecast'?'mountProvincialForecast':kind==='income'?'mountIncomePaths':'mountDynamicPrices'](host,{data,benchmarks,shapes:this.shapes,initial:kind==='services'?{stage:this.state.albertaStage,mode:this.state.albertaMode,capacity:this.state.capacity}:this.state,onChange:selection=>{
+        this.state=normalizeEconomyState({...this.state,...(kind==='services'?{albertaStage:selection.stage,albertaMode:selection.mode,capacity:selection.capacity}:kind==='forecast'?{region:selection.regions.length===1?selection.regions[0]:'CA',forecastRegions:selection.regions,forecastYear:selection.year,forecastFocus:selection.focus}:kind==='income'?{region:selection.region,incomeIndustry:selection.industry,incomeYear:selection.year,demandMillion:selection.demandMillion,includeInduced:selection.includeInduced,incomeMeasure:selection.outcome,incomeStep:selection.step}:{historyRegions:selection.regions,historyOilChange:selection.oilChangePct,historyHorizon:selection.horizonYears,historyYear:selection.selectedYear??null})});this[`${kind}MountKey`]=this.researchKey(kind);const place=this.root.querySelector('#ec-region');if(place)place.value=this.state.region;this.onChange(this.state);
       }});
     }catch{if(host.isConnected)host.innerHTML=`<p role="alert">This dataset could not load.</p><button data-ec-action="retry-research" data-research-kind="${kind}">Retry data</button>`;}
   }

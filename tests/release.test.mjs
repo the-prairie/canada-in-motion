@@ -23,6 +23,7 @@ async function fixture(t) {
   const catalog={schemaVersion:2,releaseId:'a'.repeat(20),basePath:`data/releases/${'a'.repeat(20)}/`,purpose:'noncommercial',retrievedAt:DATE,nationalComplete:false,totalRecords:1,sources:[source]};
   const coverage={provinces:config.requiredProvinces.map(code=>({code,topics:Object.fromEntries(config.requiredTopics.map(topic=>[topic,{status:'partial',sourceIds:['example'],evidenceUrl:'https://example.org/evidence',retrievedAt:DATE}]))}))};
   for(const file of PUBLIC_FILES) await write(file,file==='index.html'?'<html><head></head><body>Atlas</body></html>':file.endsWith('.json')?{}:'/* fixture */');
+  await write('capacity-data.json',JSON.parse(await fs.readFile(new URL('../capacity-data.json',import.meta.url),'utf8')));
   await write('alberta-services-data.json',JSON.parse(await fs.readFile(new URL('../alberta-services-data.json',import.meta.url),'utf8')));
   for(const file of ['monthly-energy','economy','energy-flows','provincial-impacts','alberta-well-status','income-paths','dynamic-price-history','provincial-forecasts','provincial-outlook-benchmarks'])await write(`data/${file}.json`,JSON.parse(await fs.readFile(new URL(`../data/${file}.json`,import.meta.url),'utf8')));
   for(const file of ['provincial-price-response','household-energy-costs']){

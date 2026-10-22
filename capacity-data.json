@@ -1,0 +1,1080 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-21",
+  "scope": "Alberta RN registration supply and Calgary Board of Education case studies. Conditional arithmetic, not estimated policy effects.",
+  "updatePolicy": "Reviewed source snapshot. Re-run the extractors and source validation before updating; not an automatic live feed.",
+  "sources": [
+    {
+      "id": "cihi-nursing-2025",
+      "publisher": "Canadian Institute for Health Information",
+      "title": "Nursing in Canada, 2016 to 2025 \u2014 Data Tables",
+      "url": "https://www.cihi.ca/sites/default/files/document/nursing-in-canada-2016-2025-data-tables-en.xlsx",
+      "landingUrl": "https://www.cihi.ca/en/registered-nurses",
+      "publishedAt": "2026-07-23",
+      "retrievedAt": "2026-10-21",
+      "sha256": "be8d62a7c7581028dfa559223626364d9706ef87cb2aad7c2c2f64488d5140bc",
+      "cachedPath": ".data-cache/capacity-workforce/nursing-in-canada-2016-2025-data-tables-en.xlsx",
+      "locator": "Table 3a, Alberta / Registered nurses / Total; rows 870, 882, 887, 892; E:N = 2016:2025"
+    },
+    {
+      "id": "cihi-methods-2025",
+      "publisher": "CIHI",
+      "title": "Nursing in Canada, 2025 \u2014 Methodology Notes",
+      "url": "https://www.cihi.ca/sites/default/files/document/nursing-in-canada-2025-meth-notes-en.pdf",
+      "publishedAt": "2026",
+      "retrievedAt": "2026-10-21",
+      "locator": "Printed pages 9\u201316 population definitions; page 22 flow timing; pages 36 and 40 Alberta limitations"
+    },
+    {
+      "id": "ahs-2025",
+      "publisher": "Alberta Health Services",
+      "title": "2024\u201325 AHS Annual Report",
+      "url": "https://www.albertahealthservices.ca/assets/about/publications/ahs-pub-pr-2024-25-q4.pdf",
+      "publishedAt": null,
+      "dataAsOf": "2025-06-09",
+      "retrievedAt": "2026-10-21",
+      "locator": "PDF/printed p10 staff; p11 Recovery Alberta footnote; p15 vacancy; p22 recruitment; p24 vacancy definition; p31 surgical retention; p51 FTE"
+    },
+    {
+      "id": "ahs-2022",
+      "publisher": "Alberta Health Services",
+      "title": "2021\u201322 Report to the Community: AHS By The Numbers",
+      "url": "https://www.albertahealthservices.ca/assets/About/publications/ahs-ar-2022/ahs-numbers.html",
+      "publishedAt": null,
+      "dataAsOf": "2022-05-11",
+      "retrievedAt": "2026-10-21",
+      "locator": "Provincial Quick Facts, Workforce, AHS Staff row"
+    },
+    {
+      "id": "ab-funding-model",
+      "title": "Alberta K to 12 funding model",
+      "url": "https://www.alberta.ca/k-to-12-education-funding-model",
+      "publicationDate": null,
+      "locator": "Average enrolment methodology",
+      "type": "provincial_policy"
+    },
+    {
+      "id": "cbe-budget-2023",
+      "title": "CBE Budget Report 2023-24",
+      "url": "https://cbe.ab.ca/about-us/budget-and-finance/Documents/Budget-2023-24.pdf",
+      "publicationDate": "2023-05-30",
+      "locator": "PDF pp26,34; enrolment chart p10",
+      "type": "district_budget"
+    },
+    {
+      "id": "cbe-budget-2024",
+      "title": "CBE Budget Report 2024-25",
+      "url": "https://cbe.ab.ca/about-us/budget-and-finance/Documents/cbe-budget-report-2024-2025.pdf",
+      "publicationDate": "2024-05-28",
+      "dateBasis": "Board approval date on PDF p26",
+      "locator": "Printed p34 / PDF p34; enrolment chart p9",
+      "type": "district_budget"
+    },
+    {
+      "id": "cbe-budget-2025",
+      "title": "CBE Budget Report 2025-26",
+      "url": "https://www.cbe.ab.ca/about-us/budget-and-finance/Documents/Budget-Report-2025-2026.pdf",
+      "publicationDate": "2025-05-27",
+      "locator": "Printed p31 / PDF p32; headcount chart printed p8 / PDF p9",
+      "type": "district_budget"
+    },
+    {
+      "id": "cbe-financial-2024",
+      "title": "CBE Financial Results 2024-25",
+      "url": "https://cbe.ab.ca/about-us/budget-and-finance/Documents/Financial-Results-2024-25.pdf",
+      "publicationDate": "2025-11-26",
+      "dateBasis": "Date of auditor report within PDF; exact web publication date not established",
+      "locator": "PDF p131 student statistics; MD&A p19 funding discussion",
+      "type": "district_financial_report",
+      "note": "Student statistics explicitly information only, not part of audited financial statements."
+    },
+    {
+      "id": "cbe-capital-2022",
+      "title": "CBE Three-Year School Capital Plan 2023-2026",
+      "url": "https://www.cbe.ab.ca/FormsManuals/Three-Year-School-Capital-Plan-2023-2026.pdf",
+      "publicationDate": "2022-03-29",
+      "locator": "PDF p1 approval date; p4 enrolment projection chart; p6 approved-project table",
+      "type": "district_capital_plan"
+    },
+    {
+      "id": "cbe-opening-2023",
+      "title": "CBE June 13 2023 public board agenda, Construction Projects Status Report",
+      "url": "https://cbe.ab.ca/about-us/board-of-trustees/BoardofTrusteeDocuments/20230613-public-agenda-regular-meeting.pdf",
+      "publicationDate": "2023-06-13",
+      "locator": "PDF p114; Attachment I p1 of3, exact opening-date table",
+      "type": "district_project_status"
+    },
+    {
+      "id": "cbe-opening-northtrail",
+      "title": "Prairie Sky School and North Trail High School Celebrate Official Openings",
+      "url": "https://www.cbe.ab.ca/news/prairie-sky-school-north-trail-high-school-celebrate-official-openings-1773688984626",
+      "publicationDate": "2024-04-30",
+      "locator": "Opening dates paragraph; distinguish opening for students from later ceremony",
+      "type": "district_news"
+    },
+    {
+      "id": "cbe-enrol-2023",
+      "title": "CBE School Enrolment Report 2023-2024",
+      "url": "https://cbe.ab.ca/FormsManuals/School-Enrolment-Report-2023-2024.pdf",
+      "publicationDate": "2023-12-12",
+      "locator": "Attachment IX capacity/utilization",
+      "type": "district_enrolment_report"
+    },
+    {
+      "id": "cbe-enrol-2024",
+      "title": "CBE School Enrolment Report 2024-2025",
+      "url": "https://cbe.ab.ca/FormsManuals/School-Enrolment-Report-2024-2025.pdf",
+      "publicationDate": "2024-12-17",
+      "locator": "Attachment IX capacity/utilization; total enrolment table",
+      "type": "district_enrolment_report"
+    },
+    {
+      "id": "cbe-enrol-2025",
+      "title": "CBE School Enrolment Report 2025-2026",
+      "url": "https://cbe.ab.ca/FormsManuals/School-Enrolment-Report-2025-2026.pdf",
+      "publicationDate": "2025-12-16",
+      "locator": "pp7,11 total enrolment; Attachment II",
+      "type": "district_enrolment_report"
+    },
+    {
+      "id": "cbe-construction-guidance",
+      "title": "CBE School Capital Construction Projects",
+      "url": "https://www.cbe.ab.ca/school-capital-construction-projects",
+      "publicationDate": null,
+      "locator": "Introductory delivery timelines",
+      "type": "district_guidance"
+    },
+    {
+      "id": "ab-northtrail",
+      "title": "North Trail High School - Alberta Major Projects",
+      "url": "https://majorprojects.alberta.ca/details/North-Trail-High-School/4318",
+      "publicationDate": null,
+      "locator": "Completed; estimated cost and capacity",
+      "type": "provincial_project_register"
+    }
+  ],
+  "workforce": {
+    "geography": "Alberta",
+    "unit": "people with eligible RN registration; not FTE, jobs or employer hires",
+    "frequency": "annual registration snapshot",
+    "history": [
+      {
+        "year": 2016,
+        "supply": 34992,
+        "inflow": 2467,
+        "outflow": 2153,
+        "renewal": 32525,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "E870",
+          "inflow": "E882",
+          "outflow": "E887",
+          "renewal": "E892"
+        }
+      },
+      {
+        "year": 2017,
+        "supply": 35448,
+        "inflow": 2609,
+        "outflow": 2163,
+        "renewal": 32839,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "F870",
+          "inflow": "F882",
+          "outflow": "F887",
+          "renewal": "F892"
+        }
+      },
+      {
+        "year": 2018,
+        "supply": 35691,
+        "inflow": 2406,
+        "outflow": 2243,
+        "renewal": 33285,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "G870",
+          "inflow": "G882",
+          "outflow": "G887",
+          "renewal": "G892"
+        }
+      },
+      {
+        "year": 2019,
+        "supply": 35907,
+        "inflow": 2459,
+        "outflow": 2101,
+        "renewal": 33448,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "H870",
+          "inflow": "H882",
+          "outflow": "H887",
+          "renewal": "H892"
+        }
+      },
+      {
+        "year": 2020,
+        "supply": 36394,
+        "inflow": 2588,
+        "outflow": 2496,
+        "renewal": 33806,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "I870",
+          "inflow": "I882",
+          "outflow": "I887",
+          "renewal": "I892"
+        }
+      },
+      {
+        "year": 2021,
+        "supply": 36288,
+        "inflow": 2390,
+        "outflow": 2577,
+        "renewal": 33898,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "J870",
+          "inflow": "J882",
+          "outflow": "J887",
+          "renewal": "J892"
+        }
+      },
+      {
+        "year": 2022,
+        "supply": 36302,
+        "inflow": 2591,
+        "outflow": 2608,
+        "renewal": 33711,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "K870",
+          "inflow": "K882",
+          "outflow": "K887",
+          "renewal": "K892"
+        }
+      },
+      {
+        "year": 2023,
+        "supply": 37202,
+        "inflow": 3508,
+        "outflow": 2291,
+        "renewal": 33694,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "L870",
+          "inflow": "L882",
+          "outflow": "L887",
+          "renewal": "L892"
+        }
+      },
+      {
+        "year": 2024,
+        "supply": 42694,
+        "inflow": 7783,
+        "outflow": 3331,
+        "renewal": 34911,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "M870",
+          "inflow": "M882",
+          "outflow": "M887",
+          "renewal": "M892"
+        }
+      },
+      {
+        "year": 2025,
+        "supply": 44799,
+        "inflow": 5436,
+        "outflow": null,
+        "renewal": 39363,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "N870",
+          "inflow": "N882",
+          "outflow": "N887",
+          "renewal": "N892"
+        }
+      }
+    ],
+    "definitions": {
+      "supply": "Eligible-to-practise registrants, including employed and not employed; secondary registrations excluded. First six months of registration year.",
+      "inflow": "Registered in year t but not registered in the same jurisdiction in t\u22121; includes new graduates, migrants and returners.",
+      "outflow": "Registered in year t but did not renew in same jurisdiction in t+1. Requires next-year data, so latest year is unavailable.",
+      "renewal": "Registered in t and t\u22121.",
+      "retention": "1\u2212outflow[t]/supply[t] is next-snapshot registration persistence, not employer retention."
+    },
+    "model": {
+      "status": "conditional scenario; causal effects not estimated",
+      "equation": "S[t+1] = max(0, S[t]*(1\u2212max(0,q\u2212retentionImprovementPP/100)) + I + extraEntrants[t+1\u2212delayYears])",
+      "originYear": 2025,
+      "originSupply": 44799,
+      "baselineAnnualEntrants": 5575.666666666667,
+      "baselineOutflowRate": 0.07082738084992857,
+      "calibration": "Entrants average 2023\u20132025; outflow divided by supply, pooled 2022\u20132024. Includes registration-policy regime change; no evidence that this rate persists.",
+      "controls": {
+        "extraEntrantsPerYear": {
+          "min": 0,
+          "max": 3000,
+          "default": 0,
+          "unit": "additional RN registrants/year",
+          "rationale": "Scenario range chosen for usability; not estimated recruitment capacity. Historical total entrants ranged 2390\u20137783."
+        },
+        "retentionImprovementPP": {
+          "min": 0,
+          "max": 2,
+          "default": 0,
+          "unit": "percentage points less annual registration outflow",
+          "rationale": "Illustrative sensitivity; cannot exceed baseline exit rate. No estimated program effect."
+        },
+        "delayYears": {
+          "min": 0,
+          "max": 3,
+          "default": 1,
+          "unit": "years to realize extra registrations",
+          "rationale": "Explicit assumption, not an estimated lag; 0 allows immediate registrations, 1\u20133 explores delay."
+        }
+      },
+      "constraints": [
+        "Never label registration entrants as hires or registration supply as hospital staffing.",
+        "Do not convert to staffed beds, surgeries, school capacity, wait times or dollars.",
+        "Separate new registrations from starting work; eligibility is necessary but insufficient.",
+        "Do not assume migration, pay, funding or recruitment policy causes a chosen scenario gain."
+      ]
+    },
+    "validation": {
+      "accountingReplay": {
+        "label": "Accounting identity with observed flows; not forecast validation",
+        "formula": "S[t+1]=S[t]\u2212outflow[t]+inflow[t+1]",
+        "rows": [
+          {
+            "year": 2017,
+            "actual": 35448,
+            "predicted": 35448,
+            "residual": 0
+          },
+          {
+            "year": 2018,
+            "actual": 35691,
+            "predicted": 35691,
+            "residual": 0
+          },
+          {
+            "year": 2019,
+            "actual": 35907,
+            "predicted": 35907,
+            "residual": 0
+          },
+          {
+            "year": 2020,
+            "actual": 36394,
+            "predicted": 36394,
+            "residual": 0
+          },
+          {
+            "year": 2021,
+            "actual": 36288,
+            "predicted": 36288,
+            "residual": 0
+          },
+          {
+            "year": 2022,
+            "actual": 36302,
+            "predicted": 36302,
+            "residual": 0
+          },
+          {
+            "year": 2023,
+            "actual": 37202,
+            "predicted": 37202,
+            "residual": 0
+          },
+          {
+            "year": 2024,
+            "actual": 42694,
+            "predicted": 42694,
+            "residual": 0
+          },
+          {
+            "year": 2025,
+            "actual": 44799,
+            "predicted": 44799,
+            "residual": 0
+          }
+        ],
+        "metrics": {
+          "n": 9,
+          "mae": 0,
+          "rmse": 0.0,
+          "mapePercent": 0.0,
+          "bias": 0
+        }
+      },
+      "retrospectiveHoldout": {
+        "label": "Retrospective chronological holdout using July 2026 revised data; not a real-time vintage backtest",
+        "originYear": 2020,
+        "trainingInflowYears": [
+          2016,
+          2017,
+          2018,
+          2019,
+          2020
+        ],
+        "trainingOutflowYears": [
+          2016,
+          2017,
+          2018,
+          2019
+        ],
+        "holdoutYears": [
+          2021,
+          2022,
+          2023,
+          2024,
+          2025
+        ],
+        "annualEntrants": 2505.8,
+        "outflowRate": 0.060969599684591445,
+        "method": "Freeze training mean inflow and pooled outflow/supply; recursively forecast 2021\u20132025 from observed 2020 stock. No observed holdout flows or stocks enter predictions. Outflow2020 excluded because it uses 2021 registrations.",
+        "rows": [
+          {
+            "year": 2021,
+            "actual": 36288,
+            "predicted": 36680.87238907898
+          },
+          {
+            "year": 2022,
+            "actual": 36302,
+            "predicted": 36950.25428343525
+          },
+          {
+            "year": 2023,
+            "actual": 37202,
+            "predicted": 37203.212071530346
+          },
+          {
+            "year": 2024,
+            "actual": 42694,
+            "predicted": 37440.74712454818
+          },
+          {
+            "year": 2025,
+            "actual": 44799,
+            "predicted": 37663.79976047246
+          }
+        ],
+        "metrics": {
+          "n": 5,
+          "mae": 2686.158371804787,
+          "rmse": 3976.9921305128796,
+          "mapePercent": 6.220641163677806,
+          "bias": -2269.2228741869576
+        },
+        "noChangeBaseline": {
+          "rows": [
+            {
+              "year": 2021,
+              "actual": 36288,
+              "predicted": 36394
+            },
+            {
+              "year": 2022,
+              "actual": 36302,
+              "predicted": 36394
+            },
+            {
+              "year": 2023,
+              "actual": 37202,
+              "predicted": 36394
+            },
+            {
+              "year": 2024,
+              "actual": 42694,
+              "predicted": 36394
+            },
+            {
+              "year": 2025,
+              "actual": 44799,
+              "predicted": 36394
+            }
+          ],
+          "metrics": {
+            "n": 5,
+            "mae": 3142.2,
+            "rmse": 4711.827437417462,
+            "mapePercent": 7.247042942874776,
+            "bias": -3063
+          }
+        },
+        "linearDriftBaseline": {
+          "annualDrift": 350.5,
+          "rows": [
+            {
+              "year": 2021,
+              "actual": 36288,
+              "predicted": 36744.5
+            },
+            {
+              "year": 2022,
+              "actual": 36302,
+              "predicted": 37095.0
+            },
+            {
+              "year": 2023,
+              "actual": 37202,
+              "predicted": 37445.5
+            },
+            {
+              "year": 2024,
+              "actual": 42694,
+              "predicted": 37796.0
+            },
+            {
+              "year": 2025,
+              "actual": 44799,
+              "predicted": 38146.5
+            }
+          ],
+          "metrics": {
+            "n": 5,
+            "mae": 2608.7,
+            "rmse": 3718.674326961155,
+            "mapePercent": 6.083795765700648,
+            "bias": -2011.5
+          }
+        },
+        "interpretation": "Failure to anticipate the 2024 registration-process increase limits trend extrapolation. Five annual outcomes, including COVID and a process change, cannot validate future policy effects."
+      }
+    },
+    "limitations": [
+      "RN employed/direct-care data suppressed from 2024 because voluntary employment reporting creates significant under-coverage.",
+      "CIHI attributes 2024 supply increase to additional registration pathways; it is not proof of equivalent new jobs or hours.",
+      "2021 supply includes partial pandemic return-to-practice registrations only.",
+      "Historical series is revised in the 2026 publication; original release-vintage information sets were not reconstructed."
+    ]
+  },
+  "employerContext": {
+    "scope": "AHS reported staff headcount, all occupations; not nurse-only FTE",
+    "staffHistory": [
+      {
+        "fiscalYear": "2018-19",
+        "staff": 102717,
+        "sourceId": "ahs-2022"
+      },
+      {
+        "fiscalYear": "2019-20",
+        "staff": 103340,
+        "sourceId": "ahs-2022"
+      },
+      {
+        "fiscalYear": "2020-21",
+        "staff": 108689,
+        "sourceId": "ahs-2022"
+      },
+      {
+        "fiscalYear": "2021-22",
+        "staff": 112373,
+        "sourceId": "ahs-2025"
+      },
+      {
+        "fiscalYear": "2022-23",
+        "staff": 111159,
+        "sourceId": "ahs-2025"
+      },
+      {
+        "fiscalYear": "2023-24",
+        "staff": 113897,
+        "sourceId": "ahs-2025"
+      },
+      {
+        "fiscalYear": "2024-25",
+        "staff": 115464,
+        "sourceId": "ahs-2025"
+      }
+    ],
+    "scopeWarning": "2024\u201325 headcount includes 10,580 Recovery Alberta employees to retain reporting context. It is not the current AHS-only organization. Do not mix it with AHS-only vacancy rate/FTE.",
+    "vacancyRates": [
+      {
+        "fiscalYear": "2021-22",
+        "percent": 14.2,
+        "sourceId": "ahs-2025"
+      },
+      {
+        "fiscalYear": "2022-23",
+        "percent": 14.8,
+        "sourceId": "ahs-2025"
+      },
+      {
+        "fiscalYear": "2023-24",
+        "percent": 11.8,
+        "sourceId": "ahs-2025"
+      },
+      {
+        "fiscalYear": "2024-25",
+        "percent": 11.3,
+        "sourceId": "ahs-2025"
+      }
+    ],
+    "vacancyDefinition": "Vacant positions as percentage of all filled and vacant AHS positions; not employee exits or turnover; changing position counts can change rate.",
+    "paidHoursFTE": [
+      {
+        "fiscalYear": "2023-24",
+        "fte": 89324,
+        "clinical": 56685,
+        "other": 29312,
+        "management": 3327,
+        "annualHoursDenominator": 2030.5,
+        "sourceId": "ahs-2025"
+      },
+      {
+        "fiscalYear": "2024-25",
+        "fte": 87062,
+        "clinical": 55326,
+        "other": 28728,
+        "management": 3008,
+        "annualHoursDenominator": 2022.75,
+        "sourceId": "ahs-2025"
+      }
+    ],
+    "fteDefinition": "Total paid hours including overtime, relief and paid time off divided by full-time annual hours. Includes workforce workload, not unique people. 2024\u201325 drop mainly transfers to Recovery Alberta and reduced overtime; cannot be interpreted as departures.",
+    "recruitmentEvidence": {
+      "fiscalYear": "2024-25",
+      "ienHired": 208,
+      "ienOffersAccepted": "over 600",
+      "ienArrivedAndStarted": "over 200",
+      "sourceId": "ahs-2025",
+      "locator": "p22 initiative offers/arrivals; p51 hiring count",
+      "note": "Subset of workforce. Offers, arrivals and hires are different measures and possibly cohorts; their ratio is not a measured completion rate or lag."
+    },
+    "retentionEvidence": {
+      "fiscalYear": "2024-25",
+      "surgicalRNOneYearRetentionPercent": 67,
+      "sourceId": "ahs-2025",
+      "locator": "p31",
+      "note": "Specialty-specific measure, stable relative to prior years. Do not apply to AHS organization or all nurses."
+    },
+    "modelOption": {
+      "status": "Only conditional incremental staffing sensitivity supported; no published organization-wide gross hires/exits time series identified in reviewed reports",
+      "equation": "IncrementalStaff[t+1] = assumedPersistence*IncrementalStaff[t] + extraHiresWhoStart[t\u2212delay] + additionalExistingStaffRetained[t]",
+      "units": "additional people relative to a separately labelled baseline",
+      "requirements": [
+        "Default extra hires/retention gains to zero.",
+        "Persistence and delays must be visibly user assumptions; do not estimate them from RN registration outflow.",
+        "Do not add headcount to FTE or derive vacancies from headcount.",
+        "Baseline net headcount trend can be backtested, but cannot identify hiring vs attrition or policy effectiveness."
+      ]
+    }
+  },
+  "schools": {
+    "schemaVersion": 1,
+    "retrievedAt": "2026-10-21",
+    "scope": "Calgary Board of Education only; provincial funding weights applied to this explicitly bounded case study.",
+    "funding": {
+      "scope": "CBE Grades 1\u201312 students eligible for base instruction funding, reported in FTE student-statistics schedules. ECS, home education and other ineligible students excluded.",
+      "unit": "eligible Grade 1\u201312 student FTE",
+      "actuals": [
+        {
+          "schoolYear": "2021/22",
+          "year": 2021,
+          "eligibleGrade1to12Fte": 115102,
+          "grades1to9": 84505,
+          "grades10to12": 30597,
+          "sourceId": "cbe-budget-2023",
+          "measurementDate": "2021-09-30",
+          "status": "reported_actual"
+        },
+        {
+          "schoolYear": "2022/23",
+          "year": 2022,
+          "eligibleGrade1to12Fte": 120654,
+          "grades1to9": 88559,
+          "grades10to12": 32095,
+          "sourceId": "cbe-budget-2023",
+          "measurementDate": "2022-09-30",
+          "status": "reported_actual"
+        },
+        {
+          "schoolYear": "2023/24",
+          "year": 2023,
+          "eligibleGrade1to12Fte": 127806,
+          "grades1to9": 93182,
+          "grades10to12": 34624,
+          "sourceId": "cbe-budget-2024",
+          "measurementDate": "2023-09-30",
+          "status": "reported_actual"
+        },
+        {
+          "schoolYear": "2024/25",
+          "year": 2024,
+          "eligibleGrade1to12Fte": 131902,
+          "grades1to9": 95905,
+          "grades10to12": 35997,
+          "sourceId": "cbe-budget-2025",
+          "measurementDate": "2024-09-30",
+          "status": "reported_actual"
+        },
+        {
+          "schoolYear": "2025/26",
+          "year": 2025,
+          "eligibleGrade1to12Fte": 132853,
+          "grades1to9": 96409,
+          "grades10to12": 36444,
+          "sourceId": "cbe-financial-2024",
+          "measurementDate": "2025-09-30",
+          "status": "reported_actual"
+        }
+      ],
+      "vintages": [
+        {
+          "targetYear": 2023,
+          "schoolYear": "2023/24",
+          "vintageDate": "2023-05-30",
+          "sourceId": "cbe-budget-2023",
+          "previousActual": 115102,
+          "currentActualAtBudget": 120654,
+          "forecast": 127706,
+          "forecastGrades1to9": 93478,
+          "forecastGrades10to12": 34228,
+          "realized": 127806,
+          "actualRule": "20/30/50",
+          "wma2050": 123069.6,
+          "aem3070": 125590.4,
+          "contemporaneousForecastRule": 127706,
+          "twoYearMinusThreeYear": 2520.8,
+          "forecastError": -100,
+          "forecastAbsoluteError": 100,
+          "noGrowthAbsoluteError": 7152,
+          "vintageInputsStatus": "All three inputs published in this pre-September budget; current column explicitly labelled Actual."
+        },
+        {
+          "targetYear": 2024,
+          "schoolYear": "2024/25",
+          "vintageDate": "2024-05-28",
+          "sourceId": "cbe-budget-2024",
+          "previousActual": 120654,
+          "currentActualAtBudget": 127806,
+          "forecast": 136461,
+          "forecastGrades1to9": 99554,
+          "forecastGrades10to12": 36907,
+          "realized": 131902,
+          "actualRule": "20/30/50",
+          "wma2050": 130703.1,
+          "aem3070": 133864.5,
+          "contemporaneousForecastRule": 136461,
+          "twoYearMinusThreeYear": 3161.4,
+          "forecastError": 4559,
+          "forecastAbsoluteError": 4559,
+          "noGrowthAbsoluteError": 4096,
+          "vintageInputsStatus": "All three inputs published in this pre-September budget; current column explicitly labelled Actual."
+        },
+        {
+          "targetYear": 2025,
+          "schoolYear": "2025/26",
+          "vintageDate": "2025-05-27",
+          "sourceId": "cbe-budget-2025",
+          "previousActual": 127806,
+          "currentActualAtBudget": 131902,
+          "forecast": 137195,
+          "forecastGrades1to9": 99422,
+          "forecastGrades10to12": 37773,
+          "realized": 132853,
+          "actualRule": "30/70",
+          "wma2050": 133729.3,
+          "aem3070": 135607.1,
+          "contemporaneousForecastRule": 137195,
+          "twoYearMinusThreeYear": 1877.8,
+          "forecastError": 4342,
+          "forecastAbsoluteError": 4342,
+          "noGrowthAbsoluteError": 951,
+          "vintageInputsStatus": "All three inputs published in this pre-September budget; current column explicitly labelled Actual."
+        }
+      ],
+      "rules": [
+        {
+          "id": "20/30/50",
+          "from": "2020/21",
+          "through": "2024/25",
+          "weights": [
+            0.2,
+            0.3,
+            0.5
+          ]
+        },
+        {
+          "id": "30/70",
+          "from": "2025/26",
+          "weights": [
+            0,
+            0.3,
+            0.7
+          ]
+        }
+      ],
+      "indexing": "For target year t: previousActual is t\u22122; currentActualAtBudget is t\u22121; forecast is published projection for t. Provincial documents label the budget year current and target year next.",
+      "formulaOutputLabel": "Calculated funding-weighted eligible FTE (rule-only comparison)",
+      "historicalValidation": {
+        "kind": "Published district forecast versus later reported eligible enrolment; no fitted parameters",
+        "n": 3,
+        "forecastMAE": 3000.3333333333335,
+        "noGrowthMAE": 4066.3333333333335,
+        "forecastErrorSign": "prediction minus actual",
+        "verdict": "Three observations only; compares forecasting accuracy, not causal effects of funding rule."
+      },
+      "limitations": [
+        "Weighted outputs are reconstructed rule arithmetic, not observed final funded counts or audited payments.",
+        "The 2025/26 rule change also removed Supplemental Enrolment Growth Grant; no net dollar effect can be inferred.",
+        "Funding rates differ by grade, student characteristics, grant and year; no dollar conversion is supplied.",
+        "Financial-results student schedule is explicitly outside the financial statements.",
+        "Current-year actual September count is published at each budget vintage; it is not an updated year-end count.",
+        "No claim that extra funding mechanically produces staff or rooms."
+      ],
+      "modelProposal": {
+        "controls": [
+          "target school year",
+          "20/30/50 versus30/70 versus100% published target projection",
+          "scenario growth applied to prospective eligible enrolment"
+        ],
+        "allowedOutcome": "Funded-count arithmetic gap to eligible enrolment; show forecast uncertainty and scope.",
+        "disallowedOutcome": "Net grant dollars, predicted achievement or employment caused by the rule."
+      }
+    },
+    "construction": {
+      "scope": "Five named CBE new-school projects with verified approval, historical planned opening and actual opening. Convenience cohort, not all Alberta or CBE construction.",
+      "capacityUnit": "approved design student places",
+      "projects": [
+        {
+          "id": "mahogany",
+          "name": "Mahogany School",
+          "type": "elementary",
+          "constructionApprovalDate": "2018-03-22",
+          "designApprovalDate": null,
+          "approvedCapacity": 600,
+          "plannedOpening": "2022-09",
+          "actualOpening": "2022-09-01",
+          "openingDatePrecision": "day",
+          "actualSourceId": "cbe-opening-2023",
+          "provincialCapacity2023": 551,
+          "provincialCapacity2024": 591,
+          "status": "opened",
+          "approvalSourceId": "cbe-capital-2022",
+          "plannedSourceId": "cbe-capital-2022",
+          "planVintageDate": "2022-03-29",
+          "capacitySourceId": "cbe-capital-2022",
+          "observedCapacity2023SourceId": "cbe-enrol-2023",
+          "observedCapacitySourceId": "cbe-enrol-2024",
+          "observedCapacityDate": "2024-09-30",
+          "approvalToOpeningMonths": 54,
+          "actualMinusPlannedMonths": 0
+        },
+        {
+          "id": "bayside",
+          "name": "Bayside School (Auburn Bay Elementary 2)",
+          "type": "elementary",
+          "constructionApprovalDate": "2019-11-01",
+          "designApprovalDate": null,
+          "approvedCapacity": 600,
+          "plannedOpening": "2022-09",
+          "actualOpening": "2022-09-01",
+          "openingDatePrecision": "day",
+          "actualSourceId": "cbe-opening-2023",
+          "provincialCapacity2023": 545,
+          "provincialCapacity2024": 567,
+          "status": "opened",
+          "approvalSourceId": "cbe-capital-2022",
+          "plannedSourceId": "cbe-capital-2022",
+          "planVintageDate": "2022-03-29",
+          "capacitySourceId": "cbe-capital-2022",
+          "observedCapacity2023SourceId": "cbe-enrol-2023",
+          "observedCapacitySourceId": "cbe-enrol-2024",
+          "observedCapacityDate": "2024-09-30",
+          "approvalToOpeningMonths": 34,
+          "actualMinusPlannedMonths": 0
+        },
+        {
+          "id": "lakeshore",
+          "name": "Lakeshore School (Auburn Bay Middle)",
+          "type": "middle",
+          "constructionApprovalDate": "2019-11-01",
+          "designApprovalDate": "2018-03-22",
+          "approvedCapacity": 900,
+          "plannedOpening": "2022-09",
+          "actualOpening": "2022-10-11",
+          "openingDatePrecision": "day",
+          "actualSourceId": "cbe-opening-2023",
+          "provincialCapacity2023": 971,
+          "provincialCapacity2024": 971,
+          "status": "opened",
+          "approvalSourceId": "cbe-capital-2022",
+          "plannedSourceId": "cbe-capital-2022",
+          "planVintageDate": "2022-03-29",
+          "capacitySourceId": "cbe-capital-2022",
+          "observedCapacity2023SourceId": "cbe-enrol-2023",
+          "observedCapacitySourceId": "cbe-enrol-2024",
+          "observedCapacityDate": "2024-09-30",
+          "approvalToOpeningMonths": 35,
+          "actualMinusPlannedMonths": 1
+        },
+        {
+          "id": "prairie-sky",
+          "name": "Prairie Sky School (Skyview Ranch)",
+          "type": "K-9",
+          "constructionApprovalDate": "2018-03-22",
+          "designApprovalDate": null,
+          "approvedCapacity": 900,
+          "plannedOpening": "2022-09",
+          "actualOpening": "2023-04-03",
+          "openingDatePrecision": "day",
+          "actualSourceId": "cbe-opening-2023",
+          "provincialCapacity2023": 813,
+          "provincialCapacity2024": 916,
+          "status": "opened",
+          "approvalSourceId": "cbe-capital-2022",
+          "plannedSourceId": "cbe-capital-2022",
+          "planVintageDate": "2022-03-29",
+          "capacitySourceId": "cbe-capital-2022",
+          "observedCapacity2023SourceId": "cbe-enrol-2023",
+          "observedCapacitySourceId": "cbe-enrol-2024",
+          "observedCapacityDate": "2024-09-30",
+          "approvalToOpeningMonths": 61,
+          "actualMinusPlannedMonths": 7
+        },
+        {
+          "id": "north-trail",
+          "name": "North Trail High School (North Calgary High School)",
+          "type": "high",
+          "constructionApprovalDate": "2019-11-01",
+          "designApprovalDate": "2018-03-22",
+          "approvedCapacity": 1800,
+          "plannedOpening": "2024-09",
+          "actualOpening": "2023-09",
+          "openingDatePrecision": "month",
+          "actualSourceId": "cbe-opening-northtrail",
+          "provincialCapacity2023": 1891,
+          "provincialCapacity2024": 1891,
+          "status": "opened",
+          "approvalSourceId": "cbe-capital-2022",
+          "plannedSourceId": "cbe-capital-2022",
+          "planVintageDate": "2022-03-29",
+          "capacitySourceId": "cbe-capital-2022",
+          "observedCapacity2023SourceId": "cbe-enrol-2023",
+          "observedCapacitySourceId": "cbe-enrol-2024",
+          "observedCapacityDate": "2024-09-30",
+          "approvalToOpeningMonths": 46,
+          "actualMinusPlannedMonths": -12
+        }
+      ],
+      "totalApprovedCapacityInOpenedProjects": 4800,
+      "datePrecision": "Month-level timing calculations; North Trail opening only month precision.",
+      "historicalValidation": {
+        "kind": "Historical plan-versus-opening check",
+        "planVintageDate": "2022-03-29",
+        "n": 5,
+        "meanAbsoluteTimingErrorMonths": 4,
+        "medianApprovalToOpeningMonths": 46,
+        "timingErrorsMonths": [
+          0,
+          0,
+          1,
+          7,
+          -12
+        ],
+        "verdict": "Observed schedule errors of a known project cohort; not an out-of-sample fitted delivery model."
+      },
+      "guidance": {
+        "elementaryMiddleYears": [
+          3,
+          4
+        ],
+        "highYears": [
+          4,
+          5
+        ],
+        "sourceId": "cbe-construction-guidance",
+        "kind": "CBE indicative approval-to-opening durations, not a guarantee"
+      },
+      "limitations": [
+        "Approved design capacity is not measured staffed capacity, student headcount, current official provincial capacity or net system capacity.",
+        "No construction project is counted as opened until its verified actual opening date.",
+        "Provincial capacity depends on instructional area, leased space and modulars; it differs from approval design capacity.",
+        "2018 approval date is March22 in capital plan, March23 in later narrative; retain table date and use month precision.",
+        "Five-project cohort excludes cancelled or still-unfinished projects and cannot establish representative delay distribution.",
+        "Moving a historical opening date is a scenario assumption, not evidence that budget or policy caused acceleration.",
+        "North Trail provincial project register gives $65.1M estimated cost; not verified final outturn and not used as a marginal cost per place."
+      ],
+      "modelProposal": {
+        "controls": [
+          "shift opening dates by months",
+          "preserve observed project capacity",
+          "compare actual timing to published2022 plan"
+        ],
+        "allowedOutcome": "Cumulative approved design places in projects that have opened by month; incremental design place-months from shifting dates.",
+        "disallowedOutcome": "province-wide delivered seats, staffed seats, net capacity or construction cost forecast"
+      }
+    },
+    "headcountContext": {
+      "scope": "Total CBE end-September enrolment; not used in eligible-FTE formula",
+      "unit": "students",
+      "sourceId": "cbe-budget-2025",
+      "values": [
+        {
+          "year": 2018,
+          "value": 123419
+        },
+        {
+          "year": 2019,
+          "value": 125809
+        },
+        {
+          "year": 2020,
+          "value": 122641
+        },
+        {
+          "year": 2021,
+          "value": 125329
+        },
+        {
+          "year": 2022,
+          "value": 131215
+        },
+        {
+          "year": 2023,
+          "value": 138244
+        },
+        {
+          "year": 2024,
+          "value": 142402
+        }
+      ]
+    },
+    "forecastContext": {
+      "sourceId": "cbe-capital-2022",
+      "vintageDate": "2022-03-29",
+      "scope": "CBE total student headcount, capital-planning forecast; distinct from eligible-FTE budget forecasts",
+      "values": [
+        {
+          "year": 2022,
+          "prediction": 126863
+        },
+        {
+          "year": 2023,
+          "prediction": 127651
+        },
+        {
+          "year": 2024,
+          "prediction": 128104
+        },
+        {
+          "year": 2025,
+          "prediction": 127613
+        },
+        {
+          "year": 2026,
+          "prediction": 126822
+        }
+      ],
+      "note": "Historical forecast vintage only; never present as current forecast."
+    }
+  }
+}

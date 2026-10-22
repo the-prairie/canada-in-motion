@@ -1,3 +1,4 @@
+import {normalizeCapacitySelection} from './capacity-model.mjs';
 export const ECONOMY_REGIONS = ['CA', 'NL', 'PE', 'NS', 'NB', 'QC', 'ON', 'MB', 'SK', 'AB', 'BC', 'YT', 'NT', 'NU'];
 export const ECONOMY_SCENARIOS = ['Current Measures', 'Higher', 'Lower', 'Canada Net-zero'];
 const METRICS = ['wti', 'wcs', 'brent', 'cls', 'henry-hub', 'nit', 'oil-production', 'gas-production', 'electricity-generation', 'end-use-demand', 'electricity-price', 'gas-price'];
@@ -11,6 +12,8 @@ export function normalizeEconomyState(input = {}) {
   return {
     section: ['explore', 'income', 'trade', 'supply', 'futures', 'oil', 'outlook', 'services'].includes(raw.section) ? raw.section : 'explore',
     story,
+    albertaMode: raw.albertaMode === 'capacity' ? 'capacity' : 'observed',
+    capacity: normalizeCapacitySelection(raw.capacity),
     albertaStage: ['population','schools','health','housing'].includes(raw.albertaStage)?raw.albertaStage:'population',
     display: ['bars', 'map', 'table'].includes(raw.display) ? raw.display : 'bars',
     futureIndicator: ['wti','henry-hub','oil-production','gas-production','electricity-generation','end-use-demand'].includes(raw.futureIndicator)?raw.futureIndicator:'electricity-generation',

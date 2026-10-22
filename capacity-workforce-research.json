@@ -1,0 +1,562 @@
+{
+  "schemaVersion": 1,
+  "retrievedAt": "2026-10-21",
+  "title": "Alberta workforce: registration flows and employer context",
+  "sources": [
+    {
+      "id": "cihi-nursing-2025",
+      "publisher": "Canadian Institute for Health Information",
+      "title": "Nursing in Canada, 2016 to 2025 — Data Tables",
+      "url": "https://www.cihi.ca/sites/default/files/document/nursing-in-canada-2016-2025-data-tables-en.xlsx",
+      "landingUrl": "https://www.cihi.ca/en/registered-nurses",
+      "publishedAt": "2026-07-23",
+      "retrievedAt": "2026-10-21",
+      "sha256": "be8d62a7c7581028dfa559223626364d9706ef87cb2aad7c2c2f64488d5140bc",
+      "cachedPath": ".data-cache/capacity-workforce/nursing-in-canada-2016-2025-data-tables-en.xlsx",
+      "locator": "Table 3a, Alberta / Registered nurses / Total; rows 870, 882, 887, 892; E:N = 2016:2025"
+    },
+    {
+      "id": "cihi-methods-2025",
+      "publisher": "CIHI",
+      "title": "Nursing in Canada, 2025 — Methodology Notes",
+      "url": "https://www.cihi.ca/sites/default/files/document/nursing-in-canada-2025-meth-notes-en.pdf",
+      "publishedAt": "2026",
+      "retrievedAt": "2026-10-21",
+      "locator": "Printed pages 9–16 population definitions; page 22 flow timing; pages 36 and 40 Alberta limitations"
+    },
+    {
+      "id": "ahs-2025",
+      "publisher": "Alberta Health Services",
+      "title": "2024–25 AHS Annual Report",
+      "url": "https://www.albertahealthservices.ca/assets/about/publications/ahs-pub-pr-2024-25-q4.pdf",
+      "publishedAt": null,
+      "dataAsOf": "2025-06-09",
+      "retrievedAt": "2026-10-21",
+      "locator": "PDF/printed p10 staff; p11 Recovery Alberta footnote; p15 vacancy; p22 recruitment; p24 vacancy definition; p31 surgical retention; p51 FTE"
+    },
+    {
+      "id": "ahs-2022",
+      "publisher": "Alberta Health Services",
+      "title": "2021–22 Report to the Community: AHS By The Numbers",
+      "url": "https://www.albertahealthservices.ca/assets/About/publications/ahs-ar-2022/ahs-numbers.html",
+      "publishedAt": null,
+      "dataAsOf": "2022-05-11",
+      "retrievedAt": "2026-10-21",
+      "locator": "Provincial Quick Facts, Workforce, AHS Staff row"
+    }
+  ],
+  "registeredNurses": {
+    "geography": "Alberta",
+    "unit": "people with eligible RN registration; not FTE, jobs or employer hires",
+    "frequency": "annual registration snapshot",
+    "history": [
+      {
+        "year": 2016,
+        "supply": 34992,
+        "inflow": 2467,
+        "outflow": 2153,
+        "renewal": 32525,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "E870",
+          "inflow": "E882",
+          "outflow": "E887",
+          "renewal": "E892"
+        }
+      },
+      {
+        "year": 2017,
+        "supply": 35448,
+        "inflow": 2609,
+        "outflow": 2163,
+        "renewal": 32839,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "F870",
+          "inflow": "F882",
+          "outflow": "F887",
+          "renewal": "F892"
+        }
+      },
+      {
+        "year": 2018,
+        "supply": 35691,
+        "inflow": 2406,
+        "outflow": 2243,
+        "renewal": 33285,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "G870",
+          "inflow": "G882",
+          "outflow": "G887",
+          "renewal": "G892"
+        }
+      },
+      {
+        "year": 2019,
+        "supply": 35907,
+        "inflow": 2459,
+        "outflow": 2101,
+        "renewal": 33448,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "H870",
+          "inflow": "H882",
+          "outflow": "H887",
+          "renewal": "H892"
+        }
+      },
+      {
+        "year": 2020,
+        "supply": 36394,
+        "inflow": 2588,
+        "outflow": 2496,
+        "renewal": 33806,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "I870",
+          "inflow": "I882",
+          "outflow": "I887",
+          "renewal": "I892"
+        }
+      },
+      {
+        "year": 2021,
+        "supply": 36288,
+        "inflow": 2390,
+        "outflow": 2577,
+        "renewal": 33898,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "J870",
+          "inflow": "J882",
+          "outflow": "J887",
+          "renewal": "J892"
+        }
+      },
+      {
+        "year": 2022,
+        "supply": 36302,
+        "inflow": 2591,
+        "outflow": 2608,
+        "renewal": 33711,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "K870",
+          "inflow": "K882",
+          "outflow": "K887",
+          "renewal": "K892"
+        }
+      },
+      {
+        "year": 2023,
+        "supply": 37202,
+        "inflow": 3508,
+        "outflow": 2291,
+        "renewal": 33694,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "L870",
+          "inflow": "L882",
+          "outflow": "L887",
+          "renewal": "L892"
+        }
+      },
+      {
+        "year": 2024,
+        "supply": 42694,
+        "inflow": 7783,
+        "outflow": 3331,
+        "renewal": 34911,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "M870",
+          "inflow": "M882",
+          "outflow": "M887",
+          "renewal": "M892"
+        }
+      },
+      {
+        "year": 2025,
+        "supply": 44799,
+        "inflow": 5436,
+        "outflow": null,
+        "renewal": 39363,
+        "sourceId": "cihi-nursing-2025",
+        "cells": {
+          "supply": "N870",
+          "inflow": "N882",
+          "outflow": "N887",
+          "renewal": "N892"
+        }
+      }
+    ],
+    "definitions": {
+      "supply": "Eligible-to-practise registrants, including employed and not employed; secondary registrations excluded. First six months of registration year.",
+      "inflow": "Registered in year t but not registered in the same jurisdiction in t−1; includes new graduates, migrants and returners.",
+      "outflow": "Registered in year t but did not renew in same jurisdiction in t+1. Requires next-year data, so latest year is unavailable.",
+      "renewal": "Registered in t and t−1.",
+      "retention": "1−outflow[t]/supply[t] is next-snapshot registration persistence, not employer retention."
+    },
+    "model": {
+      "status": "conditional scenario; causal effects not estimated",
+      "equation": "S[t+1] = max(0, S[t]*(1−max(0,q−retentionImprovementPP/100)) + I + extraEntrants[t+1−delayYears])",
+      "originYear": 2025,
+      "originSupply": 44799,
+      "baselineAnnualEntrants": 5575.666666666667,
+      "baselineOutflowRate": 0.07082738084992857,
+      "calibration": "Entrants average 2023–2025; outflow divided by supply, pooled 2022–2024. Includes registration-policy regime change; no evidence that this rate persists.",
+      "controls": {
+        "extraEntrantsPerYear": {
+          "min": 0,
+          "max": 3000,
+          "default": 0,
+          "unit": "additional RN registrants/year",
+          "rationale": "Scenario range chosen for usability; not estimated recruitment capacity. Historical total entrants ranged 2390–7783."
+        },
+        "retentionImprovementPP": {
+          "min": 0,
+          "max": 2,
+          "default": 0,
+          "unit": "percentage points less annual registration outflow",
+          "rationale": "Illustrative sensitivity; cannot exceed baseline exit rate. No estimated program effect."
+        },
+        "delayYears": {
+          "min": 0,
+          "max": 3,
+          "default": 1,
+          "unit": "years to realize extra registrations",
+          "rationale": "Explicit assumption, not an estimated lag; 0 allows immediate registrations, 1–3 explores delay."
+        }
+      },
+      "constraints": [
+        "Never label registration entrants as hires or registration supply as hospital staffing.",
+        "Do not convert to staffed beds, surgeries, school capacity, wait times or dollars.",
+        "Separate new registrations from starting work; eligibility is necessary but insufficient.",
+        "Do not assume migration, pay, funding or recruitment policy causes a chosen scenario gain."
+      ]
+    },
+    "validation": {
+      "accountingReplay": {
+        "label": "Accounting identity with observed flows; not forecast validation",
+        "formula": "S[t+1]=S[t]−outflow[t]+inflow[t+1]",
+        "rows": [
+          {
+            "year": 2017,
+            "actual": 35448,
+            "predicted": 35448,
+            "residual": 0
+          },
+          {
+            "year": 2018,
+            "actual": 35691,
+            "predicted": 35691,
+            "residual": 0
+          },
+          {
+            "year": 2019,
+            "actual": 35907,
+            "predicted": 35907,
+            "residual": 0
+          },
+          {
+            "year": 2020,
+            "actual": 36394,
+            "predicted": 36394,
+            "residual": 0
+          },
+          {
+            "year": 2021,
+            "actual": 36288,
+            "predicted": 36288,
+            "residual": 0
+          },
+          {
+            "year": 2022,
+            "actual": 36302,
+            "predicted": 36302,
+            "residual": 0
+          },
+          {
+            "year": 2023,
+            "actual": 37202,
+            "predicted": 37202,
+            "residual": 0
+          },
+          {
+            "year": 2024,
+            "actual": 42694,
+            "predicted": 42694,
+            "residual": 0
+          },
+          {
+            "year": 2025,
+            "actual": 44799,
+            "predicted": 44799,
+            "residual": 0
+          }
+        ],
+        "metrics": {
+          "n": 9,
+          "mae": 0,
+          "rmse": 0.0,
+          "mapePercent": 0.0,
+          "bias": 0
+        }
+      },
+      "retrospectiveHoldout": {
+        "label": "Retrospective chronological holdout using July 2026 revised data; not a real-time vintage backtest",
+        "originYear": 2020,
+        "trainingInflowYears": [
+          2016,
+          2017,
+          2018,
+          2019,
+          2020
+        ],
+        "trainingOutflowYears": [
+          2016,
+          2017,
+          2018,
+          2019
+        ],
+        "holdoutYears": [
+          2021,
+          2022,
+          2023,
+          2024,
+          2025
+        ],
+        "annualEntrants": 2505.8,
+        "outflowRate": 0.060969599684591445,
+        "method": "Freeze training mean inflow and pooled outflow/supply; recursively forecast 2021–2025 from observed 2020 stock. No observed holdout flows or stocks enter predictions. Outflow2020 excluded because it uses 2021 registrations.",
+        "rows": [
+          {
+            "year": 2021,
+            "actual": 36288,
+            "predicted": 36680.87238907898
+          },
+          {
+            "year": 2022,
+            "actual": 36302,
+            "predicted": 36950.25428343525
+          },
+          {
+            "year": 2023,
+            "actual": 37202,
+            "predicted": 37203.212071530346
+          },
+          {
+            "year": 2024,
+            "actual": 42694,
+            "predicted": 37440.74712454818
+          },
+          {
+            "year": 2025,
+            "actual": 44799,
+            "predicted": 37663.79976047246
+          }
+        ],
+        "metrics": {
+          "n": 5,
+          "mae": 2686.158371804787,
+          "rmse": 3976.9921305128796,
+          "mapePercent": 6.220641163677806,
+          "bias": -2269.2228741869576
+        },
+        "noChangeBaseline": {
+          "rows": [
+            {
+              "year": 2021,
+              "actual": 36288,
+              "predicted": 36394
+            },
+            {
+              "year": 2022,
+              "actual": 36302,
+              "predicted": 36394
+            },
+            {
+              "year": 2023,
+              "actual": 37202,
+              "predicted": 36394
+            },
+            {
+              "year": 2024,
+              "actual": 42694,
+              "predicted": 36394
+            },
+            {
+              "year": 2025,
+              "actual": 44799,
+              "predicted": 36394
+            }
+          ],
+          "metrics": {
+            "n": 5,
+            "mae": 3142.2,
+            "rmse": 4711.827437417462,
+            "mapePercent": 7.247042942874776,
+            "bias": -3063
+          }
+        },
+        "linearDriftBaseline": {
+          "annualDrift": 350.5,
+          "rows": [
+            {
+              "year": 2021,
+              "actual": 36288,
+              "predicted": 36744.5
+            },
+            {
+              "year": 2022,
+              "actual": 36302,
+              "predicted": 37095.0
+            },
+            {
+              "year": 2023,
+              "actual": 37202,
+              "predicted": 37445.5
+            },
+            {
+              "year": 2024,
+              "actual": 42694,
+              "predicted": 37796.0
+            },
+            {
+              "year": 2025,
+              "actual": 44799,
+              "predicted": 38146.5
+            }
+          ],
+          "metrics": {
+            "n": 5,
+            "mae": 2608.7,
+            "rmse": 3718.674326961155,
+            "mapePercent": 6.083795765700648,
+            "bias": -2011.5
+          }
+        },
+        "interpretation": "Failure to anticipate the 2024 registration-process increase limits trend extrapolation. Five annual outcomes, including COVID and a process change, cannot validate future policy effects."
+      }
+    },
+    "limitations": [
+      "RN employed/direct-care data suppressed from 2024 because voluntary employment reporting creates significant under-coverage.",
+      "CIHI attributes 2024 supply increase to additional registration pathways; it is not proof of equivalent new jobs or hours.",
+      "2021 supply includes partial pandemic return-to-practice registrations only.",
+      "Historical series is revised in the 2026 publication; original release-vintage information sets were not reconstructed."
+    ]
+  },
+  "employerContext": {
+    "scope": "AHS reported staff headcount, all occupations; not nurse-only FTE",
+    "staffHistory": [
+      {
+        "fiscalYear": "2018-19",
+        "staff": 102717,
+        "sourceId": "ahs-2022"
+      },
+      {
+        "fiscalYear": "2019-20",
+        "staff": 103340,
+        "sourceId": "ahs-2022"
+      },
+      {
+        "fiscalYear": "2020-21",
+        "staff": 108689,
+        "sourceId": "ahs-2022"
+      },
+      {
+        "fiscalYear": "2021-22",
+        "staff": 112373,
+        "sourceId": "ahs-2025"
+      },
+      {
+        "fiscalYear": "2022-23",
+        "staff": 111159,
+        "sourceId": "ahs-2025"
+      },
+      {
+        "fiscalYear": "2023-24",
+        "staff": 113897,
+        "sourceId": "ahs-2025"
+      },
+      {
+        "fiscalYear": "2024-25",
+        "staff": 115464,
+        "sourceId": "ahs-2025"
+      }
+    ],
+    "scopeWarning": "2024–25 headcount includes 10,580 Recovery Alberta employees to retain reporting context. It is not the current AHS-only organization. Do not mix it with AHS-only vacancy rate/FTE.",
+    "vacancyRates": [
+      {
+        "fiscalYear": "2021-22",
+        "percent": 14.2,
+        "sourceId": "ahs-2025"
+      },
+      {
+        "fiscalYear": "2022-23",
+        "percent": 14.8,
+        "sourceId": "ahs-2025"
+      },
+      {
+        "fiscalYear": "2023-24",
+        "percent": 11.8,
+        "sourceId": "ahs-2025"
+      },
+      {
+        "fiscalYear": "2024-25",
+        "percent": 11.3,
+        "sourceId": "ahs-2025"
+      }
+    ],
+    "vacancyDefinition": "Vacant positions as percentage of all filled and vacant AHS positions; not employee exits or turnover; changing position counts can change rate.",
+    "paidHoursFTE": [
+      {
+        "fiscalYear": "2023-24",
+        "fte": 89324,
+        "clinical": 56685,
+        "other": 29312,
+        "management": 3327,
+        "annualHoursDenominator": 2030.5,
+        "sourceId": "ahs-2025"
+      },
+      {
+        "fiscalYear": "2024-25",
+        "fte": 87062,
+        "clinical": 55326,
+        "other": 28728,
+        "management": 3008,
+        "annualHoursDenominator": 2022.75,
+        "sourceId": "ahs-2025"
+      }
+    ],
+    "fteDefinition": "Total paid hours including overtime, relief and paid time off divided by full-time annual hours. Includes workforce workload, not unique people. 2024–25 drop mainly transfers to Recovery Alberta and reduced overtime; cannot be interpreted as departures.",
+    "recruitmentEvidence": {
+      "fiscalYear": "2024-25",
+      "ienHired": 208,
+      "ienOffersAccepted": "over 600",
+      "ienArrivedAndStarted": "over 200",
+      "sourceId": "ahs-2025",
+      "locator": "p22 initiative offers/arrivals; p51 hiring count",
+      "note": "Subset of workforce. Offers, arrivals and hires are different measures and possibly cohorts; their ratio is not a measured completion rate or lag."
+    },
+    "retentionEvidence": {
+      "fiscalYear": "2024-25",
+      "surgicalRNOneYearRetentionPercent": 67,
+      "sourceId": "ahs-2025",
+      "locator": "p31",
+      "note": "Specialty-specific measure, stable relative to prior years. Do not apply to AHS organization or all nurses."
+    },
+    "modelOption": {
+      "status": "Only conditional incremental staffing sensitivity supported; no published organization-wide gross hires/exits time series identified in reviewed reports",
+      "equation": "IncrementalStaff[t+1] = assumedPersistence*IncrementalStaff[t] + extraHiresWhoStart[t−delay] + additionalExistingStaffRetained[t]",
+      "units": "additional people relative to a separately labelled baseline",
+      "requirements": [
+        "Default extra hires/retention gains to zero.",
+        "Persistence and delays must be visibly user assumptions; do not estimate them from RN registration outflow.",
+        "Do not add headcount to FTE or derive vacancies from headcount.",
+        "Baseline net headcount trend can be backtested, but cannot identify hiring vs attrition or policy effectiveness."
+      ]
+    }
+  }
+}

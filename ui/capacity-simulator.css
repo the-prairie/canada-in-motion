@@ -1,0 +1,72 @@
+#ec-alberta-services .capacity-simulator{--cs-green:#294c43;--cs-paper:#f8f8f0;--cs-muted:#59685e;--cs-clay:#9b5239;color:#253a31;padding:26px 0 38px;font-family:inherit;max-width:1200px;margin:auto}
+#ec-alberta-services .capacity-simulator *{box-sizing:border-box}
+#ec-alberta-services .capacity-simulator button,#ec-alberta-services .capacity-simulator select{font:inherit;min-height:44px;border:1px solid #aab9aa;border-radius:4px;background:transparent;color:var(--cs-green);cursor:pointer;padding:9px 14px}
+#ec-alberta-services .capacity-simulator button:hover{background:#e8edde}
+#ec-alberta-services .capacity-simulator :is(button,input,select,a,[tabindex]):focus-visible{outline:3px solid #a85c34;outline-offset:3px}
+#ec-alberta-services .cs-heading{display:flex;align-items:start;justify-content:space-between;gap:20px;margin-bottom:22px}
+#ec-alberta-services .capacity-simulator h2{font-size:30px;letter-spacing:-.035em;font-weight:500;line-height:1.1;margin:0 0 8px}
+#ec-alberta-services .cs-heading p{font-size:15px;margin:0;color:var(--cs-muted);line-height:1.4}
+#ec-alberta-services .cs-header-actions{display:flex;gap:8px;flex-shrink:0}
+#ec-alberta-services .cs-topics{display:flex;border-bottom:1px solid #c3cebe;gap:6px;padding-bottom:14px;margin-bottom:28px}
+#ec-alberta-services .cs-topics button[aria-pressed=true]{background:var(--cs-green);color:#fff;border-color:var(--cs-green)}
+#ec-alberta-services .cs-workspace{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(250px,1fr);column-gap:42px;row-gap:26px}
+#ec-alberta-services .cs-visual,#ec-alberta-services .cs-assumptions{min-width:0}
+#ec-alberta-services .capacity-simulator h3{font-size:23px;letter-spacing:-.025em;line-height:1.2;font-weight:500;margin:0 0 12px}
+#ec-alberta-services .cs-intro{font-size:15px;line-height:1.55;max-width:42em;margin:0 0 24px;color:#4d6054}
+#ec-alberta-services .cs-unit{display:block;font-size:12px;color:var(--cs-muted);margin-bottom:4px}
+#ec-alberta-services .cs-chart svg{display:block;width:100%;overflow:visible}
+#ec-alberta-services .cs-chart text{font:11px system-ui,sans-serif;fill:#4c5b50}
+#ec-alberta-services .cs-grid{stroke:#d9dfd2;stroke-width:1}
+#ec-alberta-services .cs-line{stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+#ec-alberta-services .cs-line.cs-observed{stroke:var(--cs-green)}
+#ec-alberta-services .cs-line.cs-baseline,#ec-alberta-services .cs-line.cs-planned{stroke:#84907d;stroke-dasharray:3 5}
+#ec-alberta-services .cs-line.cs-scenario{stroke:var(--cs-clay);stroke-dasharray:8 5}
+#ec-alberta-services .cs-future{fill:#b7c5ae;opacity:.10}
+#ec-alberta-services .cs-origin{stroke:#bdc7b6;stroke-dasharray:2 4}
+#ec-alberta-services .cs-legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:11px;color:#4e5e51;margin-top:8px;line-height:1.5}
+#ec-alberta-services .cs-legend span{display:flex;align-items:center;gap:6px}
+#ec-alberta-services .cs-legend i{display:inline-block;width:22px;height:0;border-top:3px solid var(--cs-green)}
+#ec-alberta-services .cs-legend i.cs-baseline,#ec-alberta-services .cs-legend i.cs-planned{border-top-color:#84907d;border-top-style:dotted}
+#ec-alberta-services .cs-legend i.cs-scenario{border-top-color:var(--cs-clay);border-top-style:dashed}
+#ec-alberta-services .cs-legend i.cs-reported{border-top-color:#84907d;border-top-style:dashed}
+#ec-alberta-services .capacity-simulator .cs-limit{font-size:12px;line-height:1.5;color:#5f6b5e;margin:18px 0 0}
+#ec-alberta-services .cs-assumptions{border-left:1px solid #d2dacb;padding-left:30px}
+#ec-alberta-services .cs-assumptions h3{font-size:17px;margin-bottom:22px}
+#ec-alberta-services .cs-control{margin-bottom:22px}
+#ec-alberta-services .cs-control label{display:flex;justify-content:space-between;gap:12px;align-items:baseline;font-size:13px;line-height:1.4}
+#ec-alberta-services .cs-control output{font-variant-numeric:tabular-nums;color:var(--cs-green);font-weight:600;text-align:right;flex-shrink:0}
+#ec-alberta-services .cs-control input[type=range]{display:block;width:100%;min-width:0;min-height:28px;margin:6px 0 0;padding:0;accent-color:var(--cs-green);cursor:pointer}
+#ec-alberta-services .cs-control small{display:block;font-size:11px;line-height:1.5;color:var(--cs-muted);margin-top:3px}
+#ec-alberta-services .capacity-simulator button.cs-reset{border:0;padding:0;text-decoration:underline;text-underline-offset:3px;font-size:12px;min-height:38px}
+#ec-alberta-services .cs-select{display:block;font-size:13px;margin-bottom:20px}
+#ec-alberta-services .capacity-simulator .cs-select select{display:block;width:100%;margin-top:8px;background:var(--cs-paper);font-size:14px}
+#ec-alberta-services .cs-vintage{font-size:11px;line-height:1.5;color:var(--cs-muted)}
+#ec-alberta-services .cs-actual-marker{stroke:#84907d;stroke-width:2;stroke-dasharray:3 4}
+#ec-alberta-services .cs-dot-track{stroke:#c7d0bf;stroke-width:1}
+#ec-alberta-services .cs-rule-dot{fill:#84907d;stroke:var(--cs-paper);stroke-width:2}
+#ec-alberta-services .cs-funding-selected .cs-rule-dot{fill:var(--cs-clay)}
+#ec-alberta-services .cs-funding-selected text{fill:var(--cs-green);font-weight:650}
+#ec-alberta-services .cs-outcome{grid-column:1/-1;border-top:1px solid #bac9b6;padding:22px 0 0;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:32px;align-items:center}
+#ec-alberta-services .cs-outcome p{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin:0}
+#ec-alberta-services .cs-outcome strong{font-size:40px;letter-spacing:-.05em;font-weight:500;color:var(--cs-green);line-height:1.1;font-variant-numeric:tabular-nums}
+#ec-alberta-services .cs-outcome span{font-size:14px;max-width:210px;line-height:1.45}
+#ec-alberta-services .cs-outcome>div{font-size:13px;line-height:1.55;color:#53644f}
+#ec-alberta-services .capacity-simulator .cs-validation{font-size:12px;line-height:1.5;margin:24px 0 0;padding:12px 14px;background:#e9ecde;border-left:3px solid #a3ac95;color:#53604c}
+#ec-alberta-services .cs-evidence{max-width:850px}
+#ec-alberta-services .cs-evidence h3{font-size:20px;margin:28px 0 12px}
+#ec-alberta-services .cs-evidence p,#ec-alberta-services .cs-evidence li{font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+#ec-alberta-services .cs-evidence .cs-table-wrap{max-width:100%;overflow:auto;margin-block:20px}
+#ec-alberta-services .cs-evidence table{border-collapse:collapse;min-width:480px;width:100%;font-size:12px;font-variant-numeric:tabular-nums;text-align:right}
+#ec-alberta-services .cs-evidence caption{text-align:left;font-size:14px;font-weight:600;padding-bottom:12px}
+#ec-alberta-services .cs-evidence th,#ec-alberta-services .cs-evidence td{padding:10px 8px;border-bottom:1px solid #d7ddcf;white-space:normal;vertical-align:top}
+#ec-alberta-services .cs-evidence th:first-child{text-align:left}
+#ec-alberta-services .cs-evidence thead th{font-size:11px;font-weight:600}
+#ec-alberta-services .cs-source{border-bottom:1px solid #d2d9ca;padding:14px 0;overflow-wrap:anywhere;font-size:13px}
+#ec-alberta-services .cs-source small{display:block;font-size:11px;color:var(--cs-muted);margin-top:5px}
+#ec-alberta-services .cs-source p{margin:5px 0 0}
+#ec-alberta-services .cs-evidence [data-research-export]{margin-top:24px}
+@media(max-width:900px){#ec-alberta-services .cs-workspace{gap:24px;grid-template-columns:minmax(0,1.35fr) minmax(230px,1fr)}#ec-alberta-services .cs-assumptions{padding-left:20px}#ec-alberta-services .cs-header-actions{flex-wrap:wrap;justify-content:flex-end}#ec-alberta-services .capacity-simulator h2{font-size:26px}}
+@media(max-width:620px){#ec-alberta-services .capacity-simulator{padding-top:18px}#ec-alberta-services .cs-heading{display:block;margin-bottom:18px}#ec-alberta-services .cs-header-actions{justify-content:flex-start;margin-top:14px}#ec-alberta-services .cs-header-actions button{font-size:12px}#ec-alberta-services .cs-topics{gap:4px;margin-bottom:24px}#ec-alberta-services .cs-topics button{flex:1;font-size:12px;line-height:1.3;padding:8px 5px}#ec-alberta-services .cs-workspace{display:flex;flex-direction:column;gap:24px}#ec-alberta-services .cs-assumptions{padding:20px 0 0;border-left:0;border-top:1px solid #d2dacb}#ec-alberta-services .cs-assumptions h3{margin-bottom:18px}#ec-alberta-services .cs-intro{font-size:14px;margin-bottom:18px}#ec-alberta-services .capacity-simulator h3{font-size:21px}#ec-alberta-services .cs-outcome{display:block;padding-top:18px}#ec-alberta-services .cs-outcome>div{margin-top:14px}#ec-alberta-services .cs-outcome strong{font-size:35px}#ec-alberta-services .cs-outcome span{max-width:180px}#ec-alberta-services .cs-control{margin-bottom:18px}#ec-alberta-services .cs-control input[type=range]{min-height:36px}#ec-alberta-services .cs-evidence .context-dialog-content{padding:16px}#ec-alberta-services .cs-evidence .context-dialog-content>header{gap:12px}#ec-alberta-services .cs-evidence h2{font-size:23px}#ec-alberta-services .cs-chart text{font-size:11px}}
+@media(max-width:360px){#ec-alberta-services .capacity-simulator h2{font-size:25px}#ec-alberta-services .cs-topics button{font-size:11px}#ec-alberta-services .cs-control label{font-size:12px;gap:7px}#ec-alberta-services .cs-outcome span{max-width:155px}}
+@media(max-height:560px) and (min-width:621px){#ec-alberta-services .cs-workspace{grid-template-columns:minmax(0,1.3fr) minmax(220px,1fr);gap:22px}#ec-alberta-services .capacity-simulator{padding-top:16px}#ec-alberta-services .cs-heading{margin-bottom:16px}#ec-alberta-services .cs-topics{margin-bottom:22px}#ec-alberta-services .cs-control{margin-bottom:16px}}
+@media(prefers-reduced-motion:reduce){#ec-alberta-services .capacity-simulator *{transition:none!important;scroll-behavior:auto!important}}
